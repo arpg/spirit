@@ -1,14 +1,15 @@
-# waypointer
-waypointer is a library to create waypoints for an MPC controller in order to follow
+# spirit
+spirit is a library to control a non-holonomic vehicle with a Model-based predictive controller
 
-##Dependencies(WITH_GUI=ON):
-- Eigen
+##Dependencies():
+- Eigen3
 - [Sophus](https://github.com/arpg/Sophus)
 - [Pangolin](https://github.com/arpg/Pangolin)
 - [SceneGraph](https://github.com/arpg/SceneGraph)
+- [CarPlanner](https://github.com/arpg/CarPlanner)
 
-##Commands to clone and install
-- TBD
+##Applications
+- ninja_gui : application to control our custom rc  car
 
 ## Other Instructions:
 - TBD
