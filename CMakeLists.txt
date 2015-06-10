@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.10)
-project(Spirit)
+project(SPIRIT)
 
 if( NOT CMAKE_BUILD_TYPE )
     set(CMAKE_BUILD_TYPE Release)
@@ -24,12 +24,13 @@ find_package(Sophus REQUIRED)
 find_package(Pangolin 0.1 REQUIRED)
 find_package(SceneGraph 0.1 REQUIRED)
 find_package(CarPlanner REQUIRED)
+find_package(Assimp REQUIRED)
 find_package(TINYXML2 REQUIRED)
+
 
 set( _INCLUDE_DIRS
         ${CMAKE_BINARY_DIR}
         ${EIGEN3_INCLUDE_DIR}
-        ${HAL_INCLUDE_DIRS}
         ${Sophus_INCLUDE_DIR}
         ${Pangolin_INCLUDE_DIRS}
         ${SceneGraph_INCLUDE_DIRS}
@@ -38,8 +39,8 @@ set( _INCLUDE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         )
 set( _LIBRARIES
-        ${HAL_LIBRARIES}
-        ${OpenCV2_LIBRARIES}
+        ${EIGEN3_LIBRARIES}
+        ${Sophus_LIBRARIES}
         ${Pangolin_LIBRARIES}
         ${SceneGraph_LIBRARIES}
         ${CarPlanner_LIBRARIES}
@@ -51,7 +52,6 @@ include_directories( ${_INCLUDE_DIRS} )
 
 set( HDRS
         include/spirit/Gui.h
-        include/spirit/Common.h
         )
 set( SRCS
         src/Gui.cpp
@@ -71,7 +71,6 @@ def_library(${LIBRARY_NAME}
 
 export_package( ${PROJECT_NAME}
   TARGETS ${LIBRARY_NAME}
-  LIBRARY ${LIBRARY_NAME}
-  LIBRARIES ${LIBRARY_NAME}
+  LIBRARIES ${_LIBRARIES}
   INCLUDE_DIRS ${_INCLUDE_DIRS}
   )

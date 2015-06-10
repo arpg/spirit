@@ -13,10 +13,15 @@ include_directories(${SceneGraph_INCLUDE_DIRS})
 find_package(GLOG REQUIRED)
 include_directories(${GLOG_INCLUDE_DIRS})
 
+# Find SPIRIT
+find_package(SPIRIT REQUIRED)
+include_directories(${SPIRIT_INCLUDE_DIRS})
+
 add_executable( ${ProjectId} main.cpp)
 target_link_libraries(${ProjectId}
-                            ${Pangolin_LIBRARIES}
-                            ${SceneGraph_LIBRARIES}
-                            ${GLOG_LIBRARIES}
-                            assimp
-                            )
+                      ${SPIRIT_LIBRARIES}
+                      ${Pangolin_LIBRARIES}
+                      ${SceneGraph_LIBRARIES}
+                      ${GLOG_LIBRARIES}
+                      assimp
+                      )

@@ -7,6 +7,7 @@ spirit is a library to control a non-holonomic vehicle with a Model-based predic
 - [Pangolin](https://github.com/arpg/Pangolin)
 - [SceneGraph](https://github.com/arpg/SceneGraph)
 - [CarPlanner](https://github.com/arpg/CarPlanner)
+- GLOG
 
 ##Applications
 - ninja_gui : application to control our custom rc  car
