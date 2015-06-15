@@ -1,14 +1,19 @@
 cmake_minimum_required(VERSION 2.8.10)
-project(SPIRIT)
+project(Spirit)
+set( VERSION 0.1 ) 
 
 if( NOT CMAKE_BUILD_TYPE )
-    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
+
+if(POLICY CMP0042)
+    cmake_policy(SET CMP0042 NEW) # MACOSX_RPATH
+endif()
+
 
 # Include local cmake modules directory.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
-include(def_library)
-include(export_package)
+include(install_package)
 
 # Default flags.
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall") #-DBOOST_NO_CXX11_NUMERIC_LIMITS")
@@ -35,7 +40,6 @@ set( _INCLUDE_DIRS
         ${Pangolin_INCLUDE_DIRS}
         ${SceneGraph_INCLUDE_DIRS}
         ${CarPlanner_INCLUDE_DIRS}
-        ${TINYXML2_INCLUDE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         )
 set( _LIBRARIES
@@ -44,7 +48,6 @@ set( _LIBRARIES
         ${Pangolin_LIBRARIES}
         ${SceneGraph_LIBRARIES}
         ${CarPlanner_LIBRARIES}
-        ${TINYXML2_LIBRARY}
         assimp
         )
 
@@ -52,9 +55,14 @@ include_directories( ${_INCLUDE_DIRS} )
 
 set( HDRS
         include/spirit/Gui.h
+        include/spirit/objects/SpiritAxes.h
+        include/spirit/objects/SpiritWaypoints.h
+        include/spirit/objects/CommonObj.h
         )
 set( SRCS
         src/Gui.cpp
+        src/SpiritAxes.cpp
+        src/SpiritWaypoints.cpp
         )
 
 if(BUILD_APPLICATIONS)
@@ -62,15 +70,19 @@ if(BUILD_APPLICATIONS)
 endif()
 
 set( LIBRARY_NAME ${PROJECT_NAME} )
+string( TOLOWER ${LIBRARY_NAME} LIBRARY_NAME )
 
-def_library(${LIBRARY_NAME}
-  SOURCES ${HDRS} ${SRCS}
-  LINK_LIBS ${_LIBRARIES}
-  PACKAGE ${PROJECT_NAME}
-  )
+add_library( ${LIBRARY_NAME} ${SRCS} ${HDRS} )
+target_link_libraries( ${LIBRARY_NAME} ${_LIBRARIES} )
 
-export_package( ${PROJECT_NAME}
-  TARGETS ${LIBRARY_NAME}
-  LIBRARIES ${_LIBRARIES}
+install_package(
+  PKG_NAME ${PROJECT_NAME}
+  LIB_NAME ${LIBRARY_NAME}
+  VERSION ${VERSION}
+  DESCRIPTION "CarPlanner GUI"
+  #INSTALL_INCLUDE_DIR true
+  DESTINATION ${CMAKE_INSTALL_PREFIX}
   INCLUDE_DIRS ${_INCLUDE_DIRS}
-  )
+  LINK_LIBS ${_LIBRARIES}
+)
+
