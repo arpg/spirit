@@ -1,13 +1,15 @@
 #include <spirit/Gui.h>
 
 SpiritGui::SpiritGui()
-    : glrenderstate_(
+    : axes_(glgraph_),
+      waypoints_(glgraph_),
+      groundmesh_(glgraph_),
+      cars_(groundmesh_.GetCollisionShape()),
+      glrenderstate_(
           pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
                                      WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.01,
                                      1000),
-          pangolin::ModelViewLookAt(5, 5, 5, 0, 0, 0, pangolin::AxisZ)),
-      axes_(glgraph_),
-      waypoints_(glgraph_) {
+          pangolin::ModelViewLookAt(5, 5, 5, 0, 0, 0, pangolin::AxisZ)) {
   pangolin::CreateWindowAndBind("Main", WINDOW_WIDTH, WINDOW_HEIGHT);
   SceneGraph::GLSceneGraph::ApplyPreferredGlSettings();
   glClearColor(0, 0, 0, 0);
@@ -17,7 +19,7 @@ SpiritGui::SpiritGui()
   glgrid_ = new SceneGraph::GLGrid(10, 1, true);
   glgraph_.AddChild(glgrid_);
   handler_sg_ = new SceneGraph::HandlerSceneGraph(glgraph_, glrenderstate_,
-                                                  pangolin::AxisZ);
+                                                  pangolin::AxisZ,0.01f);
   view3d_.SetBounds(0.0, 1.0, 0.0, 1.0, -(double)WINDOW_WIDTH / WINDOW_HEIGHT)
       .SetHandler(handler_sg_)
       .SetDrawFunction(
@@ -26,17 +28,10 @@ SpiritGui::SpiritGui()
   pangolin::DisplayBase().AddDisplay(view3d_);
 }
 
-SpiritGui::~SpiritGui() {}
-
-void SpiritGui::AddGroundMesh(std::string file_name) {
-  const aiScene* pScene = aiImportFile(
-      file_name.c_str(),
-      aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-          aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
-          aiProcess_FindInvalidData | aiProcess_FixInfacingNormals);
-  glgroundmesh_.Init(pScene);
-  glgroundmesh_.SetSelectable(true);
-  glgraph_.AddChild(&glgroundmesh_);
+SpiritGui::~SpiritGui() {
+  delete gllight_;
+  delete glgrid_;
+  delete handler_sg_;
 }
 
 bool SpiritGui::Render(void) {

@@ -1,0 +1,86 @@
+#include <spirit/objects/SpiritStaticTerrain.h>
+
+SpiritStaticTerrain::SpiritStaticTerrain(SceneGraph::GLSceneGraph& graph)
+    : glgraph_(&graph) {
+  collision_shape_ = NULL;
+}
+
+SpiritStaticTerrain::~SpiritStaticTerrain() {
+  delete pScene;
+  delete glgraph_;
+  delete collision_shape_;
+  delete glshadowlight_;
+  delete glstaticlight_;
+
+}
+
+void SpiritStaticTerrain::SetMeshFilePath(std::string file_name) {
+  mesh_file_path = file_name;
+}
+
+int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
+// TODO(sina) : addobj sometime crashes, there is a problem with pointers.
+//              when disabling globj part the other part works and vs.
+
+  if (mesh_file_path.empty()) {
+    std::cerr << "Meshfile path has not been specified."
+                  " specify it by calling SetMeshFilePath()"<< std::endl;
+    return -1;
+  }
+  // create and add scenegraph object
+  pScene = aiImportFile(
+      mesh_file_path.c_str(),
+      aiProcess_Triangulate | aiProcess_GenSmoothNormals |
+          aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
+          aiProcess_FindInvalidData | aiProcess_FixInfacingNormals);
+
+  // Create collision shape
+  pScene->mRootNode->mTransformation =
+      aiMatrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
+  glmesh_.Init(pScene);
+  glmesh_.SetAlpha(1.0);
+  glmesh_.SetPose(T_w_a);
+  glgraph_->AddChild(&glmesh_);
+  //add the lights
+  glgraph_->ApplyPreferredGlSettings();
+  glClearColor(0,0,0,0);
+  glshadowlight_ = new SceneGraph::GLShadowLight(100,100,-100,1024,1024);
+  glstaticlight_ = new SceneGraph::GLShadowLight(100,100,-100,4096,4096);
+  glshadowlight_->SetShadowsEnabled(false);
+  glstaticlight_->SetShadowsEnabled(false);
+  glshadowlight_->AddShadowReceiver(&glmesh_);
+  glstaticlight_->AddShadowCasterAndReceiver(&glmesh_);
+  CheckForGLErrors();
+  glstaticlight_->SetAmbient(Eigen::Vector4f(0.1,0.1,0.1,1.0));
+  glstaticlight_->SetDiffuse(Eigen::Vector4f(0.4,0.4,0.4,1.0));
+  glshadowlight_->SetAmbient(Eigen::Vector4f(0.1,0.1,0.1,1.0));
+  glshadowlight_->SetDiffuse(Eigen::Vector4f(0.4,0.4,0.4,1.0));
+  glgraph_->AddChild(glstaticlight_);
+  glgraph_->AddChild(glshadowlight_);
+
+  // Using pTriangleMesh and the terrain mesh, fill in the gaps to create a
+  // static hull.
+  BulletCarModel::GenerateStaticHull(pScene, pScene->mRootNode,
+                                     pScene->mRootNode->mTransformation, 1.0,
+                                     triangle_mesh_, dMin_, dMax_);
+  // Generate the collision shape from the triangle mesh --- to know where the
+  // ground is.
+  collision_shape_ = new btBvhTriangleMeshShape(&triangle_mesh_, true, true);
+
+  return 1;
+}
+
+int SpiritStaticTerrain::NumOfObjs() {
+  return 1;
+}
+
+int SpiritStaticTerrain::DelObj(int objnum) {
+  glgraph_->RemoveChild(&glmesh_);
+  return 0;
+}
+
+btCollisionShape* SpiritStaticTerrain::GetCollisionShape() {
+  if (collision_shape_ != NULL)
+    return collision_shape_;
+}

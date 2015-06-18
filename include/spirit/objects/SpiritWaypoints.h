@@ -19,8 +19,7 @@ class SpiritWaypoints : public SpiritCommonObj {
   SceneGraph::GLSceneGraph* glgraph_;
 
   // vector of objects
-  std::deque<std::unique_ptr<SceneGraph::GLWayPoint>> vec_;
-  std::deque<std::unique_ptr<SceneGraph::GLWayPoint>>::iterator it_;
+  std::vector<std::unique_ptr<SceneGraph::GLWayPoint>> vec_;
 
   // waypoint properties
   SceneGraph::GLWayPoint test_waypoint_;

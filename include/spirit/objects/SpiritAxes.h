@@ -19,8 +19,7 @@ class SpiritAxes : public SpiritCommonObj {
   SceneGraph::GLSceneGraph* glgraph_;
 
   // vector of objects
-  std::deque<std::unique_ptr<SceneGraph::GLAxis>> vec_;
-  std::deque<std::unique_ptr<SceneGraph::GLAxis>>::iterator it_;
+  std::vector<std::unique_ptr<SceneGraph::GLAxis>> vec_;
 
   // Axis properties
   float axis_scale_;

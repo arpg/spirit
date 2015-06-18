@@ -58,11 +58,15 @@ set( HDRS
         include/spirit/objects/SpiritAxes.h
         include/spirit/objects/SpiritWaypoints.h
         include/spirit/objects/CommonObj.h
+        include/spirit/objects/SpiritStaticTerrain.h
+        include/spirit/objects/SpiritCars.h
         )
 set( SRCS
         src/Gui.cpp
         src/SpiritAxes.cpp
         src/SpiritWaypoints.cpp
+        src/SpiritStaticTerrain.cpp
+        src/SpiritCars.cpp
         )
 
 if(BUILD_APPLICATIONS)

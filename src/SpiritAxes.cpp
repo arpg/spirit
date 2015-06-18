@@ -19,9 +19,8 @@ int SpiritAxes::AddObj(Eigen::Vector6d T_w_a) {
 
 int SpiritAxes::DelObj(int axis_num) {
   if (axis_num < vec_.size()) {
-    it_ = vec_.begin();
-    glgraph_->RemoveChild(it_[axis_num].get());
-    vec_.erase(it_ + axis_num);
+    glgraph_->RemoveChild(vec_[axis_num].get());
+    vec_.erase(vec_.begin() + axis_num);
     return vec_.size();
   } else {
     std::cerr << " - Requested object to delete does not exist." << std::endl;

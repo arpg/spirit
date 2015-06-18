@@ -3,6 +3,7 @@
 
 #include <glog/logging.h>
 #include <spirit/Gui.h>
+#include <thread>
 #include <chrono>
 
 DEFINE_string(file, "", "Specify File Path");
@@ -21,7 +22,10 @@ int main(int argc, char** argv) {
   SpiritGui ninja_gui;
 
   // add a ground mesh to gui
-  ninja_gui.AddGroundMesh(FLAGS_file.c_str());
+  Eigen::Vector6d mesh_pose;
+  mesh_pose << 0,0,0,0,0,0;
+  ninja_gui.groundmesh_.SetMeshFilePath(FLAGS_file.c_str());
+  ninja_gui.groundmesh_.AddObj(mesh_pose);
 
   // add some axis
   for(int i=1 ; i<=5 ; i++) {
