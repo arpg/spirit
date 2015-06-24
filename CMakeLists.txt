@@ -60,6 +60,7 @@ set( HDRS
         include/spirit/objects/CommonObj.h
         include/spirit/objects/SpiritStaticTerrain.h
         include/spirit/objects/SpiritCars.h
+        include/spirit/objects/GLCar.h
         )
 set( SRCS
         src/Gui.cpp

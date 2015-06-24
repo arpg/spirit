@@ -4,7 +4,7 @@ SpiritGui::SpiritGui()
     : axes_(glgraph_),
       waypoints_(glgraph_),
       groundmesh_(glgraph_),
-      cars_(groundmesh_.GetCollisionShape()),
+      cars_(glgraph_),
       glrenderstate_(
           pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
                                      WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.01,

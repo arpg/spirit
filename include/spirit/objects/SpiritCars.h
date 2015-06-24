@@ -3,20 +3,38 @@
 
 #include <CarPlanner/LocalPlanner.h>
 #include <spirit/objects/CommonObj.h>
+#include <spirit/objects/GLCar.h>
+#include <mutex>
 
-class SpiritCars : public SpiritCommonObj{
- public:
-  SpiritCars(btCollisionShape* col_shape);
-  ~SpiritCars();
-
-  int AddObj(Eigen::Vector6d T_w_a);
-  int NumOfObjs();
-  int DelObj(int objnum);
-
- private:
-  std::vector<std::unique_ptr<BulletCarModel>> vec_;
-  btCollisionShape* collision_shape_;
-  CarParameterMap default_parametes_;
+struct SpiritCar {
+  BulletCarModel bulletcar;
+  GLCar glcar;
+  SceneGraph::GLAxis glaxis;
+  CarParameters params;
+  SceneGraph::GLCachedPrimitives carlinesegments;
 };
 
-#endif    //SPIRIT_CAR_H_
+class SpiritCars : public SpiritCommonObj {
+ public:
+  SpiritCars(SceneGraph::GLSceneGraph& graph);
+  ~SpiritCars();
+
+  int AddObj(Eigen::Vector6d T_w_c);
+  int NumOfObjs();
+  int DelObj(int obj_num);
+  void InitCarParams(std::string params_file_str);
+  void InitializeMap(btCollisionShape* col_shape);
+  void SetCarState(const int& id, const VehicleState& state,
+                   bool bAddToTrajectory /* = false */);
+  void SetCarVisibility(const int &id, const bool &bVisible);
+
+ private:
+  // glgraph to be updated
+  SceneGraph::GLSceneGraph* glgraph_;
+
+  std::vector<std::unique_ptr<SpiritCar>> vec_;
+  btCollisionShape* collision_shape_;
+  CarParameterMap default_params_map_;
+};
+
+#endif  // SPIRIT_CAR_H_

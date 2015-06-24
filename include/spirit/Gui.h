@@ -25,8 +25,11 @@ class SpiritGui {
 
   SpiritAxes axes_;
   SpiritWaypoints waypoints_;
+  // create the ground mesh
   SpiritStaticTerrain groundmesh_;
+  // Initialize the collision shape for the car
   SpiritCars cars_;
+
 
 
  private:

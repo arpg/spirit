@@ -2,7 +2,7 @@
 
 SpiritStaticTerrain::SpiritStaticTerrain(SceneGraph::GLSceneGraph& graph)
     : glgraph_(&graph) {
-  collision_shape_ = NULL;
+  collision_shape_ = nullptr;
 }
 
 SpiritStaticTerrain::~SpiritStaticTerrain() {
@@ -11,7 +11,6 @@ SpiritStaticTerrain::~SpiritStaticTerrain() {
   delete collision_shape_;
   delete glshadowlight_;
   delete glstaticlight_;
-
 }
 
 void SpiritStaticTerrain::SetMeshFilePath(std::string file_name) {
@@ -19,12 +18,12 @@ void SpiritStaticTerrain::SetMeshFilePath(std::string file_name) {
 }
 
 int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
-// TODO(sina) : addobj sometime crashes, there is a problem with pointers.
-//              when disabling globj part the other part works and vs.
+  // TODO(sina) : addobj sometime crashes, there is a problem with pointers.
+  //              when disabling globj part the other part works and vs.
 
   if (mesh_file_path.empty()) {
     std::cerr << "Meshfile path has not been specified."
-                  " specify it by calling SetMeshFilePath()"<< std::endl;
+                 " specify it by calling SetMeshFilePath()" << std::endl;
     return -1;
   }
   // create and add scenegraph object
@@ -34,6 +33,11 @@ int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
           aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
           aiProcess_FindInvalidData | aiProcess_FixInfacingNormals);
 
+  if(pScene == NULL) {
+    throw SceneGraph::GLMeshException("unable to load mesh");
+    return -1;
+  }
+
   // Create collision shape
   pScene->mRootNode->mTransformation =
       aiMatrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -42,20 +46,20 @@ int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
   glmesh_.SetAlpha(1.0);
   glmesh_.SetPose(T_w_a);
   glgraph_->AddChild(&glmesh_);
-  //add the lights
+  // add the lights
   glgraph_->ApplyPreferredGlSettings();
-  glClearColor(0,0,0,0);
-  glshadowlight_ = new SceneGraph::GLShadowLight(100,100,-100,1024,1024);
-  glstaticlight_ = new SceneGraph::GLShadowLight(100,100,-100,4096,4096);
+  glClearColor(0, 0, 0, 0);
+  glshadowlight_ = new SceneGraph::GLShadowLight(100, 100, -100, 1024, 1024);
+  glstaticlight_ = new SceneGraph::GLShadowLight(100, 100, -100, 4096, 4096);
   glshadowlight_->SetShadowsEnabled(false);
   glstaticlight_->SetShadowsEnabled(false);
   glshadowlight_->AddShadowReceiver(&glmesh_);
   glstaticlight_->AddShadowCasterAndReceiver(&glmesh_);
   CheckForGLErrors();
-  glstaticlight_->SetAmbient(Eigen::Vector4f(0.1,0.1,0.1,1.0));
-  glstaticlight_->SetDiffuse(Eigen::Vector4f(0.4,0.4,0.4,1.0));
-  glshadowlight_->SetAmbient(Eigen::Vector4f(0.1,0.1,0.1,1.0));
-  glshadowlight_->SetDiffuse(Eigen::Vector4f(0.4,0.4,0.4,1.0));
+  glstaticlight_->SetAmbient(Eigen::Vector4f(0.1, 0.1, 0.1, 1.0));
+  glstaticlight_->SetDiffuse(Eigen::Vector4f(0.4, 0.4, 0.4, 1.0));
+  glshadowlight_->SetAmbient(Eigen::Vector4f(0.1, 0.1, 0.1, 1.0));
+  glshadowlight_->SetDiffuse(Eigen::Vector4f(0.4, 0.4, 0.4, 1.0));
   glgraph_->AddChild(glstaticlight_);
   glgraph_->AddChild(glshadowlight_);
 
@@ -71,9 +75,7 @@ int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
   return 1;
 }
 
-int SpiritStaticTerrain::NumOfObjs() {
-  return 1;
-}
+int SpiritStaticTerrain::NumOfObjs() { return 1; }
 
 int SpiritStaticTerrain::DelObj(int objnum) {
   glgraph_->RemoveChild(&glmesh_);
@@ -81,6 +83,10 @@ int SpiritStaticTerrain::DelObj(int objnum) {
 }
 
 btCollisionShape* SpiritStaticTerrain::GetCollisionShape() {
-  if (collision_shape_ != NULL)
+  if (collision_shape_ != nullptr) {
     return collision_shape_;
+  } else {
+    std::cerr << "Error : collision shape has not been set"
+              << std::endl;
+  }
 }

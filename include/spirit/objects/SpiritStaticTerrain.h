@@ -16,7 +16,7 @@ class SpiritStaticTerrain : public SpiritCommonObj {
   void SetMeshFilePath(std::string file_name);
   btCollisionShape* GetCollisionShape();
 
- private:
+private:
   // glgraph to be updated
   SceneGraph::GLSceneGraph* glgraph_;
 
