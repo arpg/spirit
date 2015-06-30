@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 
+// Define glog variables
 DEFINE_string(file, "", "Specify File Path");
 DEFINE_int32(verbosity, 2,
              "verbositylevel of node (the lower the less verbose)");
@@ -27,11 +28,31 @@ int main(int argc, char** argv) {
   ninja_gui.groundmesh_.SetMeshFilePath(FLAGS_file.c_str());
   ninja_gui.groundmesh_.AddObj(mesh_pose);
 
+  // add some axis
+  for (int i = 1; i <= 5; i++) {
+    Eigen::Vector6d axis_pose;
+    axis_pose << i, 1, 1, 0, 0, 0;
+    ninja_gui.axes_.AddObj(axis_pose);
+  }
+
+  // remove the last axis
+  ninja_gui.axes_.DelObj(ninja_gui.axes_.NumOfObjs() - 1);
+
+  // add some waypoints
+  for (int i = 1; i <= 5; i++) {
+    Eigen::Vector6d waypoint_pose;
+    waypoint_pose << 0, i, 1, 0, 0, 0;
+    ninja_gui.waypoints_.AddObj(waypoint_pose);
+  }
+
+  // remove the last waypoint
+  ninja_gui.waypoints_.DelObj(ninja_gui.waypoints_.NumOfObjs() - 1);
+
   // Add a car
   ninja_gui.cars_.InitCarParams(
       "/Users/Sina/rpg/spirit/parameter_files/gui_params.csv");
   ninja_gui.cars_.InitializeMap(ninja_gui.groundmesh_.GetCollisionShape());
-  for (int i = 1; i <= 2; i++) {
+  for (int i = 1; i <= 5; i++) {
     Eigen::Vector6d car_pose;
     car_pose << -1, 0, i, 0, 0, 0;
     ninja_gui.cars_.AddObj(car_pose);

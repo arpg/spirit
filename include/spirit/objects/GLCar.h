@@ -8,13 +8,14 @@
 
 enum GLCarDrawType { eTriangle = 1, eMesh = 2 };
 
+// TODO: create glwheel and glchassis files instead of glcar
 class GLCar : public SceneGraph::GLMesh {
  public:
   GLCar() {
     m_sObjectName = "Car";
     m_bPerceptable = false;
   }
-
+  // TODO: remove hardcoded mesh pathes
   void Init(GLCarDrawType eCarDrawType,
             std::string bodyMeshName = "../../../meshes/herbie.ply") {
     car_draw_type_ = eCarDrawType;

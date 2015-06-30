@@ -1,6 +1,8 @@
 #include <spirit/objects/SpiritCars.h>
 
-SpiritCars::SpiritCars(SceneGraph::GLSceneGraph &graph) : glgraph_(&graph) {}
+SpiritCars::SpiritCars(SceneGraph::GLSceneGraph &graph) : glgraph_(&graph) {
+  num_of_worlds_ = 1;
+}
 
 SpiritCars::~SpiritCars() {
   delete glgraph_;
@@ -15,9 +17,17 @@ int SpiritCars::AddObj(Eigen::Vector6d T_w_c) {
   }
 
   std::unique_ptr<SpiritCar> new_car(new SpiritCar);
-  int num_of_worlds = 1;
-  new_car->bulletcar.Init(collision_shape_, dMin_, dMax_, default_params_map_,
-                          num_of_worlds);
+  // Initialize both the terrain and car in bullet
+
+  VehicleState state;
+  // set initial pose of the car
+  state.m_dTwv = Sophus::SE3d(SceneGraph::GLCart2T(T_w_c));
+
+  new_car->physicscar.Init(collision_shape_, dMin_, dMax_, default_params_map_,
+                          num_of_worlds_);
+//  BulletCarModel tmp;
+//  tmp.SetState();
+  new_car->physicscar.SetState(num_of_worlds_-1,state);
   new_car->glcar.Init(eMesh);
   new_car->glcar.SetCarScale(
       Eigen::Vector3d(default_params_map_[CarParameters::WheelBase],
@@ -31,13 +41,11 @@ int SpiritCars::AddObj(Eigen::Vector6d T_w_c) {
   for (size_t ii = 0; ii < vec_.back()->glcar.GetWheels().size(); ii++) {
     glgraph_->AddChild(vec_.back()->glcar.GetWheels()[ii]);
   }
-  VehicleState state;
-  // set initial pose of the car
-  state.m_dTwv = Sophus::SE3d(SceneGraph::GLCart2T(T_w_c));
   // get cars current wheels state and update them
-  state.UpdateWheels(vec_.back()->bulletcar.GetWheelTransforms(0));
+  state.UpdateWheels(vec_.back()->physicscar.GetWheelTransforms(0));
   // update cars state
   this->SetCarState(vec_.size() - 1, state, false);
+
   return vec_.size();
 }
 
@@ -46,6 +54,9 @@ int SpiritCars::NumOfObjs() { return vec_.size(); }
 int SpiritCars::DelObj(int car_num) {
   if (car_num < vec_.size()) {
     glgraph_->RemoveChild(&vec_[car_num]->glcar);
+    for (size_t ii = 0; ii < vec_.back()->glcar.GetWheels().size(); ii++) {
+      glgraph_->RemoveChild(vec_[car_num]->glcar.GetWheels()[ii]);
+    }
     vec_.erase(vec_.begin() + car_num);
     return vec_.size();
   } else {
@@ -90,5 +101,19 @@ void SpiritCars::SetCarVisibility(const int &id, const bool &bVisible) {
   vec_[id]->glcar.SetVisible(bVisible);
   for (size_t ii = 0; ii < vec_[id]->glcar.GetWheels().size(); ii++) {
     vec_[id]->glcar.GetWheels()[ii]->SetVisible(bVisible);
+  }
+}
+
+void SpiritCars::UpdateGuiFromPhysics(const int& world_id) {
+  VehicleState state;
+  for (size_t ii=0; ii<vec_.size(); ii++) {
+    //   update opengl state with physics state
+    ControlCommand cmd;
+    cmd.m_dForce = 0.5;
+    cmd.m_dT = 0.5;
+    vec_[ii]->physicscar.UpdateState(0,cmd,1,true,true);
+    vec_[ii]->physicscar.GetVehicleState(world_id,state);
+    state.UpdateWheels(vec_[ii]->physicscar.GetWheelTransforms(0));
+    this->SetCarState(ii, state, false);
   }
 }

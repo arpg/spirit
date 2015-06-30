@@ -7,7 +7,7 @@
 #include <mutex>
 
 struct SpiritCar {
-  BulletCarModel bulletcar;
+  BulletCarModel physicscar;
   GLCar glcar;
   SceneGraph::GLAxis glaxis;
   CarParameters params;
@@ -26,7 +26,8 @@ class SpiritCars : public SpiritCommonObj {
   void InitializeMap(btCollisionShape* col_shape);
   void SetCarState(const int& id, const VehicleState& state,
                    bool bAddToTrajectory /* = false */);
-  void SetCarVisibility(const int &id, const bool &bVisible);
+  void SetCarVisibility(const int& id, const bool& bVisible);
+  void UpdateGuiFromPhysics(const int& world_id);
 
  private:
   // glgraph to be updated
@@ -35,6 +36,7 @@ class SpiritCars : public SpiritCommonObj {
   std::vector<std::unique_ptr<SpiritCar>> vec_;
   btCollisionShape* collision_shape_;
   CarParameterMap default_params_map_;
+  int num_of_worlds_;
 };
 
 #endif  // SPIRIT_CAR_H_
