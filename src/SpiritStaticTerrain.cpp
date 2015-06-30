@@ -1,7 +1,9 @@
 #include <spirit/objects/SpiritStaticTerrain.h>
 
 SpiritStaticTerrain::SpiritStaticTerrain(SceneGraph::GLSceneGraph& graph)
-    : glgraph_(&graph) {
+    : glgraph_(&graph),
+      // green color is (0.4f,0.5f,0.4f)
+      mesh_color_(SceneGraph::GLColor(1.0f,1.0f,1.0f)){
   collision_shape_ = nullptr;
 }
 
@@ -43,7 +45,7 @@ int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
       aiMatrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
   glmesh_.Init(pScene);
-  glmesh_.SetAlpha(1.0);
+  glmesh_.SetMeshColor(mesh_color_);
   glmesh_.SetPose(T_w_a);
   glgraph_->AddChild(&glmesh_);
   // add the lights

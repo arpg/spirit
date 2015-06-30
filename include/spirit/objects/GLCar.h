@@ -25,7 +25,8 @@ class GLCar : public SceneGraph::GLMesh {
       body_mesh_name_ = bodyMeshName;
     }
     // Set the color of the car, if we are without textures.
-    color_ = SceneGraph::GLColor(1.0f, 1.0f, 1.0f);
+    chasiscolor_ = SceneGraph::GLColor(1.0f,0.4f,0.4f);
+    tirecolor_ = SceneGraph::GLColor(0.2f, 0.2f, 0.2f);
 
     // only if the body isn't a triangle, load the meshes
     if (car_draw_type_ != eTriangle) {
@@ -59,6 +60,7 @@ class GLCar : public SceneGraph::GLMesh {
       wheels_vec_.resize(4);
       for (size_t i = 0; i < wheels_vec_.size(); i++) {
         wheels_vec_[i] = new GLMesh();
+        wheels_vec_[i]->SetMeshColor(tirecolor_);
         wheels_vec_[i]->Init(pWheelMesh);
         // m_vWheels[i]->SetScale(m_fScale*0.75);
       }
@@ -67,7 +69,7 @@ class GLCar : public SceneGraph::GLMesh {
 
   void DrawCanonicalObject() {
     if (car_draw_type_ == eTriangle) {
-      glColor4f(color_.r, color_.g, color_.b, color_.a);
+      SetMeshColor(chasiscolor_);
       glBegin(GL_TRIANGLES);
       //            glVertex3d(m_fScale, 0, 0);
       //            glVertex3d(-m_fScale, -m_fScale / 2, 0);
@@ -76,10 +78,11 @@ class GLCar : public SceneGraph::GLMesh {
     } else {
       // glScaled(m_dScale(0),m_dSc ale(1),m_dScale(2));
       // Set the color now if there are no textures.
-      glColor4f(color_.r, color_.g, color_.b, color_.a);
+//      glColor4f(color_.r, color_.g, color_.b, color_.a);
+      SetMeshColor(chasiscolor_);
       GLMesh::DrawCanonicalObject();
     }
-    glColor4f(1.0, 1.0, 1.0, 1.0);
+//    glColor4f(1.0, 1.0, 1.0, 1.0);
   }
 
   void SetRelativeWheelPose(const unsigned int& id, const Sophus::SE3d& pose) {
@@ -88,7 +91,8 @@ class GLCar : public SceneGraph::GLMesh {
     }
   }
 
-  void SetColor(SceneGraph::GLColor C) { color_ = C; }
+  void SetChasisColor(SceneGraph::GLColor C) { chasiscolor_ = C; }
+  void SetTireColor(SceneGraph::GLColor C) { tirecolor_ = C; }
 
   void SetCarScale(Eigen::Vector3d scale) {
     GLMesh::SetScale(scale);
@@ -104,7 +108,8 @@ class GLCar : public SceneGraph::GLMesh {
   Eigen::Matrix4d pose_;
 
   // control scale of car
-  SceneGraph::GLColor color_;
+  SceneGraph::GLColor chasiscolor_;
+  SceneGraph::GLColor tirecolor_;
   std::string body_mesh_name_;
   std::vector<GLMesh*> wheels_vec_;
   GLCarDrawType car_draw_type_;

@@ -25,6 +25,7 @@ private:
   std::string mesh_file_path;
   const aiScene* pScene;
   SceneGraph::GLMesh glmesh_;
+  SceneGraph::GLColor mesh_color_;
   btTriangleMesh triangle_mesh_;
   btCollisionShape* collision_shape_;
   SceneGraph::GLShadowLight *glshadowlight_;
