@@ -5,6 +5,7 @@
 #include <spirit/Gui.h>
 #include <thread>
 #include <chrono>
+#include <math.h>
 
 DEFINE_string(file, "", "Specify File Path");
 DEFINE_int32(verbosity, 2,
@@ -21,6 +22,11 @@ int main(int argc, char** argv) {
   // Initialize a spirit gui
   SpiritGui ninja_gui;
 
+  // add a axis frame
+  Eigen::Vector6d axis_pose;
+  axis_pose << 0, 0, 0, 0, 0, 0;
+  ninja_gui.axes_.AddObj(axis_pose);
+
   // add a ground mesh to gui
   Eigen::Vector6d mesh_pose;
   mesh_pose << 0, 0, 0, 0, 0, 0;
@@ -31,17 +37,17 @@ int main(int argc, char** argv) {
   ninja_gui.cars_.InitCarParams(
       "/Users/Sina/rpg/spirit/parameter_files/gui_params.csv");
   ninja_gui.cars_.InitializeMap(ninja_gui.groundmesh_.GetCollisionShape());
-  for (int i = 1; i <= 2; i++) {
-    Eigen::Vector6d car_pose;
-    car_pose << -1, 0, i, 0, 0, 0;
-    ninja_gui.cars_.AddObj(car_pose);
-    ninja_gui.cars_.SetCarVisibility(i - 1, true);
-  }
-  ninja_gui.cars_.DelObj(ninja_gui.cars_.NumOfObjs() - 1);
-
+  Eigen::Vector6d car_pose;
+  car_pose << -3.5, 0, -1, 0, 0, 0;
+  ninja_gui.cars_.AddObj(car_pose);
+  ninja_gui.cars_.SetCarVisibility(0, true);
+  bool flag = true;
   while (ninja_gui.Render()) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 50));
-    ninja_gui.cars_.UpdateGuiFromPhysics(0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    if (flag) {
+      ninja_gui.cars_.UpdateVisualsFromPhysics(0);
+//      flag = false;
+    }
   }
 
   return 0;

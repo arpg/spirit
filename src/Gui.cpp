@@ -9,17 +9,17 @@ SpiritGui::SpiritGui()
           pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
                                      WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.01,
                                      1000),
-          pangolin::ModelViewLookAt(5, 5, 5, 0, 0, 0, pangolin::AxisZ)) {
+          pangolin::ModelViewLookAt(-5, -5, -5, 0, 0, 0, pangolin::AxisNegZ)) {
   pangolin::CreateWindowAndBind("Main", WINDOW_WIDTH, WINDOW_HEIGHT);
   SceneGraph::GLSceneGraph::ApplyPreferredGlSettings();
   glClearColor(0, 0, 0, 0);
   glewInit();
-  gllight_ = new SceneGraph::GLLight(10, 10, -100);
+  gllight_ = new SceneGraph::GLLight(0, 0, -0.1);
   glgraph_.AddChild(gllight_);
   glgrid_ = new SceneGraph::GLGrid(10, 1, true);
   glgraph_.AddChild(glgrid_);
   handler_sg_ = new SceneGraph::HandlerSceneGraph(glgraph_, glrenderstate_,
-                                                  pangolin::AxisZ,0.01f);
+                                                  pangolin::AxisNegZ,0.01f);
   view3d_.SetBounds(0.0, 1.0, 0.0, 1.0, -(double)WINDOW_WIDTH / WINDOW_HEIGHT)
       .SetHandler(handler_sg_)
       .SetDrawFunction(

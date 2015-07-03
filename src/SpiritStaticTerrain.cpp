@@ -3,7 +3,7 @@
 SpiritStaticTerrain::SpiritStaticTerrain(SceneGraph::GLSceneGraph& graph)
     : glgraph_(&graph),
       // green color is (0.4f,0.5f,0.4f)
-      mesh_color_(SceneGraph::GLColor(1.0f,1.0f,1.0f)){
+      mesh_color_(SceneGraph::GLColor(1.0f, 1.0f, 1.0f)) {
   collision_shape_ = nullptr;
 }
 
@@ -35,15 +35,15 @@ int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
           aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
           aiProcess_FindInvalidData | aiProcess_FixInfacingNormals);
 
-  if(pScene == NULL) {
+  if (pScene == NULL) {
     throw SceneGraph::GLMeshException("unable to load mesh");
     return -1;
   }
 
   // Create collision shape
   pScene->mRootNode->mTransformation =
-      aiMatrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-
+//      aiMatrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+      aiMatrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1);
   glmesh_.Init(pScene);
   glmesh_.SetMeshColor(mesh_color_);
   glmesh_.SetPose(T_w_a);
@@ -57,7 +57,6 @@ int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
   glstaticlight_->SetShadowsEnabled(false);
   glshadowlight_->AddShadowReceiver(&glmesh_);
   glstaticlight_->AddShadowCasterAndReceiver(&glmesh_);
-  CheckForGLErrors();
   glstaticlight_->SetAmbient(Eigen::Vector4f(0.1, 0.1, 0.1, 1.0));
   glstaticlight_->SetDiffuse(Eigen::Vector4f(0.4, 0.4, 0.4, 1.0));
   glshadowlight_->SetAmbient(Eigen::Vector4f(0.1, 0.1, 0.1, 1.0));
@@ -88,7 +87,6 @@ btCollisionShape* SpiritStaticTerrain::GetCollisionShape() {
   if (collision_shape_ != nullptr) {
     return collision_shape_;
   } else {
-    std::cerr << "Error : collision shape has not been set"
-              << std::endl;
+    std::cerr << "Error : collision shape has not been set" << std::endl;
   }
 }

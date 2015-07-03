@@ -24,10 +24,11 @@ int SpiritCars::AddObj(Eigen::Vector6d T_w_c) {
   state.m_dTwv = Sophus::SE3d(SceneGraph::GLCart2T(T_w_c));
 
   new_car->physicscar.Init(collision_shape_, dMin_, dMax_, default_params_map_,
-                          num_of_worlds_);
-//  BulletCarModel tmp;
-//  tmp.SetState();
-  new_car->physicscar.SetState(num_of_worlds_-1,state);
+                           num_of_worlds_);
+  //    BulletCarModel tmp;
+  new_car->physicscar._InternalUpdateParameters(
+      new_car->physicscar.GetWorldInstance(0));
+  new_car->physicscar.SetState(0, state);
   new_car->glcar.Init(eMesh);
   new_car->glcar.SetCarScale(
       Eigen::Vector3d(default_params_map_[CarParameters::WheelBase],
@@ -45,6 +46,8 @@ int SpiritCars::AddObj(Eigen::Vector6d T_w_c) {
   state.UpdateWheels(vec_.back()->physicscar.GetWheelTransforms(0));
   // update cars state
   this->SetCarState(vec_.size() - 1, state, false);
+  // Initialize tick time
+  vec_.back()->tic_time = CarPlanner::Tic();
 
   return vec_.size();
 }
@@ -104,16 +107,26 @@ void SpiritCars::SetCarVisibility(const int &id, const bool &bVisible) {
   }
 }
 
-void SpiritCars::UpdateGuiFromPhysics(const int& world_id) {
+void SpiritCars::UpdateVisualsFromPhysics(const int &world_id) {
   VehicleState state;
-  for (size_t ii=0; ii<vec_.size(); ii++) {
+  for (size_t ii = 0; ii < vec_.size(); ii++) {
     //   update opengl state with physics state
     ControlCommand cmd;
-    cmd.m_dForce = 0.5;
-    cmd.m_dT = 0.5;
-    vec_[ii]->physicscar.UpdateState(0,cmd,1,true,true);
-    vec_[ii]->physicscar.GetVehicleState(world_id,state);
-    state.UpdateWheels(vec_[ii]->physicscar.GetWheelTransforms(0));
+    // this is the time that simulator would be simulated
+    cmd.m_dT = 0.01;
+    cmd.m_dPhi = -0.45;
+//    cmd.m_dT = CarPlanner::Toc(vec_[ii]->tic_time);
+//    vec_[ii]->tic_time = CarPlanner::Tic();
+//    std::cout << "time is : " << vec_[ii]->tic_time << std::endl;
+    // this is some kind of normal foce when car hits ground
+    cmd.m_dForce = 0;
+    // dunno what Phi is ...
+    cmd.m_dPhi = 0;
+    vec_[ii]->physicscar.GetTotalGravityForce(
+        vec_[ii]->physicscar.GetWorldInstance(0));
+    vec_[ii]->physicscar.UpdateState(0, cmd, cmd.m_dT, true, false);
+    vec_[ii]->physicscar.GetVehicleState(world_id, state);
+    //state.UpdateWheels(vec_[ii]->physicscar.GetWheelTransforms(0));
     this->SetCarState(ii, state, false);
   }
 }

@@ -12,6 +12,7 @@ struct SpiritCar {
   SceneGraph::GLAxis glaxis;
   CarParameters params;
   SceneGraph::GLCachedPrimitives carlinesegments;
+  double tic_time;
 };
 
 class SpiritCars : public SpiritCommonObj {
@@ -27,7 +28,7 @@ class SpiritCars : public SpiritCommonObj {
   void SetCarState(const int& id, const VehicleState& state,
                    bool bAddToTrajectory /* = false */);
   void SetCarVisibility(const int& id, const bool& bVisible);
-  void UpdateGuiFromPhysics(const int& world_id);
+  void UpdateVisualsFromPhysics(const int& world_id);
 
  private:
   // glgraph to be updated

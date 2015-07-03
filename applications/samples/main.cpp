@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 
   while (ninja_gui.Render()) {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 50));
-    ninja_gui.cars_.UpdateGuiFromPhysics(0);
+    ninja_gui.cars_.UpdateVisualsFromPhysics(0);
   }
 
   return 0;
