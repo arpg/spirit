@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
       "/Users/Sina/rpg/spirit/parameter_files/gui_params.csv");
   ninja_gui.cars_.InitializeMap(ninja_gui.groundmesh_.GetCollisionShape());
   Eigen::Vector6d car_pose;
-  car_pose << -3.5, 0, -1, 0, 0, 0;
+  car_pose << -3.5, 0.9, -1, 0, 0, -0.25;
   ninja_gui.cars_.AddObj(car_pose);
   ninja_gui.cars_.SetCarVisibility(0, true);
   bool flag = true;

@@ -34,6 +34,7 @@ class SpiritCars : public SpiritCommonObj {
   // glgraph to be updated
   SceneGraph::GLSceneGraph* glgraph_;
 
+  ControlCommand cmd_;
   std::vector<std::unique_ptr<SpiritCar>> vec_;
   btCollisionShape* collision_shape_;
   CarParameterMap default_params_map_;

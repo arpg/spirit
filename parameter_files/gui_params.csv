@@ -20,7 +20,7 @@ RollInfluence,1.000000000
 SteeringCoef,-1.50000000
 MaxSteering,0.700000000
 MaxSteeringRate,13.000000000
-AccelOffset,0.0000000
+AccelOffset,-0.1600000
 SteeringOffset,0.000000
 StallTorqueCoef,0.13000000
 TorqueSpeedSlope,1.268540000
