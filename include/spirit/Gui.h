@@ -30,6 +30,8 @@ class SpiritGui {
   // Initialize the collision shape for the car
   SpiritCars cars_;
 
+  void StartThreads();
+
  private:
   // GUI variables
   SceneGraph::GLSceneGraph glgraph_;

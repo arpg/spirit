@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-/// This file includes the problems which has been realized during tests, to keep
+/// This file includes the problems which has been realized during tests, to
+/// keep
 /// track of problems and how the have been solved in the code (related code fix
 /// might be followed from github history)
 /*
@@ -13,4 +14,13 @@ car drifts on the mesh very slowly.
 each time running the car It gives different answeres for final position of the
 car.
 
+ - motor torque  distribution between left and right wheels is half and half,
+differential is not veing considered for force distribution.
+
+ - velocity profile for steering wheel velocity is linear
+
+ - engine torque is only used on back wheels and has ben splitted in half
+between left and right wheel(in car planner).
+
+ - unit of engine force and phi angle are not known but scale is in 100s
 */

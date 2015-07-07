@@ -113,17 +113,15 @@ void SpiritCars::UpdateVisualsFromPhysics(const int &world_id) {
     //   update opengl state with physics state
     // this is the time that simulator would be simulated
     cmd_.m_dT = 0.009;
+//    cmd_.m_dT = -1;
 //    cmd_.m_dT = CarPlanner::Toc(vec_[ii]->tic_time);
 //    vec_[ii]->tic_time = CarPlanner::Tic();
 
     // this is the acceleration torque
-    cmd_.m_dForce = 0;
+    cmd_.m_dForce = 100;
     // This is steering angle
-    cmd_.m_dPhi = 10;
-
-    vec_[ii]->physicscar.GetTotalGravityForce(
-        vec_[ii]->physicscar.GetWorldInstance(0));
-    vec_[ii]->physicscar.UpdateState(0, cmd_, cmd_.m_dT, true, false);
+    cmd_.m_dPhi = -0.01;
+    vec_[ii]->physicscar.UpdateState(world_id, cmd_, cmd_.m_dT, true, false);
     vec_[ii]->physicscar.GetVehicleState(world_id, state);
     //state.UpdateWheels(vec_[ii]->physicscar.GetWheelTransforms(0));
     this->SetCarState(ii, state, false);

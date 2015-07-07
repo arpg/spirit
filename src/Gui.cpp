@@ -9,7 +9,7 @@ SpiritGui::SpiritGui()
           pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
                                      WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.01,
                                      1000),
-          pangolin::ModelViewLookAt(-5, -5, -5, 0, 0, 0, pangolin::AxisNegZ)) {
+          pangolin::ModelViewLookAt(-5, 0, -3, 0, 0, 0, pangolin::AxisNegZ)) {
   pangolin::CreateWindowAndBind("Main", WINDOW_WIDTH, WINDOW_HEIGHT);
   SceneGraph::GLSceneGraph::ApplyPreferredGlSettings();
   glClearColor(0, 0, 0, 0);
@@ -41,4 +41,9 @@ bool SpiritGui::Render(void) {
     return true;
   }
   return false;
+}
+
+void SpiritGui::StartThreads()
+{
+
 }
