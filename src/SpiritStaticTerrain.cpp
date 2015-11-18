@@ -1,5 +1,7 @@
 #include <spirit/objects/SpiritStaticTerrain.h>
 
+DEFINE_string(mesh, "", "Defines the mesh of the environment.");
+
 SpiritStaticTerrain::SpiritStaticTerrain(SceneGraph::GLSceneGraph& graph)
     : glgraph_(&graph),
       // green color is (0.4f,0.5f,0.4f)
@@ -15,22 +17,22 @@ SpiritStaticTerrain::~SpiritStaticTerrain() {
   delete glstaticlight_;
 }
 
-void SpiritStaticTerrain::SetMeshFilePath(std::string file_name) {
-  mesh_file_path = file_name;
+void SpiritStaticTerrain::SetMeshFilePath() {
+  mesh_file_path = FLAGS_mesh;
 }
 
 int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
   // TODO(sina) : addobj sometime crashes, there is a problem with pointers.
   //              when disabling globj part the other part works and vs.
 
-  if (mesh_file_path.empty()) {
+  if (FLAGS_mesh.empty()) {
     std::cerr << "Meshfile path has not been specified."
                  " specify it by calling SetMeshFilePath()" << std::endl;
     return -1;
   }
   // create and add scenegraph object
   pScene = aiImportFile(
-      mesh_file_path.c_str(),
+      FLAGS_mesh.c_str(),
       aiProcess_Triangulate | aiProcess_GenSmoothNormals |
           aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
           aiProcess_FindInvalidData | aiProcess_FixInfacingNormals);

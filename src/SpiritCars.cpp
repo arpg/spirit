@@ -1,5 +1,10 @@
 #include <spirit/objects/SpiritCars.h>
 
+DEFINE_string(params, "", "Parameters for the car.");
+DEFINE_string(car, "", "Mesh file for the car.");
+DEFINE_string(wheel, "", "Mesh file for the wheel.");
+
+
 SpiritCars::SpiritCars(SceneGraph::GLSceneGraph &graph) : glgraph_(&graph) {
   num_of_worlds_ = 1;
 }
@@ -72,8 +77,8 @@ void SpiritCars::InitializeMap(btCollisionShape *col_shape) {
   collision_shape_ = col_shape;
 }
 
-void SpiritCars::InitCarParams(std::string params_file_str) {
-  CarParameters::LoadFromFile(params_file_str, default_params_map_);
+void SpiritCars::InitCarParams() {
+  CarParameters::LoadFromFile(FLAGS_params, default_params_map_);
 }
 
 void SpiritCars::SetCarState(const int &id, const VehicleState &state,

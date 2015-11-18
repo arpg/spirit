@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
   // add a ground mesh to gui
   Eigen::Vector6d mesh_pose;
   mesh_pose << 0, 0, 0, 0, 0, 0;
-  ninja_gui.groundmesh_.SetMeshFilePath(FLAGS_file.c_str());
+  ninja_gui.groundmesh_.SetMeshFilePath();
   ninja_gui.groundmesh_.AddObj(mesh_pose);
 
   // add some axis
@@ -49,8 +49,7 @@ int main(int argc, char** argv) {
   ninja_gui.waypoints_.DelObj(ninja_gui.waypoints_.NumOfObjs() - 1);
 
   // Add a car
-  ninja_gui.cars_.InitCarParams(
-      "/Users/Sina/rpg/spirit/parameter_files/gui_params.csv");
+  ninja_gui.cars_.InitCarParams();
   ninja_gui.cars_.InitializeMap(ninja_gui.groundmesh_.GetCollisionShape());
   for (int i = 1; i <= 5; i++) {
     Eigen::Vector6d car_pose;

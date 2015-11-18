@@ -13,7 +13,6 @@
 #define UI_PANEL_WIDTH 200
 #define UI_PANEL_HEIGHT WINDOW_HEIGHT
 
-
 class SpiritGui {
  public:
 

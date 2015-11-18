@@ -1,10 +1,16 @@
 #ifndef GL_CAR_H_
 #define GL_CAR_H_
 
+#include <gflags/gflags.h>
+
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 #include <sophus/se3.hpp>
 #include <SceneGraph/SceneGraph.h>
+
+DECLARE_string(params);
+DECLARE_string(car);
+DECLARE_string(wheel);
 
 enum GLCarDrawType { eTriangle = 1, eMesh = 2 };
 
@@ -15,15 +21,11 @@ class GLCar : public SceneGraph::GLMesh {
     m_sObjectName = "Car";
     m_bPerceptable = false;
   }
-  // TODO: remove hardcoded mesh pathes
-  void Init(GLCarDrawType eCarDrawType,
-            std::string bodyMeshName = "../../../meshes/herbie.ply") {
+
+  void Init(GLCarDrawType eCarDrawType ) {
     car_draw_type_ = eCarDrawType;
-    if(bodyMeshName.empty()) {
-      body_mesh_name_ = "../../../meshes/herbie.ply";
-    } else {
-      body_mesh_name_ = bodyMeshName;
-    }
+    body_mesh_name_ = FLAGS_car;
+    wheel_mesh_name_ = FLAGS_wheel;
     // Set the color of the car, if we are without textures.
     chasiscolor_ = SceneGraph::GLColor(1.0f,0.4f,0.4f);
     tirecolor_ = SceneGraph::GLColor(0.2f, 0.2f, 0.2f);
@@ -33,8 +35,7 @@ class GLCar : public SceneGraph::GLMesh {
       // initialize the body mesh
       const aiScene* pBodyMesh;
       // SetObjectName("mesh");
-      pBodyMesh = aiImportFile(
-          "/Users/Sina/rpg/spirit/meshes/herbie.ply",
+      pBodyMesh = aiImportFile(body_mesh_name_.c_str(),
           aiProcess_Triangulate | aiProcess_GenSmoothNormals |
               aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
               aiProcess_FindInvalidData | aiProcess_FixInfacingNormals);
@@ -50,7 +51,7 @@ class GLCar : public SceneGraph::GLMesh {
       const aiScene* pWheelMesh;
 
       pWheelMesh =
-          aiImportFile("/Users/Sina/rpg/spirit/meshes/wheel.ply",
+          aiImportFile(wheel_mesh_name_.c_str(),
                        aiProcess_Triangulate | aiProcess_GenSmoothNormals);
       if (pWheelMesh == NULL) {
         throw SceneGraph::GLMeshException("Unable to load mesh.");
@@ -111,6 +112,7 @@ class GLCar : public SceneGraph::GLMesh {
   SceneGraph::GLColor chasiscolor_;
   SceneGraph::GLColor tirecolor_;
   std::string body_mesh_name_;
+  std::string wheel_mesh_name_;
   std::vector<GLMesh*> wheels_vec_;
   GLCarDrawType car_draw_type_;
 };

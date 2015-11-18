@@ -5,6 +5,8 @@
 #include <assimp/postprocess.h>
 #include <spirit/objects/CommonObj.h>
 
+DECLARE_string(mesh);
+
 class SpiritStaticTerrain : public SpiritCommonObj {
  public:
   SpiritStaticTerrain(SceneGraph::GLSceneGraph& graph);
@@ -13,7 +15,7 @@ class SpiritStaticTerrain : public SpiritCommonObj {
   int AddObj(Eigen::Vector6d T_w_a);
   int NumOfObjs();
   int DelObj(int objnum);
-  void SetMeshFilePath(std::string file_name);
+  void SetMeshFilePath();
   btCollisionShape* GetCollisionShape();
 
 private:

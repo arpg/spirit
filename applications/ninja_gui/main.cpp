@@ -1,23 +1,30 @@
-/// Sample Ccommandline Argument
-// ./ninja_gui --file=/Users/Sina/rpg/datasets/meshes/lab.ply
-
+#include <gflags/gflags.h>
 #include <glog/logging.h>
+
 #include <spirit/Gui.h>
 #include <thread>
 #include <chrono>
 #include <math.h>
 
-DEFINE_string(file, "", "Specify File Path");
 DEFINE_int32(verbosity, 2,
              "verbositylevel of node (the lower the less verbose)");
 
-int main(int argc, char** argv) {
+static const char* g_usage =
+"Examples: \n\n"
+" ninja_gui -mesh /home/user/data/environment_mesh.ply -params /home/user/data/car_params.csv" ;
+
+int main(int argc, char *argv[]) {
   // Read commandline args
-  google::SetUsageMessage(
-      "this is a massage to show how to use the code or"
-      " info about the program.");
-  google::ParseCommandLineFlags(&argc, &argv, true);
+  if( argc == 1 ) {
+    google::SetUsageMessage(g_usage);
+    google::ShowUsageWithFlags(argv[0]);
+    return -1;
+  }
+
   google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
+
+  LOG(INFO) << "Starting NinjaGui.";
 
   // Initialize a spirit gui
   SpiritGui ninja_gui;
@@ -30,12 +37,14 @@ int main(int argc, char** argv) {
   // add a ground mesh to gui
   Eigen::Vector6d mesh_pose;
   mesh_pose << 0, 0, 0, 0, 0, 0;
-  ninja_gui.groundmesh_.SetMeshFilePath(FLAGS_file.c_str());
+
+  LOG(INFO) << "Loading mesh file.";
+  ninja_gui.groundmesh_.SetMeshFilePath();
   ninja_gui.groundmesh_.AddObj(mesh_pose);
 
   // Add a car
-  ninja_gui.cars_.InitCarParams(
-      "/Users/Sina/rpg/spirit/parameter_files/gui_params.csv");
+  LOG(INFO) << "Loading car parameters.";
+  ninja_gui.cars_.InitCarParams();
   ninja_gui.cars_.InitializeMap(ninja_gui.groundmesh_.GetCollisionShape());
   Eigen::Vector6d car_pose;
   car_pose << -3.5, 0.9, -1, 0, 0, -0.3;

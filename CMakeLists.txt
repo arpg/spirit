@@ -31,6 +31,8 @@ find_package(SceneGraph 0.1 REQUIRED)
 find_package(CarPlanner REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(TINYXML2 REQUIRED)
+find_package(GLog REQUIRED)
+find_package(GFlags REQUIRED)
 
 set( _INCLUDE_DIRS
         ${CMAKE_BINARY_DIR}
@@ -40,8 +42,11 @@ set( _INCLUDE_DIRS
         ${SceneGraph_INCLUDE_DIRS}
         ${CarPlanner_INCLUDE_DIRS}
         ${ASSIMP_INCLUDE_DIRS}
+        ${GFLags_INCLUDE_DIRS}
+        ${GLog_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         )
+
 set( _LIBRARIES
         ${EIGEN3_LIBRARIES}
         ${Sophus_LIBRARIES}
@@ -49,6 +54,8 @@ set( _LIBRARIES
         ${SceneGraph_LIBRARIES}
         ${CarPlanner_LIBRARIES}
         ${ASSIMP_LIBRARIES}
+        ${GFlags_LIBRARIES}
+        ${GLog_LIBRARIES}
         )
 
 include_directories( ${_INCLUDE_DIRS} )
@@ -73,7 +80,7 @@ set( SRCS
 set( LIBRARY_NAME ${PROJECT_NAME} )
 string( TOLOWER ${LIBRARY_NAME} LIBRARY_NAME )
 
-add_library( ${LIBRARY_NAME} ${SRCS} ${HDRS} )
+add_library( ${LIBRARY_NAME} SHARED ${SRCS} ${HDRS} )
 target_link_libraries( ${LIBRARY_NAME} ${_LIBRARIES} )
 
 install_package(

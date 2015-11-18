@@ -4,7 +4,7 @@
 #include <CarPlanner/LocalPlanner.h>
 #include <spirit/objects/CommonObj.h>
 #include <spirit/objects/GLCar.h>
-#include <mutex>
+
 
 struct SpiritCar {
   BulletCarModel physicscar;
@@ -23,7 +23,7 @@ class SpiritCars : public SpiritCommonObj {
   int AddObj(Eigen::Vector6d T_w_c);
   int NumOfObjs();
   int DelObj(int obj_num);
-  void InitCarParams(std::string params_file_str);
+  void InitCarParams();
   void InitializeMap(btCollisionShape* col_shape);
   void SetCarState(const int& id, const VehicleState& state,
                    bool bAddToTrajectory /* = false */);
