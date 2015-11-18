@@ -1,5 +1,6 @@
 #include <spirit/Gui.h>
 
+//////////////////////////////////////////////////////////////////////////
 SpiritGui::SpiritGui()
     : axes_(glgraph_),
       waypoints_(glgraph_),
@@ -28,12 +29,14 @@ SpiritGui::SpiritGui()
   pangolin::DisplayBase().AddDisplay(view3d_);
 }
 
+//////////////////////////////////////////////////////////////////////////
 SpiritGui::~SpiritGui() {
   delete gllight_;
   delete glgrid_;
   delete handler_sg_;
 }
 
+//////////////////////////////////////////////////////////////////////////
 bool SpiritGui::Render(void) {
   if (!pangolin::ShouldQuit()) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -43,6 +46,7 @@ bool SpiritGui::Render(void) {
   return false;
 }
 
+//////////////////////////////////////////////////////////////////////////
 void SpiritGui::StartThreads()
 {
 

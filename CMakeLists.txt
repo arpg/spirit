@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.10)
 project(Spirit)
-set( VERSION 0.1 ) 
+set( VERSION 0.1 )
 
 if( NOT CMAKE_BUILD_TYPE )
-    set(CMAKE_BUILD_TYPE RelWithDebInfo)
+    set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 if(POLICY CMP0042)
@@ -32,7 +32,6 @@ find_package(CarPlanner REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(TINYXML2 REQUIRED)
 
-
 set( _INCLUDE_DIRS
         ${CMAKE_BINARY_DIR}
         ${EIGEN3_INCLUDE_DIR}
@@ -40,6 +39,7 @@ set( _INCLUDE_DIRS
         ${Pangolin_INCLUDE_DIRS}
         ${SceneGraph_INCLUDE_DIRS}
         ${CarPlanner_INCLUDE_DIRS}
+        ${ASSIMP_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         )
 set( _LIBRARIES
@@ -48,7 +48,7 @@ set( _LIBRARIES
         ${Pangolin_LIBRARIES}
         ${SceneGraph_LIBRARIES}
         ${CarPlanner_LIBRARIES}
-        assimp
+        ${ASSIMP_LIBRARIES}
         )
 
 include_directories( ${_INCLUDE_DIRS} )
@@ -70,10 +70,6 @@ set( SRCS
         src/SpiritCars.cpp
         )
 
-if(BUILD_APPLICATIONS)
-  add_subdirectory( applications )
-endif()
-
 set( LIBRARY_NAME ${PROJECT_NAME} )
 string( TOLOWER ${LIBRARY_NAME} LIBRARY_NAME )
 
@@ -90,4 +86,18 @@ install_package(
   INCLUDE_DIRS ${_INCLUDE_DIRS}
   LINK_LIBS ${_LIBRARIES}
 )
+
+if(BUILD_APPLICATIONS)
+  set(Spirit_LIBRARIES ${_LIBRARIES} spirit )
+  set(Spirit_INCLUDE_DIRS ${_INCLUDE_DIRS} )
+  set(Spirit_DIR ${CMAKE_CURRENT_BINARY_DIR} )
+  add_subdirectory( applications )
+endif()
+
+########################################
+include( ${CMAKE_MODULE_PATH}/cmake_uninstall.cmake.in)
+
+add_custom_target(uninstall
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+
 
