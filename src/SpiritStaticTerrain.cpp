@@ -10,7 +10,7 @@ SpiritStaticTerrain::SpiritStaticTerrain(SceneGraph::GLSceneGraph& graph)
 }
 
 SpiritStaticTerrain::~SpiritStaticTerrain() {
-  delete pScene;
+  delete scene_;
   delete glgraph_;
   delete collision_shape_;
   delete glshadowlight_;
@@ -25,28 +25,7 @@ int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
   // TODO(sina) : addobj sometime crashes, there is a problem with pointers.
   //              when disabling globj part the other part works and vs.
 
-  if (FLAGS_mesh.empty()) {
-    std::cerr << "Meshfile path has not been specified."
-                 " specify it by calling SetMeshFilePath()" << std::endl;
-    return -1;
-  }
-  // create and add scenegraph object
-  pScene = aiImportFile(
-      FLAGS_mesh.c_str(),
-      aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-          aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
-          aiProcess_FindInvalidData | aiProcess_FixInfacingNormals);
-
-  if (pScene == NULL) {
-    throw SceneGraph::GLMeshException("unable to load mesh");
-    return -1;
-  }
-
-  // Create collision shape
-  pScene->mRootNode->mTransformation =
-//      aiMatrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-      aiMatrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1);
-  glmesh_.Init(pScene);
+  glmesh_.Init(scene_);
   glmesh_.SetMeshColor(mesh_color_);
   glmesh_.SetPose(T_w_a);
   glgraph_->AddChild(&glmesh_);
@@ -66,15 +45,6 @@ int SpiritStaticTerrain::AddObj(Eigen::Vector6d T_w_a) {
   glgraph_->AddChild(glstaticlight_);
   glgraph_->AddChild(glshadowlight_);
 
-  // Using pTriangleMesh and the terrain mesh, fill in the gaps to create a
-  // static hull.
-  BulletCarModel::GenerateStaticHull(pScene, pScene->mRootNode,
-                                     pScene->mRootNode->mTransformation, 1.0,
-                                     triangle_mesh_, dMin_, dMax_);
-  // Generate the collision shape from the triangle mesh --- to know where the
-  // ground is.
-  collision_shape_ = new btBvhTriangleMeshShape(&triangle_mesh_, true, true);
-
   return 1;
 }
 
@@ -89,6 +59,41 @@ btCollisionShape* SpiritStaticTerrain::GetCollisionShape() {
   if (collision_shape_ != nullptr) {
     return collision_shape_;
   } else {
-    std::cerr << "Error : collision shape has not been set" << std::endl;
+    LOG(ERROR) << "Error : collision shape has not been set";
+    return nullptr;
   }
+}
+
+int SpiritStaticTerrain::ImportResources() {
+  /// First import into bullet.
+  if (FLAGS_mesh.empty()) {
+    LOG(ERROR) << "Meshfile path has not been specified."
+                  " specify it by calling SetMeshFilePath()";
+    return -1;
+  }
+
+  // create and add scenegraph object
+  scene_ = aiImportFile( FLAGS_mesh.c_str(),
+                         aiProcess_Triangulate | aiProcess_GenSmoothNormals |
+                         aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
+                         aiProcess_FindInvalidData | aiProcess_FixInfacingNormals);
+
+  if (scene_ == NULL) {
+    throw SceneGraph::GLMeshException("unable to load mesh");
+    return -1;
+  }
+  // Create collision shape
+  scene_->mRootNode->mTransformation =
+      aiMatrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1);
+
+  // Using pTriangleMesh and the terrain mesh, fill in the gaps to create a
+  // static hull.
+  BulletCarModel::GenerateStaticHull(scene_, scene_->mRootNode,
+                                     scene_->mRootNode->mTransformation, 1.0,
+                                     triangle_mesh_, dMin_, dMax_);
+  // Generate the collision shape from the triangle mesh --- to know where the
+  // ground is.
+  collision_shape_ = new btBvhTriangleMeshShape(&triangle_mesh_, true, true);
+
+  return 0;
 }

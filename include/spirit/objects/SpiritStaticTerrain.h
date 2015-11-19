@@ -18,7 +18,13 @@ class SpiritStaticTerrain : public SpiritCommonObj {
   void SetMeshFilePath();
   btCollisionShape* GetCollisionShape();
 
-  void Clear() { for(size_t ii = 0; ii < NumOfObjs() ; ii++ ) { DelObj(ii); } }
+  int ImportResources();
+
+  void Clear() {
+    for(size_t ii = 0; ii < NumOfObjs() ; ii++ ) {
+      DelObj(ii);
+    };
+  }
 
 
 private:
@@ -28,7 +34,7 @@ private:
   btVector3 dMin_;
   btVector3 dMax_;
   std::string mesh_file_path;
-  const aiScene* pScene;
+  const aiScene* scene_;
   SceneGraph::GLMesh glmesh_;
   SceneGraph::GLColor mesh_color_;
   btTriangleMesh triangle_mesh_;

@@ -16,10 +16,7 @@ SpiritGui::SpiritGui() :
   SceneGraph::GLSceneGraph::ApplyPreferredGlSettings();
   glClearColor(0, 0, 0, 0);
   glewInit();
-  gllight_ = new SceneGraph::GLLight(0, 0, -0.1);
-  glgraph_.AddChild(gllight_);
-  glgrid_ = new SceneGraph::GLGrid(10, 1, true);
-  glgraph_.AddChild(glgrid_);
+
   handler_sg_ = new SceneGraph::HandlerSceneGraph(glgraph_, glrenderstate_,
                                                   pangolin::AxisNegZ,0.01f);
   view3d_.SetBounds(0.0, 1.0, 0.0, 1.0, -(double)WINDOW_WIDTH / WINDOW_HEIGHT)
@@ -27,11 +24,10 @@ SpiritGui::SpiritGui() :
       .SetDrawFunction(
           SceneGraph::ActivateDrawFunctor(glgraph_, glrenderstate_));
 
-  // Add our views as children to the base container.
-  pangolin::DisplayBase().AddDisplay(view3d_);
-
   // Set up keybindings.
   setup_keybindings();
+
+  groundmesh_.ImportResources();
 
   Init();
 
@@ -39,6 +35,14 @@ SpiritGui::SpiritGui() :
 
 //////////////////////////////////////////////////////////////////////////
 void SpiritGui::Init() {
+  gllight_ = new SceneGraph::GLLight(0, 0, -0.1);
+  glgraph_.AddChild(gllight_);
+  glgrid_ = new SceneGraph::GLGrid(10, 1, true);
+  glgraph_.AddChild(glgrid_);
+
+  // Add our views as children to the base container.
+  pangolin::DisplayBase().AddDisplay(view3d_);
+
   /// Build up the necessary components.
   // Add an axis frame
   Eigen::Vector6d axis_pose;
@@ -69,6 +73,9 @@ void SpiritGui::Clear() {
   groundmesh_.Clear();
   axes_.Clear();
   waypoints_.Clear();
+  glgraph_.Clear();
+  delete gllight_;
+  delete glgrid_;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -79,8 +86,8 @@ SpiritGui::~SpiritGui() {
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool SpiritGui::Render(void) {
-  if (!pangolin::ShouldQuit()) {
+bool SpiritGui::Render() {
+  if (!pangolin::ShouldQuit() ) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     pangolin::FinishFrame();
     return true;

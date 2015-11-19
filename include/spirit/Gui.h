@@ -20,8 +20,7 @@ class SpiritGui {
   ~SpiritGui();
 
   // Render a new  frame
-  bool Render(void);
-
+  bool Render();
   void Init();
   void Clear();
 
