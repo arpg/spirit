@@ -29,27 +29,6 @@ int main(int argc, char *argv[]) {
   // Initialize a spirit gui
   SpiritGui ninja_gui;
 
-  // add a axis frame
-  Eigen::Vector6d axis_pose;
-  axis_pose << 0, 0, 0, 0, 0, 0;
-  ninja_gui.axes_.AddObj(axis_pose);
-
-  // add a ground mesh to gui
-  Eigen::Vector6d mesh_pose;
-  mesh_pose << 0, 0, 0, 0, 0, 0;
-
-  LOG(INFO) << "Loading mesh file.";
-  ninja_gui.groundmesh_.SetMeshFilePath();
-  ninja_gui.groundmesh_.AddObj(mesh_pose);
-
-  // Add a car
-  LOG(INFO) << "Loading car parameters.";
-  ninja_gui.cars_.InitCarParams();
-  ninja_gui.cars_.InitializeMap(ninja_gui.groundmesh_.GetCollisionShape());
-  Eigen::Vector6d car_pose;
-  car_pose << -3.5, 0.9, -1, 0, 0, -0.3;
-  ninja_gui.cars_.AddObj(car_pose);
-  ninja_gui.cars_.SetCarVisibility(0, true);
   bool flag = true;
   while (ninja_gui.Render()) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));

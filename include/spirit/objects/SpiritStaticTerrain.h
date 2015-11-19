@@ -18,6 +18,9 @@ class SpiritStaticTerrain : public SpiritCommonObj {
   void SetMeshFilePath();
   btCollisionShape* GetCollisionShape();
 
+  void Clear() { for(size_t ii = 0; ii < NumOfObjs() ; ii++ ) { DelObj(ii); } }
+
+
 private:
   // glgraph to be updated
   SceneGraph::GLSceneGraph* glgraph_;

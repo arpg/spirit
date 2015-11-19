@@ -22,6 +22,9 @@ class SpiritGui {
   // Render a new  frame
   bool Render(void);
 
+  void Init();
+  void Clear();
+
   SpiritAxes axes_;
   SpiritWaypoints waypoints_;
   // create the ground mesh
@@ -32,6 +35,9 @@ class SpiritGui {
   void StartThreads();
 
  private:
+  void reset();
+  void setup_keybindings();
+
   // GUI variables
   SceneGraph::GLSceneGraph glgraph_;
   SceneGraph::GLLight* gllight_;

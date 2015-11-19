@@ -1,16 +1,17 @@
 #include <spirit/Gui.h>
 
 //////////////////////////////////////////////////////////////////////////
-SpiritGui::SpiritGui()
-    : axes_(glgraph_),
-      waypoints_(glgraph_),
-      groundmesh_(glgraph_),
-      cars_(glgraph_),
-      glrenderstate_(
-          pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
-                                     WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.01,
-                                     1000),
-          pangolin::ModelViewLookAt(-5, 0, -3, 0, 0, 0, pangolin::AxisNegZ)) {
+SpiritGui::SpiritGui() :
+  axes_(glgraph_),
+  waypoints_(glgraph_),
+  groundmesh_(glgraph_),
+  cars_(glgraph_),
+  glrenderstate_(
+      pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
+                                 WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.01,
+                                 1000),
+      pangolin::ModelViewLookAt(-5, 0, -3, 0, 0, 0, pangolin::AxisNegZ))
+{
   pangolin::CreateWindowAndBind("Main", WINDOW_WIDTH, WINDOW_HEIGHT);
   SceneGraph::GLSceneGraph::ApplyPreferredGlSettings();
   glClearColor(0, 0, 0, 0);
@@ -25,8 +26,49 @@ SpiritGui::SpiritGui()
       .SetHandler(handler_sg_)
       .SetDrawFunction(
           SceneGraph::ActivateDrawFunctor(glgraph_, glrenderstate_));
+
   // Add our views as children to the base container.
   pangolin::DisplayBase().AddDisplay(view3d_);
+
+  // Set up keybindings.
+  setup_keybindings();
+
+  Init();
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+void SpiritGui::Init() {
+  /// Build up the necessary components.
+  // Add an axis frame
+  Eigen::Vector6d axis_pose;
+  axis_pose << 0, 0, 0, 0, 0, 0;
+  axes_.AddObj(axis_pose);
+
+  // Add a ground mesh to gui
+  Eigen::Vector6d mesh_pose;
+  mesh_pose << 0, 0, 0, 0, 0, 0;
+
+  LOG(INFO) << "Loading mesh file.";
+  groundmesh_.SetMeshFilePath();
+  groundmesh_.AddObj(mesh_pose);
+
+  // Add a car
+  LOG(INFO) << "Loading car parameters.";
+  cars_.InitCarParams();
+  cars_.InitializeMap(groundmesh_.GetCollisionShape());
+  Eigen::Vector6d car_pose;
+  car_pose << -3.5, 0.9, -1, 0, 0, -0.3;
+  cars_.AddObj(car_pose);
+  cars_.SetCarVisibility(0, true);
+}
+
+//////////////////////////////////////////////////////////////////////////
+void SpiritGui::Clear() {
+  cars_.Clear();
+  groundmesh_.Clear();
+  axes_.Clear();
+  waypoints_.Clear();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -50,4 +92,9 @@ bool SpiritGui::Render(void) {
 void SpiritGui::StartThreads()
 {
 
+}
+
+//////////////////////////////////////////////////////////////////////////
+void SpiritGui::setup_keybindings() {
+  pangolin::RegisterKeyPressCallback( pangolin::PANGO_CTRL + 'r', [&] { this->Clear(); this->Init(); } );
 }

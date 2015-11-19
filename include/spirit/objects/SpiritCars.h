@@ -30,6 +30,8 @@ class SpiritCars : public SpiritCommonObj {
   void SetCarVisibility(const int& id, const bool& bVisible);
   void UpdateVisualsFromPhysics(const int& world_id);
 
+  void Clear() { for(size_t ii = 0; ii < NumOfObjs() ; ii++ ) { DelObj(ii); } }
+
  private:
   // glgraph to be updated
   SceneGraph::GLSceneGraph* glgraph_;
