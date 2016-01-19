@@ -13,6 +13,9 @@ include_directories(${SceneGraph_INCLUDE_DIRS})
 find_package(GLOG REQUIRED)
 include_directories(${GLOG_INCLUDE_DIRS})
 
+# Find gflags
+find_package(gflags REQUIRED)
+
 # Find SPIRIT
 find_package(Spirit REQUIRED)
 include_directories(${SPIRIT_INCLUDE_DIRS})
@@ -25,4 +28,5 @@ target_link_libraries(${ProjectId}
                       ${GLOG_LIBRARIES}
                       assimp
                       spirit
-                      )
+                      gflags
+		      )

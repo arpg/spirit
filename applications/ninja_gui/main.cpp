@@ -1,5 +1,5 @@
 /// Sample Ccommandline Argument
-// ./ninja_gui --file=/Users/Sina/rpg/datasets/meshes/lab.ply
+// ./ninja_gui --meshfile=/Users/saghli/code/datasets/meshes/lab.ply
 
 #include <glog/logging.h>
 #include <spirit/Gui.h>
@@ -7,7 +7,8 @@
 #include <chrono>
 #include <math.h>
 
-DEFINE_string(file, "", "Specify File Path");
+DEFINE_string(groundmeshfile, "", "Specify File Path");
+DEFINE_string(paramfile, "", "Specify File Path");
 DEFINE_int32(verbosity, 2,
              "verbositylevel of node (the lower the less verbose)");
 
@@ -30,12 +31,11 @@ int main(int argc, char** argv) {
   // add a ground mesh to gui
   Eigen::Vector6d mesh_pose;
   mesh_pose << 0, 0, 0, 0, 0, 0;
-  ninja_gui.groundmesh_.SetMeshFilePath(FLAGS_file.c_str());
+  ninja_gui.groundmesh_.SetMeshFilePath(FLAGS_groundmeshfile.c_str());
   ninja_gui.groundmesh_.AddObj(mesh_pose);
 
   // Add a car
-  ninja_gui.cars_.InitCarParams(
-      "/Users/Sina/rpg/spirit/parameter_files/gui_params.csv");
+  ninja_gui.cars_.InitCarParams(FLAGS_paramfile.c_str());
   ninja_gui.cars_.InitializeMap(ninja_gui.groundmesh_.GetCollisionShape());
   Eigen::Vector6d car_pose;
   car_pose << -3.5, 0.9, -1, 0, 0, -0.3;

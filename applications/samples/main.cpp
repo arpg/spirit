@@ -7,7 +7,8 @@
 #include <chrono>
 
 // Define glog variables
-DEFINE_string(file, "", "Specify File Path");
+DEFINE_string(meshfile, "", "Specify File Path");
+DEFINE_string(paramfile, "", "Specify File Path");
 DEFINE_int32(verbosity, 2,
              "verbositylevel of node (the lower the less verbose)");
 
@@ -25,7 +26,7 @@ int main(int argc, char** argv) {
   // add a ground mesh to gui
   Eigen::Vector6d mesh_pose;
   mesh_pose << 0, 0, 0, 0, 0, 0;
-  ninja_gui.groundmesh_.SetMeshFilePath(FLAGS_file.c_str());
+  ninja_gui.groundmesh_.SetMeshFilePath(FLAGS_meshfile.c_str());
   ninja_gui.groundmesh_.AddObj(mesh_pose);
 
   // add some axis

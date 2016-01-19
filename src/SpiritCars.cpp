@@ -22,10 +22,10 @@ int SpiritCars::AddObj(Eigen::Vector6d T_w_c) {
   VehicleState state;
   // set initial pose of the car
   state.m_dTwv = Sophus::SE3d(SceneGraph::GLCart2T(T_w_c));
-
+  SpiritCar test;
+  test.physicscar.Init(collision_shape_,dMin_,dMax_,default_params_map_,num_of_worlds_);
   new_car->physicscar.Init(collision_shape_, dMin_, dMax_, default_params_map_,
                            num_of_worlds_);
-  //    BulletCarModel tmp;
   new_car->physicscar._InternalUpdateParameters(
       new_car->physicscar.GetWorldInstance(0));
   new_car->physicscar.SetState(0, state);

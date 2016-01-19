@@ -34,7 +34,7 @@ class GLCar : public SceneGraph::GLMesh {
       const aiScene* pBodyMesh;
       // SetObjectName("mesh");
       pBodyMesh = aiImportFile(
-          "/Users/Sina/rpg/spirit/meshes/herbie.ply",
+          "/Users/saghli/code/spirit/meshes/herbie.ply",
           aiProcess_Triangulate | aiProcess_GenSmoothNormals |
               aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes |
               aiProcess_FindInvalidData | aiProcess_FixInfacingNormals);
@@ -50,7 +50,7 @@ class GLCar : public SceneGraph::GLMesh {
       const aiScene* pWheelMesh;
 
       pWheelMesh =
-          aiImportFile("/Users/Sina/rpg/spirit/meshes/wheel.ply",
+          aiImportFile("/Users/saghli/code/spirit/meshes/wheel.ply",
                        aiProcess_Triangulate | aiProcess_GenSmoothNormals);
       if (pWheelMesh == NULL) {
         throw SceneGraph::GLMeshException("Unable to load mesh.");
