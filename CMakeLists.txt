@@ -24,14 +24,13 @@ ENDIF()
 
 option(BUILD_APPLICATIONS "Build Applications" ON)
 
-find_package(Eigen3 REQUIRED)
-find_package(Sophus REQUIRED)
-find_package(Pangolin 0.1 REQUIRED)
-find_package(SceneGraph 0.1 REQUIRED)
-find_package(CarPlanner REQUIRED)
-find_package(Assimp REQUIRED)
-find_package(TINYXML2 REQUIRED)
-
+find_package( Eigen3 REQUIRED )
+find_package( Sophus REQUIRED )
+find_package( Pangolin 0.1 REQUIRED )
+find_package( SceneGraph 0.1 REQUIRED )
+find_package( CarPlanner REQUIRED )
+find_package( Assimp REQUIRED )
+find_package( TINYXML2 REQUIRED )
 
 set( _INCLUDE_DIRS
         ${CMAKE_BINARY_DIR}

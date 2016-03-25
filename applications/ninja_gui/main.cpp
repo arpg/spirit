@@ -1,5 +1,5 @@
 /// Sample Ccommandline Argument
-// ./ninja_gui --meshfile=/Users/saghli/code/datasets/meshes/lab.ply
+// ./ninja_gui --groundmeshfile=/Users/saghli/code/datasets/meshes/lab.ply --paramfile=/Users/saghli/code/spirit/parameter_files/gui_params.csv
 
 #include <glog/logging.h>
 #include <spirit/Gui.h>

@@ -28,5 +28,5 @@ target_link_libraries(${ProjectId}
                       ${GLog_LIBRARIES}
                       assimp
                       spirit
-		      gflags
+											gflags
                       )

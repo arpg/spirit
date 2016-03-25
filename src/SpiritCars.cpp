@@ -47,7 +47,7 @@ int SpiritCars::AddObj(Eigen::Vector6d T_w_c) {
   // update cars state
   this->SetCarState(vec_.size() - 1, state, false);
   // Initialize tick time
-  vec_.back()->tic_time = CarPlanner::Tic();
+//[fix]  vec_.back()->tic_time = CarPlanner::Tic();
 
   return vec_.size();
 }
