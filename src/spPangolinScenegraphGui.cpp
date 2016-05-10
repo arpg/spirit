@@ -11,7 +11,13 @@ spPangolinScenegraphGui::spPangolinScenegraphGui()
       save_cube_("ui.Save_Cube", false, false),
       record_cube_("ui.Record_Cube", false, false) {}
 
-spPangolinScenegraphGui::~spPangolinScenegraphGui() {}
+spPangolinScenegraphGui::~spPangolinScenegraphGui() {
+  // remove globjects in row
+  for(int ii=globjects_.size()-1 ; ii>=0 ; ii--) {
+    glscenegraph_.RemoveChild(globjects_[ii]);
+    delete(globjects_[ii]);
+  }
+}
 
 void spPangolinScenegraphGui::InitGui() {
   if (!GeneralTools::CheckFileExists(SPIRITGUI_PARAM_FILE)) {
@@ -24,32 +30,51 @@ void spPangolinScenegraphGui::InitGui() {
   // Create OpenGL window in single line
   pangolin::CreateWindowAndBind(SPIRITGUI_WINDOW_NAME, 640, 480);
 
+  SceneGraph::GLSceneGraph::ApplyPreferredGlSettings();
+  glClearColor(0, 0, 0, 0);
+  glewInit();
+
   // 3D Mouse handler requires depth testing to be enabled
   glEnable(GL_DEPTH_TEST);
 
-  s_cam_ = pangolin::OpenGlRenderState(
-      pangolin::ProjectionMatrix(640, 480, 420, 420, 320, 240, 0.1, 1000),
-      pangolin::ModelViewLookAt(-0, 0.5, -3, 0, 0, 0, pangolin::AxisY));
+  glrenderstate_ = pangolin::OpenGlRenderState(
+      pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.1, 1000),
+      pangolin::ModelViewLookAt(10, 10, 10, 0, 0, 0, pangolin::AxisZ));
+
+  handler_scenegraph_ = new SceneGraph::HandlerSceneGraph(glscenegraph_, glrenderstate_,
+                                                  pangolin::AxisZ,0.01f);
 
   // Add named OpenGL viewport to window and provide 3D Handler
-  d_cam_ = pangolin::CreateDisplay()
-              .SetBounds(0.0, 1.0, pangolin::Attach::Pix(UI_WIDTH_), 1.0,
-                         -640.0f / 480.0f)
-              .SetHandler(new pangolin::Handler3D(s_cam_));
+      pangoview_.SetBounds(0.0, 1.0, 0, 1.0, -(double)WINDOW_WIDTH / WINDOW_HEIGHT)
+      .SetHandler(handler_scenegraph_)
+      .SetDrawFunction(SceneGraph::ActivateDrawFunctor(glscenegraph_, glrenderstate_));
+
+
+  // Create Globjects
+  globjects_.push_back(new SceneGraph::GLGrid(10, 1, false));
+  globjects_.push_back(new SceneGraph::GLLight(0, 0, 0));
+
+  // Add already created globjects to glscenegraph_
+  for(int ii=0 ; ii<globjects_.size() ; ii++) {
+    glscenegraph_.AddChild(globjects_[ii]);
+  }
+
+  pangolin::DisplayBase().AddDisplay(pangoview_);
+
 
   // Add named Panel and bind to variables beginning 'ui'
   // A Panel is just a View with a default layout and input handling
   pangolin::CreatePanel("ui")
-      .SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(UI_WIDTH_));
+      .SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(UI_PANEL_WIDTH));
 
-  // Demonstration of how we can register a keyboard hook to alter a Var
+  /// Register Keyboard actions
   pangolin::RegisterKeyPressCallback(
       pangolin::PANGO_CTRL + 'b',
       pangolin::SetVarFunctor<double>("ui.A Double", 3.5));
 
   // Demonstration of how we can register a keyboard hook to trigger a method
   pangolin::RegisterKeyPressCallback(pangolin::PANGO_CTRL + 'r',
-                                     this->SampleMethod);
+                                     this->KeyActionMethodSample);
 }
 
 bool spPangolinScenegraphGui::ShouldQuit() { return (pangolin::ShouldQuit()); }
@@ -59,11 +84,7 @@ void spPangolinScenegraphGui::Refresh() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // Activate efficiently by object
-  d_cam_.Activate(s_cam_);
-
-  // Render some stuff
-  glColor3f(1.0, 1.0, 1.0);
-  pangolin::glDrawColouredCube();
+  pangoview_.Activate(glrenderstate_);
 
   // Swap frames and Process Events
   pangolin::FinishFrame();
@@ -84,7 +105,7 @@ void spPangolinScenegraphGui::CheckKeyboardAction() {
   }
 
   if (pangolin::Pushed(save_cube_)) {
-    d_cam_.SaveOnRender("cube");
+    pangoview_.SaveOnRender("cube");
   }
 
   if (pangolin::Pushed(record_cube_)) {
@@ -93,7 +114,7 @@ void spPangolinScenegraphGui::CheckKeyboardAction() {
   }
 }
 
-void spPangolinScenegraphGui::SampleMethod() {
-  std::cout << "sample Method of spPangolinScenegraph is called ..."
+void spPangolinScenegraphGui::KeyActionMethodSample() {
+  std::cout << "KeyActionMethodSample() method of spPangolinScenegraph is called ..."
             << std::endl;
 }

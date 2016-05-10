@@ -5,6 +5,13 @@
 #include <spirit/Gui/spCommonGui.h>
 #include <pangolin/pangolin.h>
 #include <spirit/GeneralTools.h>
+#include <SceneGraph/SceneGraph.h>
+
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
+
+#define UI_PANEL_WIDTH 200
+#define UI_PANEL_HEIGHT WINDOW_HEIGHT
 
 /// this class is the interface between Pangolin/Scenegraph and spGui
 class spPangolinScenegraphGui : public spCommonGUI {
@@ -18,11 +25,7 @@ class spPangolinScenegraphGui : public spCommonGUI {
   void CheckKeyboardAction();
 
  private:
-  static void SampleMethod();
-
-  pangolin::OpenGlRenderState s_cam_;
-  pangolin::View d_cam_;
-  const int UI_WIDTH_ = 180;
+  static void KeyActionMethodSample();
 
   // Safe and efficient binding of named variables.
   // Specialisations mean no conversions take place for exact types
@@ -36,6 +39,14 @@ class spPangolinScenegraphGui : public spCommonGUI {
   pangolin::Var<bool> save_window_;
   pangolin::Var<bool> save_cube_;
   pangolin::Var<bool> record_cube_;
+
+  pangolin::OpenGlRenderState glrenderstate_;
+  pangolin::View pangoview_;
+  SceneGraph::GLSceneGraph glscenegraph_;
+  SceneGraph::HandlerSceneGraph* handler_scenegraph_;
+  SceneGraph::GLGrid* glgrid_;
+  SceneGraph::GLLight* gllight_;
+  std::vector<SceneGraph::GLObject*> globjects_;
 
 };
 
