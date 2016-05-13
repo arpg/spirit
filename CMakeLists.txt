@@ -22,18 +22,23 @@ IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
 ENDIF()
 
 find_package( Pangolin 0.1 REQUIRED )
+find_package( Bullet REQUIRED )
 find_package( SceneGraph 0.1 REQUIRED )
+find_package( Eigen3 REQUIRED )
 
 
 set( _INCLUDE_DIRS
 	${CMAKE_BINARY_DIR}
 	${Pangolin_INCLUDE_DIRS}
 	${SceneGraph_INCLUDE_DIRS}
+	${BULLET_INCLUDE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	)
 set( _LIBRARIES
 	${Pangolin_LIBRARIES}
 	${SceneGraph_LIBRARIES}
+	${BULLET_LIBRARIES}
+	${EIGEN3_INCLUDE_DIR}
 	)
 
 
@@ -49,8 +54,12 @@ set( HDRS
 	include/spirit/Controllers/spMPC.h
 	include/spirit/Gui/spCommonGui.h
 	include/spirit/Gui/spPangolinScenegraphGui.h
-	include/spirit/Physics/spBulletPhysicsInterface.h
+	include/spirit/Physics/spBulletPhysicsCommon.h
 	include/spirit/Physics/spCommonPhysics.h
+	include/spirit/Physics/spPhysicsWorld.h
+	include/spirit/Physics/spBulletWorld.h
+	include/spirit/Physics/spPhysicsRigidBody.h
+	include/spirit/Physics/spBulletRigidBody.h
 	include/spirit/Planners/spAStar.h
 	include/spirit/Planners/spCommonPlanner.h
 	include/spirit/GeneralTools.h
@@ -64,10 +73,12 @@ set( SRCS
 	src/Planner.cpp
 	src/spMPC.cpp
 	src/spPangolinScenegraphGui.cpp
-	src/spBulletPhysicsInterface.cpp
+	src/spBulletPhysicsCommon.cpp
 	src/spAStar.cpp
 	src/GeneralTools.cpp
 	src/Settings.cpp
+	src/spBulletWorld.cpp
+	src/spBulletRigidBody.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)

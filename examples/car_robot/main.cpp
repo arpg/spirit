@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
 
   while(sp_world.ShouldRun()) {
     sp_world.IterateGraphics();
+    sp_world.CheckKeyboardAction();
   }
   std::cout << "Done ... !" << std::endl;
   return 0;

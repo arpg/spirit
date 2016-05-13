@@ -16,7 +16,9 @@ void World::Create() {
     gui_.reset();
     gui_ = std::make_shared<Gui>();
     gui_->Create(user_settings_->GetGuiType());
-  }  
+  }
+  // add physics world
+
 }
 
 bool World::ShouldRun() {
@@ -29,5 +31,9 @@ bool World::ShouldRun() {
 
 void World::IterateGraphics() {
   gui_->Refresh();
+  gui_->CheckKeyboardAction();
+}
+
+void World::CheckKeyboardAction() {
   gui_->CheckKeyboardAction();
 }

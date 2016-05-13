@@ -14,7 +14,7 @@ public:
   void Create();
   bool ShouldRun();
   void IterateGraphics();
-
+  void CheckKeyboardAction();
 private:
   std::shared_ptr<Gui> gui_;
   std::shared_ptr<Settings> user_settings_;

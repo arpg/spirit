@@ -37,8 +37,6 @@ class spPangolinScenegraphGui : public spCommonGUI {
   pangolin::Var<bool> a_checkbox_;
   pangolin::Var<int> an_int_no_input_;
   pangolin::Var<bool> save_window_;
-  pangolin::Var<bool> save_cube_;
-  pangolin::Var<bool> record_cube_;
 
   pangolin::OpenGlRenderState glrenderstate_;
   pangolin::View pangoview_;

@@ -7,15 +7,13 @@ spPangolinScenegraphGui::spPangolinScenegraphGui()
       a_double_log_("ui.Log_scale var", 3, 1, 1E4, true),
       a_checkbox_("ui.A_Checkbox", false, true),
       an_int_no_input_("ui.An_Int_No_Input", 2),
-      save_window_("ui.Save_Window", false, false),
-      save_cube_("ui.Save_Cube", false, false),
-      record_cube_("ui.Record_Cube", false, false) {}
+      save_window_("ui.Save_Window", false, false) {}
 
 spPangolinScenegraphGui::~spPangolinScenegraphGui() {
   // remove globjects in row
-  for(int ii=globjects_.size()-1 ; ii>=0 ; ii--) {
+  for (int ii = globjects_.size() - 1; ii >= 0; ii--) {
     glscenegraph_.RemoveChild(globjects_[ii]);
-    delete(globjects_[ii]);
+    delete (globjects_[ii]);
   }
 }
 
@@ -38,35 +36,37 @@ void spPangolinScenegraphGui::InitGui() {
   glEnable(GL_DEPTH_TEST);
 
   glrenderstate_ = pangolin::OpenGlRenderState(
-      pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.1, 1000),
+      pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
+                                 WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.1,
+                                 1000),
       pangolin::ModelViewLookAt(10, 10, 10, 0, 0, 0, pangolin::AxisZ));
 
-  handler_scenegraph_ = new SceneGraph::HandlerSceneGraph(glscenegraph_, glrenderstate_,
-                                                  pangolin::AxisZ,0.01f);
+  handler_scenegraph_ = new SceneGraph::HandlerSceneGraph(
+      glscenegraph_, glrenderstate_, pangolin::AxisZ, 0.01f);
 
   // Add named OpenGL viewport to window and provide 3D Handler
-      pangoview_.SetBounds(0.0, 1.0, 0, 1.0, -(double)WINDOW_WIDTH / WINDOW_HEIGHT)
+  pangoview_.SetBounds(0.0, 1.0, 0, 1.0, -(double)WINDOW_WIDTH / WINDOW_HEIGHT)
       .SetHandler(handler_scenegraph_)
-      .SetDrawFunction(SceneGraph::ActivateDrawFunctor(glscenegraph_, glrenderstate_));
-
+      .SetDrawFunction(
+          SceneGraph::ActivateDrawFunctor(glscenegraph_, glrenderstate_));
 
   // Create Globjects
   globjects_.push_back(new SceneGraph::GLGrid(10, 1, false));
   globjects_.push_back(new SceneGraph::GLLight(0, 0, 0));
 
   // Add already created globjects to glscenegraph_
-  for(int ii=0 ; ii<globjects_.size() ; ii++) {
+  for (int ii = 0; ii < globjects_.size(); ii++) {
     glscenegraph_.AddChild(globjects_[ii]);
   }
 
   pangolin::DisplayBase().AddDisplay(pangoview_);
-
 
   // Add named Panel and bind to variables beginning 'ui'
   // A Panel is just a View with a default layout and input handling
   pangolin::CreatePanel("ui")
       .SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(UI_PANEL_WIDTH));
 
+  //////////////////////////////////////////////////
   /// Register Keyboard actions
   pangolin::RegisterKeyPressCallback(
       pangolin::PANGO_CTRL + 'b',
@@ -104,17 +104,10 @@ void spPangolinScenegraphGui::CheckKeyboardAction() {
     pangolin::SaveWindowOnRender("window");
   }
 
-  if (pangolin::Pushed(save_cube_)) {
-    pangoview_.SaveOnRender("cube");
-  }
-
-  if (pangolin::Pushed(record_cube_)) {
-    pangolin::DisplayBase().RecordOnRender(
-        "ffmpeg:[fps=50,bps=8388608,unique_filename]//screencap.avi");
-  }
 }
 
 void spPangolinScenegraphGui::KeyActionMethodSample() {
-  std::cout << "KeyActionMethodSample() method of spPangolinScenegraph is called ..."
-            << std::endl;
+  std::cout
+      << "KeyActionMethodSample() method of spPangolinScenegraph is called ..."
+      << std::endl;
 }
