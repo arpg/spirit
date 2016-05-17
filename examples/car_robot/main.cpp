@@ -20,6 +20,15 @@ int main(int argc, char** argv) {
 //  google::ParseCommandLineFlags(&argc, &argv, true);
 //  google::InitGoogleLogging(argv[0]);
 
+  Eigen::Transform<double,3,Eigen::Affine> tr(Eigen::Transform<double,3,Eigen::Affine>::Identity());
+  Eigen::AngleAxisd ang(0,Eigen::Vector3d::UnitY());
+  tr.rotate(ang);
+  std::cout << "transform is:\n" << tr.matrix() << std::endl;
+  Eigen::Quaterniond q(tr.rotation());
+  std::cout << "Quaternion is:\n" << q.x()<<" , "<< q.y()<<" , "<< q.z()<<" , " << q.w()<<" , "<< std::endl;
+  std::cout << "rotation matrix is:\n" << q.toRotationMatrix() << std::endl;
+
+  return 0;
 
   spirit::Settings settings_obj;
   settings_obj.SetGuiType(spirit::GUI_PANGOSCENEGRAPH);

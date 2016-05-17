@@ -24,6 +24,9 @@ spBulletWorld::~spBulletWorld() {
     case spPhysolver::MLCP_PROJECTEDGAUSSSEIDEL:
       delete(solver_gseidel_);
       break;
+    case spPhysolver::SEQUENTIAL_IMPULSE:
+      // do nothing
+      break;
   }
   delete(solver_);
   delete(broadphase_);
@@ -84,30 +87,24 @@ bool spBulletWorld::InitEmptyDynamicsWorld() {
   return 1;
 }
 
+int spBulletWorld::AddBox(const spBoxSize& box_size, const double mass, const spPose& pose) {
 
-void spBulletWorld::AddRigidBody(spRigidBodyType& rb_type) {
-}
-
-void spBulletWorld::AddRigidBody(spRigidBodyType rb_type, double mass, const spBoxSize& box_size ,const spPose& pose) {
-  btCollisionShape* shape;
-  switch(rb_type) {
-    case BOX:
-      shape = new btBoxShape(btVector3(box_size[0],box_size[1],box_size[2]));
-      break;
-  }
-
+  btCollisionShape* shape = new btBoxShape(btVector3(box_size[0],box_size[1],box_size[2]));
   collisionShapes_.push_back(shape);
 
   //rigidbody is dynamic if and only if mass is non zero, otherwise static
   bool isDynamic = (mass != 0.f);
 
   btVector3 localInertia(0,0,0);
-  if (isDynamic)
-    shape->calculateLocalInertia(mass,localInertia);
+  if (isDynamic) {
+      // bullet calculates inertia tensor for a cuboid shape (it only has diagonal values).
+      shape->calculateLocalInertia(mass,localInertia);
+  }
 
   btTransform tr;
   tr.setOrigin(btVector3(pose.translation()[0],pose.translation()[1],pose.translation()[2]));
-//  tr.setRotation(btQuaternion(pose.rot));
+  Eigen::Quaterniond q(pose.rotation());
+  tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
   //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
 #ifdef USE_MOTIONSTATE
   btDefaultMotionState* myMotionState = new btDefaultMotionState(tr);
@@ -121,16 +118,45 @@ void spBulletWorld::AddRigidBody(spRigidBodyType rb_type, double mass, const spB
 
 	dynamics_world_->addRigidBody(body);
 
-
+	return body->getUserIndex();
 }
 
+int spBulletWorld::AddSphere(const double& radius, const double& mass, const spPose& pose) {
 
+  btCollisionShape* shape = new btSphereShape(radius);
+  collisionShapes_.push_back(shape);
 
+  //rigidbody is dynamic if and only if mass is non zero, otherwise static
+  bool isDynamic = (mass != 0.f);
 
+  btVector3 localInertia(0,0,0);
+  if (isDynamic) {
+      shape->calculateLocalInertia(mass,localInertia);
+  }
 
+  btTransform tr;
+  tr.setOrigin(btVector3(pose.translation()[0],pose.translation()[1],pose.translation()[2]));
+  Eigen::Quaterniond q(pose.rotation());
+  tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
+  //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+#ifdef USE_MOTIONSTATE
+  btDefaultMotionState* myMotionState = new btDefaultMotionState(tr);
+  btRigidBody::btRigidBodyConstructionInfo cInfo(mass,myMotionState,shape,localInertia);
+  btRigidBody* body = new btRigidBody(cInfo);
+  //body->setContactProcessingThreshold(defaultContactProcessingThreshold_);
+#else
+	btRigidBody* body = new btRigidBody(mass,0,shape,localInertia);
+	body->setWorldTransform(startTransform);
+#endif
 
+	dynamics_world_->addRigidBody(body);
 
+	return body->getUserIndex();
+}
 
+int spBulletWorld::AddCar(const spCarParamseters& car_params, const spPose& pose) {
+
+}
 
 
 

@@ -21,10 +21,13 @@ public:
   ~spBulletWorld();
 
   bool InitEmptyDynamicsWorld();
-  void AddRigidBody(spRigidBodyType& rb_type);
-  void AddRigidBody(spRigidBodyType rb_type, double mass, const spBoxSize& box_size, const spPose& pose);
+  int AddBox(const spBoxSize& box_size, const double mass, const spPose& pose);
+  int AddSphere(const double&  radius, const double& mass, const spPose& pose);
+  int AddCar(const spCarParamseters& car_params, const spPose& pose);
 
 private:
+  int object_counter;
+  void AddRigidBodyToWorld(btCollisionShape* shape);
   BulletWorldParams world_params_;
   btCollisionShape* def_groundShape_;
   btDefaultCollisionConfiguration* collisionConfiguration_;
