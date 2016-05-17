@@ -1,4 +1,0 @@
-#ifndef SP_BULLETRIGIDBODY_H__
-#define SP_BULLETRIGIDBODY_H__
-
-#endif // SP_BULLETRIGIDBODY_H__

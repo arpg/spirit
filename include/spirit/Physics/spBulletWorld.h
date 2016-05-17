@@ -21,9 +21,9 @@ public:
   ~spBulletWorld();
 
   bool InitEmptyDynamicsWorld();
-  int AddBox(const spBoxSize& box_size, const double mass, const spPose& pose);
-  int AddSphere(const double&  radius, const double& mass, const spPose& pose);
-  int AddCar(const spCarParamseters& car_params, const spPose& pose);
+  int AddBox(spBox& box);
+  int AddSphere(spSphere& sphere);
+  int AddCar(spCarParamseters& car_params);
 
 private:
   int object_counter;

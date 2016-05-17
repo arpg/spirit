@@ -2,6 +2,7 @@
 #define WORLD_H__
 
 #include <spirit/Gui.h>
+#include <spirit/Physics.h>
 #include <spirit/Settings.h>
 #include <spirit/GeneralTools.h>
 
@@ -13,11 +14,15 @@ public:
   ~World();
   void Create();
   bool ShouldRun();
-  void IterateGraphics();
+  void IterateWorld();
   void CheckKeyboardAction();
+  void TestWorldBoxFall();
 private:
-  std::shared_ptr<Gui> gui_;
-  std::shared_ptr<Settings> user_settings_;
+  Gui gui_;
+  Settings user_settings_;
+  Physics physics_;
+  void IterateGraphics();
+  void IteratePhysics();
 };
 }
 #endif  //WORLD_H__

@@ -8,9 +8,12 @@ Gui::~Gui(){
 
 }
 
-void Gui::Create(const spirit::spGuiType gui_type) {
+void Gui::Create(const spGuiType gui_type) {
   switch(gui_type) {
-    case spirit::GUI_PANGOSCENEGRAPH:
+    case spGuiType::GUI_NONE:
+      std::cout << "Initializing spirit withoud gui" << std::endl;
+      break;
+    case spGuiType::GUI_PANGOSCENEGRAPH:
       gui_.reset();
       gui_ = std::make_shared<spPangolinScenegraphGui>();
       break;

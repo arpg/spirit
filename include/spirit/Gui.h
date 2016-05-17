@@ -3,13 +3,13 @@
 
 #include <spirit/Gui/spCommonGui.h>
 #include <spirit/Gui/spPangolinScenegraphGui.h>
-#include <spirit/Settings.h>
+#include <spirit/GeneralTools.h>
 
 class Gui {
 public:
   Gui();
   ~Gui();
-  void Create(const spirit::spGuiType gui_type);
+  void Create(const spGuiType gui_type);
   bool ShouldQuit();
   void Refresh();
   void CheckKeyboardAction();

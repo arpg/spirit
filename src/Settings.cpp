@@ -12,10 +12,15 @@ void Settings::SetGuiType(const spGuiType& gui_type) {
   gui_type_ = gui_type;
 }
 
-bool Settings::HasGui() {
-  return (gui_type_ != GUI_NONE);
-}
-
 spGuiType Settings::GetGuiType() {
   return gui_type_;
 }
+
+spPhyEngineType Settings::GetPhysicsEngineType( void ) {
+  return phy_type_;
+}
+
+void Settings::SetPhysicsEngineType(const spPhyEngineType &phy_type) {
+  phy_type_ = phy_type;
+}
+

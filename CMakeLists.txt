@@ -58,8 +58,6 @@ set( HDRS
 	include/spirit/Physics/spCommonPhysics.h
 	include/spirit/Physics/spPhysicsWorld.h
 	include/spirit/Physics/spBulletWorld.h
-	include/spirit/Physics/spPhysicsRigidBody.h
-	include/spirit/Physics/spBulletRigidBody.h
 	include/spirit/Planners/spAStar.h
 	include/spirit/Planners/spCommonPlanner.h
 	include/spirit/GeneralTools.h
@@ -78,7 +76,6 @@ set( SRCS
 	src/GeneralTools.cpp
 	src/Settings.cpp
 	src/spBulletWorld.cpp
-	src/spBulletRigidBody.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)
