@@ -45,7 +45,7 @@ set( _LIBRARIES
 include_directories( ${_INCLUDE_DIRS} )
 
 set( HDRS
-	include/spirit/World.h
+	include/spirit/spirit.h
 	include/spirit/Controller.h
 	include/spirit/Gui.h
 	include/spirit/Physics.h
@@ -54,17 +54,20 @@ set( HDRS
 	include/spirit/Controllers/spMPC.h
 	include/spirit/Gui/spCommonGui.h
 	include/spirit/Gui/spPangolinScenegraphGui.h
-	include/spirit/Physics/spBulletPhysicsCommon.h
 	include/spirit/Physics/spCommonPhysics.h
 	include/spirit/Physics/spPhysicsWorld.h
 	include/spirit/Physics/spBulletWorld.h
 	include/spirit/Planners/spAStar.h
 	include/spirit/Planners/spCommonPlanner.h
-	include/spirit/GeneralTools.h
-	include/spirit/Settings.h
+	include/spirit/spGeneralTools.h
+	include/spirit/spSettings.h
+	include/spirit/Objects/spBox.h
+	include/spirit/Objects/spSphere.h
+	include/spirit/Objects/spCommonObject.h
+
 	)
 set( SRCS
-	src/World.cpp
+	src/spirit.cpp
 	src/Controller.cpp
 	src/Gui.cpp
 	src/Physics.cpp
@@ -73,9 +76,11 @@ set( SRCS
 	src/spPangolinScenegraphGui.cpp
 	src/spBulletPhysicsCommon.cpp
 	src/spAStar.cpp
-	src/GeneralTools.cpp
-	src/Settings.cpp
+	src/spGeneralTools.cpp
+	src/spSettings.cpp
 	src/spBulletWorld.cpp
+	src/spBox.cpp
+	src/spSphere.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)

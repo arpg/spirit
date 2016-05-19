@@ -1,5 +1,5 @@
-#ifndef GENERALTOOLS_H__
-#define GENERALTOOLS_H__
+#ifndef SP_GENERALTOOLS_H__
+#define SP_GENERALTOOLS_H__
 
 #include <string>
 #include <sys/stat.h>
@@ -20,13 +20,6 @@ enum spPhysolver{MLCP_DANTZING,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum spPhyEngineType{PHY_NONE,PHY_BULLET};
 
-struct spBox{
-  spBoxSize dims;
-  double mass;
-  spPose pose;
-  spColor color;
-};
-
 struct spSphere{
   double  radius;
   double mass;
@@ -39,9 +32,9 @@ struct spCarParamseters{
 };
 
 
-class GeneralTools {
+class spGeneralTools {
  public:
   static bool CheckFileExists(const std::string& file_name);
 };
 
-#endif  // GENSERALTOOLS_H__
+#endif  // SP_GENSERALTOOLS_H__

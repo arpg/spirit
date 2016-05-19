@@ -11,7 +11,6 @@
 struct BulletWorldParams{
   btVector3 worldMin;
   btVector3 worldMax;
-  bool has_defground;
   spPhysolver solver;
 };
 

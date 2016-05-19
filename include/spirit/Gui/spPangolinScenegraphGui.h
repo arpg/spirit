@@ -1,10 +1,10 @@
 #ifndef SP_PANGOLINSCENEGRAPHGUI_H__
 #define SP_PANGOLINSCENEGRAPHGUI_H__
 
-#include <spirit/Settings.h>
+#include <spirit/spSettings.h>
 #include <spirit/Gui/spCommonGui.h>
 #include <pangolin/pangolin.h>
-#include <spirit/GeneralTools.h>
+#include <spirit/spGeneralTools.h>
 #include <SceneGraph/SceneGraph.h>
 
 #define WINDOW_WIDTH 640

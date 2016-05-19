@@ -18,7 +18,7 @@ spPangolinScenegraphGui::~spPangolinScenegraphGui() {
 }
 
 void spPangolinScenegraphGui::InitGui() {
-  if (!GeneralTools::CheckFileExists(SPIRITGUI_PARAM_FILE)) {
+  if (!spGeneralTools::CheckFileExists(SPIRITGUI_PARAM_FILE)) {
     std::cerr << "Error: Missing Pangolin config file." << std::endl;
   }
 

@@ -5,7 +5,7 @@
 #include <thread>
 #include <chrono>
 #include <math.h>
-#include <spirit/World.h>
+#include <spirit/spirit.h>
 
 DEFINE_string(groundmeshfile, "", "Specify File Path");
 DEFINE_string(paramfile, "", "Specify File Path");
@@ -20,11 +20,11 @@ int main(int argc, char** argv) {
 //  google::ParseCommandLineFlags(&argc, &argv, true);
 //  google::InitGoogleLogging(argv[0]);
 
-  spirit::Settings settings_obj;
+  spSettings settings_obj;
   settings_obj.SetGuiType(spGuiType::GUI_PANGOSCENEGRAPH);
   settings_obj.SetPhysicsEngineType(spPhyEngineType::PHY_BULLET);
 
-  spirit::World sp_world(settings_obj);
+  spirit sp_world(settings_obj);
   sp_world.Create();
 
   while(sp_world.ShouldRun()) {

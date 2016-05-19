@@ -3,7 +3,7 @@
 
 #include <spirit/Physics/spPhysicsWorld.h>
 #include <spirit/Physics/spBulletWorld.h>
-#include <spirit/Settings.h>
+#include <spirit/spSettings.h>
 
 class Physics {
  public:

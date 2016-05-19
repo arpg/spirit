@@ -1,7 +1,8 @@
 #ifndef SP_PHYSICSWORLD_H__
 #define SP_PHYSICSWORLD_H__
 
-#include <spirit/GeneralTools.h>
+#include <spirit/spGeneralTools.h>
+#include <spirit/Objects/spBox.h>
 
 class spPhysicsWorld {
 public:
