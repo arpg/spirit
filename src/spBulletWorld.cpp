@@ -72,10 +72,10 @@ bool spBulletWorld::InitEmptyDynamicsWorld() {
   }
 
   dynamics_world_->getSolverInfo().m_numIterations = 100;
-  return 1;
+  return true;
 }
 
-int spBulletWorld::AddBox(spBox& box) {
+void spBulletWorld::AddBox(spBox& box) {
   spVector3d dims = box.GetDimensions();
   btCollisionShape* shape = new btBoxShape(btVector3(dims[0],dims[1],dims[2]));
   collisionShapes_.push_back(shape);
@@ -106,10 +106,10 @@ int spBulletWorld::AddBox(spBox& box) {
 
 	dynamics_world_->addRigidBody(body);
 
-	return body->getUserIndex();
+	box.SetPhysicsObjIndex(body->getUserIndex());
 }
 
-int spBulletWorld::AddSphere(spSphere& sphere) {
+void spBulletWorld::AddSphere(spSphere& sphere) {
 
   btCollisionShape* shape = new btSphereShape(sphere.radius);
   collisionShapes_.push_back(shape);
@@ -139,12 +139,11 @@ int spBulletWorld::AddSphere(spSphere& sphere) {
 
 	dynamics_world_->addRigidBody(body);
 
-	return body->getUserIndex();
+//	add  set physics_object_index
 }
 
-int spBulletWorld::AddCar(spCarParamseters& car_params) {
+void spBulletWorld::AddCar(spCarParamseters& car_params) {
  std::cerr << "AddCar HAS NOT BEEN IMPLEMENTED!" << std::endl;
- return -1;
 }
 
 

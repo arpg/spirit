@@ -3,9 +3,9 @@
 
 class spCommonPhysics {
 public:
-  virtual InitPhysics() = 0;
-  virtual StepSimulation(double time_step) = 0;
-  virtual ExitPhysics() = 0;
+  virtual void InitPhysics() = 0;
+  virtual void StepSimulation(double time_step) = 0;
+  virtual void ExitPhysics() = 0;
 };
 
 #endif // SP_COMMONPHYSICS_H__

@@ -33,3 +33,7 @@ void Gui::Refresh() {
 void Gui::CheckKeyboardAction() {
   gui_->CheckKeyboardAction();
 }
+
+void Gui::AddBox(spBox &box) {
+  gui_->AddBox(box);
+}

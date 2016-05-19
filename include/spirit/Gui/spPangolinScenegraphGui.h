@@ -23,6 +23,7 @@ class spPangolinScenegraphGui : public spCommonGUI {
   bool ShouldQuit();
   void Refresh();
   void CheckKeyboardAction();
+  void AddBox(spBox& box);
 
  private:
   static void KeyActionMethodSample();
@@ -42,8 +43,6 @@ class spPangolinScenegraphGui : public spCommonGUI {
   pangolin::View pangoview_;
   SceneGraph::GLSceneGraph glscenegraph_;
   SceneGraph::HandlerSceneGraph* handler_scenegraph_;
-  SceneGraph::GLGrid* glgrid_;
-  SceneGraph::GLLight* gllight_;
   std::vector<SceneGraph::GLObject*> globjects_;
 
 };

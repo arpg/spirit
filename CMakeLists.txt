@@ -25,6 +25,7 @@ find_package( Pangolin 0.1 REQUIRED )
 find_package( Bullet REQUIRED )
 find_package( SceneGraph 0.1 REQUIRED )
 find_package( Eigen3 REQUIRED )
+find_package( Sophus REQUIRED)
 
 
 set( _INCLUDE_DIRS
@@ -32,6 +33,7 @@ set( _INCLUDE_DIRS
 	${Pangolin_INCLUDE_DIRS}
 	${SceneGraph_INCLUDE_DIRS}
 	${BULLET_INCLUDE_DIR}
+	${Sophus_INCLUDE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	)
 set( _LIBRARIES
@@ -39,6 +41,7 @@ set( _LIBRARIES
 	${SceneGraph_LIBRARIES}
 	${BULLET_LIBRARIES}
 	${EIGEN3_INCLUDE_DIR}
+	${Sophus_LIBRARIES}
 	)
 
 
@@ -46,19 +49,13 @@ include_directories( ${_INCLUDE_DIRS} )
 
 set( HDRS
 	include/spirit/spirit.h
-	include/spirit/Controller.h
 	include/spirit/Gui.h
 	include/spirit/Physics.h
-	include/spirit/Planner.h
-	include/spirit/Controllers/spCommonController.h
-	include/spirit/Controllers/spMPC.h
 	include/spirit/Gui/spCommonGui.h
 	include/spirit/Gui/spPangolinScenegraphGui.h
 	include/spirit/Physics/spCommonPhysics.h
 	include/spirit/Physics/spPhysicsWorld.h
 	include/spirit/Physics/spBulletWorld.h
-	include/spirit/Planners/spAStar.h
-	include/spirit/Planners/spCommonPlanner.h
 	include/spirit/spGeneralTools.h
 	include/spirit/spSettings.h
 	include/spirit/Objects/spBox.h
@@ -68,19 +65,16 @@ set( HDRS
 	)
 set( SRCS
 	src/spirit.cpp
-	src/Controller.cpp
 	src/Gui.cpp
 	src/Physics.cpp
-	src/Planner.cpp
-	src/spMPC.cpp
 	src/spPangolinScenegraphGui.cpp
 	src/spBulletPhysicsCommon.cpp
-	src/spAStar.cpp
 	src/spGeneralTools.cpp
 	src/spSettings.cpp
 	src/spBulletWorld.cpp
 	src/spBox.cpp
 	src/spSphere.cpp
+	src/spCommonObject.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)

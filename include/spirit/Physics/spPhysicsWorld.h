@@ -7,9 +7,9 @@
 class spPhysicsWorld {
 public:
   virtual bool InitEmptyDynamicsWorld() = 0;
-  virtual int AddBox(spBox& box) = 0;
-  virtual int AddSphere(spSphere& sphere) = 0;
-  virtual int AddCar(spCarParamseters& car_params) = 0;
+  virtual void AddBox(spBox& box) = 0;
+  virtual void AddSphere(spSphere& sphere) = 0;
+  virtual void AddCar(spCarParamseters& car_params) = 0;
 };
 
 #endif // SP_PHYSICSWORLD_H__

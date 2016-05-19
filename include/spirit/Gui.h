@@ -13,6 +13,7 @@ public:
   bool ShouldQuit();
   void Refresh();
   void CheckKeyboardAction();
+  void AddBox(spBox& box);
 private:
    std::shared_ptr<spCommonGUI> gui_;
 };

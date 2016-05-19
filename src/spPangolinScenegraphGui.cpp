@@ -52,7 +52,7 @@ void spPangolinScenegraphGui::InitGui() {
 
   // Create Globjects
   globjects_.push_back(new SceneGraph::GLGrid(10, 1, false));
-  globjects_.push_back(new SceneGraph::GLLight(0, 0, 0));
+  globjects_.push_back(new SceneGraph::GLLight(10, 10, 10));
 
   // Add already created globjects to glscenegraph_
   for (int ii = 0; ii < globjects_.size(); ii++) {
@@ -103,11 +103,18 @@ void spPangolinScenegraphGui::CheckKeyboardAction() {
   if (pangolin::Pushed(save_window_)) {
     pangolin::SaveWindowOnRender("window");
   }
-
 }
 
 void spPangolinScenegraphGui::KeyActionMethodSample() {
   std::cout
       << "KeyActionMethodSample() method of spPangolinScenegraph is called ..."
       << std::endl;
+}
+
+void spPangolinScenegraphGui::AddBox(spBox &box) {
+  SceneGraph::GLBox glbox;
+  glbox.SetPose(box.GetPose().matrix());
+  glbox.SetScale(box.GetDimensions());
+  globjects_.push_back(new SceneGraph::GLBox(glbox));
+  glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
 }

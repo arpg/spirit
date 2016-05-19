@@ -34,7 +34,7 @@ void spirit::CheckKeyboardAction() {
 
 void spirit::ScenarioWorldBoxFall() {
   // add a box for ground
-  groundbox.SetDimensions(spBoxSize(50,3,50));
+  groundbox.SetDimensions(spBoxSize(1,1,2));
 //  groundbox.dims << 50, 3, 50;
   // make it static
   groundbox.SetMass(0);
@@ -43,6 +43,7 @@ void spirit::ScenarioWorldBoxFall() {
   spPose gnd_pose = spPose::Identity();
   groundbox.SetPose(gnd_pose);
   physics_.AddBox(groundbox);
+  gui_.AddBox(groundbox);
 
   spBoxSize box_size;
   box_size << 1,1,1;
@@ -53,6 +54,7 @@ void spirit::ScenarioWorldBoxFall() {
   box.SetPose(box_pose);
   box.SetColor(spColor(1, 0, 0));
   physics_.AddBox(box);
+  gui_.AddBox(box);
 }
 
 void spirit::IterateWorld() {

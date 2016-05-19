@@ -4,6 +4,10 @@ spBox::spBox() {
   mass_ = 0;
   color_ = spColor(1,1,1);
   pose_ = spPose::Identity();
+  dims_ = spBoxSize(1,1,1);
+  phy_obj_index_ = -1;
+  graphics_obj_index_ = -1;
+  spirit_obj_index_ = -1;
 }
 
 spBox::~spBox() {}
