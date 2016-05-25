@@ -34,6 +34,16 @@ void Gui::CheckKeyboardAction() {
   gui_->CheckKeyboardAction();
 }
 
-void Gui::AddBox(spBox &box) {
-  gui_->AddBox(box);
+void Gui::AddObject(spCommonObject &obj) {
+  switch(obj.GetObjecType()) {
+    case spObjectType::BOX:
+      gui_->AddBox((spBox&) obj);
+      break;
+  }
+}
+
+void Gui::Iterate(Objects& spobjects) {
+  gui_->UpdateGuiObjects(spobjects);
+  gui_->Refresh();
+  gui_->CheckKeyboardAction();
 }

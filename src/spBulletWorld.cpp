@@ -106,7 +106,7 @@ void spBulletWorld::AddBox(spBox& box) {
 
 	dynamics_world_->addRigidBody(body);
 
-	box.SetPhysicsObjIndex(body->getUserIndex());
+	box.SetPhyIndex(body->getUserIndex());
 }
 
 void spBulletWorld::AddSphere(spSphere& sphere) {
@@ -139,12 +139,38 @@ void spBulletWorld::AddSphere(spSphere& sphere) {
 
 	dynamics_world_->addRigidBody(body);
 
-//	add  set physics_object_index
+#warning	"TODO: add phy index to object here"
 }
 
 void spBulletWorld::AddCar(spCarParamseters& car_params) {
- std::cerr << "AddCar HAS NOT BEEN IMPLEMENTED!" << std::endl;
+#warning "TODO:implement this"
 }
+
+void spBulletWorld::UpdatePhyObjects(Objects &spobj) {
+//  // go through all spirit objects
+//  for(int ii=0; ii<spobj.GetNumOfObjects(); ii++) {
+//    //only update objects which had physics property changes
+//    if(spobj.GetObject(ii).HasChangedPhy()) {
+//      // get gui index of object
+//      int gui_index = spobj.GetObject(ii).GetGuiIndex();
+//      // update the gui object
+//      switch (spobj.GetObject(ii).GetObjecType()) {
+//        case spObjectType::BOX:
+//          spBox* box = (spBox*) &spobj.GetObject(ii);
+//          globjects_[gui_index]->SetPose(box->GetPose().matrix());
+//          globjects_[gui_index]->SetScale(box->GetDimensions());
+//#warning "TODO: set color of box somehow"
+//          break;
+//      }
+//    }
+//  }
+
+//}
+}
+
+
+
+
 
 
 

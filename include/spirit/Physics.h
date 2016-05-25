@@ -10,9 +10,8 @@ class Physics {
   Physics();
   ~Physics();
   void Create(const spPhyEngineType phy_type);
-  void AddBox(spBox& box);
-  void AddSphere(spSphere& sphere);
-  void AddCar(spCarParamseters& car_params);
+  void AddObject(spCommonObject& obj);
+  void Iterate();
 
  private:
   std::shared_ptr<spPhysicsWorld> phyworld_;

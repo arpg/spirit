@@ -115,6 +115,51 @@ void spPangolinScenegraphGui::AddBox(spBox &box) {
   SceneGraph::GLBox glbox;
   glbox.SetPose(box.GetPose().matrix());
   glbox.SetScale(box.GetDimensions());
+  glbox.SetCheckerboard(0);
+#warning "TODO: set color of box somehow"
   globjects_.push_back(new SceneGraph::GLBox(glbox));
+  box.SetGuiIndex(globjects_.size()-1);
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
 }
+
+
+void spPangolinScenegraphGui::UpdateGuiObjects(Objects &spobj) {
+  // go through all spirit objects
+  for(int ii=0; ii<spobj.GetNumOfObjects(); ii++) {
+    //only update objects which had gui property changes
+    if(spobj.GetObject(ii).HasChangedGui()) {
+      // get gui index of object
+      int gui_index = spobj.GetObject(ii).GetGuiIndex();
+      // update the gui object
+      switch (spobj.GetObject(ii).GetObjecType()) {
+        case spObjectType::BOX:
+          spBox* box = (spBox*) &spobj.GetObject(ii);
+          globjects_[gui_index]->SetPose(box->GetPose().matrix());
+          globjects_[gui_index]->SetScale(box->GetDimensions());
+#warning "TODO: set color of box somehow"
+          break;
+      }
+    }
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

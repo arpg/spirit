@@ -15,19 +15,22 @@ class spCommonObject {
 
   spCommonObject();
   ~spCommonObject();
-  void SetPhysicsObjIndex(int index);
-  void SetGraphicsObjIndex(int index);
-  int GetSpiritObjIndex();
+  void SetPhyIndex(int index);
+  void SetGuiIndex(int index);
+  int GetGuiIndex();
+  int GetPhyIndex();
   void Create();
   void Delete();
+  bool HasChangedGui();
+  bool HasChangedPhy();
+  spObjectType GetObjecType();
 
  protected:
-   int phy_obj_index_;
-   int graphics_obj_index_;
-   int spirit_obj_index_;
-
- private:
-   static int spirit_obj_counter_;
+  int index_phy_;
+  int index_gui_;
+  bool obj_guichanged_;
+  bool obj_phychanged_;
+  spObjectType object_type_;
 };
 
 #endif  //  SP_COMMONOBJECT_H__

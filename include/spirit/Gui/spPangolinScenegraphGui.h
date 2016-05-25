@@ -24,6 +24,7 @@ class spPangolinScenegraphGui : public spCommonGUI {
   void Refresh();
   void CheckKeyboardAction();
   void AddBox(spBox& box);
+  void UpdateGuiObjects(Objects &spobj);
 
  private:
   static void KeyActionMethodSample();

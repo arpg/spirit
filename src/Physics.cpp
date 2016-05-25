@@ -23,14 +23,17 @@ void Physics::Create(const spPhyEngineType phy_type) {
   phyworld_->InitEmptyDynamicsWorld();
 }
 
-void Physics::AddBox(spBox &box){
-  phyworld_->AddBox(box);
+void Physics::AddObject(spCommonObject &obj) {
+  switch(obj.GetObjecType()) {
+    case spObjectType::BOX:
+      phyworld_->AddBox((spBox&)obj);
+      break;
+    case spObjectType::SPHERE:
+      phyworld_->AddSphere((spSphere&)obj);
+      break;
+  }
 }
 
-void Physics::AddSphere(spSphere &sphere) {
-  phyworld_->AddSphere(sphere);
-}
+void Physics::Iterate() {
 
-void Physics::AddCar(spCarParamseters &car_params) {
-  phyworld_->AddCar(car_params);
 }

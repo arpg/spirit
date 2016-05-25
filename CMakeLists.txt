@@ -61,7 +61,7 @@ set( HDRS
 	include/spirit/Objects/spBox.h
 	include/spirit/Objects/spSphere.h
 	include/spirit/Objects/spCommonObject.h
-
+	include/spirit/Objects.h
 	)
 set( SRCS
 	src/spirit.cpp
@@ -75,6 +75,7 @@ set( SRCS
 	src/spBox.cpp
 	src/spSphere.cpp
 	src/spCommonObject.cpp
+	src/Objects.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)

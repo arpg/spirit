@@ -23,6 +23,7 @@ public:
   void AddBox(spBox& box);
   void AddSphere(spSphere& sphere);
   void AddCar(spCarParamseters& car_params);
+  void UpdatePhyObjects(Objects& spobj);
 
 private:
   int object_counter;

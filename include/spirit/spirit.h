@@ -5,7 +5,7 @@
 #include <spirit/Physics.h>
 #include <spirit/spSettings.h>
 #include <spirit/spGeneralTools.h>
-#include <spirit/Objects/spBox.h>
+#include <spirit/Objects.h>
 
 class spirit{
 public:
@@ -20,13 +20,12 @@ private:
   Gui gui_;
   spSettings user_settings_;
   Physics physics_;
-  void IterateGraphics();
-  void IteratePhysics();
 
-  // for test purposes
-  spBox groundbox;
-  spBox box;
+  Objects objects_;
 
+  int obj_gnd_index;
+  int obj_box_index;
+  spPose boxpose_;
 };
 
 #endif  //SPIRIT_H__

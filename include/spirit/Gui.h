@@ -4,6 +4,7 @@
 #include <spirit/Gui/spCommonGui.h>
 #include <spirit/Gui/spPangolinScenegraphGui.h>
 #include <spirit/spGeneralTools.h>
+#include <spirit/Objects.h>
 
 class Gui {
 public:
@@ -13,9 +14,10 @@ public:
   bool ShouldQuit();
   void Refresh();
   void CheckKeyboardAction();
-  void AddBox(spBox& box);
+  void AddObject(spCommonObject& obj);
+  void Iterate(Objects& spobjects);
 private:
-   std::shared_ptr<spCommonGUI> gui_;
+  std::shared_ptr<spCommonGUI> gui_;
 };
 
 #endif  // GUI_H__

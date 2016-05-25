@@ -1,6 +1,10 @@
 #include <spirit/spirit.h>
+#include <chrono>
+#include <thread>
 
-spirit::spirit(spSettings& user_settings) { user_settings_ = user_settings; }
+spirit::spirit(spSettings& user_settings): boxpose_(spPose::Identity()) {
+  user_settings_ = user_settings;
+}
 
 spirit::~spirit() {}
 
@@ -23,43 +27,26 @@ bool spirit::ShouldRun() {
   }
 }
 
-void spirit::IterateGraphics() {
-  gui_.Refresh();
-  gui_.CheckKeyboardAction();
-}
-
 void spirit::CheckKeyboardAction() {
   gui_.CheckKeyboardAction();
 }
 
 void spirit::ScenarioWorldBoxFall() {
-  // add a box for ground
-  groundbox.SetDimensions(spBoxSize(1,1,2));
-//  groundbox.dims << 50, 3, 50;
-  // make it static
-  groundbox.SetMass(0);
-  groundbox.SetPose(spPose::Identity());
-  groundbox.SetColor(spColor(0, 1, 0));
-  spPose gnd_pose = spPose::Identity();
-  groundbox.SetPose(gnd_pose);
-  physics_.AddBox(groundbox);
-  gui_.AddBox(groundbox);
+  // create and add a ground as a box to objects_ vector
+  obj_gnd_index = objects_.CreateBox(spPose::Identity(),spBoxSize(20,20,0.1),0,spColor(0, 1, 0));
+  physics_.AddObject(objects_.GetObject(obj_gnd_index));
+  gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
-  spBoxSize box_size;
-  box_size << 1,1,1;
-  box.SetDimensions(box_size);
-  box.SetMass(1);
-  spPose box_pose = spPose::Identity();
-  box_pose.translate(spVector3d(0,0,10));
-  box.SetPose(box_pose);
-  box.SetColor(spColor(1, 0, 0));
-  physics_.AddBox(box);
-  gui_.AddBox(box);
+  boxpose_.translate(spVector3d(0,0,1));
+  obj_box_index = objects_.CreateBox(boxpose_,spBoxSize(1,1,1),1,spColor(0, 1, 0));
+  physics_.AddObject(objects_.GetObject(obj_box_index));
+  gui_.AddObject(objects_.GetObject(obj_box_index));
 }
 
 void spirit::IterateWorld() {
-  IterateGraphics();
-    IteratePhysics();
+  boxpose_.translate(spVector3d(0,0,-0.01));
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  objects_.GetObject(obj_box_index).SetPose(boxpose_);
+  gui_.Iterate(objects_);
+  physics_.Iterate();
 }
-
-void spirit::IteratePhysics() {}
