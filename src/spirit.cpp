@@ -2,7 +2,7 @@
 #include <chrono>
 #include <thread>
 
-spirit::spirit(spSettings& user_settings): boxpose_(spPose::Identity()) {
+spirit::spirit(spSettings& user_settings) {
   user_settings_ = user_settings;
 }
 
@@ -32,21 +32,23 @@ void spirit::CheckKeyboardAction() {
 }
 
 void spirit::ScenarioWorldBoxFall() {
+  spPose pose(spPose::Identity());
+  pose.translate(spTranslation(0,0,8));
+  Eigen::AngleAxisd ang(M_PI/5,Eigen::Vector3d::UnitY());
+  pose.rotate(ang);
+  obj_box_index = objects_.CreateBox(pose,spBoxSize(1,1,1),100,spColor(1, 0, 0));
+  physics_.AddObject(objects_.GetObject(obj_box_index));
+  gui_.AddObject(objects_.GetObject(obj_box_index));
+
   // create and add a ground as a box to objects_ vector
-  obj_gnd_index = objects_.CreateBox(spPose::Identity(),spBoxSize(20,20,0.1),0,spColor(0, 1, 0));
+  obj_gnd_index = objects_.CreateBox(spPose::Identity(),spBoxSize(10,10,1),0,spColor(0, 1, 0));
   physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
-  boxpose_.translate(spVector3d(0,0,1));
-  obj_box_index = objects_.CreateBox(boxpose_,spBoxSize(1,1,1),1,spColor(0, 1, 0));
-  physics_.AddObject(objects_.GetObject(obj_box_index));
-  gui_.AddObject(objects_.GetObject(obj_box_index));
 }
 
 void spirit::IterateWorld() {
-  boxpose_.translate(spVector3d(0,0,-0.01));
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
-  objects_.GetObject(obj_box_index).SetPose(boxpose_);
   gui_.Iterate(objects_);
-  physics_.Iterate();
+  physics_.Iterate(objects_);
+  std::this_thread::sleep_for(std::chrono::milliseconds(16));
 }

@@ -20,16 +20,18 @@ public:
   ~spBulletWorld();
 
   bool InitEmptyDynamicsWorld();
-  void AddBox(spBox& box);
+  void AddNewPhyObject(spCommonObject& sp_obj);
+  void UpdatePhyObjectsFromSpirit(Objects& spobj);
+  void StepPhySimulation(double step_time);
+  void UpdateSpiritObjectsFromPhy(Objects& spobjects);
+
   void AddSphere(spSphere& sphere);
   void AddCar(spCarParamseters& car_params);
-  void UpdatePhyObjects(Objects& spobj);
 
 private:
-  int object_counter;
-  void AddRigidBodyToWorld(btCollisionShape* shape);
+  btRigidBody* UpdateBulletBoxObject(spBox& source_obj, btRigidBody* dest_obj);
+
   BulletWorldParams world_params_;
-  btCollisionShape* def_groundShape_;
   btDefaultCollisionConfiguration* collisionConfiguration_;
   btCollisionDispatcher*	dispatcher_;
   btBroadphaseInterface*	broadphase_;

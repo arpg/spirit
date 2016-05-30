@@ -49,3 +49,10 @@ double spBox::GetMass() {
   return mass_;
 }
 
+bool spBox::IsDynamic() {
+  if (mass_ > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}

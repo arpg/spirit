@@ -25,7 +25,6 @@ private:
 
   int obj_gnd_index;
   int obj_box_index;
-  spPose boxpose_;
 };
 
 #endif  //SPIRIT_H__

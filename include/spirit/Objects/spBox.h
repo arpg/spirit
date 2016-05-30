@@ -12,6 +12,7 @@ class spBox : public spCommonObject {
   void SetColor(const spColor& color);
   void SetMass(double mass);
   double GetMass();
+  bool IsDynamic();
 
   void SetDimensions(const spBoxSize& dims);
   spBoxSize GetDimensions();

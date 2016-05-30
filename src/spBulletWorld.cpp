@@ -1,8 +1,8 @@
 #include <spirit/Physics/spBulletWorld.h>
 
 spBulletWorld::spBulletWorld() {
-  world_params_.worldMax.setValue(-1000,-1000,-1000);
-  world_params_.worldMin.setValue(1000,1000,1000);
+  world_params_.worldMax.setValue(1000,1000,1000);
+  world_params_.worldMin.setValue(-1000,-1000,-1000);
   world_params_.solver = spPhysolver::SEQUENTIAL_IMPULSE;
 }
 
@@ -49,9 +49,6 @@ bool spBulletWorld::InitEmptyDynamicsWorld() {
     case spPhysolver::SEQUENTIAL_IMPULSE:
       solver_ = new btSequentialImpulseConstraintSolver();
       break;
-    default:
-      std::cerr << "Error: olver has not been selected " << std::endl;
-      return 0;
   }
 
   dynamics_world_ = new btDiscreteDynamicsWorld(dispatcher_,broadphase_,solver_,collisionConfiguration_);
@@ -71,43 +68,23 @@ bool spBulletWorld::InitEmptyDynamicsWorld() {
       break;
   }
 
+  dynamics_world_->setGravity(btVector3(0,0,-9.80665));
   dynamics_world_->getSolverInfo().m_numIterations = 100;
   return true;
 }
 
-void spBulletWorld::AddBox(spBox& box) {
-  spVector3d dims = box.GetDimensions();
-  btCollisionShape* shape = new btBoxShape(btVector3(dims[0],dims[1],dims[2]));
-  collisionShapes_.push_back(shape);
-
-  //rigidbody is dynamic if and only if mass is non zero, otherwise static
-  bool isDynamic = (box.GetMass() != 0.f);
-
-  btVector3 localInertia(0,0,0);
-  if (isDynamic) {
-      // bullet calculates inertia tensor for a cuboid shape (it only has diagonal values).
-      shape->calculateLocalInertia(box.GetMass(),localInertia);
+void spBulletWorld::AddNewPhyObject(spCommonObject &sp_obj) {
+  switch (sp_obj.GetObjecType()) {
+    case spObjectType::BOX:
+      // pass in nullptr to create a new bullet object
+      btRigidBody* body = UpdateBulletBoxObject((spBox&)sp_obj,nullptr);
+      body->setUserIndex(dynamics_world_->getNumCollisionObjects());
+      dynamics_world_->addRigidBody(body);
+      sp_obj.SetPhyIndex(body->getUserIndex());
+      break;
   }
-
-  btTransform tr;
-  tr.setOrigin(btVector3(box.GetPose().translation()[0], box.GetPose().translation()[1], box.GetPose().translation()[2]));
-  Eigen::Quaterniond q(box.GetPose().rotation());
-  tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
-  //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-#ifdef USE_MOTIONSTATE
-  btDefaultMotionState* myMotionState = new btDefaultMotionState(tr);
-  btRigidBody::btRigidBodyConstructionInfo cInfo(box.GetMass(),myMotionState,shape,localInertia);
-  btRigidBody* body = new btRigidBody(cInfo);
-  //body->setContactProcessingThreshold(defaultContactProcessingThreshold_);
-#else
-	btRigidBody* body = new btRigidBody(box.mass,0,shape,localInertia);
-	body->setWorldTransform(tr);
-#endif
-
-	dynamics_world_->addRigidBody(body);
-
-	box.SetPhyIndex(body->getUserIndex());
 }
+
 
 void spBulletWorld::AddSphere(spSphere& sphere) {
 
@@ -127,15 +104,10 @@ void spBulletWorld::AddSphere(spSphere& sphere) {
   Eigen::Quaterniond q(sphere.pose.rotation());
   tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
   //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-#ifdef USE_MOTIONSTATE
-  btDefaultMotionState* myMotionState = new btDefaultMotionState(tr);
-  btRigidBody::btRigidBodyConstructionInfo cInfo(sphere.mass,myMotionState,shape,localInertia);
+  btDefaultMotionState* motion_state = new btDefaultMotionState(tr);
+  btRigidBody::btRigidBodyConstructionInfo cInfo(sphere.mass,motion_state,shape,localInertia);
   btRigidBody* body = new btRigidBody(cInfo);
   //body->setContactProcessingThreshold(defaultContactProcessingThreshold_);
-#else
-	btRigidBody* body = new btRigidBody(sphere.mass,0,shape,localInertia);
-	body->setWorldTransform(tr);
-#endif
 
 	dynamics_world_->addRigidBody(body);
 
@@ -146,29 +118,81 @@ void spBulletWorld::AddCar(spCarParamseters& car_params) {
 #warning "TODO:implement this"
 }
 
-void spBulletWorld::UpdatePhyObjects(Objects &spobj) {
-//  // go through all spirit objects
-//  for(int ii=0; ii<spobj.GetNumOfObjects(); ii++) {
-//    //only update objects which had physics property changes
-//    if(spobj.GetObject(ii).HasChangedPhy()) {
-//      // get gui index of object
-//      int gui_index = spobj.GetObject(ii).GetGuiIndex();
-//      // update the gui object
-//      switch (spobj.GetObject(ii).GetObjecType()) {
-//        case spObjectType::BOX:
-//          spBox* box = (spBox*) &spobj.GetObject(ii);
-//          globjects_[gui_index]->SetPose(box->GetPose().matrix());
-//          globjects_[gui_index]->SetScale(box->GetDimensions());
-//#warning "TODO: set color of box somehow"
-//          break;
-//      }
-//    }
-//  }
+// update all parameters of a box
+btRigidBody* spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody *dest_obj) {
+  // if bullet pointer has not been defined yet then assign memory and initialize
+  if (dest_obj == nullptr) {
+    btCollisionShape* shape = new btBoxShape(btVector3(1,1,1));
+    collisionShapes_.push_back(shape);
+    btDefaultMotionState* motion_state = new btDefaultMotionState;
+    btRigidBody::btRigidBodyConstructionInfo cInfo(0,motion_state,shape,btVector3(0,0,0));
+    dest_obj = new btRigidBody(cInfo);
+  }
+  // reset box size
+  spBoxSize dims(source_obj.GetDimensions());
+  dest_obj->getCollisionShape()->setLocalScaling(btVector3(dims[0]/2,dims[1]/2,dims[2]/2));
 
-//}
+  //rigidbody is dynamic if and only if mass is non zero, otherwise static
+  btVector3 localInertia(0,0,0);
+  if (source_obj.IsDynamic()) {
+      // bullet calculates inertia tensor for a cuboid shape (it only has diagonal values).
+      dest_obj->getCollisionShape()->calculateLocalInertia(source_obj.GetMass(),localInertia);
+  }
+  // reset object mass
+  dest_obj->setMassProps(source_obj.GetMass(),localInertia);
+  // transform phy object
+  btTransform tr;
+  tr.setOrigin(btVector3(source_obj.GetPose().translation()[0], source_obj.GetPose().translation()[1], source_obj.GetPose().translation()[2]));
+  Eigen::Quaterniond q(source_obj.GetPose().rotation());
+  tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
+  dest_obj->setWorldTransform(tr);
+  return dest_obj;
 }
 
+void spBulletWorld::UpdatePhyObjectsFromSpirit(Objects &spobj) {
+  // go through all spirit objects
+  for(int ii=0; ii<spobj.GetNumOfObjects(); ii++) {
+    //only update objects which had physics property changes
+    if(spobj.GetObject(ii).HasChangedPhy()) {
+      // get gui index of object
+      int phy_index = spobj.GetObject(ii).GetPhyIndex();
+      // update the phy object
+      switch (spobj.GetObject(ii).GetObjecType()) {
+        case spObjectType::BOX:
+          btCollisionObject* col_obj = dynamics_world_->getCollisionObjectArray()[phy_index];
+#warning  "upcasting might not pass pointer correctly, this should be tested"
+          btRigidBody* bulletbody = btRigidBody::upcast(col_obj);
+          UpdateBulletBoxObject((spBox&)spobj,bulletbody);
+          break;
+      }
+    }
+  }
+}
 
+void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
+  for(int ii=0; ii<spobjects.GetNumOfObjects(); ii++) {
+    //only update objects which are dynamic
+    if(spobjects.GetObject(ii).IsDynamic()) {
+      // get gui index of object
+      int phy_index = spobjects.GetObject(ii).GetPhyIndex();
+      // update the phy object
+      btCollisionObject* obj = dynamics_world_->getCollisionObjectArray()[phy_index];
+      btTransform bttrans;
+      bttrans = obj->getWorldTransform();
+      btVector3 btorigin = bttrans.getOrigin();
+      spPose sppose(spPose::Identity());
+      sppose.translate(spTranslation(btorigin[0],btorigin[1],btorigin[2]));
+      btQuaternion btrot = bttrans.getRotation();
+      spRotation spangle(btrot.w(),btrot.x(),btrot.y(),btrot.z());
+      sppose.rotate(spangle);
+      spobjects.GetObject(ii).SetPose(sppose);
+    }
+  }
+}
+
+void spBulletWorld::StepPhySimulation(double step_time) {
+  dynamics_world_->stepSimulation(step_time,10);
+}
 
 
 

@@ -24,16 +24,11 @@ void Physics::Create(const spPhyEngineType phy_type) {
 }
 
 void Physics::AddObject(spCommonObject &obj) {
-  switch(obj.GetObjecType()) {
-    case spObjectType::BOX:
-      phyworld_->AddBox((spBox&)obj);
-      break;
-    case spObjectType::SPHERE:
-      phyworld_->AddSphere((spSphere&)obj);
-      break;
-  }
+  phyworld_->AddNewPhyObject(obj);
 }
 
-void Physics::Iterate() {
-
+void Physics::Iterate(Objects& objects) {
+  // simulate in 60Hz
+  phyworld_->StepPhySimulation(1.f/60);
+  phyworld_->UpdateSpiritObjectsFromPhy(objects);
 }

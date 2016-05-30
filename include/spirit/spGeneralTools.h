@@ -4,11 +4,13 @@
 #include <string>
 #include <sys/stat.h>
 #include <Eigen/Eigen>
+#include <iostream>
 
 // spirit types
 #define spPose Eigen::Transform<double,3,Eigen::Affine>
+#define spRotation Eigen::Quaternion<double>
+#define spTranslation Eigen::Vector3d
 #define spBoxSize Eigen::Vector3d
-#define spVector3d Eigen::Vector3d
 #define spColor Eigen::Vector3d
 #define spInertiaTensor Eigen::Matrix3d
 #define spCubeInertiaTensor Eigen::Vector3d

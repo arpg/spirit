@@ -12,6 +12,7 @@ class spCommonObject {
   virtual void SetColor(const spColor& color) = 0;
   virtual void SetMass(double mass) = 0;
   virtual double GetMass() = 0;
+  virtual bool IsDynamic() = 0;
 
   spCommonObject();
   ~spCommonObject();
@@ -31,6 +32,8 @@ class spCommonObject {
   bool obj_guichanged_;
   bool obj_phychanged_;
   spObjectType object_type_;
+
+  double mass_;
 };
 
 #endif  //  SP_COMMONOBJECT_H__

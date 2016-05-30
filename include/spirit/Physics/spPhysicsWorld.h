@@ -7,10 +7,10 @@
 class spPhysicsWorld {
 public:
   virtual bool InitEmptyDynamicsWorld() = 0;
-  virtual void AddBox(spBox& box) = 0;
-  virtual void AddSphere(spSphere& sphere) = 0;
-  virtual void AddCar(spCarParamseters& car_params) = 0;
-  virtual void UpdatePhyObjects(Objects& sp_objects) = 0;
+  virtual void AddNewPhyObject(spCommonObject& sp_object) = 0;
+  virtual void UpdatePhyObjectsFromSpirit(Objects& sp_objects) = 0;
+  virtual void UpdateSpiritObjectsFromPhy(Objects& sp_objects) = 0;
+  virtual void StepPhySimulation(double step_time) = 0;
 };
 
 #endif // SP_PHYSICSWORLD_H__
