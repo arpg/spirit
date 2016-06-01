@@ -36,7 +36,7 @@ void spirit::ScenarioWorldBoxFall() {
   pose.translate(spTranslation(0,0,8));
   Eigen::AngleAxisd ang(M_PI/5,Eigen::Vector3d::UnitY());
   pose.rotate(ang);
-  obj_box_index = objects_.CreateBox(pose,spBoxSize(1,1,1),100,spColor(1, 0, 0));
+  obj_box_index = objects_.CreateBox(pose,spBoxSize(1,1,1),1,spColor(1, 0, 0));
   physics_.AddObject(objects_.GetObject(obj_box_index));
   gui_.AddObject(objects_.GetObject(obj_box_index));
 

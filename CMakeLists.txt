@@ -53,7 +53,6 @@ set( HDRS
 	include/spirit/Physics.h
 	include/spirit/Gui/spCommonGui.h
 	include/spirit/Gui/spPangolinScenegraphGui.h
-	include/spirit/Physics/spCommonPhysics.h
 	include/spirit/Physics/spPhysicsWorld.h
 	include/spirit/Physics/spBulletWorld.h
 	include/spirit/spGeneralTools.h
@@ -62,6 +61,8 @@ set( HDRS
 	include/spirit/Objects/spSphere.h
 	include/spirit/Objects/spCommonObject.h
 	include/spirit/Objects.h
+	include/spirit/Objects/spMesh.h
+	include/spirit/Objects/spCar.h
 	)
 set( SRCS
 	src/spirit.cpp
@@ -76,6 +77,8 @@ set( SRCS
 	src/spSphere.cpp
 	src/spCommonObject.cpp
 	src/Objects.cpp
+	src/spMesh.cpp
+	src/spCar.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)

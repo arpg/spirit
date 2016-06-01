@@ -11,8 +11,6 @@ public:
   Objects();
   ~Objects();
   int CreateBox(const spPose& pose, const spBoxSize& size, const double mass,const spColor& color);
-  void EditObjMass(int obj_index, const double des_mass);
-  void EditObjPose(int obj_index, const spPose& des_pose);
   void RemoveObj(int obj_index);
   int GetNumOfObjects();
   spCommonObject& GetObject(int obj_index);

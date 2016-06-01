@@ -11,6 +11,7 @@
 #define spRotation Eigen::Quaternion<double>
 #define spTranslation Eigen::Vector3d
 #define spBoxSize Eigen::Vector3d
+#define spMeshSize Eigen::Vector2d
 #define spColor Eigen::Vector3d
 #define spInertiaTensor Eigen::Matrix3d
 #define spCubeInertiaTensor Eigen::Vector3d
@@ -21,7 +22,7 @@
 enum spPhysolver{MLCP_DANTZING,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum spPhyEngineType{PHY_NONE,PHY_BULLET};
-enum spObjectType{BOX,SPHERE};
+enum spObjectType{BOX,SPHERE,MESH};
 
 struct spSphere{
   double  radius;
@@ -29,11 +30,6 @@ struct spSphere{
   spPose pose;
   spColor color;
 };
-struct spCarParamseters{
-  spPose pose;
-  float wheel_friction;
-};
-
 
 class spGeneralTools {
  public:

@@ -26,7 +26,6 @@ public:
   void UpdateSpiritObjectsFromPhy(Objects& spobjects);
 
   void AddSphere(spSphere& sphere);
-  void AddCar(spCarParamseters& car_params);
 
 private:
   btRigidBody* UpdateBulletBoxObject(spBox& source_obj, btRigidBody* dest_obj);

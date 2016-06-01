@@ -13,16 +13,8 @@ int Objects::CreateBox(const spPose& pose, const spBoxSize& size, const double m
   return (objects_.size()-1);
 }
 
-void Objects::EditObjPose(int obj_index, const spPose& des_pose) {
-  objects_[obj_index]->SetPose(des_pose);
-}
-
 void Objects::RemoveObj(int obj_index) {
   objects_.erase(objects_.begin()+obj_index);
-}
-
-void Objects::EditObjMass(int obj_index, const double des_mass) {
-  objects_[obj_index]->SetMass(des_mass);
 }
 
 spCommonObject& Objects::GetObject(int obj_index) {

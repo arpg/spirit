@@ -10,8 +10,8 @@ class spCommonObject {
   virtual void SetPose(const spPose& pose) = 0;
   virtual const spPose& GetPose() = 0;
   virtual void SetColor(const spColor& color) = 0;
-  virtual void SetMass(double mass) = 0;
-  virtual double GetMass() = 0;
+//  virtual void SetMass(double mass) = 0;
+//  virtual double GetMass() = 0;
   virtual bool IsDynamic() = 0;
 
   spCommonObject();

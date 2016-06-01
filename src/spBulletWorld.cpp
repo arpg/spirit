@@ -114,10 +114,6 @@ void spBulletWorld::AddSphere(spSphere& sphere) {
 #warning	"TODO: add phy index to object here"
 }
 
-void spBulletWorld::AddCar(spCarParamseters& car_params) {
-#warning "TODO:implement this"
-}
-
 // update all parameters of a box
 btRigidBody* spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody *dest_obj) {
   // if bullet pointer has not been defined yet then assign memory and initialize
@@ -140,6 +136,7 @@ btRigidBody* spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody
   }
   // reset object mass
   dest_obj->setMassProps(source_obj.GetMass(),localInertia);
+
   // transform phy object
   btTransform tr;
   tr.setOrigin(btVector3(source_obj.GetPose().translation()[0], source_obj.GetPose().translation()[1], source_obj.GetPose().translation()[2]));
