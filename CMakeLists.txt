@@ -69,7 +69,6 @@ set( SRCS
 	src/Gui.cpp
 	src/Physics.cpp
 	src/spPangolinScenegraphGui.cpp
-	src/spBulletPhysicsCommon.cpp
 	src/spGeneralTools.cpp
 	src/spSettings.cpp
 	src/spBulletWorld.cpp

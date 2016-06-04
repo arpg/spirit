@@ -82,36 +82,14 @@ void spBulletWorld::AddNewPhyObject(spCommonObject &sp_obj) {
       dynamics_world_->addRigidBody(body);
       sp_obj.SetPhyIndex(body->getUserIndex());
       break;
+    case spObjectType::CAR:
+      // pass in nullptr to create a new bullet object
+      btRigidBody* compound_body = UpdateBulletBoxObject((spCar&)sp_obj,nullptr);
+      compound_body->setUserIndex(dynamics_world_->getNumCollisionObjects());
+      dynamics_world_->addRigidBody(compound_body);
+      sp_obj.SetPhyIndex(compound_body->getUserIndex());
+      break;
   }
-}
-
-
-void spBulletWorld::AddSphere(spSphere& sphere) {
-
-  btCollisionShape* shape = new btSphereShape(sphere.radius);
-  collisionShapes_.push_back(shape);
-
-  //rigidbody is dynamic if and only if mass is non zero, otherwise static
-  bool isDynamic = (sphere.mass != 0.f);
-
-  btVector3 localInertia(0,0,0);
-  if (isDynamic) {
-      shape->calculateLocalInertia(sphere.mass,localInertia);
-  }
-
-  btTransform tr;
-  tr.setOrigin(btVector3(sphere.pose.translation()[0],sphere.pose.translation()[1],sphere.pose.translation()[2]));
-  Eigen::Quaterniond q(sphere.pose.rotation());
-  tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
-  //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-  btDefaultMotionState* motion_state = new btDefaultMotionState(tr);
-  btRigidBody::btRigidBodyConstructionInfo cInfo(sphere.mass,motion_state,shape,localInertia);
-  btRigidBody* body = new btRigidBody(cInfo);
-  //body->setContactProcessingThreshold(defaultContactProcessingThreshold_);
-
-	dynamics_world_->addRigidBody(body);
-
-#warning	"TODO: add phy index to object here"
 }
 
 // update all parameters of a box
@@ -145,6 +123,46 @@ btRigidBody* spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody
   dest_obj->setWorldTransform(tr);
   return dest_obj;
 }
+
+btRigidBody* spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj) {
+  // if bullet pointer has not been defined yet then assign memory and initialize
+  if (dest_obj == nullptr) {
+    btCollisionShape* chassis_shape = new btBoxShape(btVector3(1.f,0.5f,2.f));
+    collisionShapes_.push_back(chassis_shape);
+    btCompoundShape compound = new btCompoundShape();
+    collisionShapes_.push_back(compound);
+    //chassis_tr effectively shifts the center of mass with respect to the chassis
+    btTransform chassis_tr;
+    chassis_tr.setIdentity();
+    chassis_tr.setOrigin(btVector3(0,1,0));
+    compound.addChildShape(chassis_tr,chassis_shape);
+
+    btDefaultMotionState* motion_state = new btDefaultMotionState;
+    btRigidBody::btRigidBodyConstructionInfo cInfo(0,motion_state,shape,btVector3(0,0,0));
+    dest_obj = new btRigidBody(cInfo);
+  }
+  // reset box size
+  spBoxSize dims(source_obj.GetDimensions());
+  dest_obj->getCollisionShape()->setLocalScaling(btVector3(dims[0]/2,dims[1]/2,dims[2]/2));
+
+  //rigidbody is dynamic if and only if mass is non zero, otherwise static
+  btVector3 localInertia(0,0,0);
+  if (source_obj.IsDynamic()) {
+      // bullet calculates inertia tensor for a cuboid shape (it only has diagonal values).
+      dest_obj->getCollisionShape()->calculateLocalInertia(source_obj.GetMass(),localInertia);
+  }
+  // reset object mass
+  dest_obj->setMassProps(source_obj.GetMass(),localInertia);
+
+  // transform phy object
+  btTransform tr;
+  tr.setOrigin(btVector3(source_obj.GetPose().translation()[0], source_obj.GetPose().translation()[1], source_obj.GetPose().translation()[2]));
+  Eigen::Quaterniond q(source_obj.GetPose().rotation());
+  tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
+  dest_obj->setWorldTransform(tr);
+  return dest_obj;
+}
+
 
 void spBulletWorld::UpdatePhyObjectsFromSpirit(Objects &spobj) {
   // go through all spirit objects

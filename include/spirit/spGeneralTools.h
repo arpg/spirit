@@ -22,14 +22,7 @@
 enum spPhysolver{MLCP_DANTZING,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum spPhyEngineType{PHY_NONE,PHY_BULLET};
-enum spObjectType{BOX,SPHERE,MESH};
-
-struct spSphere{
-  double  radius;
-  double mass;
-  spPose pose;
-  spColor color;
-};
+enum spObjectType{BOX,CAR};
 
 class spGeneralTools {
  public:

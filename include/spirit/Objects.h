@@ -5,6 +5,7 @@
 #include <vector>
 #include <spirit/Objects/spCommonObject.h>
 #include <spirit/Objects/spBox.h>
+#include <spirit/Objects/spCar.h>
 
 class Objects {
 public:

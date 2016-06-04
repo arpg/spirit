@@ -25,10 +25,9 @@ public:
   void StepPhySimulation(double step_time);
   void UpdateSpiritObjectsFromPhy(Objects& spobjects);
 
-  void AddSphere(spSphere& sphere);
-
 private:
   btRigidBody* UpdateBulletBoxObject(spBox& source_obj, btRigidBody* dest_obj);
+  btRigidBody* UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj);
 
   BulletWorldParams world_params_;
   btDefaultCollisionConfiguration* collisionConfiguration_;
