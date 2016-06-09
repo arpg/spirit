@@ -104,3 +104,43 @@ double spCar::GetSuspensionDamping() { return suspension_damping_; }
 double spCar::GetSuspensionRestLength() { return suspension_restLength_; }
 
 double spCar::GetRollInfluence() { return roll_influence_; }
+
+void spCar::SetWheelFLPose(const spPose& wheel_pose) {
+  pose_wheelFL_ = wheel_pose;
+}
+
+void spCar::SetWheelFRPose(const spPose& wheel_pose) {
+  pose_wheelFR_ = wheel_pose;
+}
+
+void spCar::SetWheelBLPose(const spPose& wheel_pose) {
+  pose_wheelBL_ = wheel_pose;
+}
+
+void spCar::SetWheelBRPose(const spPose& wheel_pose) {
+  pose_wheelBR_ = wheel_pose;
+}
+
+spPose spCar::SetWheelFLPose() { return pose_wheelFL_; }
+
+spPose spCar::SetWheelFRPose() { return pose_wheelFR_; }
+
+spPose spCar::SetWheelBLPose() { return pose_wheelBL_; }
+
+spPose spCar::SetWheelBRPose() { return pose_wheelBR_; }
+
+void spCar::SetChassisSize(const spBoxSize& size) {
+  chassis_size_ = size;
+}
+
+const spBoxSize& spCar::GetChassisSize() {
+  return chassis_size_;
+}
+
+void spCar::SetWheelWeight(double mass) {
+  wheel_weight_ = mass;
+}
+
+double spCar::GetWheelWeight() {
+  return wheel_weight_;
+}

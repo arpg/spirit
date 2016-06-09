@@ -27,7 +27,8 @@ public:
 
 private:
   btRigidBody* UpdateBulletBoxObject(spBox& source_obj, btRigidBody* dest_obj);
-  btRigidBody* UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj);
+  btcom* UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj);
+  btRigidBody* CreateRigidBody(double mass, const btTransform tr, btCollisionShape* shape);
 
   BulletWorldParams world_params_;
   btDefaultCollisionConfiguration* collisionConfiguration_;

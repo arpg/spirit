@@ -75,20 +75,22 @@ bool spBulletWorld::InitEmptyDynamicsWorld() {
 
 void spBulletWorld::AddNewPhyObject(spCommonObject &sp_obj) {
   switch (sp_obj.GetObjecType()) {
-    case spObjectType::BOX:
-      // pass in nullptr to create a new bullet object
+    case spObjectType::BOX :
+      {// pass in nullptr to create a new bullet object
       btRigidBody* body = UpdateBulletBoxObject((spBox&)sp_obj,nullptr);
       body->setUserIndex(dynamics_world_->getNumCollisionObjects());
       dynamics_world_->addRigidBody(body);
       sp_obj.SetPhyIndex(body->getUserIndex());
       break;
-    case spObjectType::CAR:
-      // pass in nullptr to create a new bullet object
-      btRigidBody* compound_body = UpdateBulletBoxObject((spCar&)sp_obj,nullptr);
+    }
+    case spObjectType::CAR :
+    {  // pass in nullptr to create a new bullet object
+      btRigidBody* compound_body = UpdateBulletCarObject((spCar&)sp_obj,nullptr);
       compound_body->setUserIndex(dynamics_world_->getNumCollisionObjects());
       dynamics_world_->addRigidBody(compound_body);
       sp_obj.SetPhyIndex(compound_body->getUserIndex());
       break;
+    }
   }
 }
 
@@ -127,19 +129,33 @@ btRigidBody* spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody
 btRigidBody* spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj) {
   // if bullet pointer has not been defined yet then assign memory and initialize
   if (dest_obj == nullptr) {
-    btCollisionShape* chassis_shape = new btBoxShape(btVector3(1.f,0.5f,2.f));
-    collisionShapes_.push_back(chassis_shape);
-    btCompoundShape compound = new btCompoundShape();
+    /// Here we are gonna create a bullet car from scratch
+    // Create a bullet compound shape
+    btCompoundShape* compound = new btCompoundShape();
     collisionShapes_.push_back(compound);
+    // add chassis as a box to compound shape
+    btCollisionShape* chassis_shape = new btBoxShape(btVector3(source_obj.GetChassisSize()[0],source_obj.GetChassisSize()[1],source_obj.GetChassisSize()[2]));
+    collisionShapes_.push_back(chassis_shape);
     //chassis_tr effectively shifts the center of mass with respect to the chassis
     btTransform chassis_tr;
     chassis_tr.setIdentity();
-    chassis_tr.setOrigin(btVector3(0,1,0));
-    compound.addChildShape(chassis_tr,chassis_shape);
-
+    chassis_tr.setOrigin(btVector3(0,0,0));
+    compound->addChildShape(chassis_tr,chassis_shape);
     btDefaultMotionState* motion_state = new btDefaultMotionState;
-    btRigidBody::btRigidBodyConstructionInfo cInfo(0,motion_state,shape,btVector3(0,0,0));
+    btRigidBody::btRigidBodyConstructionInfo cInfo(0,motion_state,compound,btVector3(0,0,0));
+    // create a rigidbody from compound shape
     dest_obj = new btRigidBody(cInfo);
+    // now create and add wheels (we assume they are same size and shape)
+    btCollisionShape* wheel_shape = new btCylinderShapeX(btVector3(source_obj.GetWheelWidth(),source_obj.GetWheelRadius(),source_obj.GetWheelRadius()));;
+    for(int ii=0 ; ii<4 ; ii++) {
+      dest_obj->setActivationState(DISABLE_DEACTIVATION);
+      btTransform tr;
+      tr.setIdentity();
+
+
+    }
+// implement createRigidBody(10.0, tr, m_wheelShape);
+
   }
   // reset box size
   spBoxSize dims(source_obj.GetDimensions());
@@ -163,6 +179,27 @@ btRigidBody* spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody
   return dest_obj;
 }
 
+btRigidBody spBulletWorld::CreateRigidBody(double mass, const btTransform& tr, btCollisionShape *shape) {
+	{
+		//rigidbody is dynamic if and only if mass is non zero, otherwise static
+		bool isDynamic = (mass != 0.f);
+
+		btVector3 localInertia(0, 0, 0);
+		if (isDynamic)
+			shape->calculateLocalInertia(mass, localInertia);
+
+		//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+
+		btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+
+		btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState, shape, localInertia);
+
+		btRigidBody* body = new btRigidBody(cInfo);
+		//body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
+		body->setUserIndex(-1);
+		m_dynamicsWorld->addRigidBody(body);
+		return body;
+}
 
 void spBulletWorld::UpdatePhyObjectsFromSpirit(Objects &spobj) {
   // go through all spirit objects
@@ -175,7 +212,6 @@ void spBulletWorld::UpdatePhyObjectsFromSpirit(Objects &spobj) {
       switch (spobj.GetObject(ii).GetObjecType()) {
         case spObjectType::BOX:
           btCollisionObject* col_obj = dynamics_world_->getCollisionObjectArray()[phy_index];
-#warning  "upcasting might not pass pointer correctly, this should be tested"
           btRigidBody* bulletbody = btRigidBody::upcast(col_obj);
           UpdateBulletBoxObject((spBox&)spobj,bulletbody);
           break;
