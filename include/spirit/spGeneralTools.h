@@ -11,6 +11,7 @@
 #define spRotation Eigen::Quaternion<double>
 #define spTranslation Eigen::Vector3d
 #define spBoxSize Eigen::Vector3d
+#define spCylinderSize Eigen::Vector3d
 #define spMeshSize Eigen::Vector2d
 #define spColor Eigen::Vector3d
 #define spInertiaTensor Eigen::Matrix3d
@@ -18,6 +19,9 @@
 
 // bullet definitions
 #define USE_MOTIONSTATE 1
+#define SP_PI 3.14159265359
+#define SP_PI_HALF 1.57079632679
+#define SP_PI_QUART 0.78539816339
 
 enum spPhysolver{MLCP_DANTZING,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
