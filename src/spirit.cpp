@@ -31,20 +31,35 @@ void spirit::CheckKeyboardAction() {
   gui_.CheckKeyboardAction();
 }
 
+void spirit::ScenarioWorldCarFall() {
+  // create and add a car
+  spPose pose(spPose::Identity());
+  pose.translate(spTranslation(0,0,4));
+  obj_car_index = objects_.CreateCar(pose,4,spColor(0,1,0));
+  physics_.AddObject(objects_.GetObject(obj_car_index));
+  gui_.AddObject(objects_.GetObject(obj_car_index));
+
+  // create and add a ground as a box to objects_ vector
+  obj_gnd_index = objects_.CreateBox(spPose::Identity(),spBoxSize(10,10,1),0,spColor(0,1,0));
+  physics_.AddObject(objects_.GetObject(obj_gnd_index));
+  gui_.AddObject(objects_.GetObject(obj_gnd_index));
+
+}
+
+
 void spirit::ScenarioWorldBoxFall() {
   spPose pose(spPose::Identity());
   pose.translate(spTranslation(0,0,8));
   Eigen::AngleAxisd ang(M_PI/5,Eigen::Vector3d::UnitY());
   pose.rotate(ang);
-  obj_box_index = objects_.CreateBox(pose,spBoxSize(1,1,1),1,spColor(1, 0, 0));
+  obj_box_index = objects_.CreateBox(pose,spBoxSize(1,1,1),1,spColor(1,0,0));
   physics_.AddObject(objects_.GetObject(obj_box_index));
   gui_.AddObject(objects_.GetObject(obj_box_index));
 
   // create and add a ground as a box to objects_ vector
-  obj_gnd_index = objects_.CreateBox(spPose::Identity(),spBoxSize(10,10,1),0,spColor(0, 1, 0));
+  obj_gnd_index = objects_.CreateBox(spPose::Identity(),spBoxSize(10,10,1),0,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
-
 }
 
 void spirit::IterateWorld() {

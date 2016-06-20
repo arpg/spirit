@@ -13,6 +13,15 @@ int Objects::CreateBox(const spPose& pose, const spBoxSize& size, const double m
   return (objects_.size()-1);
 }
 
+int Objects::CreateCar(const spPose& pose, const int number_of_wheels, const spColor& color)
+{
+  std::shared_ptr<spCar> a_car = std::make_shared<spCar>(number_of_wheels);
+  a_car->SetPose(pose);
+  a_car->SetColor(color);
+  objects_.push_back(a_car);
+  return (objects_.size()-1);
+}
+
 void Objects::RemoveObj(int obj_index) {
   objects_.erase(objects_.begin()+obj_index);
 }

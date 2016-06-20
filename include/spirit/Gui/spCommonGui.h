@@ -13,6 +13,7 @@ class spCommonGUI {
   virtual void Refresh() = 0;
   virtual void CheckKeyboardAction() = 0;
   virtual void AddBox(spBox& box) = 0;
+  virtual void AddCar(spCar& car) = 0;
   virtual void UpdateGuiObjects(Objects& spobjects) = 0;
 };
 

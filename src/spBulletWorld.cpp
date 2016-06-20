@@ -98,26 +98,23 @@ void spBulletWorld::AddNewPhyObject(spCommonObject &sp_obj) {
     case spObjectType::BOX :
     {
       // pass in nullptr to create a new bullet object and add it to world
-      int phy_obj_index = UpdateBulletBoxObject((spBox&)sp_obj,nullptr);
-      sp_obj.SetPhyIndex(phy_obj_index);
+      UpdateBulletBoxObject((spBox&)sp_obj,nullptr);
       break;
     }
     case spObjectType::CAR :
     {
       // pass in nullptr to create a new bullet object
-      btRigidBody* compound_body = UpdateBulletCarObject((spCar&)sp_obj,nullptr);
-      compound_body->setUserIndex(dynamics_world_->getNumCollisionObjects());
-      dynamics_world_->addRigidBody(compound_body);
-      sp_obj.SetPhyIndex(compound_body->getUserIndex());
+      UpdateBulletCarObject((spCar&)sp_obj,nullptr);
       break;
     }
   }
 }
 
 
-btRigidBody* spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj) {
+void spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj) {
   // if bullet pointer has not been defined yet then assign memory and initialize
   if (dest_obj == nullptr) {
+    std::cout << "number of collision objects: " << dynamics_world_->getNumCollisionObjects() << std::endl;
     /// Here we are gonna create a bullet car from scratch
     // Create a bullet compound shape
     btCompoundShape* compound = new btCompoundShape();
@@ -172,6 +169,8 @@ btRigidBody* spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody
       // add the hinge constraint to the world and disable collision between bodyA/bodyB
       dynamics_world_->addConstraint(hinge,true);
     }
+#error "number of collission objects doesn't increase after adding the car to the world"
+    std::cout << "number of collision objects: " << dynamics_world_->getNumCollisionObjects() << std::endl;
   }
 
   // get compoundshape from rigidbody
@@ -238,10 +237,9 @@ btRigidBody* spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody
       hinge->setMaxMotorForce(steering_motor_axis,source_obj.GetWheelSteeringMotorTorque(ii));
     }
   }
-  return dest_obj;
 }
 
-const btTransform& spBulletWorld::spPose2btTransform(const spPose& pose) {
+btTransform spBulletWorld::spPose2btTransform(const spPose& pose) {
   btTransform tr;
   tr.setOrigin(btVector3(pose.translation()[0],pose.translation()[1],pose.translation()[2]));
   spRotation q(pose.rotation());
@@ -250,7 +248,7 @@ const btTransform& spBulletWorld::spPose2btTransform(const spPose& pose) {
 }
 
 // update all parameters of a box
-int spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody *dest_obj) {
+void spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody *dest_obj) {
 
   // if bullet pointer has not been defined yet then assign memory and initialize
   if (dest_obj == nullptr) {
@@ -258,14 +256,14 @@ int spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody *dest_ob
     collisionShapes_.push_back(shape);
     btTransform tr;
     tr.setIdentity();
-    dest_obj = CreateRigidBody(0,tr,shape);
+    dest_obj = CreateRigidBody(1,tr,shape);
     dynamics_world_->addRigidBody(dest_obj);
-    dest_obj->setUserIndex(dynamics_world_->getNumCollisionObjects());
+    dest_obj->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
+    source_obj.SetPhyIndex(dest_obj->getUserIndex());
   }
   // reset box size
   spBoxSize dims(source_obj.GetDimensions());
   dest_obj->getCollisionShape()->setLocalScaling(btVector3(dims[0]/2,dims[1]/2,dims[2]/2));
-
   //rigidbody is dynamic if and only if mass is non zero, otherwise static
   btVector3 localInertia(0,0,0);
   if (source_obj.IsDynamic()) {
@@ -274,14 +272,8 @@ int spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody *dest_ob
   }
   // reset object mass
   dest_obj->setMassProps(source_obj.GetMass(),localInertia);
-
   // transform phy object
-//  tr.setOrigin(btVector3(source_obj.GetPose().translation()[0], source_obj.GetPose().translation()[1], source_obj.GetPose().translation()[2]));
-//  Eigen::Quaterniond q(source_obj.GetPose().rotation());
-//  tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
-//  dest_obj->setWorldTransform(tr);
   dest_obj->setWorldTransform(spPose2btTransform(source_obj.GetPose()));
-  return dest_obj->getUserIndex();
 }
 
 
@@ -297,7 +289,7 @@ void spBulletWorld::UpdatePhyObjectsFromSpirit(Objects &spobj) {
         case spObjectType::BOX:
           btCollisionObject* col_obj = dynamics_world_->getCollisionObjectArray()[phy_index];
           btRigidBody* bulletbody = btRigidBody::upcast(col_obj);
-          UpdateBulletBoxObject((spBox&)spobj,bulletbody);
+          UpdateBulletBoxObject((spBox&)spobj.GetObject(ii),bulletbody);
           break;
       }
     }
@@ -315,6 +307,7 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
       btTransform bttrans;
       bttrans = obj->getWorldTransform();
       btVector3 btorigin = bttrans.getOrigin();
+//      std::cout << "Origin is: " << btorigin[0] << " , " << btorigin[1] << " , " << btorigin[2] << std::endl;
       spPose sppose(spPose::Identity());
       sppose.translate(spTranslation(btorigin[0],btorigin[1],btorigin[2]));
       btQuaternion btrot = bttrans.getRotation();

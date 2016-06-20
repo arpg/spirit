@@ -16,6 +16,7 @@ public:
   void IterateWorld();
   void CheckKeyboardAction();
   void ScenarioWorldBoxFall();
+  void ScenarioWorldCarFall();
 private:
   Gui gui_;
   spSettings user_settings_;
@@ -25,6 +26,7 @@ private:
 
   int obj_gnd_index;
   int obj_box_index;
+  int obj_car_index;
 };
 
 #endif  //SPIRIT_H__

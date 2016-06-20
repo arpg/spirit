@@ -122,6 +122,22 @@ void spPangolinScenegraphGui::AddBox(spBox &box) {
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
 }
 
+void spPangolinScenegraphGui::AddCar(spCar& car)
+{
+  // draw car with a box for chassis and four cylinders for wheels
+  SceneGraph::GLBox glchassis;
+  glchassis.SetPose(car.GetChassisPose().matrix());
+  glchassis.SetScale(car.GetChassisSize());
+  glchassis.SetCheckerboard(0);
+#warning "TODO: set color of box somehow"
+  globjects_.push_back(new SceneGraph::GLBox(glchassis));
+  car.SetGuiIndex(globjects_.size()-1);
+  glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
+  SceneGraph::GLObject* obj;
+  obj->AddChild(new SceneGraph::GLBox(glchassis));
+  obj->AddChild(new SceneGraph::GLBox(glchassis));
+  glscenegraph_.AddChild(&obj[0]);
+}
 
 void spPangolinScenegraphGui::UpdateGuiObjects(Objects &spobj) {
   // go through all spirit objects

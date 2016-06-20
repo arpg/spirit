@@ -25,10 +25,16 @@ bool spCommonObject::HasChangedGui() {
   return status;
 }
 
+// tells if object has been modified since last query
 bool spCommonObject::HasChangedPhy() {
   bool status = obj_phychanged_;
   obj_phychanged_ = false;
   return status;
+}
+
+bool spCommonObject::IsCompound()
+{
+  return is_compound;
 }
 
 spObjectType spCommonObject::GetObjecType() { return object_type_; }

@@ -26,10 +26,10 @@ public:
   void UpdateSpiritObjectsFromPhy(Objects& spobjects);
 
 private:
-  int UpdateBulletBoxObject(spBox& source_obj, btRigidBody* dest_obj);
-  btRigidBody* UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj);
+  void UpdateBulletBoxObject(spBox& source_obj, btRigidBody* dest_obj);
+  void UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj);
   btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
-  const btTransform& spPose2btTransform(const spPose& pose);
+  btTransform spPose2btTransform(const spPose& pose);
 
   BulletWorldParams world_params_;
   btDefaultCollisionConfiguration* collisionConfiguration_;

@@ -86,6 +86,8 @@ class spCar : public spCommonObject {
   const spTranslation& GetLocalCOG();
   void SetLocalCOG(const spTranslation& tr);
 
+
+
   struct spWheel {
     spTranslation origin_tr;
     double friction;  // unit less

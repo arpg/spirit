@@ -12,6 +12,7 @@ public:
   Objects();
   ~Objects();
   int CreateBox(const spPose& pose, const spBoxSize& size, const double mass,const spColor& color);
+  int CreateCar(const spPose& pose, const int number_of_wheels, const spColor& color);
   void RemoveObj(int obj_index);
   int GetNumOfObjects();
   spCommonObject& GetObject(int obj_index);

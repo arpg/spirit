@@ -10,6 +10,7 @@ spCar::spCar(int num_wheels) {
   obj_phychanged_ = false;
   obj_guichanged_ = false;
   object_type_ = spObjectType::CAR;
+  is_compound = true;
 }
 
 spCar::~spCar() {}

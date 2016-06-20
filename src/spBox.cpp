@@ -10,6 +10,7 @@ spBox::spBox() {
   obj_phychanged_ = false;
   obj_guichanged_ = false;
   object_type_ = spObjectType::BOX;
+  is_compound = false;
 }
 
 spBox::~spBox() {}

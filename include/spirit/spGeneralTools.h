@@ -8,7 +8,7 @@
 
 // spirit types
 #define spPose Eigen::Transform<double,3,Eigen::Affine>
-#define spRotation Eigen::Quaternion<double>
+#define spRotation Eigen::Quaterniond
 #define spTranslation Eigen::Vector3d
 #define spBoxSize Eigen::Vector3d
 #define spCylinderSize Eigen::Vector3d

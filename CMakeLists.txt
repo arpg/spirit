@@ -63,6 +63,7 @@ set( HDRS
 	include/spirit/Objects.h
 	include/spirit/Objects/spMesh.h
 	include/spirit/Objects/spCar.h
+	include/spirit/Objects/spAWSDCar.h
 	)
 set( SRCS
 	src/spirit.cpp
@@ -78,6 +79,7 @@ set( SRCS
 	src/Objects.cpp
 	src/spMesh.cpp
 	src/spCar.cpp
+	src/spAWSDCar.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)
