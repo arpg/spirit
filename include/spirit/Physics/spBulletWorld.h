@@ -30,6 +30,8 @@ private:
   void UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj);
   btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
   btTransform spPose2btTransform(const spPose& pose);
+  btRigidBody* CreateBulletCarObject(spCar& source_obj);
+  btRigidBody* CreateBulletBoxObject(spBox& source_obj);
 
   BulletWorldParams world_params_;
   btDefaultCollisionConfiguration* collisionConfiguration_;

@@ -32,9 +32,11 @@ bool spCommonObject::HasChangedPhy() {
   return status;
 }
 
-bool spCommonObject::IsCompound()
-{
-  return is_compound;
-}
-
 spObjectType spCommonObject::GetObjecType() { return object_type_; }
+
+bool spCommonObject::IsDynamic() {
+  if(mass_>0)
+    return true;
+  else
+    return false;
+}

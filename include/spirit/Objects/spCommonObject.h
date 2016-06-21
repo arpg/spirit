@@ -12,7 +12,7 @@ class spCommonObject {
   virtual void SetColor(const spColor& color) = 0;
 //  virtual void SetMass(double mass) = 0;
 //  virtual double GetMass() = 0;
-  virtual bool IsDynamic() = 0;
+  bool IsDynamic();
 
   spCommonObject();
   ~spCommonObject();
@@ -24,7 +24,6 @@ class spCommonObject {
   void Delete();
   bool HasChangedGui();
   bool HasChangedPhy();
-  bool IsCompound();
   spObjectType GetObjecType();
 
  protected:
@@ -32,7 +31,6 @@ class spCommonObject {
   int index_gui_;
   bool obj_guichanged_;
   bool obj_phychanged_;
-  bool is_compound;
   spObjectType object_type_;
 
   double mass_;

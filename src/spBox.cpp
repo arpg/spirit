@@ -10,7 +10,6 @@ spBox::spBox() {
   obj_phychanged_ = false;
   obj_guichanged_ = false;
   object_type_ = spObjectType::BOX;
-  is_compound = false;
 }
 
 spBox::~spBox() {}
@@ -48,12 +47,4 @@ void spBox::SetMass(double mass) {
 
 double spBox::GetMass() {
   return mass_;
-}
-
-bool spBox::IsDynamic() {
-  if (mass_ > 0) {
-    return true;
-  } else {
-    return false;
-  }
 }
