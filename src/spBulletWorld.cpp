@@ -121,14 +121,20 @@ btRigidBody* spBulletWorld::CreateBulletCarObject(spCar& source_obj) {
   collisionShapes_.push_back(chassis_shape);
   //cg_tr effectively shifts the center of mass with respect to the chassis
   // this transform is to put the cog in the right spot
-  spPose chassis_transform(spPose::Identity());
-  spPose cog_transform(spPose::Identity());
-  cog_transform.translate(source_obj.GetLocalCOG());
-  chassis_transform = source_obj.GetChassisPose() * cog_transform.inverse();
-  compound->addChildShape(spPose2btTransform(chassis_transform),chassis_shape);
+//  spPose chassis_transform(spPose::Identity());
+//  spPose cog_transform(spPose::Identity());
+//  cog_transform.translate(source_obj.GetLocalCOG());
+//  chassis_transform = source_obj.GetPose() * cog_transform.inverse();
+//  compound->addChildShape(spPose2btTransform(chassis_transform),chassis_shape);
+#warning "we are not doing the cog transform for now, but it should be fixed later"
+  compound->addChildShape(spPose2btTransform(spPose::Identity()),chassis_shape);  // test
   // create a rigidbody from compound shape and add it world
-  spPose global_cog(source_obj.GetChassisPose() * cog_transform);
-  btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(global_cog),compound);
+
+  // apply cog transform
+//  spPose global_cog(source_obj.GetPose() * cog_transform);
+//  btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(global_cog),compound);
+  btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(source_obj.GetPose()),compound);  // test
+
   dynamics_world_->addRigidBody(bodyA);
   // set the correct index for spCar object so we can access this object later
   bodyA->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
@@ -139,6 +145,7 @@ btRigidBody* spBulletWorld::CreateBulletCarObject(spCar& source_obj) {
     bodyA->setActivationState(DISABLE_DEACTIVATION);
     btTransform tr;
     tr.setIdentity();
+#warning "wheel origin is different than wheel pose, make sure it has been implemented correctly"
     tr.setOrigin(btVector3(source_obj.GetWheelOrigin(ii)[0], source_obj.GetWheelOrigin(ii)[1], source_obj.GetWheelOrigin(ii)[2]));
     btCollisionShape* wheel_shape = new btCylinderShapeX(btVector3(1,1,1));
     btRigidBody* bodyB = CreateRigidBody(spwheel->GetMass(),tr,wheel_shape);
@@ -193,12 +200,14 @@ void spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_o
   chassis_shape->calculateLocalInertia(source_obj.GetChassisMass(),localInertia);
   // reset COG from spObject
   dest_obj->setMassProps(source_obj.GetChassisMass(),localInertia);
-  spPose chassis_transform(spPose::Identity());
-  spPose cog_transform(spPose::Identity());
-  cog_transform.translate(source_obj.GetLocalCOG());
-  chassis_transform = source_obj.GetChassisPose() * cog_transform.inverse();
-  compound->updateChildTransform(box_childnumber,spPose2btTransform(chassis_transform));
-  spPose global_cog(source_obj.GetChassisPose() * cog_transform);
+//  spPose chassis_transform(spPose::Identity());
+//  spPose cog_transform(spPose::Identity());
+//  cog_transform.translate(source_obj.GetLocalCOG());
+//  chassis_transform = source_obj.GetPose() * cog_transform.inverse();
+//  compound->updateChildTransform(box_childnumber,spPose2btTransform(chassis_transform));
+//  spPose global_cog(source_obj.GetPose() * cog_transform);
+#warning "we are not doing the cog transform for now, but it should be fixed later"
+  spPose global_cog(source_obj.GetPose());
   dest_obj->setWorldTransform(spPose2btTransform(global_cog));
   // Update wheel
   for(int ii=0; ii<source_obj.GetNumberOfWheels(); ii++){
@@ -213,10 +222,11 @@ void spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_o
     wheel_body->getCollisionShape()->calculateLocalInertia(wheel_mass,wheel_local_inertia);
     wheel_body->setMassProps(wheel_mass,wheel_local_inertia);
     // reset wheel location
-    btTransform wheel_tr;
-    wheel_tr.setIdentity();
-    wheel_tr.setOrigin(btVector3(source_obj.GetWheelOrigin(ii)[0], source_obj.GetWheelOrigin(ii)[1], source_obj.GetWheelOrigin(ii)[2]));
-    wheel_body->setWorldTransform(wheel_tr);
+#warning "removed updating wheel origin, I guess this is something to be decided only by phy engine"
+//    btTransform wheel_tr;
+//    wheel_tr.setIdentity();
+//    wheel_tr.setOrigin(btVector3(source_obj.GetWheelOrigin(ii)[0], source_obj.GetWheelOrigin(ii)[1], source_obj.GetWheelOrigin(ii)[2]));
+//    wheel_body->setWorldTransform(wheel_tr);
     // reset wheel friction and damping
     wheel_body->setFriction(spwheel->GetFriction());
 
@@ -243,7 +253,7 @@ void spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_o
     }
   }
 }
-
+#warning "returning bttransform might not be the fastest way of type conversion"
 btTransform spBulletWorld::spPose2btTransform(const spPose& pose) {
   btTransform tr;
   tr.setOrigin(btVector3(pose.translation()[0],pose.translation()[1],pose.translation()[2]));
@@ -251,6 +261,17 @@ btTransform spBulletWorld::spPose2btTransform(const spPose& pose) {
   tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
   return tr;
 }
+#warning "if I return a reference instead of sppose UpdateSpiritObjectsFromPhy() will mess up things"
+spPose spBulletWorld::btTransform2spPose(const btTransform& tr) {
+  spPose pose(spPose::Identity());
+  btVector3 origin = tr.getOrigin();
+  pose.translate(spTranslation(origin[0],origin[1],origin[2]));
+  btQuaternion btrot = tr.getRotation();
+  spRotation spangle(btrot.w(),btrot.x(),btrot.y(),btrot.z());
+  pose.rotate(spangle);
+  return pose;
+}
+
 
 btRigidBody* spBulletWorld::CreateBulletBoxObject(spBox &source_obj) {
   btCollisionShape* shape = new btBoxShape(btVector3(1,1,1));
@@ -279,6 +300,7 @@ void spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody *dest_o
   // reset object mass
   dest_obj->setMassProps(source_obj.GetMass(),localInertia);
   // transform phy object
+//  std::cout << "source_obj pose" << btTransform2spPose(dest_obj->getWorldTransform()).matrix() << std::endl;
   dest_obj->setWorldTransform(spPose2btTransform(source_obj.GetPose()));
 }
 
@@ -297,6 +319,7 @@ void spBulletWorld::UpdatePhyObjectsFromSpirit(Objects &spobj) {
           btCollisionObject* col_obj = dynamics_world_->getCollisionObjectArray()[phy_index];
           btRigidBody* bulletbody = btRigidBody::upcast(col_obj);
           UpdateBulletBoxObject((spBox&)spobj.GetObject(ii),bulletbody);
+          spobj.GetObject(ii).SetPhyUpdated();
           break;
         }
         case spObjectType::CAR:
@@ -304,6 +327,7 @@ void spBulletWorld::UpdatePhyObjectsFromSpirit(Objects &spobj) {
           btCollisionObject* col_obj = dynamics_world_->getCollisionObjectArray()[phy_index];
           btRigidBody* bulletbody = btRigidBody::upcast(col_obj);
           UpdateBulletCarObject((spCar&)spobj.GetObject(ii),bulletbody);
+          spobj.GetObject(ii).SetPhyUpdated();
           break;
         }
       }
@@ -315,20 +339,31 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
   for(int ii=0; ii<spobjects.GetNumOfObjects(); ii++) {
     //only update objects which are dynamic
     if(spobjects.GetObject(ii).IsDynamic()) {
-      // get gui index of object
-      int phy_index = spobjects.GetObject(ii).GetPhyIndex();
-      // update the phy object
-      btCollisionObject* obj = dynamics_world_->getCollisionObjectArray()[phy_index];
-      btTransform bttrans;
-      bttrans = obj->getWorldTransform();
-      btVector3 btorigin = bttrans.getOrigin();
-//      std::cout << "Origin is: " << btorigin[0] << " , " << btorigin[1] << " , " << btorigin[2] << std::endl;
-      spPose sppose(spPose::Identity());
-      sppose.translate(spTranslation(btorigin[0],btorigin[1],btorigin[2]));
-      btQuaternion btrot = bttrans.getRotation();
-      spRotation spangle(btrot.w(),btrot.x(),btrot.y(),btrot.z());
-      sppose.rotate(spangle);
-      spobjects.GetObject(ii).SetPose(sppose);
+      switch (spobjects.GetObject(ii).GetObjecType()) {
+        case spObjectType::BOX:
+        {
+          spBox& box = (spBox&) spobjects.GetObject(ii);
+          // update the phy object
+          btCollisionObject* obj = dynamics_world_->getCollisionObjectArray()[box.GetPhyIndex()];
+          spPose ps(btTransform2spPose(obj->getWorldTransform()));
+          box.SetPose(ps);
+          break;
+        }
+        case spObjectType::CAR:
+        {
+#error "car wheels are not oriented correctly, it has a initialization issue, in first frame all wheels are in one point of space"
+          spCar& car = (spCar&) spobjects.GetObject(ii);
+          // update chassis
+          btCollisionObject* chassis_obj = dynamics_world_->getCollisionObjectArray()[car.GetPhyIndex()];
+          car.SetPose(btTransform2spPose(chassis_obj->getWorldTransform()));
+          // update wheels
+          for(int ii=0; ii<car.GetNumberOfWheels(); ii++) {
+            btCollisionObject* wheel_obj = dynamics_world_->getCollisionObjectArray()[car.GetWheel(ii)->GetPhyIndex()];
+            car.GetWheel(ii)->SetPose(btTransform2spPose(wheel_obj->getWorldTransform()));
+          }
+          break;
+        }
+      }
     }
   }
 }

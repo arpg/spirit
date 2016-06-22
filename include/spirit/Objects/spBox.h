@@ -20,7 +20,6 @@ class spBox : public spCommonObject {
   spBoxSize dims_;
   spPose pose_;
   spColor color_;
-  double mass_;
 };
 
 #endif  //  SP_BOX_H__

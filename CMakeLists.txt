@@ -58,7 +58,6 @@ set( HDRS
 	include/spirit/spGeneralTools.h
 	include/spirit/spSettings.h
 	include/spirit/Objects/spBox.h
-	include/spirit/Objects/spSphere.h
 	include/spirit/Objects/spCommonObject.h
 	include/spirit/Objects.h
 	include/spirit/Objects/spMesh.h
@@ -75,7 +74,6 @@ set( SRCS
 	src/spSettings.cpp
 	src/spBulletWorld.cpp
 	src/spBox.cpp
-	src/spSphere.cpp
 	src/spCommonObject.cpp
 	src/Objects.cpp
 	src/spMesh.cpp

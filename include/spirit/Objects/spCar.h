@@ -38,7 +38,6 @@ class spCar : public spCommonObject {
   void SetLocalCOG(const spTranslation& tr);
 
  protected:
-  void SetChassisPose(const spPose& pose);
   void SetWheelOrigin(int index, const spTranslation& tr);
 
  private:
@@ -47,7 +46,6 @@ class spCar : public spCommonObject {
   spTranslation cog_;  // center of gravity
   spColor color_;
   spBoxSize chassis_size_;
-  spPose chassis_pose_;
   spTranslation cog_local_;
   // Car parameters
   double chassis_mass_;  // in kg

@@ -63,6 +63,8 @@ public:
   bool GetAirborneState();
   void SetAirborneState(bool status);
 
+#warning " i shouldn't have a public variable like this"
+spTranslation origin;
 
 private:
   double friction_;  // unit less

@@ -25,6 +25,8 @@ class spCommonObject {
   bool HasChangedGui();
   bool HasChangedPhy();
   spObjectType GetObjecType();
+  void SetPhyUpdated();
+  void SetGuiUpdated();
 
  protected:
   int index_phy_;

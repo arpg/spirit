@@ -34,6 +34,16 @@ bool spCommonObject::HasChangedPhy() {
 
 spObjectType spCommonObject::GetObjecType() { return object_type_; }
 
+void spCommonObject::SetPhyUpdated()
+{
+  obj_phychanged_ = false;
+}
+
+void spCommonObject::SetGuiUpdated()
+{
+  obj_guichanged_ = false;
+}
+
 bool spCommonObject::IsDynamic() {
   if(mass_>0)
     return true;

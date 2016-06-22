@@ -34,13 +34,18 @@ void spirit::CheckKeyboardAction() {
 void spirit::ScenarioWorldCarFall() {
   // create and add a car
   spPose pose(spPose::Identity());
-  pose.translate(spTranslation(0,0,4));
+  pose.translate(spTranslation(0,0,0.5));
   obj_car_index = objects_.CreateCar(pose,4,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_car_index));
   gui_.AddObject(objects_.GetObject(obj_car_index));
 
+
   // create and add a ground as a box to objects_ vector
-  obj_gnd_index = objects_.CreateBox(spPose::Identity(),spBoxSize(10,10,1),0,spColor(0,1,0));
+  spPose ground(spPose::Identity());
+  ground.translate(spTranslation(0,0,-2));
+  Eigen::AngleAxisd ang(M_PI/20,Eigen::Vector3d::UnitX());
+  ground.rotate(ang);
+  obj_gnd_index = objects_.CreateBox(ground,spBoxSize(100,100,0.1),0,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 

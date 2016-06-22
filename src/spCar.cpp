@@ -7,9 +7,20 @@ spCar::spCar(int num_wheels) {
     wheel_.push_back(std::make_shared<spWheel>());
     mass_ += wheel_[ii]->GetMass();
   }
+  if(num_wheels==4) {
+    std::cout << "this called" << std::endl;
+    SetWheelOrigin(0,spTranslation(1,1,-0.1));
+    SetWheelOrigin(1,spTranslation(-1,1,-0.1));
+    SetWheelOrigin(2,spTranslation(-1,-1,-0.1));
+    SetWheelOrigin(3,spTranslation(1,-1,-0.1));
+  }
 
   color_ = spColor(0, 0, 0);
   pose_ = spPose::Identity();
+  cog_ = pose_.translation();
+  cog_local_ = spTranslation(0,0,0);
+  chassis_mass_ = 1;
+  chassis_size_ = spBoxSize(1,1,1);
   index_phy_ = -1;
   index_gui_ = -1;
   obj_phychanged_ = false;
@@ -22,6 +33,8 @@ spCar::~spCar() {}
 
 void spCar::SetPose(const spPose& pose) {
   pose_ = pose;
+#warning "cog = pose for test here"
+  cog_ = pose.translation();
   obj_phychanged_ = true;
   obj_guichanged_ = true;
 }
@@ -35,14 +48,14 @@ void spCar::SetColor(const spColor& color) {
 
 const spTranslation& spCar::GetWheelOrigin(int index)
 {
-  return wheel_[index]->GetPose().translation();
+  return wheel_[index]->origin;//->GetPose().translation();
 }
 
 void spCar::SetWheelOrigin(int index, const spTranslation& tr)
 {
-  spPose pose = wheel_[index]->GetPose();
-  pose.translate(tr);
-  wheel_[index]->SetPose(pose);
+  wheel_[index]->origin = tr;
+  obj_phychanged_ = true;
+  obj_guichanged_ = true;
 }
 
 double spCar::GetRollInfluence() {
@@ -51,6 +64,7 @@ double spCar::GetRollInfluence() {
 
 void spCar::SetRollInfluence(double roll_inf) {
   roll_influence_ = roll_inf;
+  obj_phychanged_ = true;
 }
 
 double spCar::GetChassisMass() {
@@ -59,6 +73,7 @@ double spCar::GetChassisMass() {
 
 void spCar::SetChassisMass(double mass) {
   chassis_mass_ = mass;
+  obj_phychanged_ = true;
 }
 
 
@@ -68,6 +83,8 @@ const spBoxSize& spCar::GetChassisSize() {
 
 void spCar::SetChassisSize(const spBoxSize& dim) {
   chassis_size_ = dim;
+  obj_phychanged_ = true;
+  obj_guichanged_ = true;
 }
 
 const spTranslation& spCar::GetLocalCOG() {
@@ -77,10 +94,7 @@ const spTranslation& spCar::GetLocalCOG() {
 
 void spCar::SetLocalCOG(const spTranslation& tr) {
 #warning "implememt this"
-}
-
-const spPose& spCar::GetChassisPose() {
-  return chassis_pose_;
+  obj_phychanged_ = true;
 }
 
 int spCar::GetNumberOfWheels()

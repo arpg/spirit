@@ -37,8 +37,15 @@ void Gui::CheckKeyboardAction() {
 void Gui::AddObject(spCommonObject &obj) {
   switch(obj.GetObjecType()) {
     case spObjectType::BOX:
+    {
       gui_->AddBox((spBox&) obj);
       break;
+    }
+    case spObjectType::CAR:
+    {
+      gui_->AddCar((spCar&) obj);
+      break;
+    }
   }
 }
 

@@ -29,6 +29,8 @@ class spPangolinScenegraphGui : public spCommonGUI {
 
  private:
   static void KeyActionMethodSample();
+  void UpdateBoxObject(spBox& spobj);
+  void UpdateCarObject(spCar& spobj);
 
   // Safe and efficient binding of named variables.
   // Specialisations mean no conversions take place for exact types

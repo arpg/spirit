@@ -126,17 +126,38 @@ void spPangolinScenegraphGui::AddCar(spCar& car)
 {
   // draw car with a box for chassis and four cylinders for wheels
   SceneGraph::GLBox glchassis;
-  glchassis.SetPose(car.GetChassisPose().matrix());
+  glchassis.SetPose(car.GetPose().matrix());
   glchassis.SetScale(car.GetChassisSize());
-  glchassis.SetCheckerboard(0);
-#warning "TODO: set color of box somehow"
   globjects_.push_back(new SceneGraph::GLBox(glchassis));
   car.SetGuiIndex(globjects_.size()-1);
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
-  SceneGraph::GLObject* obj;
-  obj->AddChild(new SceneGraph::GLBox(glchassis));
-  obj->AddChild(new SceneGraph::GLBox(glchassis));
-  glscenegraph_.AddChild(&obj[0]);
+
+  for(int ii=0; ii<car.GetNumberOfWheels(); ii++) {
+    SceneGraph::GLBox glwheel;
+    glwheel.SetPose(car.GetWheel(ii)->GetPose().matrix());
+    glwheel.SetScale(Eigen::Vector3d(0.2,0.5,0.5));
+//    glwheel.SetColor(SceneGraph::GLColor(Eigen::Vector4d(1,0,0,0.5)));
+    globjects_.push_back(new SceneGraph::GLBox(glwheel));
+    car.GetWheel(ii)->SetGuiIndex(globjects_.size()-1);
+    glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
+  }
+}
+
+void spPangolinScenegraphGui::UpdateBoxObject(spBox& box) {
+  int gui_index = box.GetGuiIndex();
+  globjects_[gui_index]->SetPose(box.GetPose().matrix());
+  globjects_[gui_index]->SetScale(box.GetDimensions());
+#warning "TODO: set color of box somehow"
+}
+
+void spPangolinScenegraphGui::UpdateCarObject(spCar& car) {
+  int chassis_index = car.GetGuiIndex();
+  globjects_[chassis_index]->SetPose(car.GetPose().matrix());
+  globjects_[chassis_index]->SetScale(car.GetChassisSize());
+  for(int ii=0; ii<car.GetNumberOfWheels(); ii++) {
+    int wheel_index = car.GetWheel(ii)->GetGuiIndex();
+    globjects_[wheel_index]->SetPose(car.GetWheel(ii)->GetPose().matrix());
+  }
 }
 
 void spPangolinScenegraphGui::UpdateGuiObjects(Objects &spobj) {
@@ -144,38 +165,20 @@ void spPangolinScenegraphGui::UpdateGuiObjects(Objects &spobj) {
   for(int ii=0; ii<spobj.GetNumOfObjects(); ii++) {
     //only update objects which had gui property changes
     if(spobj.GetObject(ii).HasChangedGui()) {
-      // get gui index of object
-      int gui_index = spobj.GetObject(ii).GetGuiIndex();
       // update the gui object
       switch (spobj.GetObject(ii).GetObjecType()) {
         case spObjectType::BOX:
-          spBox* box = (spBox*) &spobj.GetObject(ii);
-          globjects_[gui_index]->SetPose(box->GetPose().matrix());
-          globjects_[gui_index]->SetScale(box->GetDimensions());
-#warning "TODO: set color of box somehow"
+        {
+          UpdateBoxObject((spBox&)spobj.GetObject(ii));
           break;
+        }
+        case spObjectType::CAR:
+        {
+          UpdateCarObject((spCar&)spobj.GetObject(ii));
+          break;
+        }
       }
     }
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
