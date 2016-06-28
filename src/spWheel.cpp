@@ -3,7 +3,7 @@
 
 spWheel::spWheel()
 {
-  friction_ = 1;
+  friction_ = 100;
   width_ = 0.2;
   radius_ = 0.4;
   susp_damping_ = 0.2;

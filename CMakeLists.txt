@@ -61,7 +61,7 @@ set( HDRS
 	include/spirit/Objects/spCommonObject.h
 	include/spirit/Objects.h
 	include/spirit/Objects/spMesh.h
-	include/spirit/Objects/spCar.h
+	include/spirit/Objects/spVehicle.h
 	include/spirit/Objects/spAWSDCar.h
 	include/spirit/Objects/spWheel.h
 	)
@@ -77,7 +77,7 @@ set( SRCS
 	src/spCommonObject.cpp
 	src/Objects.cpp
 	src/spMesh.cpp
-	src/spCar.cpp
+	src/spVehicle.cpp
 	src/spAWSDCar.cpp
 	src/spWheel.cpp
 	)

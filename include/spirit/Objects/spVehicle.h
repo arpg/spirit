@@ -1,19 +1,19 @@
-#ifndef SP_CAR_H__
-#define SP_CAR_H__
+#ifndef SP_VEHICLE_H__
+#define SP_VEHICLE_H__
 
 #include <spirit/Objects/spCommonObject.h>
 #include <vector>
 #include <spirit/Objects/spWheel.h>
 
-// 1 - Geometric center of the chassis box will be the center of car object and
+// 1 - Geometric center of the chassis box will be the center of vehicle object and
 // any local transformation will be with respect to coordinate system in this
 // center.
 // 2 - every transformation is in global coordinates unless it has name "Local"
 // in its fucntion name.
-class spCar : public spCommonObject {
+class spVehicle : public spCommonObject {
  public:
-  spCar(int num_wheels);
-  ~spCar();
+  spVehicle(std::vector<spTranslation> wheel_anchor);
+  ~spVehicle();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
   void SetColor(const spColor& color);
@@ -29,7 +29,7 @@ class spCar : public spCommonObject {
   double GetChassisMass();
   void SetChassisMass(double mass);
 
-  const spTranslation& GetWheelOrigin(int index);
+  const spPose& GetWheelOrigin(int index);
 
   const spBoxSize& GetChassisSize();
   void SetChassisSize(const spBoxSize& dim);
@@ -37,8 +37,10 @@ class spCar : public spCommonObject {
   const spTranslation& GetLocalCOG();
   void SetLocalCOG(const spTranslation& tr);
 
+  void MoveWheelsToAnchors(void);
+
  protected:
-  void SetWheelOrigin(int index, const spTranslation& tr);
+  void SetWheelOrigin(int index, const spPose& pose);
   void SetWheelAnchor(int index, const spTranslation& tr);
 
  private:
@@ -48,9 +50,8 @@ class spCar : public spCommonObject {
   spColor color_;
   spBoxSize chassis_size_;
   spTranslation cog_local_;
-  // Car parameters
   double chassis_mass_;  // in kg
   double roll_influence_;
 };
 
-#endif  //  SP_BOX_H__
+#endif  //  SP_VEHICLE_H__

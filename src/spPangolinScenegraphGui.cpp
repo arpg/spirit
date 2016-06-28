@@ -122,23 +122,23 @@ void spPangolinScenegraphGui::AddBox(spBox &box) {
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
 }
 
-void spPangolinScenegraphGui::AddCar(spCar& car)
+void spPangolinScenegraphGui::AddVehicle(spVehicle& vehicle)
 {
-  // draw car with a box for chassis and four cylinders for wheels
+  // draw vehicle with a box for chassis and four cylinders for wheels
   SceneGraph::GLBox glchassis;
-  glchassis.SetPose(car.GetPose().matrix());
-  glchassis.SetScale(car.GetChassisSize());
+  glchassis.SetPose(vehicle.GetPose().matrix());
+  glchassis.SetScale(vehicle.GetChassisSize());
   globjects_.push_back(new SceneGraph::GLBox(glchassis));
-  car.SetGuiIndex(globjects_.size()-1);
+  vehicle.SetGuiIndex(globjects_.size()-1);
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
 
-  for(int ii=0; ii<car.GetNumberOfWheels(); ii++) {
+  for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
     SceneGraph::GLBox glwheel;
-    glwheel.SetPose(car.GetWheel(ii)->GetPose().matrix());
+    glwheel.SetPose(vehicle.GetWheel(ii)->GetPose().matrix());
     glwheel.SetScale(Eigen::Vector3d(0.2,0.5,0.5));
 //    glwheel.SetColor(SceneGraph::GLColor(Eigen::Vector4d(1,0,0,0.5)));
     globjects_.push_back(new SceneGraph::GLBox(glwheel));
-    car.GetWheel(ii)->SetGuiIndex(globjects_.size()-1);
+    vehicle.GetWheel(ii)->SetGuiIndex(globjects_.size()-1);
     glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
   }
 }
@@ -150,13 +150,13 @@ void spPangolinScenegraphGui::UpdateBoxObject(spBox& box) {
 #warning "TODO: set color of box somehow"
 }
 
-void spPangolinScenegraphGui::UpdateCarObject(spCar& car) {
-  int chassis_index = car.GetGuiIndex();
-  globjects_[chassis_index]->SetPose(car.GetPose().matrix());
-  globjects_[chassis_index]->SetScale(car.GetChassisSize());
-  for(int ii=0; ii<car.GetNumberOfWheels(); ii++) {
-    int wheel_index = car.GetWheel(ii)->GetGuiIndex();
-    globjects_[wheel_index]->SetPose(car.GetWheel(ii)->GetPose().matrix());
+void spPangolinScenegraphGui::UpdateVehicleObject(spVehicle& vehicle) {
+  int chassis_index = vehicle.GetGuiIndex();
+  globjects_[chassis_index]->SetPose(vehicle.GetPose().matrix());
+  globjects_[chassis_index]->SetScale(vehicle.GetChassisSize());
+  for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
+    int wheel_index = vehicle.GetWheel(ii)->GetGuiIndex();
+    globjects_[wheel_index]->SetPose(vehicle.GetWheel(ii)->GetPose().matrix());
   }
 }
 
@@ -172,9 +172,9 @@ void spPangolinScenegraphGui::UpdateGuiObjects(Objects &spobj) {
           UpdateBoxObject((spBox&)spobj.GetObject(ii));
           break;
         }
-        case spObjectType::CAR:
+        case spObjectType::VEHICLE:
         {
-          UpdateCarObject((spCar&)spobj.GetObject(ii));
+          UpdateVehicleObject((spVehicle&)spobj.GetObject(ii));
           break;
         }
       }

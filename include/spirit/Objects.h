@@ -5,14 +5,14 @@
 #include <vector>
 #include <spirit/Objects/spCommonObject.h>
 #include <spirit/Objects/spBox.h>
-#include <spirit/Objects/spCar.h>
+#include <spirit/Objects/spVehicle.h>
 
 class Objects {
 public:
   Objects();
   ~Objects();
   int CreateBox(const spPose& pose, const spBoxSize& size, const double mass,const spColor& color);
-  int CreateCar(const spPose& pose, const int number_of_wheels, const spColor& color);
+  int CreateVehicle(const spPose& pose, const std::vector<spTranslation>& wheels_anchor, const spColor& color);
   void RemoveObj(int obj_index);
   int GetNumOfObjects();
   spCommonObject& GetObject(int obj_index);

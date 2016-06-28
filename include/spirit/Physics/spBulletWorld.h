@@ -27,11 +27,11 @@ public:
 
 private:
   void UpdateBulletBoxObject(spBox& source_obj, btRigidBody* dest_obj);
-  void UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj);
+  void UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody* dest_obj);
   btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
   btTransform spPose2btTransform(const spPose& pose);
   spPose btTransform2spPose(const btTransform& tr);
-  btRigidBody* CreateBulletCarObject(spCar& source_obj);
+  btRigidBody* CreateBulletVehicleObject(spVehicle& source_obj);
   btRigidBody* CreateBulletBoxObject(spBox& source_obj);
 
   BulletWorldParams world_params_;

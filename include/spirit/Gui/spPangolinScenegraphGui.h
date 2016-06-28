@@ -24,13 +24,13 @@ class spPangolinScenegraphGui : public spCommonGUI {
   void Refresh();
   void CheckKeyboardAction();
   void AddBox(spBox& box);
-  void AddCar(spCar& car);
+  void AddVehicle(spVehicle& vehicle);
   void UpdateGuiObjects(Objects &spobj);
 
  private:
   static void KeyActionMethodSample();
   void UpdateBoxObject(spBox& spobj);
-  void UpdateCarObject(spCar& spobj);
+  void UpdateVehicleObject(spVehicle& spobj);
 
   // Safe and efficient binding of named variables.
   // Specialisations mean no conversions take place for exact types

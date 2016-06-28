@@ -35,9 +35,15 @@ void spirit::ScenarioWorldCarFall() {
   // create and add a car
   spPose pose(spPose::Identity());
   pose.translate(spTranslation(5,0,2.5));
-//  Eigen::AngleAxisd rot(M_PI/10,Eigen::Vector3d::UnitY());
+  Eigen::AngleAxisd rot(M_PI/10,Eigen::Vector3d::UnitY());
 //  pose.rotate(rot);
-  obj_car_index = objects_.CreateCar(pose,4,spColor(0,1,0));
+  // set wheel anchors
+  std::vector<spTranslation> anchors;
+  anchors.push_back(spTranslation(-1,1,-1));
+  anchors.push_back(spTranslation(-1,-1,-1));
+  anchors.push_back(spTranslation(1,-1,-1));
+  anchors.push_back(spTranslation(1,1,-1));
+  obj_car_index = objects_.CreateVehicle(pose,anchors,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_car_index));
   gui_.AddObject(objects_.GetObject(obj_car_index));
 
@@ -47,6 +53,7 @@ void spirit::ScenarioWorldCarFall() {
   ground.translate(spTranslation(0,0,-2));
   Eigen::AngleAxisd ang(M_PI/20,Eigen::Vector3d::UnitX());
   ground.rotate(ang);
+
   obj_gnd_index = objects_.CreateBox(ground,spBoxSize(100,100,0.1),0,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
@@ -71,12 +78,13 @@ void spirit::ScenarioWorldBoxFall() {
 void spirit::IterateWorld() {
   gui_.Iterate(objects_);
   static int fl = 0;
-  if(fl<10000) {
+  if(fl<1000) {
     physics_.Iterate(objects_);
     fl++;
   }
-  spCar& car = (spCar&) objects_.GetObject(obj_car_index);
-  spPose pose(spPose::Identity());
-//  car.SetPose(pose);
+  spVehicle& car = (spVehicle&) objects_.GetObject(obj_car_index);
+  if(fl>100) {
+    car.GetWheel(0)->SetSteeringServoTargetAngle(SP_PI/10);
+  }
   std::this_thread::sleep_for(std::chrono::milliseconds(20));
 }

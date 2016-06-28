@@ -26,7 +26,7 @@
 enum spPhysolver{MLCP_DANTZING,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum spPhyEngineType{PHY_NONE,PHY_BULLET};
-enum spObjectType{BOX,CAR,WHEEL};
+enum spObjectType{BOX,VEHICLE,WHEEL};
 
 class spGeneralTools {
  public:

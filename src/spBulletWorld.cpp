@@ -101,17 +101,17 @@ void spBulletWorld::AddNewPhyObject(spCommonObject &sp_obj) {
       UpdateBulletBoxObject((spBox&)sp_obj,thebox);
       break;
     }
-    case spObjectType::CAR :
+    case spObjectType::VEHICLE :
     {
-      btRigidBody* thecar = CreateBulletCarObject((spCar&)sp_obj);
-      UpdateBulletCarObject((spCar&)sp_obj,thecar);
+      btRigidBody* thevehicle = CreateBulletVehicleObject((spVehicle&)sp_obj);
+      UpdateBulletVehicleObject((spVehicle&)sp_obj,thevehicle);
       break;
     }
   }
 }
 
-btRigidBody* spBulletWorld::CreateBulletCarObject(spCar& source_obj) {
-  // Here we are gonna create a bullet car from scratch
+btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
+  // Here we are gonna create a bullet vehicle from scratch
   // Create a bullet compound shape
   btCompoundShape* compound = new btCompoundShape();
   collisionShapes_.push_back(compound);
@@ -133,10 +133,10 @@ btRigidBody* spBulletWorld::CreateBulletCarObject(spCar& source_obj) {
   // apply cog transform
 //  spPose global_cog(source_obj.GetPose() * cog_transform);
 //  btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(global_cog),compound);
-  btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(source_obj.GetPose()),compound);  // test
+  btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(spPose::Identity()),compound);  // test
 
   dynamics_world_->addRigidBody(bodyA);
-  // set the correct index for spCar object so we can access this object later
+  // set the correct index for spVehicle object so we can access this object later
   bodyA->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
   source_obj.SetPhyIndex(bodyA->getUserIndex());
   // now create and add wheels
@@ -146,10 +146,8 @@ btRigidBody* spBulletWorld::CreateBulletCarObject(spCar& source_obj) {
     // calculate wheel origin in world
     btTransform tr;
     tr.setIdentity();
-    spTranslation global_anchor;
-    global_anchor = source_obj.GetPose()*source_obj.GetWheel(ii)->GetChassisAnchor();
-//    tr.setOrigin(btVector3(source_obj.GetWheel(ii)->GetChassisAnchor()[0],source_obj.GetWheel(ii)->GetChassisAnchor()[1],source_obj.GetWheel(ii)->GetChassisAnchor()[2]));
-    tr.setOrigin(btVector3(global_anchor[0],global_anchor[1],global_anchor[2]));
+    tr.setOrigin(btVector3(source_obj.GetWheel(ii)->GetChassisAnchor()[0],source_obj.GetWheel(ii)->GetChassisAnchor()[1],source_obj.GetWheel(ii)->GetChassisAnchor()[2]));
+//    tr = spPose2btTransform(source_obj.GetWheel(ii)->GetPose());
     btCollisionShape* wheel_shape = new btCylinderShapeX(btVector3(1,1,1));
     btRigidBody* bodyB = CreateRigidBody(spwheel->GetMass(),tr,wheel_shape);
     bodyB->setDamping(0,0);
@@ -195,13 +193,13 @@ btRigidBody* spBulletWorld::CreateBulletCarObject(spCar& source_obj) {
 }
 
 
-void spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_obj) {
+void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody* dest_obj) {
   // get compoundshape from rigidbody
   btCompoundShape* compound = (btCompoundShape*) dest_obj->getCollisionShape();
   // since we only added chassis(box) to compound shape its gonna be in index_0 shape
   int box_childnumber = 0;
   btCollisionShape* chassis_shape = compound->getChildShape(box_childnumber);
-  // Here we should update all properties of the car
+  // Here we should update all properties of the vehicle
   // reset box size
   spBoxSize dims(source_obj.GetChassisSize());
   chassis_shape->setLocalScaling(btVector3(dims[0]/2,dims[1]/2,dims[2]/2));
@@ -228,6 +226,8 @@ void spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_o
     // resize wheel
     btVector3 wheel_dim(spwheel->GetWidth()/2,spwheel->GetRadius()/2,spwheel->GetRadius()/2);
     wheel_body->getCollisionShape()->setLocalScaling(wheel_dim);
+    // set wheel pose
+    wheel_body->setWorldTransform(spPose2btTransform(spwheel->GetPose()));
     // calculate and set inertia/mass
     btVector3 wheel_local_inertia(0,0,0);
     double wheel_mass = spwheel->GetMass();
@@ -338,11 +338,11 @@ void spBulletWorld::UpdatePhyObjectsFromSpirit(Objects &spobj) {
           spobj.GetObject(ii).SetPhyUpdated();
           break;
         }
-        case spObjectType::CAR:
+        case spObjectType::VEHICLE:
         {
           btCollisionObject* col_obj = dynamics_world_->getCollisionObjectArray()[phy_index];
           btRigidBody* bulletbody = btRigidBody::upcast(col_obj);
-          UpdateBulletCarObject((spCar&)spobj.GetObject(ii),bulletbody);
+          UpdateBulletVehicleObject((spVehicle&)spobj.GetObject(ii),bulletbody);
           spobj.GetObject(ii).SetPhyUpdated();
           break;
         }
@@ -365,16 +365,16 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
           box.SetPose(ps);
           break;
         }
-        case spObjectType::CAR:
+        case spObjectType::VEHICLE:
         {
-          spCar& car = (spCar&) spobjects.GetObject(ii);
+          spVehicle& vehicle = (spVehicle&) spobjects.GetObject(ii);
           // update chassis
-          btCollisionObject* chassis_obj = dynamics_world_->getCollisionObjectArray()[car.GetPhyIndex()];
-          car.SetPose(btTransform2spPose(chassis_obj->getWorldTransform()));
+          btCollisionObject* chassis_obj = dynamics_world_->getCollisionObjectArray()[vehicle.GetPhyIndex()];
+          vehicle.SetPose(btTransform2spPose(chassis_obj->getWorldTransform()));
           // update wheels
-          for(int ii=0; ii<car.GetNumberOfWheels(); ii++) {
-            btCollisionObject* wheel_obj = dynamics_world_->getCollisionObjectArray()[car.GetWheel(ii)->GetPhyIndex()];
-            car.GetWheel(ii)->SetPose(btTransform2spPose(wheel_obj->getWorldTransform()));
+          for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
+            btCollisionObject* wheel_obj = dynamics_world_->getCollisionObjectArray()[vehicle.GetWheel(ii)->GetPhyIndex()];
+            vehicle.GetWheel(ii)->SetPose(btTransform2spPose(wheel_obj->getWorldTransform()));
           }
           break;
         }
