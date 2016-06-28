@@ -34,7 +34,9 @@ void spirit::CheckKeyboardAction() {
 void spirit::ScenarioWorldCarFall() {
   // create and add a car
   spPose pose(spPose::Identity());
-  pose.translate(spTranslation(0,0,0.5));
+  pose.translate(spTranslation(5,0,2.5));
+//  Eigen::AngleAxisd rot(M_PI/10,Eigen::Vector3d::UnitY());
+//  pose.rotate(rot);
   obj_car_index = objects_.CreateCar(pose,4,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_car_index));
   gui_.AddObject(objects_.GetObject(obj_car_index));
@@ -50,7 +52,6 @@ void spirit::ScenarioWorldCarFall() {
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
 }
-
 
 void spirit::ScenarioWorldBoxFall() {
   spPose pose(spPose::Identity());
@@ -69,6 +70,13 @@ void spirit::ScenarioWorldBoxFall() {
 
 void spirit::IterateWorld() {
   gui_.Iterate(objects_);
-  physics_.Iterate(objects_);
-  std::this_thread::sleep_for(std::chrono::milliseconds(16));
+  static int fl = 0;
+  if(fl<10000) {
+    physics_.Iterate(objects_);
+    fl++;
+  }
+  spCar& car = (spCar&) objects_.GetObject(obj_car_index);
+  spPose pose(spPose::Identity());
+//  car.SetPose(pose);
+  std::this_thread::sleep_for(std::chrono::milliseconds(20));
 }

@@ -128,7 +128,7 @@ btRigidBody* spBulletWorld::CreateBulletCarObject(spCar& source_obj) {
 //  compound->addChildShape(spPose2btTransform(chassis_transform),chassis_shape);
 #warning "we are not doing the cog transform for now, but it should be fixed later"
   compound->addChildShape(spPose2btTransform(spPose::Identity()),chassis_shape);  // test
-  // create a rigidbody from compound shape and add it world
+  // create a rigidbody from compound shape and add it to world
 
   // apply cog transform
 //  spPose global_cog(source_obj.GetPose() * cog_transform);
@@ -143,38 +143,50 @@ btRigidBody* spBulletWorld::CreateBulletCarObject(spCar& source_obj) {
   for(int ii=0 ; ii<source_obj.GetNumberOfWheels() ; ii++) {
     spWheel* spwheel = source_obj.GetWheel(ii);
     bodyA->setActivationState(DISABLE_DEACTIVATION);
+    // calculate wheel origin in world
     btTransform tr;
     tr.setIdentity();
-#warning "wheel origin is different than wheel pose, make sure it has been implemented correctly"
-    tr.setOrigin(btVector3(source_obj.GetWheelOrigin(ii)[0], source_obj.GetWheelOrigin(ii)[1], source_obj.GetWheelOrigin(ii)[2]));
+    spTranslation global_anchor;
+    global_anchor = source_obj.GetPose()*source_obj.GetWheel(ii)->GetChassisAnchor();
+//    tr.setOrigin(btVector3(source_obj.GetWheel(ii)->GetChassisAnchor()[0],source_obj.GetWheel(ii)->GetChassisAnchor()[1],source_obj.GetWheel(ii)->GetChassisAnchor()[2]));
+    tr.setOrigin(btVector3(global_anchor[0],global_anchor[1],global_anchor[2]));
     btCollisionShape* wheel_shape = new btCylinderShapeX(btVector3(1,1,1));
     btRigidBody* bodyB = CreateRigidBody(spwheel->GetMass(),tr,wheel_shape);
+    bodyB->setDamping(0,0);
     dynamics_world_->addRigidBody(bodyB);
     bodyB->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
     spwheel->SetPhyIndex(bodyB->getUserIndex());
     bodyB->setFriction(spwheel->GetFriction());
     bodyB->setActivationState(DISABLE_DEACTIVATION);
-    btVector3 parent_axis(0,1,0);
+    btVector3 parent_axis(0,0,1);
     btVector3 child_axis(1,0,0);
     btVector3 anchor = tr.getOrigin();
     btHinge2Constraint* hinge = new btHinge2Constraint(*bodyA,*bodyB,anchor, parent_axis, child_axis);
     // set suspension damping to axis 2 of constraint only (z direction)
     hinge->setDamping(2,spwheel->GetSuspDamping());
+    hinge->setStiffness(2,spwheel->GetSuspStiffness());
     // fix x,y linear movement directions and only move in z direction
     hinge->setLinearLowerLimit(btVector3(0,0,spwheel->GetSuspLowerLimit()));
     hinge->setLinearUpperLimit(btVector3(0,0,spwheel->GetSuspUpperLimit()));
     // set rotational directions
     // unlimitted in tire axis, fixed in one direction and limitted in steering direction(set upper/lower to 0/0 if its not supposed to be steering)
-    hinge->setAngularLowerLimit(btVector3(1,0,spwheel->GetSteeringLowerLimit()));
-    hinge->setAngularUpperLimit(btVector3(-1,0,spwheel->GetSteeringLowerLimit()));
+    hinge->setAngularLowerLimit(btVector3(1,0,spwheel->GetSteeringServoLowerLimit()));
+    hinge->setAngularUpperLimit(btVector3(-1,0,spwheel->GetSteeringServoUpperLimit()));
     // add motors if required
-    int drive_motor_axis = 3;
-    int steering_motor_axis = 5;
+    int drive_motor_axis = source_obj.GetWheel(ii)->GetDriveMotorAxis();
+    int steering_servo_axis = source_obj.GetWheel(ii)->GetSteeringServoAxis();
     if(spwheel->GetHasDriveMotor()) {
       hinge->enableMotor(drive_motor_axis,true);
+      hinge->setTargetVelocity(drive_motor_axis,spwheel->GetDriveMotorTargetVelocity());
+      hinge->setMaxMotorForce(drive_motor_axis,spwheel->GetDriveMotorTorque());
     }
-    if(spwheel->GetHasSteeringMotor()) {
-      hinge->enableMotor(steering_motor_axis,true);
+    if(spwheel->GetHasSteeringServo()) {
+      // create a servo motor for this joint.
+      hinge->enableMotor(steering_servo_axis,true);
+      hinge->setTargetVelocity(steering_servo_axis,spwheel->GetSteeringServoMaxVelocity());
+      hinge->setMaxMotorForce(steering_servo_axis,spwheel->GetSteeringServoTorque());
+      hinge->setServo(steering_servo_axis,true);
+      hinge->setServoTarget(steering_servo_axis,spwheel->GetSteeringServoTargetAngle());
     }
     // add the hinge constraint to the world and disable collision between bodyA/bodyB
     dynamics_world_->addConstraint(hinge,true);
@@ -225,31 +237,35 @@ void spBulletWorld::UpdateBulletCarObject(spCar& source_obj, btRigidBody* dest_o
 #warning "removed updating wheel origin, I guess this is something to be decided only by phy engine"
 //    btTransform wheel_tr;
 //    wheel_tr.setIdentity();
-//    wheel_tr.setOrigin(btVector3(source_obj.GetWheelOrigin(ii)[0], source_obj.GetWheelOrigin(ii)[1], source_obj.GetWheelOrigin(ii)[2]));
+//    wheel_tr.setOrigin(btVector3(source_obj.GetWheel(ii)->GetChassisAnchor()[0],source_obj.GetWheel(ii)->GetChassisAnchor()[1],source_obj.GetWheel(ii)->GetChassisAnchor()[2]));
 //    wheel_body->setWorldTransform(wheel_tr);
     // reset wheel friction and damping
     wheel_body->setFriction(spwheel->GetFriction());
 
-    // reset suspension damping to axis 2 of constraint only (z direction)
+    // reset suspension damping to 2-axis of constraint only (z direction)
     btHinge2Constraint* hinge = (btHinge2Constraint*) dest_obj->getConstraintRef(ii);
     hinge->setDamping(2,spwheel->GetSuspDamping());
+    hinge->setStiffness(2,spwheel->GetSuspStiffness());
+
     // fix x,y linear movement directions and only move in z direction
     hinge->setLinearLowerLimit(btVector3(0,0,spwheel->GetSuspLowerLimit()));
     hinge->setLinearUpperLimit(btVector3(0,0,spwheel->GetSuspUpperLimit()));
     // set rotational directions
-    // unlimitted in tire axis, fixed in one direction and limitted in steering direction
-    hinge->setAngularLowerLimit(btVector3(1,0,spwheel->GetSteeringLowerLimit()));
-    hinge->setAngularUpperLimit(btVector3(-1,0,spwheel->GetSteeringLowerLimit()));
+    // unlimitted in tire axis, fixed in one direction and limitted in steering direction(set upper/lower to 0/0 if its not supposed to be steering)
+    hinge->setAngularLowerLimit(btVector3(1,0,spwheel->GetSteeringServoLowerLimit()));
+    hinge->setAngularUpperLimit(btVector3(-1,0,spwheel->GetSteeringServoUpperLimit()));
     // add motors if required
-    int drive_motor_axis = 3;
-    int steering_motor_axis = 5;
+    int drive_motor_axis = source_obj.GetWheel(ii)->GetDriveMotorAxis();
+    int steering_servo_axis = source_obj.GetWheel(ii)->GetSteeringServoAxis();
     if(spwheel->GetHasDriveMotor()) {
       hinge->setTargetVelocity(drive_motor_axis,spwheel->GetDriveMotorTargetVelocity());
       hinge->setMaxMotorForce(drive_motor_axis,spwheel->GetDriveMotorTorque());
     }
-    if(spwheel->GetHasSteeringMotor()) {
-      hinge->setTargetVelocity(steering_motor_axis,spwheel->GetSteeringMotorTargetVelocity());
-      hinge->setMaxMotorForce(steering_motor_axis,spwheel->GetSteeringMotorTorque());
+    if(spwheel->GetHasSteeringServo()) {
+      // update
+      hinge->setTargetVelocity(steering_servo_axis,spwheel->GetSteeringServoMaxVelocity());
+      hinge->setMaxMotorForce(steering_servo_axis,spwheel->GetSteeringServoTorque());
+      hinge->setServoTarget(steering_servo_axis,spwheel->GetSteeringServoTargetAngle());
     }
   }
 }
@@ -351,7 +367,6 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
         }
         case spObjectType::CAR:
         {
-#error "car wheels are not oriented correctly, it has a initialization issue, in first frame all wheels are in one point of space"
           spCar& car = (spCar&) spobjects.GetObject(ii);
           // update chassis
           btCollisionObject* chassis_obj = dynamics_world_->getCollisionObjectArray()[car.GetPhyIndex()];

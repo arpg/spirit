@@ -1,25 +1,31 @@
 #include <spirit/Objects/spCar.h>
 
 spCar::spCar(int num_wheels) {
-  chassis_mass_ = 1;
+  chassis_mass_ = 100;
   mass_ = chassis_mass_;
   for(int ii=0; ii<num_wheels; ii++) {
     wheel_.push_back(std::make_shared<spWheel>());
     mass_ += wheel_[ii]->GetMass();
   }
   if(num_wheels==4) {
-    std::cout << "this called" << std::endl;
-    SetWheelOrigin(0,spTranslation(1,1,-0.1));
-    SetWheelOrigin(1,spTranslation(-1,1,-0.1));
-    SetWheelOrigin(2,spTranslation(-1,-1,-0.1));
-    SetWheelOrigin(3,spTranslation(1,-1,-0.1));
+    // Set wheel anchors
+    std::cout << "car has 4 wheels" << std::endl;
+    double depth = -1;
+    wheel_[0]->SetChassisAnchor(spTranslation(-1,1,depth));
+    wheel_[1]->SetChassisAnchor(spTranslation(-1,-1,depth));
+    wheel_[2]->SetChassisAnchor(spTranslation(1,-1,depth));
+    wheel_[3]->SetChassisAnchor(spTranslation(1,1,depth));
+    // reset wheels to anchor points
+    SetWheelOrigin(0,wheel_[0]->GetChassisAnchor());
+    SetWheelOrigin(1,wheel_[1]->GetChassisAnchor());
+    SetWheelOrigin(2,wheel_[2]->GetChassisAnchor());
+    SetWheelOrigin(3,wheel_[3]->GetChassisAnchor());
   }
 
   color_ = spColor(0, 0, 0);
   pose_ = spPose::Identity();
   cog_ = pose_.translation();
   cog_local_ = spTranslation(0,0,0);
-  chassis_mass_ = 1;
   chassis_size_ = spBoxSize(1,1,1);
   index_phy_ = -1;
   index_gui_ = -1;
@@ -32,9 +38,14 @@ spCar::spCar(int num_wheels) {
 spCar::~spCar() {}
 
 void spCar::SetPose(const spPose& pose) {
+  // set chassis pose
   pose_ = pose;
+  // move wheels with chassis based on anchor points
+  for(int ii=0; ii<wheel_.size(); ii++) {
+    SetWheelOrigin(ii,pose_*wheel_[ii]->GetChassisAnchor());
+  }
 #warning "cog = pose for test here"
-  cog_ = pose.translation();
+//  cog_ = pose.translation();
   obj_phychanged_ = true;
   obj_guichanged_ = true;
 }
@@ -48,12 +59,14 @@ void spCar::SetColor(const spColor& color) {
 
 const spTranslation& spCar::GetWheelOrigin(int index)
 {
-  return wheel_[index]->origin;//->GetPose().translation();
+  return wheel_[index]->GetPose().translation();
 }
 
 void spCar::SetWheelOrigin(int index, const spTranslation& tr)
 {
-  wheel_[index]->origin = tr;
+  spPose pose(spPose::Identity());
+  pose.translate(tr);
+  wheel_[index]->SetPose(pose);
   obj_phychanged_ = true;
   obj_guichanged_ = true;
 }

@@ -33,23 +33,23 @@ public:
   double GetSuspUpperLimit();
   void SetSuspUpperLimit(double limit);
 
-  double GetSteeringLowerLimit();
-  void SetSteeringLowerLimit(double limit);
+  double GetSteeringServoLowerLimit();
+  void SetSteeringServoLowerLimit(double limit);
 
-  double GetSteeringUpperLimit();
-  void SetSteeringUpperLimit(double limit);
+  double GetSteeringServoUpperLimit();
+  void SetSteeringServoUpperLimit(double limit);
 
-  double GetSteeringMotorTargetVelocity();
-  void SetSteeringMotorTargetVelocity(double velocity);
+  double GetSteeringServoMaxVelocity();
+  void SetSteeringServoMaxVelocity(double velocity);
 
-  double GetSteeringMotorTorque();
-  void SetSteeringMotorTorque(double torque);
+  double GetSteeringServoTorque();
+  void SetSteeringServoTorque(double torque);
 
   bool GetHasDriveMotor();
   void SetHasDriveMotor(bool status);
 
-  bool GetHasSteeringMotor();
-  void SetHasSteeringMotor(bool status);
+  bool GetHasSteeringServo();
+  void SetHasSteeringServo(bool status);
 
   double GetDriveMotorTargetVelocity();
   void SetDriveMotorTargetVelocity(double velocity);
@@ -63,10 +63,20 @@ public:
   bool GetAirborneState();
   void SetAirborneState(bool status);
 
-#warning " i shouldn't have a public variable like this"
-spTranslation origin;
+  const spTranslation& GetChassisAnchor();
+  void SetChassisAnchor(const spTranslation anchor);
+
+  double GetSteeringServoCurrentAngle();
+  void SetSteeringServoCurrentAngle(double angle);
+
+  double GetSteeringServoTargetAngle();
+  void SetSteeringServoTargetAngle(double angle);
+
+  int GetDriveMotorAxis();
+  int GetSteeringServoAxis();
 
 private:
+  spTranslation chassis_anchor;
   double friction_;  // unit less
   double width_;     // in meters
   double radius_;    // in meters
@@ -75,13 +85,17 @@ private:
   double susp_lower_limit_;
   double susp_upper_limit_;
   double has_drive_motor_;
-  double has_steering_motor_;
+  double has_steering_servo_;
   double drive_motor_target_velocity_;
   double drive_motor_torque_;
-  double steering_motor_torque_;
-  double steering_motor_target_velocity_;
-  double steering_lower_limit_;
-  double steering_upper_limit_;
+  double steering_servo_torque_;
+  double steering_servo_max_velocity_;
+  double steering_servo_lower_limit_;
+  double steering_servo_upper_limit_;
+  double steering_servo_target_angle_;
+  double steering_servo_angle_;
+  const int drive_motor_axis = 3;
+  const int steering_servo_axis = 5;
   bool airborne_;
   spPose pose_;
   spColor color_;

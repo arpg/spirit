@@ -39,6 +39,7 @@ class spCar : public spCommonObject {
 
  protected:
   void SetWheelOrigin(int index, const spTranslation& tr);
+  void SetWheelAnchor(int index, const spTranslation& tr);
 
  private:
   std::vector<std::shared_ptr<spWheel>> wheel_;
