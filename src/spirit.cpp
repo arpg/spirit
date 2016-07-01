@@ -34,15 +34,15 @@ void spirit::CheckKeyboardAction() {
 void spirit::ScenarioWorldCarFall() {
   // create and add a car
   spPose pose(spPose::Identity());
-  pose.translate(spTranslation(5,0,2.5));
-  Eigen::AngleAxisd rot(M_PI/10,Eigen::Vector3d::UnitY());
+  pose.translate(spTranslation(0,0,20));
+//  Eigen::AngleAxisd rot(M_PI/10,Eigen::Vector3d::UnitY());
 //  pose.rotate(rot);
   // set wheel anchors
   std::vector<spTranslation> anchors;
-  anchors.push_back(spTranslation(-1,1,-1));
-  anchors.push_back(spTranslation(-1,-1,-1));
-  anchors.push_back(spTranslation(1,-1,-1));
-  anchors.push_back(spTranslation(1,1,-1));
+  anchors.push_back(spTranslation(-1.3,1.7,-1.8));
+  anchors.push_back(spTranslation(-1.3,-1.7,-1.8));
+  anchors.push_back(spTranslation(1.3,-1.7,-1.8));
+  anchors.push_back(spTranslation(1.3,1.7,-1.8));
   obj_car_index = objects_.CreateVehicle(pose,anchors,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_car_index));
   gui_.AddObject(objects_.GetObject(obj_car_index));
@@ -50,11 +50,11 @@ void spirit::ScenarioWorldCarFall() {
 
   // create and add a ground as a box to objects_ vector
   spPose ground(spPose::Identity());
-  ground.translate(spTranslation(0,0,-2));
+  ground.translate(spTranslation(0,0,-0.5));
   Eigen::AngleAxisd ang(M_PI/20,Eigen::Vector3d::UnitX());
-  ground.rotate(ang);
+//  ground.rotate(ang);
 
-  obj_gnd_index = objects_.CreateBox(ground,spBoxSize(100,100,0.1),0,spColor(0,1,0));
+  obj_gnd_index = objects_.CreateBox(ground,spBoxSize(1000,1000,1),0,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
@@ -78,13 +78,13 @@ void spirit::ScenarioWorldBoxFall() {
 void spirit::IterateWorld() {
   gui_.Iterate(objects_);
   static int fl = 0;
-  if(fl<1000) {
+  if(fl<10000) {
     physics_.Iterate(objects_);
     fl++;
   }
   spVehicle& car = (spVehicle&) objects_.GetObject(obj_car_index);
   if(fl>100) {
-    car.GetWheel(0)->SetSteeringServoTargetAngle(SP_PI/10);
+//    car.GetWheel(0)->SetSteeringServoTargetAngle(SP_PI/10);
   }
-  std::this_thread::sleep_for(std::chrono::milliseconds(20));
+//  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }

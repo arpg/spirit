@@ -8,6 +8,8 @@
 #include <bullet/BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h>
 #include <bullet/BulletDynamics/MLCPSolvers/btMLCPSolver.h>
 
+#define BT_USE_DOUBLE_PRECISION 1
+
 struct BulletWorldParams{
   btVector3 worldMin;
   btVector3 worldMax;

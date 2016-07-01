@@ -1,7 +1,7 @@
 #include <spirit/Objects/spVehicle.h>
 
 spVehicle::spVehicle(std::vector<spTranslation> wheel_anchor) {
-  chassis_mass_ = 100;
+  chassis_mass_ = 3;
   mass_ = chassis_mass_;
   for(int ii=0; ii<wheel_anchor.size(); ii++) {
     wheel_.push_back(std::make_shared<spWheel>());
@@ -13,7 +13,7 @@ spVehicle::spVehicle(std::vector<spTranslation> wheel_anchor) {
   pose_ = spPose::Identity();
   cog_ = pose_.translation();
   cog_local_ = spTranslation(0,0,0);
-  chassis_size_ = spBoxSize(1,1,1);
+  chassis_size_ = spBoxSize(2,4,1);
   index_phy_ = -1;
   index_gui_ = -1;
   obj_phychanged_ = false;

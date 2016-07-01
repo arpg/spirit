@@ -4,15 +4,15 @@
 spWheel::spWheel()
 {
   friction_ = 100;
-  width_ = 0.2;
-  radius_ = 0.4;
-  susp_damping_ = 0.2;
-  susp_stiffness_ = 10;
-  susp_upper_limit_ = 0.5;
-  susp_lower_limit_ = 0.0;
+  width_ = 0.4;
+  radius_ = 0.575;
+  susp_damping_ = 1;
+  susp_stiffness_ = 50;
+  susp_upper_limit_ = 1.8;// 5.5cm
+  susp_lower_limit_ = 1.5;
   has_drive_motor_ = true;
-  drive_motor_target_velocity_ = 1;
-  drive_motor_torque_ = 10;
+  drive_motor_target_velocity_ = 0;
+  drive_motor_torque_ = 1000;
 
   has_steering_servo_ = true;
   steering_servo_torque_ = 50;
@@ -29,7 +29,7 @@ spWheel::spWheel()
   obj_phychanged_ = false;
   obj_guichanged_ = false;
   object_type_ = spObjectType::WHEEL;
-  mass_ = 1;
+  mass_ = 0.4;
 }
 
 spWheel::~spWheel()

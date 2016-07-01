@@ -68,7 +68,7 @@ bool spBulletWorld::InitEmptyDynamicsWorld() {
       break;
   }
 
-  dynamics_world_->setGravity(btVector3(0,0,-9.80665));
+  dynamics_world_->setGravity(btVector3(0,0,-98.0665));
   dynamics_world_->getSolverInfo().m_numIterations = 100;
   return true;
 }
@@ -161,8 +161,8 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
     btVector3 anchor = tr.getOrigin();
     btHinge2Constraint* hinge = new btHinge2Constraint(*bodyA,*bodyB,anchor, parent_axis, child_axis);
     // set suspension damping to axis 2 of constraint only (z direction)
-    hinge->setDamping(2,spwheel->GetSuspDamping());
-    hinge->setStiffness(2,spwheel->GetSuspStiffness());
+//    hinge->setDamping(2,spwheel->GetSuspDamping());
+//    hinge->setStiffness(2,spwheel->GetSuspStiffness());
     // fix x,y linear movement directions and only move in z direction
     hinge->setLinearLowerLimit(btVector3(0,0,spwheel->GetSuspLowerLimit()));
     hinge->setLinearUpperLimit(btVector3(0,0,spwheel->GetSuspUpperLimit()));
@@ -224,7 +224,7 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
     spWheel* spwheel = source_obj.GetWheel(ii);
     btRigidBody* wheel_body = &dest_obj->getConstraintRef(ii)->getRigidBodyB();
     // resize wheel
-    btVector3 wheel_dim(spwheel->GetWidth()/2,spwheel->GetRadius()/2,spwheel->GetRadius()/2);
+    btVector3 wheel_dim(spwheel->GetWidth(),spwheel->GetRadius(),spwheel->GetRadius());
     wheel_body->getCollisionShape()->setLocalScaling(wheel_dim);
     // set wheel pose
     wheel_body->setWorldTransform(spPose2btTransform(spwheel->GetPose()));
@@ -385,6 +385,8 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
 
 void spBulletWorld::StepPhySimulation(double step_time) {
 #warning "what is 10 here ..."
+  // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=&f=&t=367
+  // choose the number of iterations for the constraint solver in the range 4 to 10.
   dynamics_world_->stepSimulation(step_time,10);
 }
 

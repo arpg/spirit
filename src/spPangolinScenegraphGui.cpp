@@ -39,7 +39,7 @@ void spPangolinScenegraphGui::InitGui() {
       pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
                                  WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.1,
                                  1000),
-      pangolin::ModelViewLookAt(10, 10, 10, 0, 0, 0, pangolin::AxisZ));
+      pangolin::ModelViewLookAt(5, 5, 5, 0, 0, 0, pangolin::AxisZ));
 
   handler_scenegraph_ = new SceneGraph::HandlerSceneGraph(
       glscenegraph_, glrenderstate_, pangolin::AxisZ, 0.01f);
@@ -51,8 +51,10 @@ void spPangolinScenegraphGui::InitGui() {
           SceneGraph::ActivateDrawFunctor(glscenegraph_, glrenderstate_));
 
   // Create Globjects
-  globjects_.push_back(new SceneGraph::GLGrid(10, 1, false));
-  globjects_.push_back(new SceneGraph::GLLight(10, 10, 10));
+  SceneGraph::GLGrid grid(10, 1, false);
+  grid.SetScale(10);
+  globjects_.push_back(new SceneGraph::GLGrid(grid));
+  globjects_.push_back(new SceneGraph::GLLight(1000, 1000, 1000));
 
   // Add already created globjects to glscenegraph_
   for (int ii = 0; ii < globjects_.size(); ii++) {
@@ -133,11 +135,12 @@ void spPangolinScenegraphGui::AddVehicle(spVehicle& vehicle)
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
 
   for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
-    SceneGraph::GLBox glwheel;
+//    SceneGraph::GLBox glwheel;
+    SceneGraph::GLCylinder glwheel;
+    glwheel.Init(vehicle.GetWheel(ii)->GetRadius(),vehicle.GetWheel(ii)->GetRadius(),vehicle.GetWheel(ii)->GetWidth(),20,1);
     glwheel.SetPose(vehicle.GetWheel(ii)->GetPose().matrix());
-    glwheel.SetScale(Eigen::Vector3d(0.2,0.5,0.5));
-//    glwheel.SetColor(SceneGraph::GLColor(Eigen::Vector4d(1,0,0,0.5)));
-    globjects_.push_back(new SceneGraph::GLBox(glwheel));
+    globjects_.push_back(new SceneGraph::GLCylinder(glwheel));
+//    globjects_.push_back(new SceneGraph::GLBox(glwheel));
     vehicle.GetWheel(ii)->SetGuiIndex(globjects_.size()-1);
     glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
   }
@@ -156,7 +159,13 @@ void spPangolinScenegraphGui::UpdateVehicleObject(spVehicle& vehicle) {
   globjects_[chassis_index]->SetScale(vehicle.GetChassisSize());
   for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
     int wheel_index = vehicle.GetWheel(ii)->GetGuiIndex();
-    globjects_[wheel_index]->SetPose(vehicle.GetWheel(ii)->GetPose().matrix());
+    // apply gui coordinate difference with spirit coordinates
+    spPose glwheelpose(vehicle.GetWheel(ii)->GetPose());
+    Eigen::AngleAxisd ang(M_PI/2,Eigen::Vector3d::UnitY());
+    glwheelpose.rotate(ang);
+    glwheelpose.translate(spTranslation(0,0,-vehicle.GetWheel(ii)->GetWidth()/2));
+    globjects_[wheel_index]->SetPose(glwheelpose.matrix());
+//    globjects_[wheel_index]->SetPose(vehicle.GetWheel(ii)->GetPose().matrix());
   }
 }
 
