@@ -1,8 +1,8 @@
 #include <spirit/Physics/spBulletWorld.h>
 
 spBulletWorld::spBulletWorld() {
-  world_params_.worldMax.setValue(1000,1000,1000);
-  world_params_.worldMin.setValue(-1000,-1000,-1000);
+  world_params_.worldMax.setValue(1000*WSCALE,1000*WSCALE,1000*WSCALE);
+  world_params_.worldMin.setValue(-1000*WSCALE,-1000*WSCALE,-1000*WSCALE);
   world_params_.solver = spPhysolver::SEQUENTIAL_IMPULSE;
 }
 
@@ -68,7 +68,7 @@ bool spBulletWorld::InitEmptyDynamicsWorld() {
       break;
   }
 
-  dynamics_world_->setGravity(btVector3(0,0,-98.0665));
+  dynamics_world_->setGravity(btVector3(0,0,-9.80665)*WSCALE);
   dynamics_world_->getSolverInfo().m_numIterations = 100;
   return true;
 }
@@ -127,14 +127,13 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
 //  chassis_transform = source_obj.GetPose() * cog_transform.inverse();
 //  compound->addChildShape(spPose2btTransform(chassis_transform),chassis_shape);
 #warning "we are not doing the cog transform for now, but it should be fixed later"
-  compound->addChildShape(spPose2btTransform(spPose::Identity()),chassis_shape);  // test
+  compound->addChildShape(spPose2btTransform(spPose::Identity(),WSCALE),chassis_shape);  // test
   // create a rigidbody from compound shape and add it to world
 
   // apply cog transform
 //  spPose global_cog(source_obj.GetPose() * cog_transform);
 //  btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(global_cog),compound);
-  btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(spPose::Identity()),compound);  // test
-
+  btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(spPose::Identity(),WSCALE),compound);  // test
   dynamics_world_->addRigidBody(bodyA);
   // set the correct index for spVehicle object so we can access this object later
   bodyA->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
@@ -146,7 +145,7 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
     // calculate wheel origin in world
     btTransform tr;
     tr.setIdentity();
-    tr.setOrigin(btVector3(source_obj.GetWheel(ii)->GetChassisAnchor()[0],source_obj.GetWheel(ii)->GetChassisAnchor()[1],source_obj.GetWheel(ii)->GetChassisAnchor()[2]));
+    tr.setOrigin(btVector3(source_obj.GetWheel(ii)->GetChassisAnchor()[0],source_obj.GetWheel(ii)->GetChassisAnchor()[1],source_obj.GetWheel(ii)->GetChassisAnchor()[2])*WSCALE);
 //    tr = spPose2btTransform(source_obj.GetWheel(ii)->GetPose());
     btCollisionShape* wheel_shape = new btCylinderShapeX(btVector3(1,1,1));
     btRigidBody* bodyB = CreateRigidBody(spwheel->GetMass(),tr,wheel_shape);
@@ -202,7 +201,7 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
   // Here we should update all properties of the vehicle
   // reset box size
   spBoxSize dims(source_obj.GetChassisSize());
-  chassis_shape->setLocalScaling(btVector3(dims[0]/2,dims[1]/2,dims[2]/2));
+  chassis_shape->setLocalScaling(btVector3(dims[0]/2,dims[1]/2,dims[2]/2)*WSCALE);
 
   //rigidbody is dynamic if and only if mass is non zero, otherwise static
   btVector3 localInertia(0,0,0);
@@ -218,16 +217,16 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
 //  spPose global_cog(source_obj.GetPose() * cog_transform);
 #warning "we are not doing the cog transform for now, but it should be fixed later"
   spPose global_cog(source_obj.GetPose());
-  dest_obj->setWorldTransform(spPose2btTransform(global_cog));
+  dest_obj->setWorldTransform(spPose2btTransform(global_cog,WSCALE));
   // Update wheel
   for(int ii=0; ii<source_obj.GetNumberOfWheels(); ii++){
     spWheel* spwheel = source_obj.GetWheel(ii);
     btRigidBody* wheel_body = &dest_obj->getConstraintRef(ii)->getRigidBodyB();
     // resize wheel
     btVector3 wheel_dim(spwheel->GetWidth(),spwheel->GetRadius(),spwheel->GetRadius());
-    wheel_body->getCollisionShape()->setLocalScaling(wheel_dim);
+    wheel_body->getCollisionShape()->setLocalScaling(wheel_dim*WSCALE);
     // set wheel pose
-    wheel_body->setWorldTransform(spPose2btTransform(spwheel->GetPose()));
+    wheel_body->setWorldTransform(spPose2btTransform(spwheel->GetPose(),WSCALE));
     // calculate and set inertia/mass
     btVector3 wheel_local_inertia(0,0,0);
     double wheel_mass = spwheel->GetMass();
@@ -248,8 +247,8 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
     hinge->setStiffness(2,spwheel->GetSuspStiffness());
 
     // fix x,y linear movement directions and only move in z direction
-    hinge->setLinearLowerLimit(btVector3(0,0,spwheel->GetSuspLowerLimit()));
-    hinge->setLinearUpperLimit(btVector3(0,0,spwheel->GetSuspUpperLimit()));
+    hinge->setLinearLowerLimit(btVector3(0,0,spwheel->GetSuspLowerLimit())*WSCALE);
+    hinge->setLinearUpperLimit(btVector3(0,0,spwheel->GetSuspUpperLimit())*WSCALE);
     // set rotational directions
     // unlimitted in tire axis, fixed in one direction and limitted in steering direction(set upper/lower to 0/0 if its not supposed to be steering)
     hinge->setAngularLowerLimit(btVector3(1,0,spwheel->GetSteeringServoLowerLimit()));
@@ -258,30 +257,30 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
     int drive_motor_axis = source_obj.GetWheel(ii)->GetDriveMotorAxis();
     int steering_servo_axis = source_obj.GetWheel(ii)->GetSteeringServoAxis();
     if(spwheel->GetHasDriveMotor()) {
-      hinge->setTargetVelocity(drive_motor_axis,spwheel->GetDriveMotorTargetVelocity());
-      hinge->setMaxMotorForce(drive_motor_axis,spwheel->GetDriveMotorTorque());
+      hinge->setTargetVelocity(drive_motor_axis,spwheel->GetDriveMotorTargetVelocity()*WSCALE_INV);
+      hinge->setMaxMotorForce(drive_motor_axis,spwheel->GetDriveMotorTorque()*WSCALE);
     }
     if(spwheel->GetHasSteeringServo()) {
       // update
-      hinge->setTargetVelocity(steering_servo_axis,spwheel->GetSteeringServoMaxVelocity());
-      hinge->setMaxMotorForce(steering_servo_axis,spwheel->GetSteeringServoTorque());
+      hinge->setTargetVelocity(steering_servo_axis,spwheel->GetSteeringServoMaxVelocity()*WSCALE_INV);
+      hinge->setMaxMotorForce(steering_servo_axis,spwheel->GetSteeringServoTorque()*WSCALE);
       hinge->setServoTarget(steering_servo_axis,spwheel->GetSteeringServoTargetAngle());
     }
   }
 }
 #warning "returning bttransform might not be the fastest way of type conversion"
-btTransform spBulletWorld::spPose2btTransform(const spPose& pose) {
+btTransform spBulletWorld::spPose2btTransform(const spPose& pose, double btworld_scale) {
   btTransform tr;
-  tr.setOrigin(btVector3(pose.translation()[0],pose.translation()[1],pose.translation()[2]));
+  tr.setOrigin(btVector3(pose.translation()[0],pose.translation()[1],pose.translation()[2])*btworld_scale);
   spRotation q(pose.rotation());
   tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
   return tr;
 }
 #warning "if I return a reference instead of sppose UpdateSpiritObjectsFromPhy() will mess up things"
-spPose spBulletWorld::btTransform2spPose(const btTransform& tr) {
+spPose spBulletWorld::btTransform2spPose(const btTransform& tr, double btworld_scale_inv) {
   spPose pose(spPose::Identity());
   btVector3 origin = tr.getOrigin();
-  pose.translate(spTranslation(origin[0],origin[1],origin[2]));
+  pose.translate(spTranslation(origin[0],origin[1],origin[2])*btworld_scale_inv);
   btQuaternion btrot = tr.getRotation();
   spRotation spangle(btrot.w(),btrot.x(),btrot.y(),btrot.z());
   pose.rotate(spangle);
@@ -306,7 +305,7 @@ btRigidBody* spBulletWorld::CreateBulletBoxObject(spBox &source_obj) {
 void spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody *dest_obj) {
   // reset box size
   spBoxSize dims(source_obj.GetDimensions());
-  dest_obj->getCollisionShape()->setLocalScaling(btVector3(dims[0]/2,dims[1]/2,dims[2]/2));
+  dest_obj->getCollisionShape()->setLocalScaling(btVector3(dims[0]/2,dims[1]/2,dims[2]/2)*WSCALE);
   //rigidbody is dynamic if and only if mass is non zero, otherwise static
   btVector3 localInertia(0,0,0);
   if (source_obj.IsDynamic()) {
@@ -317,7 +316,7 @@ void spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody *dest_o
   dest_obj->setMassProps(source_obj.GetMass(),localInertia);
   // transform phy object
 //  std::cout << "source_obj pose" << btTransform2spPose(dest_obj->getWorldTransform()).matrix() << std::endl;
-  dest_obj->setWorldTransform(spPose2btTransform(source_obj.GetPose()));
+  dest_obj->setWorldTransform(spPose2btTransform(source_obj.GetPose(),WSCALE));
 }
 
 
@@ -361,7 +360,7 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
           spBox& box = (spBox&) spobjects.GetObject(ii);
           // update the phy object
           btCollisionObject* obj = dynamics_world_->getCollisionObjectArray()[box.GetPhyIndex()];
-          spPose ps(btTransform2spPose(obj->getWorldTransform()));
+          spPose ps(btTransform2spPose(obj->getWorldTransform(),WSCALE_INV));
           box.SetPose(ps);
           break;
         }
@@ -370,11 +369,11 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
           spVehicle& vehicle = (spVehicle&) spobjects.GetObject(ii);
           // update chassis
           btCollisionObject* chassis_obj = dynamics_world_->getCollisionObjectArray()[vehicle.GetPhyIndex()];
-          vehicle.SetPose(btTransform2spPose(chassis_obj->getWorldTransform()));
+          vehicle.SetPose(btTransform2spPose(chassis_obj->getWorldTransform(),WSCALE_INV));
           // update wheels
           for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
             btCollisionObject* wheel_obj = dynamics_world_->getCollisionObjectArray()[vehicle.GetWheel(ii)->GetPhyIndex()];
-            vehicle.GetWheel(ii)->SetPose(btTransform2spPose(wheel_obj->getWorldTransform()));
+            vehicle.GetWheel(ii)->SetPose(btTransform2spPose(wheel_obj->getWorldTransform(),WSCALE_INV));
           }
           break;
         }
@@ -384,10 +383,11 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
 }
 
 void spBulletWorld::StepPhySimulation(double step_time) {
-#warning "what is 10 here ..."
+#warning "Is should read more about this step simulation function. increasing the last parameter avoid penetrations and also increases the processing load alot"
+#warning "stepSimulation parameters are really important to understand since it changes simulation result drastically"
   // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=&f=&t=367
   // choose the number of iterations for the constraint solver in the range 4 to 10.
-  dynamics_world_->stepSimulation(step_time,10);
+  dynamics_world_->stepSimulation(step_time,100,0.001);
 }
 
 

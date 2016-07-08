@@ -4,15 +4,16 @@
 spWheel::spWheel()
 {
   friction_ = 100;
-  width_ = 0.4;
-  radius_ = 0.575;
-  susp_damping_ = 1;
+  width_ = 0.04;
+  radius_ = 0.05;
+  susp_damping_ = 0.1;
   susp_stiffness_ = 50;
-  susp_upper_limit_ = 1.8;// 5.5cm
-  susp_lower_limit_ = 1.5;
+  susp_upper_limit_ = 0.18;
+  susp_lower_limit_ = 0.15;
+#warning "should add suspension preloading and remove this responsibility from anchor points and upper/lower limits"
   has_drive_motor_ = true;
   drive_motor_target_velocity_ = 0;
-  drive_motor_torque_ = 1000;
+  drive_motor_torque_ = 1;
 
   has_steering_servo_ = true;
   steering_servo_torque_ = 50;

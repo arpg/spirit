@@ -8,7 +8,12 @@
 #include <bullet/BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h>
 #include <bullet/BulletDynamics/MLCPSolvers/btMLCPSolver.h>
 
-#define BT_USE_DOUBLE_PRECISION 1
+// I need to scale the world since bullet cannot handle objects less than 5cm and we need finer sized objects
+#warning "simulation doesn't work properly for scalle of 100 for some reason, I suspect suspension spring preloading might fix it"
+#define WSCALE 1
+#define WSCALE_INV 1
+
+#error "there is a difference btw scale 1 and 10 for spring stiffness "
 
 struct BulletWorldParams{
   btVector3 worldMin;
@@ -31,8 +36,8 @@ private:
   void UpdateBulletBoxObject(spBox& source_obj, btRigidBody* dest_obj);
   void UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody* dest_obj);
   btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
-  btTransform spPose2btTransform(const spPose& pose);
-  spPose btTransform2spPose(const btTransform& tr);
+  btTransform spPose2btTransform(const spPose& pose, double btworld_scale);
+  spPose btTransform2spPose(const btTransform& tr, double btworld_scale_inv);
   btRigidBody* CreateBulletVehicleObject(spVehicle& source_obj);
   btRigidBody* CreateBulletBoxObject(spBox& source_obj);
 

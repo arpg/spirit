@@ -34,15 +34,15 @@ void spirit::CheckKeyboardAction() {
 void spirit::ScenarioWorldCarFall() {
   // create and add a car
   spPose pose(spPose::Identity());
-  pose.translate(spTranslation(0,0,20));
+  pose.translate(spTranslation(0,0,1));
 //  Eigen::AngleAxisd rot(M_PI/10,Eigen::Vector3d::UnitY());
 //  pose.rotate(rot);
   // set wheel anchors
   std::vector<spTranslation> anchors;
-  anchors.push_back(spTranslation(-1.3,1.7,-1.8));
-  anchors.push_back(spTranslation(-1.3,-1.7,-1.8));
-  anchors.push_back(spTranslation(1.3,-1.7,-1.8));
-  anchors.push_back(spTranslation(1.3,1.7,-1.8));
+  anchors.push_back(spTranslation(-0.13,0.17,-0.18));
+  anchors.push_back(spTranslation(-0.13,-0.17,-0.18));
+  anchors.push_back(spTranslation(0.13,-0.17,-0.18));
+  anchors.push_back(spTranslation(0.13,0.17,-0.18));
   obj_car_index = objects_.CreateVehicle(pose,anchors,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_car_index));
   gui_.AddObject(objects_.GetObject(obj_car_index));
@@ -54,7 +54,7 @@ void spirit::ScenarioWorldCarFall() {
   Eigen::AngleAxisd ang(M_PI/20,Eigen::Vector3d::UnitX());
 //  ground.rotate(ang);
 
-  obj_gnd_index = objects_.CreateBox(ground,spBoxSize(1000,1000,1),0,spColor(0,1,0));
+  obj_gnd_index = objects_.CreateBox(ground,spBoxSize(10,10,1),0,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
@@ -86,5 +86,5 @@ void spirit::IterateWorld() {
   if(fl>100) {
 //    car.GetWheel(0)->SetSteeringServoTargetAngle(SP_PI/10);
   }
-//  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+//  std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }

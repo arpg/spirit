@@ -13,7 +13,7 @@ spVehicle::spVehicle(std::vector<spTranslation> wheel_anchor) {
   pose_ = spPose::Identity();
   cog_ = pose_.translation();
   cog_local_ = spTranslation(0,0,0);
-  chassis_size_ = spBoxSize(2,4,1);
+  chassis_size_ = spBoxSize(0.2,0.4,0.1);
   index_phy_ = -1;
   index_gui_ = -1;
   obj_phychanged_ = false;

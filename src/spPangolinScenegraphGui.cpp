@@ -39,7 +39,7 @@ void spPangolinScenegraphGui::InitGui() {
       pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
                                  WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.1,
                                  1000),
-      pangolin::ModelViewLookAt(5, 5, 5, 0, 0, 0, pangolin::AxisZ));
+      pangolin::ModelViewLookAt(2, 2, 2, 0, 0, 0, pangolin::AxisZ));
 
   handler_scenegraph_ = new SceneGraph::HandlerSceneGraph(
       glscenegraph_, glrenderstate_, pangolin::AxisZ, 0.01f);
@@ -52,7 +52,6 @@ void spPangolinScenegraphGui::InitGui() {
 
   // Create Globjects
   SceneGraph::GLGrid grid(10, 1, false);
-  grid.SetScale(10);
   globjects_.push_back(new SceneGraph::GLGrid(grid));
   globjects_.push_back(new SceneGraph::GLLight(1000, 1000, 1000));
 
