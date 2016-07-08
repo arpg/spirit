@@ -39,10 +39,10 @@ void spirit::ScenarioWorldCarFall() {
 //  pose.rotate(rot);
   // set wheel anchors
   std::vector<spTranslation> anchors;
-  anchors.push_back(spTranslation(-0.13,0.17,-0.18));
-  anchors.push_back(spTranslation(-0.13,-0.17,-0.18));
-  anchors.push_back(spTranslation(0.13,-0.17,-0.18));
-  anchors.push_back(spTranslation(0.13,0.17,-0.18));
+  anchors.push_back(spTranslation(-0.13,0.17,-0.05));
+  anchors.push_back(spTranslation(-0.13,-0.17,-0.05));
+  anchors.push_back(spTranslation(0.13,-0.17,-0.05));
+  anchors.push_back(spTranslation(0.13,0.17,-0.05));
   obj_car_index = objects_.CreateVehicle(pose,anchors,spColor(0,1,0));
   physics_.AddObject(objects_.GetObject(obj_car_index));
   gui_.AddObject(objects_.GetObject(obj_car_index));

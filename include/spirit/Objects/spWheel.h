@@ -24,6 +24,9 @@ public:
   double GetSuspStiffness();
   void SetSuspStiffness(double stiffness);
 
+  double GetSuspPreloadingSpacer();
+  void SetSuspPreloadingSpacer(double distance);
+
   double GetSuspDamping();
   void SetSuspDamping(double damping);
 
@@ -82,6 +85,7 @@ private:
   double radius_;    // in meters
   double susp_damping_;
   double susp_stiffness_;
+  double susp_preloading_spacer_;
   double susp_lower_limit_;
   double susp_upper_limit_;
   double has_drive_motor_;

@@ -5,7 +5,7 @@ spVehicle::spVehicle(std::vector<spTranslation> wheel_anchor) {
   mass_ = chassis_mass_;
   for(int ii=0; ii<wheel_anchor.size(); ii++) {
     wheel_.push_back(std::make_shared<spWheel>());
-    wheel_[ii]->SetChassisAnchor(wheel_anchor[ii]);
+    wheel_[ii]->SetChassisAnchor(wheel_anchor[ii]+spTranslation(0,0,-wheel_[ii]->GetSuspPreloadingSpacer()));
     mass_ += wheel_[ii]->GetMass();
   }
   MoveWheelsToAnchors();

@@ -8,12 +8,9 @@
 #include <bullet/BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h>
 #include <bullet/BulletDynamics/MLCPSolvers/btMLCPSolver.h>
 
-// I need to scale the world since bullet cannot handle objects less than 5cm and we need finer sized objects
-#warning "simulation doesn't work properly for scalle of 100 for some reason, I suspect suspension spring preloading might fix it"
-#define WSCALE 1
-#define WSCALE_INV 1
-
-#error "there is a difference btw scale 1 and 10 for spring stiffness "
+// for a stable physics result use a scale of 2-10
+#define WSCALE 2
+#define WSCALE_INV 0.5
 
 struct BulletWorldParams{
   btVector3 worldMin;

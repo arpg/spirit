@@ -6,10 +6,11 @@ spWheel::spWheel()
   friction_ = 100;
   width_ = 0.04;
   radius_ = 0.05;
-  susp_damping_ = 0.1;
-  susp_stiffness_ = 50;
-  susp_upper_limit_ = 0.18;
-  susp_lower_limit_ = 0.15;
+  susp_damping_ = 10;
+  susp_stiffness_ = 200;
+  susp_preloading_spacer_ = 0.01;
+  susp_upper_limit_ = susp_preloading_spacer_+0.05;
+  susp_lower_limit_ = susp_preloading_spacer_-0.05;
 #warning "should add suspension preloading and remove this responsibility from anchor points and upper/lower limits"
   has_drive_motor_ = true;
   drive_motor_target_velocity_ = 0;
@@ -108,6 +109,16 @@ void spWheel::SetSuspStiffness(double stiffness)
 {
   susp_stiffness_ = stiffness;
   obj_phychanged_ = true;
+}
+
+double spWheel::GetSuspPreloadingSpacer()
+{
+  return susp_preloading_spacer_;
+}
+
+void spWheel::SetSuspPreloadingSpacer(double distance)
+{
+  susp_preloading_spacer_ = distance;
 }
 
 double spWheel::GetSuspDamping()
