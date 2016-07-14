@@ -5,7 +5,7 @@
 
 class spWheel : public spCommonObject {
 public:
-  spWheel();
+  spWheel(const spVehicleConstructionInfo& vehicle_info);
   ~spWheel();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
@@ -48,12 +48,6 @@ public:
   double GetSteeringServoTorque();
   void SetSteeringServoTorque(double torque);
 
-  bool GetHasDriveMotor();
-  void SetHasDriveMotor(bool status);
-
-  bool GetHasSteeringServo();
-  void SetHasSteeringServo(bool status);
-
   double GetDriveMotorTargetVelocity();
   void SetDriveMotorTargetVelocity(double velocity);
 
@@ -64,7 +58,6 @@ public:
   void SetMass(double mass);
 
   bool GetAirborneState();
-  void SetAirborneState(bool status);
 
   const spTranslation& GetChassisAnchor();
   void SetChassisAnchor(const spTranslation anchor);
@@ -77,6 +70,13 @@ public:
 
   int GetDriveMotorAxis();
   int GetSteeringServoAxis();
+
+  bool GetHasDriveMotor();
+  bool GetHasSteeringServo();
+
+  void SetHasDriveMotor(bool status);
+  void SetHasSteeringServo(bool status);
+  void SetAirborneState(bool status);
 
 private:
   spTranslation chassis_anchor;

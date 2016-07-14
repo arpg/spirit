@@ -1,27 +1,27 @@
 #include <spirit/Objects/spWheel.h>
 
 
-spWheel::spWheel()
+spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info)
 {
-  friction_ = 100;
-  width_ = 0.04;
-  radius_ = 0.05;
-  susp_damping_ = 10;
-  susp_stiffness_ = 200;
-  susp_preloading_spacer_ = 0.01;
-  susp_upper_limit_ = susp_preloading_spacer_+0.05;
-  susp_lower_limit_ = susp_preloading_spacer_-0.05;
-#warning "should add suspension preloading and remove this responsibility from anchor points and upper/lower limits"
-  has_drive_motor_ = true;
+  friction_ = vehicle_info.wheel_friction;
+  width_ = vehicle_info.wheel_width;
+  radius_ = vehicle_info.wheel_radius;
+  susp_damping_ = vehicle_info.susp_damping;
+  susp_stiffness_ = vehicle_info.susp_stiffness;
+  susp_preloading_spacer_ = vehicle_info.susp_preloading_spacer;
+  susp_upper_limit_ = vehicle_info.susp_upper_limit;
+  susp_lower_limit_ = vehicle_info.susp_lower_limit;
+  has_drive_motor_ = false;
   drive_motor_target_velocity_ = 0;
-  drive_motor_torque_ = 1;
+  drive_motor_torque_ = 0;
+  mass_ = vehicle_info.wheel_mass;
 
-  has_steering_servo_ = true;
-  steering_servo_torque_ = 50;
-  steering_servo_max_velocity_ = 10;
+  has_steering_servo_ = false;
+  steering_servo_torque_ = 0;
+  steering_servo_max_velocity_ = 0;
   steering_servo_target_angle_ = 0;
-  steering_servo_lower_limit_ = -SP_PI/4;
-  steering_servo_upper_limit_ = SP_PI/4;
+  steering_servo_lower_limit_ = vehicle_info.steering_servo_lower_limit;
+  steering_servo_upper_limit_ = vehicle_info.steering_servo_upper_limit;
 
   airborne_ = false;
   color_ = spColor(0,0,0);
@@ -31,7 +31,6 @@ spWheel::spWheel()
   obj_phychanged_ = false;
   obj_guichanged_ = false;
   object_type_ = spObjectType::WHEEL;
-  mass_ = 0.4;
 }
 
 spWheel::~spWheel()

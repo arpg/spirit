@@ -13,13 +13,15 @@ int Objects::CreateBox(const spPose& pose, const spBoxSize& size, const double m
   return (objects_.size()-1);
 }
 
-int Objects::CreateVehicle(const spPose& pose, const std::vector<spTranslation>& wheels_anchor, const spColor& color)
-{
-  std::shared_ptr<spVehicle> a_vehicle = std::make_shared<spVehicle>(wheels_anchor);
-  a_vehicle->SetPose(pose);
-  a_vehicle->MoveWheelsToAnchors();
-  a_vehicle->SetColor(color);
-  objects_.push_back(a_vehicle);
+int Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_info) {
+  switch (vehicle_info.vehicle_type) {
+    case spVehicleConfig::AWSD:
+    {
+      std::shared_ptr<spAWSDCar> a_vehicle = std::make_shared<spAWSDCar>(vehicle_info);
+      objects_.push_back(a_vehicle);
+      break;
+    }
+  }
   return (objects_.size()-1);
 }
 

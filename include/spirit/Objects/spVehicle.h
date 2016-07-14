@@ -12,7 +12,7 @@
 // in its fucntion name.
 class spVehicle : public spCommonObject {
  public:
-  spVehicle(std::vector<spTranslation> wheel_anchor);
+  spVehicle(const spVehicleConstructionInfo& vehicle_info);
   ~spVehicle();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
@@ -34,7 +34,8 @@ class spVehicle : public spCommonObject {
   const spBoxSize& GetChassisSize();
   void SetChassisSize(const spBoxSize& dim);
 
-  const spTranslation& GetLocalCOG();
+  const spPose& GetLocalCOG();
+  const spPose& GetGlobalCOG();
   void SetLocalCOG(const spTranslation& tr);
 
   void MoveWheelsToAnchors(void);
@@ -46,11 +47,9 @@ class spVehicle : public spCommonObject {
  private:
   std::vector<std::shared_ptr<spWheel>> wheel_;
   spPose pose_;        // this pose will represent geometric center of the car
-  spTranslation cog_;  // center of gravity
+  spPose cog_local_;  // center of gravity
   spColor color_;
   spBoxSize chassis_size_;
-  spTranslation cog_local_;
-  double chassis_mass_;  // in kg
   double roll_influence_;
 };
 

@@ -6,7 +6,13 @@
 
 class spAWSDCar : public spVehicle {
 public:
-  spBox bal;
+  spAWSDCar(const spVehicleConstructionInfo& vehicle_info);
+  ~spAWSDCar();
+  void SetFrontSteeringAngle(double angle);
+  void SetBackSteeringAngle(double angle);
+//  void ApplySteeringCouplings();
+//  void ApplyTransmissionDifferentialCoupling();
+  void ApplyMotorTorque(double torque);
 };
 
 #endif  // SP_AWSDCAR_H__

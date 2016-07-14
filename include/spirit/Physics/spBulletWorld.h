@@ -9,8 +9,8 @@
 #include <bullet/BulletDynamics/MLCPSolvers/btMLCPSolver.h>
 
 // for a stable physics result use a scale of 2-10
-#define WSCALE 2
-#define WSCALE_INV 0.5
+#define WSCALE 1
+#define WSCALE_INV 1
 
 struct BulletWorldParams{
   btVector3 worldMin;

@@ -1,25 +1,24 @@
 #include <spirit/Objects/spVehicle.h>
 
-spVehicle::spVehicle(std::vector<spTranslation> wheel_anchor) {
-  chassis_mass_ = 3;
-  mass_ = chassis_mass_;
-  for(int ii=0; ii<wheel_anchor.size(); ii++) {
-    wheel_.push_back(std::make_shared<spWheel>());
-    wheel_[ii]->SetChassisAnchor(wheel_anchor[ii]+spTranslation(0,0,-wheel_[ii]->GetSuspPreloadingSpacer()));
-    mass_ += wheel_[ii]->GetMass();
+spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info) {
+  mass_ = vehicle_info.chassis_mass;
+  for(int ii=0; ii<vehicle_info.wheels_anchor.size(); ii++) {
+    wheel_.push_back(std::make_shared<spWheel>(vehicle_info));
+    wheel_[ii]->SetChassisAnchor(vehicle_info.wheels_anchor[ii]);
   }
+
+  pose_ = vehicle_info.pose;
   MoveWheelsToAnchors();
-  color_ = spColor(0, 0, 0);
-  pose_ = spPose::Identity();
-  cog_ = pose_.translation();
-  cog_local_ = spTranslation(0,0,0);
-  chassis_size_ = spBoxSize(0.2,0.4,0.1);
+  color_ = vehicle_info.color;
+  cog_local_ = spPose::Identity();
+  SetLocalCOG(vehicle_info.cog);
+  chassis_size_ = vehicle_info.chassis_size;
   index_phy_ = -1;
   index_gui_ = -1;
   obj_phychanged_ = false;
   obj_guichanged_ = false;
   object_type_ = spObjectType::VEHICLE;
-  roll_influence_ = 0.1;
+  roll_influence_ = vehicle_info.roll_influence;
 }
 
 spVehicle::~spVehicle() {}
@@ -27,8 +26,6 @@ spVehicle::~spVehicle() {}
 void spVehicle::SetPose(const spPose& pose) {
   // set chassis pose
   pose_ = pose;
-#warning "cog = pose for test here"
-//  cog_ = pose.translation();
   obj_phychanged_ = true;
   obj_guichanged_ = true;
 }
@@ -71,11 +68,11 @@ void spVehicle::SetRollInfluence(double roll_inf) {
 }
 
 double spVehicle::GetChassisMass() {
-  return chassis_mass_;
+  return mass_;
 }
 
 void spVehicle::SetChassisMass(double mass) {
-  chassis_mass_ = mass;
+  mass_ = mass;
   obj_phychanged_ = true;
 }
 
@@ -90,13 +87,16 @@ void spVehicle::SetChassisSize(const spBoxSize& dim) {
   obj_guichanged_ = true;
 }
 
-const spTranslation& spVehicle::GetLocalCOG() {
-#warning "implememt this"
+const spPose& spVehicle::GetLocalCOG(){
   return cog_local_;
 }
 
+const spPose& spVehicle::GetGlobalCOG(){
+  return pose_*cog_local_;
+}
+
 void spVehicle::SetLocalCOG(const spTranslation& tr) {
-#warning "implememt this"
+  cog_local_.translation() = tr;
   obj_phychanged_ = true;
 }
 

@@ -33,20 +33,33 @@ void spirit::CheckKeyboardAction() {
 
 void spirit::ScenarioWorldCarFall() {
   // create and add a car
-  spPose pose(spPose::Identity());
-  pose.translate(spTranslation(0,0,1));
-//  Eigen::AngleAxisd rot(M_PI/10,Eigen::Vector3d::UnitY());
-//  pose.rotate(rot);
-  // set wheel anchors
-  std::vector<spTranslation> anchors;
-  anchors.push_back(spTranslation(-0.13,0.17,-0.05));
-  anchors.push_back(spTranslation(-0.13,-0.17,-0.05));
-  anchors.push_back(spTranslation(0.13,-0.17,-0.05));
-  anchors.push_back(spTranslation(0.13,0.17,-0.05));
-  obj_car_index = objects_.CreateVehicle(pose,anchors,spColor(0,1,0));
+  spVehicleConstructionInfo car_param;
+  car_param.vehicle_type = spVehicleConfig::AWSD;
+  car_param.pose.translate(spTranslation(0,0,1));
+//  Eigen::AngleAxisd rot(M_PI/2,Eigen::Vector3d::UnitY());
+//  car_param.pose.rotate(rot);
+  car_param.wheels_anchor.push_back(spTranslation(-0.13,0.17,-0.05));
+  car_param.wheels_anchor.push_back(spTranslation(-0.13,-0.17,-0.05));
+  car_param.wheels_anchor.push_back(spTranslation(0.13,-0.17,-0.05));
+  car_param.wheels_anchor.push_back(spTranslation(0.13,0.17,-0.05));
+  car_param.chassis_size = spBoxSize(0.2,0.4,0.1);
+  car_param.cog = spTranslation(0,0.3,0);
+  car_param.wheel_friction = 100;
+  car_param.wheel_width = 0.04;
+  car_param.wheel_radius = 0.05;
+  car_param.susp_damping = 10;
+  car_param.susp_stiffness = 200;
+  car_param.susp_preloading_spacer = 0.1;
+  car_param.susp_upper_limit = 0.05;
+  car_param.susp_lower_limit = -0.05;
+  car_param.wheel_mass = 0.1;
+  car_param.chassis_mass = 3;
+  car_param.steering_servo_lower_limit = -SP_PI/4;;
+  car_param.steering_servo_upper_limit = SP_PI/4;;
+
+  obj_car_index = objects_.CreateVehicle(car_param);
   physics_.AddObject(objects_.GetObject(obj_car_index));
   gui_.AddObject(objects_.GetObject(obj_car_index));
-
 
   // create and add a ground as a box to objects_ vector
   spPose ground(spPose::Identity());
@@ -78,13 +91,15 @@ void spirit::ScenarioWorldBoxFall() {
 void spirit::IterateWorld() {
   gui_.Iterate(objects_);
   static int fl = 0;
-  if(fl<10000) {
+  if(fl<1000) {
     physics_.Iterate(objects_);
     fl++;
   }
-  spVehicle& car = (spVehicle&) objects_.GetObject(obj_car_index);
+  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
+
   if(fl>100) {
-//    car.GetWheel(0)->SetSteeringServoTargetAngle(SP_PI/10);
+    car.SetFrontSteeringAngle(SP_PI/10);
+    car.SetBackSteeringAngle(-SP_PI/10);
   }
-//  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
