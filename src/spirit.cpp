@@ -43,7 +43,7 @@ void spirit::ScenarioWorldCarFall() {
   car_param.wheels_anchor.push_back(spTranslation(0.13,-0.17,-0.05));
   car_param.wheels_anchor.push_back(spTranslation(0.13,0.17,-0.05));
   car_param.chassis_size = spBoxSize(0.2,0.4,0.1);
-  car_param.cog = spTranslation(0,0.3,0);
+  car_param.cog = spTranslation(0,0,0);
   car_param.wheel_friction = 100;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.05;
@@ -53,7 +53,7 @@ void spirit::ScenarioWorldCarFall() {
   car_param.susp_upper_limit = 0.05;
   car_param.susp_lower_limit = -0.05;
   car_param.wheel_mass = 0.1;
-  car_param.chassis_mass = 3;
+  car_param.chassis_mass = 1;
   car_param.steering_servo_lower_limit = -SP_PI/4;;
   car_param.steering_servo_upper_limit = SP_PI/4;;
 
@@ -98,8 +98,7 @@ void spirit::IterateWorld() {
   spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
 
   if(fl>100) {
-    car.SetFrontSteeringAngle(SP_PI/10);
-    car.SetBackSteeringAngle(-SP_PI/10);
+//    car.SetLocalCOG(spTranslation(0,-0.3,0));
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }

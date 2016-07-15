@@ -11,14 +11,13 @@ spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info) {
   MoveWheelsToAnchors();
   color_ = vehicle_info.color;
   cog_local_ = spPose::Identity();
-  SetLocalCOG(vehicle_info.cog);
+  cog_local_.translation() = vehicle_info.cog;
   chassis_size_ = vehicle_info.chassis_size;
   index_phy_ = -1;
   index_gui_ = -1;
   obj_phychanged_ = false;
   obj_guichanged_ = false;
   object_type_ = spObjectType::VEHICLE;
-  roll_influence_ = vehicle_info.roll_influence;
 }
 
 spVehicle::~spVehicle() {}
@@ -35,7 +34,7 @@ void spVehicle::MoveWheelsToAnchors(void) {
     spPose sp(spPose::Identity());
     sp.translate(pose_*wheel_[ii]->GetChassisAnchor());
     sp.rotate(pose_.rotation());
-    SetWheelOrigin(ii,sp);
+    wheel_[ii]->SetPose(sp);
   }
 }
 
@@ -49,22 +48,6 @@ void spVehicle::SetColor(const spColor& color) {
 const spPose& spVehicle::GetWheelOrigin(int index)
 {
   return wheel_[index]->GetPose();
-}
-
-void spVehicle::SetWheelOrigin(int index, const spPose& pose)
-{
-  wheel_[index]->SetPose(pose);
-  obj_phychanged_ = true;
-  obj_guichanged_ = true;
-}
-
-double spVehicle::GetRollInfluence() {
-  return roll_influence_;
-}
-
-void spVehicle::SetRollInfluence(double roll_inf) {
-  roll_influence_ = roll_inf;
-  obj_phychanged_ = true;
 }
 
 double spVehicle::GetChassisMass() {
@@ -81,23 +64,12 @@ const spBoxSize& spVehicle::GetChassisSize() {
   return chassis_size_;
 }
 
-void spVehicle::SetChassisSize(const spBoxSize& dim) {
-  chassis_size_ = dim;
-  obj_phychanged_ = true;
-  obj_guichanged_ = true;
-}
-
 const spPose& spVehicle::GetLocalCOG(){
   return cog_local_;
 }
 
 const spPose& spVehicle::GetGlobalCOG(){
   return pose_*cog_local_;
-}
-
-void spVehicle::SetLocalCOG(const spTranslation& tr) {
-  cog_local_.translation() = tr;
-  obj_phychanged_ = true;
 }
 
 int spVehicle::GetNumberOfWheels()

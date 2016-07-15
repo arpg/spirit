@@ -38,7 +38,6 @@ struct spVehicleConstructionInfo{
   double chassis_mass;
   spColor color;
   spBoxSize chassis_size;
-  double roll_influence; // bullet requires this
   // wheel info
   double wheel_friction;  // unit less
   double wheel_width;     // in meters
@@ -59,7 +58,6 @@ struct spVehicleConstructionInfo{
     cog = spTranslation(0,0,0);
     chassis_mass = 0;
     chassis_size = spBoxSize(0,0,0);
-    roll_influence = 0.1;
     wheel_friction = 0;
     wheel_width = 0;
     wheel_radius = 0;

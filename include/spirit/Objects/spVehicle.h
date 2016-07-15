@@ -17,32 +17,15 @@ class spVehicle : public spCommonObject {
   void SetPose(const spPose& pose);
   const spPose& GetPose();
   void SetColor(const spColor& color);
-
-  const spPose& GetChassisPose();
-
   int GetNumberOfWheels();
   spWheel* GetWheel(int index);
-
-  double GetRollInfluence();
-  void SetRollInfluence(double roll_inf);
-
   double GetChassisMass();
   void SetChassisMass(double mass);
-
   const spPose& GetWheelOrigin(int index);
-
   const spBoxSize& GetChassisSize();
-  void SetChassisSize(const spBoxSize& dim);
-
   const spPose& GetLocalCOG();
   const spPose& GetGlobalCOG();
-  void SetLocalCOG(const spTranslation& tr);
-
   void MoveWheelsToAnchors(void);
-
- protected:
-  void SetWheelOrigin(int index, const spPose& pose);
-  void SetWheelAnchor(int index, const spTranslation& tr);
 
  private:
   std::vector<std::shared_ptr<spWheel>> wheel_;
@@ -50,7 +33,8 @@ class spVehicle : public spCommonObject {
   spPose cog_local_;  // center of gravity
   spColor color_;
   spBoxSize chassis_size_;
-  double roll_influence_;
+  void SetWheelOrigin(int index, const spPose& pose);
+  void SetWheelAnchor(int index, const spTranslation& tr);
 };
 
 #endif  //  SP_VEHICLE_H__
