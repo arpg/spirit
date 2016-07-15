@@ -344,7 +344,7 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
 void spBulletWorld::StepPhySimulation(double step_time) {
 #warning "Is should read more about this step simulation function. increasing the last parameter avoid penetrations and also increases the processing load alot"
 #warning "stepSimulation parameters are really important to understand since it changes simulation result drastically"
-  // http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=&f=&t=367
+  // simulation_step/penetration -> http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=&f=&t=367
   // choose the number of iterations for the constraint solver in the range 4 to 10.
   dynamics_world_->stepSimulation(step_time,100,0.001);
 }

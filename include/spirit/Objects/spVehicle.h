@@ -24,7 +24,6 @@ class spVehicle : public spCommonObject {
   const spPose& GetWheelOrigin(int index);
   const spBoxSize& GetChassisSize();
   const spPose& GetLocalCOG();
-  const spPose& GetGlobalCOG();
   void MoveWheelsToAnchors(void);
 
  private:

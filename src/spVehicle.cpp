@@ -68,10 +68,6 @@ const spPose& spVehicle::GetLocalCOG(){
   return cog_local_;
 }
 
-const spPose& spVehicle::GetGlobalCOG(){
-  return pose_*cog_local_;
-}
-
 int spVehicle::GetNumberOfWheels()
 {
   return wheel_.size();
