@@ -1,9 +1,14 @@
 #include <spirit/Physics/spBulletWorld.h>
+// Bullet spring model Ref  -->  http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?t=9997
+
 
 spBulletWorld::spBulletWorld() {
   world_params_.worldMax.setValue(1000*WSCALE,1000*WSCALE,1000*WSCALE);
   world_params_.worldMin.setValue(-1000*WSCALE,-1000*WSCALE,-1000*WSCALE);
   world_params_.solver = spPhysolver::SEQUENTIAL_IMPULSE;
+  chassis_collide_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
+  wheel_collide_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
+  box_collide_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH | BulletCollissionType::COL_CHASSIS | BulletCollissionType::COL_WHEEL;
 }
 
 spBulletWorld::~spBulletWorld() {
@@ -16,7 +21,7 @@ spBulletWorld::~spBulletWorld() {
 
   delete(dynamics_world_);
   switch(world_params_.solver) {
-    case spPhysolver::MLCP_DANTZING:
+    case spPhysolver::MLCP_DANTZIG:
       delete(solver_dantzig_);
       break;
     case spPhysolver::MLCP_PROJECTEDGAUSSSEIDEL:
@@ -38,7 +43,7 @@ bool spBulletWorld::InitEmptyDynamicsWorld() {
   dispatcher_ = new btCollisionDispatcher(collisionConfiguration_);
   broadphase_ = new btAxisSweep3(world_params_.worldMin,world_params_.worldMax);
   switch(world_params_.solver) {
-    case spPhysolver::MLCP_DANTZING:
+    case spPhysolver::MLCP_DANTZIG:
       solver_dantzig_ = new btDantzigSolver();
       solver_ = new btMLCPSolver(solver_dantzig_);
       break;
@@ -54,7 +59,7 @@ bool spBulletWorld::InitEmptyDynamicsWorld() {
   dynamics_world_ = new btDiscreteDynamicsWorld(dispatcher_,broadphase_,solver_,collisionConfiguration_);
 
   switch(world_params_.solver) {
-    case spPhysolver::MLCP_DANTZING:
+    case spPhysolver::MLCP_DANTZIG:
       //for direct solver it is better to have a small A matrix
       dynamics_world_->getSolverInfo().m_minimumSolverBatchSize = 1;
       break;
@@ -122,7 +127,7 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
   compound->addChildShape(spPose2btTransform(source_obj.GetLocalCOG().inverse(),WSCALE),chassis_shape);
   // create a rigidbody from compound shape and add it to world
   btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(source_obj.GetLocalCOG(),WSCALE),compound);
-  dynamics_world_->addRigidBody(bodyA);
+  dynamics_world_->addRigidBody(bodyA,BulletCollissionType::COL_CHASSIS,chassis_collide_with_);
   // set the correct index for spVehicle object so we can access this object later
   bodyA->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
   source_obj.SetPhyIndex(bodyA->getUserIndex());
@@ -136,8 +141,8 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
     tr.setOrigin(btVector3(source_obj.GetWheel(ii)->GetChassisAnchor()[0],source_obj.GetWheel(ii)->GetChassisAnchor()[1],source_obj.GetWheel(ii)->GetChassisAnchor()[2]-source_obj.GetWheel(ii)->GetSuspPreloadingSpacer())*WSCALE);
     btCollisionShape* wheel_shape = new btCylinderShapeX(btVector3(source_obj.GetWheel(ii)->GetWidth()/2,source_obj.GetWheel(ii)->GetRadius(),source_obj.GetWheel(ii)->GetRadius())*WSCALE);
     btRigidBody* bodyB = CreateRigidBody(spwheel->GetMass(),tr,wheel_shape);
-    bodyB->setDamping(0,0);
-    dynamics_world_->addRigidBody(bodyB);
+    bodyB->setDamping(0.0,0.0);
+    dynamics_world_->addRigidBody(bodyB,BulletCollissionType::COL_WHEEL,wheel_collide_with_);
     bodyB->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
     spwheel->SetPhyIndex(bodyB->getUserIndex());
     bodyB->setFriction(spwheel->GetFriction());
@@ -210,6 +215,7 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
     // fix x,y linear movement directions and only move in z direction
     hinge->setLinearLowerLimit(btVector3(0,0,spwheel->GetSuspPreloadingSpacer()+spwheel->GetSuspLowerLimit())*WSCALE);
     hinge->setLinearUpperLimit(btVector3(0,0,spwheel->GetSuspPreloadingSpacer()+spwheel->GetSuspUpperLimit())*WSCALE);
+    hinge->setEquilibriumPoint();
     // set rotational directions
     // unlimitted in tire axis, fixed in one direction and limitted in steering direction(set upper/lower to 0/0 if its not supposed to be steering)
     hinge->setAngularLowerLimit(btVector3(1,0,spwheel->GetSteeringServoLowerLimit()));
@@ -219,11 +225,11 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
     int steering_servo_axis = source_obj.GetWheel(ii)->GetSteeringServoAxis();
     if(spwheel->GetHasDriveMotor()) {
       hinge->setTargetVelocity(drive_motor_axis,spwheel->GetDriveMotorTargetVelocity());
-      hinge->setMaxMotorForce(drive_motor_axis,spwheel->GetDriveMotorTorque());
+      hinge->setMaxMotorForce(drive_motor_axis,spwheel->GetDriveMotorTorque()*WSCALE);
     }
     if(spwheel->GetHasSteeringServo()) {
       hinge->setTargetVelocity(steering_servo_axis,spwheel->GetSteeringServoMaxVelocity());
-      hinge->setMaxMotorForce(steering_servo_axis,spwheel->GetSteeringServoTorque());
+      hinge->setMaxMotorForce(steering_servo_axis,spwheel->GetSteeringServoTorque()*WSCALE);
       hinge->setServoTarget(steering_servo_axis,spwheel->GetSteeringServoTargetAngle());
     }
   }
@@ -254,7 +260,7 @@ btRigidBody* spBulletWorld::CreateBulletBoxObject(spBox &source_obj) {
   btTransform tr;
   tr.setIdentity();
   btRigidBody* dest_obj = CreateRigidBody(1,tr,shape);
-  dynamics_world_->addRigidBody(dest_obj);
+  dynamics_world_->addRigidBody(dest_obj,BulletCollissionType::COL_BOX,box_collide_with_);
   dest_obj->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
   source_obj.SetPhyIndex(dest_obj->getUserIndex());
   return dest_obj;
@@ -342,11 +348,18 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
 }
 
 void spBulletWorld::StepPhySimulation(double step_time) {
-#warning "Is should read more about this step simulation function. increasing the last parameter avoid penetrations and also increases the processing load alot"
-#warning "stepSimulation parameters are really important to understand since it changes simulation result drastically"
+
   // simulation_step/penetration -> http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=&f=&t=367
+  // http://bulletphysics.org/mediawiki-1.5.8/index.php/Stepping_the_World
   // choose the number of iterations for the constraint solver in the range 4 to 10.
-  dynamics_world_->stepSimulation(step_time,100,0.001);
+  const btScalar fixed_time_step = 0.01;
+  if (step_time <= fixed_time_step) {
+    std::cerr << "step_time should be lesst than fixed_time_step in Line:" << __LINE__ << ", " << __FILE__ << std::endl;
+  }
+  // this is to guarantee that all steps are simulation steps rather than interpolation
+  // timeStep < maxSubSteps * fixedTimeStep
+  int max_sub_steps = (step_time/fixed_time_step)+1;
+  dynamics_world_->stepSimulation(step_time,max_sub_steps,fixed_time_step);
 }
 
 

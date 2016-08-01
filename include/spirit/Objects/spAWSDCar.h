@@ -10,9 +10,9 @@ public:
   ~spAWSDCar();
   void SetFrontSteeringAngle(double angle);
   void SetBackSteeringAngle(double angle);
-//  void ApplySteeringCouplings();
-//  void ApplyTransmissionDifferentialCoupling();
-  void ApplyMotorTorque(double torque);
+  void SetMotorTorque(double torque);
+private:
+  void ApplyTransmissionDifferentialCoupling();
 };
 
 #endif  // SP_AWSDCAR_H__
