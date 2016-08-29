@@ -6,9 +6,9 @@ spBulletWorld::spBulletWorld() {
   world_params_.worldMax.setValue(1000*WSCALE,1000*WSCALE,1000*WSCALE);
   world_params_.worldMin.setValue(-1000*WSCALE,-1000*WSCALE,-1000*WSCALE);
   world_params_.solver = spPhysolver::SEQUENTIAL_IMPULSE;
-  chassis_collide_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
-  wheel_collide_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
-  box_collide_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH | BulletCollissionType::COL_CHASSIS | BulletCollissionType::COL_WHEEL;
+  chassis_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
+  wheel_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
+  box_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH | BulletCollissionType::COL_CHASSIS | BulletCollissionType::COL_WHEEL;
 }
 
 spBulletWorld::~spBulletWorld() {
@@ -127,7 +127,7 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
   compound->addChildShape(spPose2btTransform(source_obj.GetLocalCOG().inverse(),WSCALE),chassis_shape);
   // create a rigidbody from compound shape and add it to world
   btRigidBody* bodyA = CreateRigidBody(source_obj.GetChassisMass(),spPose2btTransform(source_obj.GetLocalCOG(),WSCALE),compound);
-  dynamics_world_->addRigidBody(bodyA,BulletCollissionType::COL_CHASSIS,chassis_collide_with_);
+  dynamics_world_->addRigidBody(bodyA,BulletCollissionType::COL_CHASSIS,chassis_collides_with_);
   // set the correct index for spVehicle object so we can access this object later
   bodyA->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
   source_obj.SetPhyIndex(bodyA->getUserIndex());
@@ -140,9 +140,10 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
     tr.setIdentity();
     tr.setOrigin(btVector3(source_obj.GetWheel(ii)->GetChassisAnchor()[0],source_obj.GetWheel(ii)->GetChassisAnchor()[1],source_obj.GetWheel(ii)->GetChassisAnchor()[2]-source_obj.GetWheel(ii)->GetSuspPreloadingSpacer())*WSCALE);
     btCollisionShape* wheel_shape = new btCylinderShapeX(btVector3(source_obj.GetWheel(ii)->GetWidth()/2,source_obj.GetWheel(ii)->GetRadius(),source_obj.GetWheel(ii)->GetRadius())*WSCALE);
+//    btCollisionShape* wheel_shape = new btCapsuleShapeX(source_obj.GetWheel(ii)->GetRadius()*WSCALE,(source_obj.GetWheel(ii)->GetWidth()/2)*WSCALE);
     btRigidBody* bodyB = CreateRigidBody(spwheel->GetMass(),tr,wheel_shape);
     bodyB->setDamping(0.0,0.0);
-    dynamics_world_->addRigidBody(bodyB,BulletCollissionType::COL_WHEEL,wheel_collide_with_);
+    dynamics_world_->addRigidBody(bodyB,BulletCollissionType::COL_WHEEL,wheel_collides_with_);
     bodyB->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
     spwheel->SetPhyIndex(bodyB->getUserIndex());
     bodyB->setFriction(spwheel->GetFriction());
@@ -260,7 +261,7 @@ btRigidBody* spBulletWorld::CreateBulletBoxObject(spBox &source_obj) {
   btTransform tr;
   tr.setIdentity();
   btRigidBody* dest_obj = CreateRigidBody(1,tr,shape);
-  dynamics_world_->addRigidBody(dest_obj,BulletCollissionType::COL_BOX,box_collide_with_);
+  dynamics_world_->addRigidBody(dest_obj,BulletCollissionType::COL_BOX,box_collides_with_);
   dest_obj->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
   source_obj.SetPhyIndex(dest_obj->getUserIndex());
   return dest_obj;

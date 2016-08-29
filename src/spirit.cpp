@@ -36,8 +36,8 @@ void spirit::ScenarioWorldCarFall() {
   spVehicleConstructionInfo car_param;
   car_param.vehicle_type = spVehicleConfig::AWSD;
   car_param.pose.translate(spTranslation(0,0,0.24));
-//  Eigen::AngleAxisd rot(M_PI/4,Eigen::Vector3d::UnitY());
-//  car_param.pose.rotate(rot);
+  Eigen::AngleAxisd rot(M_PI/4+0.17355,Eigen::Vector3d::UnitY());
+  car_param.pose.rotate(rot);
   car_param.wheels_anchor.push_back(spTranslation(-0.13,0.17,-0.003));
   car_param.wheels_anchor.push_back(spTranslation(-0.13,-0.17,-0.003));
   car_param.wheels_anchor.push_back(spTranslation(0.13,-0.17,-0.003));
@@ -57,12 +57,12 @@ void spirit::ScenarioWorldCarFall() {
   car_param.steering_servo_lower_limit = -SP_PI/2;;
   car_param.steering_servo_upper_limit = SP_PI/2;;
 
-  for(int ii=0;ii<30;ii++) {
+//  for(int ii=0;ii<30;ii++) {
     obj_car_index = objects_.CreateVehicle(car_param);
     physics_.AddObject(objects_.GetObject(obj_car_index));
     gui_.AddObject(objects_.GetObject(obj_car_index));
-    car_param.pose.translate(spTranslation(0.1,0,0));
-  }
+//    car_param.pose.translate(spTranslation(0.1,0,0));
+//  }
   // create and add a ground as a box to objects_ vector
   spPose ground(spPose::Identity());
   ground.translate(spTranslation(0,0,-0.5));
@@ -93,7 +93,7 @@ void spirit::ScenarioWorldBoxFall() {
 void spirit::IterateWorld() {
   gui_.Iterate(objects_);
   static int fl = 0;
-  if(fl<30) {
+  if(fl<10) {
     physics_.Iterate(objects_);
     fl++;
   }
@@ -102,5 +102,5 @@ void spirit::IterateWorld() {
   if(fl>100) {
 //    car.SetLocalCOG(spTranslation(0,-0.3,0));
   }
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }

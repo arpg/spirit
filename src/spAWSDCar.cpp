@@ -8,10 +8,11 @@ spAWSDCar::spAWSDCar(const spVehicleConstructionInfo& vehicle_info):spVehicle(ve
     wheel->SetHasSteeringServo(true);
     wheel->SetSteeringServoMaxVelocity(0.2);
     wheel->SetSteeringServoTorque(10);
-    wheel->SetSteeringServoTargetAngle(SP_PI/2);
+//    wheel->SetSteeringServoTargetAngle(SP_PI/2);
+    wheel->SetSteeringServoTargetAngle(0);
     wheel->SetHasDriveMotor(true);
-    wheel->SetDriveMotorTargetVelocity(10);
-    wheel->SetDriveMotorTorque(0.11);
+    wheel->SetDriveMotorTargetVelocity(20);
+    wheel->SetDriveMotorTorque(0.91);
   }
 }
 

@@ -59,9 +59,9 @@ private:
   btDantzigSolver* solver_dantzig_;
   btSolveProjectedGaussSeidel* solver_gseidel_;
   btAlignedObjectArray<btCollisionShape*>	collisionShapes_;
-  int chassis_collide_with_;
-  int wheel_collide_with_;
-  int box_collide_with_;
+  int chassis_collides_with_;
+  int wheel_collides_with_;
+  int box_collides_with_;
 };
 
 #endif // SP_BULLETWORLD_H__
