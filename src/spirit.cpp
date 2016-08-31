@@ -93,7 +93,7 @@ void spirit::ScenarioWorldBoxFall() {
 void spirit::IterateWorld() {
   gui_.Iterate(objects_);
   static int fl = 0;
-  if(fl<10) {
+  if(fl<0) {
     physics_.Iterate(objects_);
     fl++;
   }

@@ -20,13 +20,12 @@ spPangolinScenegraphGui::~spPangolinScenegraphGui() {
 void spPangolinScenegraphGui::InitGui() {
   if (!spGeneralTools::CheckFileExists(SPIRITGUI_PARAM_FILE)) {
     std::cerr << "Error: Missing Pangolin config file." << std::endl;
+  } else {
+    // Load configuration data
+    pangolin::ParseVarsFile(SPIRITGUI_PARAM_FILE);
   }
-
-  // Load configuration data
-  pangolin::ParseVarsFile(SPIRITGUI_PARAM_FILE);
-
   // Create OpenGL window in single line
-  pangolin::CreateWindowAndBind(SPIRITGUI_WINDOW_NAME, 640, 480);
+  pangolin::CreateWindowAndBind(SPIRITGUI_WINDOW_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
 
   SceneGraph::GLSceneGraph::ApplyPreferredGlSettings();
   glClearColor(0, 0, 0, 0);

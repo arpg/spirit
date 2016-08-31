@@ -18,7 +18,7 @@ void Physics::Create(const spPhyEngineType phy_type) {
       phyworld_ = std::make_shared<spBulletWorld>();
       break;
     default:
-      std::cerr << "Wrong type of PhysicsEngine has been selected" << std::endl;
+      std::cerr << "Selected PhysicsEngine is not supported by spirit." << std::endl;
   }
   phyworld_->InitEmptyDynamicsWorld();
 }

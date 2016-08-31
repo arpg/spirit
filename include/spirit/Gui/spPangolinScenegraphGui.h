@@ -7,11 +7,6 @@
 #include <spirit/spGeneralTools.h>
 #include <SceneGraph/SceneGraph.h>
 
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
-
-#define UI_PANEL_WIDTH 200
-#define UI_PANEL_HEIGHT WINDOW_HEIGHT
 
 /// this class is the interface between Pangolin/Scenegraph and spGui
 class spPangolinScenegraphGui : public spCommonGUI {

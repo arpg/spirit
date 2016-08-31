@@ -6,6 +6,7 @@
 hal::CarCommandMsg commandMSG;
 
 void GamepadCallback(hal::GamepadMsg& _msg) {
+
   std::cout << "-> "
             << _msg.axes().data(0) << ", "
             << _msg.axes().data(1) << ", "
