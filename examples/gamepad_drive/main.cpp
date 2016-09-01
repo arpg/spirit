@@ -46,14 +46,15 @@ void CarSensorCallback(hal::CarStateMsg msg) {
 
 
 int main(int argc, char** argv) {
-
   // connect to a gamepad
   hal::Gamepad gamepad("gamepad:/");
   gamepad.RegisterGamepadDataCallback(&GamepadCallback);
 
   // Connect to NinjaV3Car
 //  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/cu.SLAB_USBtoUART]//");
-  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/cu.usbserial-00001014A]//");
+  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/cu.usbserial-00002014A]//");
+//  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/cu.SLAB_USBtoUART]//");
+
   ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
 
   // initialize command packet

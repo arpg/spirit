@@ -116,9 +116,17 @@ void spPangolinScenegraphGui::AddBox(spBox &box) {
   glbox.SetPose(box.GetPose().matrix());
   glbox.SetScale(box.GetDimensions());
   glbox.SetCheckerboard(0);
-#warning "TODO: set color of box somehow"
   globjects_.push_back(new SceneGraph::GLBox(glbox));
   box.SetGuiIndex(globjects_.size()-1);
+  glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
+}
+
+void spPangolinScenegraphGui::AddWaypoint(spWaypoint& waypoint) {
+  SceneGraph::GLWayPoint* glwaypoint = new SceneGraph::GLWayPoint();
+  glwaypoint->SetPose(waypoint.GetPose().matrix());
+  glwaypoint->SetColor(waypoint.GetColor()[0],waypoint.GetColor()[1],waypoint.GetColor()[2]);
+  globjects_.push_back(glwaypoint);
+  waypoint.SetGuiIndex(globjects_.size()-1);
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
 }
 
@@ -144,11 +152,17 @@ void spPangolinScenegraphGui::AddVehicle(spVehicle& vehicle)
   }
 }
 
-void spPangolinScenegraphGui::UpdateBoxObject(spBox& box) {
-  int gui_index = box.GetGuiIndex();
-  globjects_[gui_index]->SetPose(box.GetPose().matrix());
-  globjects_[gui_index]->SetScale(box.GetDimensions());
-#warning "TODO: set color of box somehow"
+void spPangolinScenegraphGui::UpdateBoxObject(spBox& spobj) {
+  int gui_index = spobj.GetGuiIndex();
+  globjects_[gui_index]->SetPose(spobj.GetPose().matrix());
+  globjects_[gui_index]->SetScale(spobj.GetDimensions());
+}
+
+void spPangolinScenegraphGui::UpdateWaypointObject(spWaypoint& spobj) {
+  int gui_index = spobj.GetGuiIndex();
+  SceneGraph::GLWayPoint* glwaypoint = (SceneGraph::GLWayPoint*)globjects_[gui_index];
+  glwaypoint->SetPose(spobj.GetPose().matrix());
+  glwaypoint->SetColor(spobj.GetColor()[0],spobj.GetColor()[1],spobj.GetColor()[2]);
 }
 
 void spPangolinScenegraphGui::UpdateVehicleObject(spVehicle& vehicle) {
@@ -163,17 +177,26 @@ void spPangolinScenegraphGui::UpdateVehicleObject(spVehicle& vehicle) {
     glwheelpose.rotate(ang);
     glwheelpose.translate(spTranslation(0,0,-vehicle.GetWheel(ii)->GetWidth()/2));
     globjects_[wheel_index]->SetPose(glwheelpose.matrix());
-//    globjects_[wheel_index]->SetPose(vehicle.GetWheel(ii)->GetPose().matrix());
   }
 }
 
-void spPangolinScenegraphGui::UpdateGuiObjects(Objects &spobj) {
+void spPangolinScenegraphGui::UpdateGuiObjects(Objects& spobj) {
   // go through all spirit objects
   for(int ii=0; ii<spobj.GetNumOfObjects(); ii++) {
     //only update objects which had gui property changes
     if(spobj.GetObject(ii).HasChangedGui()) {
       // update the gui object
       switch (spobj.GetObject(ii).GetObjecType()) {
+        case spObjectType::WHEEL:
+        {
+          std::cout << "WHEEL should not be created by itself" << std::endl;
+          break;
+        }
+        case spObjectType::WAYPOINT:
+        {
+          UpdateWaypointObject((spWaypoint&)spobj.GetObject(ii));
+          break;
+        }
         case spObjectType::BOX:
         {
           UpdateBoxObject((spBox&)spobj.GetObject(ii));

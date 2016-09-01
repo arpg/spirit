@@ -19,12 +19,14 @@ class spPangolinScenegraphGui : public spCommonGUI {
   void Refresh();
   void CheckKeyboardAction();
   void AddBox(spBox& box);
+  void AddWaypoint(spWaypoint& waypoint);
   void AddVehicle(spVehicle& vehicle);
   void UpdateGuiObjects(Objects &spobj);
 
  private:
   static void KeyActionMethodSample();
   void UpdateBoxObject(spBox& spobj);
+  void UpdateWaypointObject(spWaypoint& spobj);
   void UpdateVehicleObject(spVehicle& spobj);
 
   // Safe and efficient binding of named variables.
@@ -43,7 +45,6 @@ class spPangolinScenegraphGui : public spCommonGUI {
   SceneGraph::GLSceneGraph glscenegraph_;
   SceneGraph::HandlerSceneGraph* handler_scenegraph_;
   std::vector<SceneGraph::GLObject*> globjects_;
-
 };
 
 #endif  // SP_PANGOLINSCENEGRAPHGUI_H__

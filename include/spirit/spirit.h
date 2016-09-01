@@ -27,6 +27,7 @@ private:
   int obj_gnd_index;
   int obj_box_index;
   int obj_car_index;
+  int obj_waypoint_index;
 };
 
 #endif  //SPIRIT_H__

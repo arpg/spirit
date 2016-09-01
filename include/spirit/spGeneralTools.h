@@ -27,7 +27,7 @@
 enum spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum spPhyEngineType{PHY_NONE,PHY_BULLET};
-enum spObjectType{BOX,VEHICLE,WHEEL};
+enum spObjectType{BOX,VEHICLE,WHEEL,WAYPOINT};
 enum spVehicleConfig{AWSD};
 
 struct spVehicleConstructionInfo{

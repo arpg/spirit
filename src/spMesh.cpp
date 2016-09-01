@@ -39,6 +39,10 @@ void spMesh::SetColor(const spColor& color) {
   obj_guichanged_ = true;
 }
 
+const spColor& spMesh::GetColor() {
+  return color_;
+}
+
 bool spMesh::IsDynamic() {
   return false;
 }

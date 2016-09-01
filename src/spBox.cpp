@@ -40,6 +40,11 @@ void spBox::SetColor(const spColor& color) {
   obj_guichanged_ = true;
 }
 
+const spColor& spBox::GetColor() {
+  return color_;
+}
+
+
 void spBox::SetMass(double mass) {
   mass_ = mass;
   obj_phychanged_ = true;

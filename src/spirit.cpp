@@ -73,6 +73,9 @@ void spirit::ScenarioWorldCarFall() {
   physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
+  spPose waypoint_pose(spPose::Identity());
+  obj_waypoint_index = objects_.CreateWaypoint(waypoint_pose,spColor(0,0,1));
+  gui_.AddObject(objects_.GetObject(obj_waypoint_index));
 }
 
 void spirit::ScenarioWorldBoxFall() {
@@ -98,7 +101,6 @@ void spirit::IterateWorld() {
     fl++;
   }
 //  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
-
   if(fl>100) {
 //    car.SetLocalCOG(spTranslation(0,-0.3,0));
   }

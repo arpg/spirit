@@ -64,6 +64,7 @@ set( HDRS
 	include/spirit/Objects/spVehicle.h
 	include/spirit/Objects/spAWSDCar.h
 	include/spirit/Objects/spWheel.h
+	include/spirit/Objects/spWaypoint.h
 	)
 set( SRCS
 	src/spirit.cpp
@@ -74,6 +75,7 @@ set( SRCS
 	src/spSettings.cpp
 	src/spBulletWorld.cpp
 	src/spBox.cpp
+	src/spWaypoint.cpp
 	src/spCommonObject.cpp
 	src/Objects.cpp
 	src/spMesh.cpp

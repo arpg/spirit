@@ -10,6 +10,8 @@ public:
   void SetPose(const spPose& pose);
   const spPose& GetPose();
   void SetColor(const spColor& color);
+  const spColor& GetColor();
+
   bool IsDynamic();
 
   double GetFriction();

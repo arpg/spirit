@@ -12,6 +12,8 @@ class spMesh : public spCommonObject {
   void SetPose(const spPose& pose);
   const spPose& GetPose();
   void SetColor(const spColor& color);
+  const spColor& GetColor();
+
   bool IsDynamic();
 
   void SetDimensions(const spMeshSize& dims);

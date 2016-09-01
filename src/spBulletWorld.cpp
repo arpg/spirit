@@ -111,6 +111,16 @@ void spBulletWorld::AddNewPhyObject(spCommonObject &sp_obj) {
       UpdateBulletVehicleObject((spVehicle&)sp_obj,thevehicle);
       break;
     }
+    case spObjectType::WHEEL:
+    {
+      std::cerr << "WHEEL should not be implemented by itself" << std::endl;
+      break;
+    }
+    case spObjectType::WAYPOINT:
+    {
+      std::cerr << "WAYPOINT should not be implemented by itself" << std::endl;
+      break;
+    }
   }
 }
 
@@ -311,6 +321,17 @@ void spBulletWorld::UpdatePhyObjectsFromSpirit(Objects &spobj) {
           spobj.GetObject(ii).SetPhyUpdated();
           break;
         }
+        case spObjectType::WHEEL:
+        {
+          std::cerr << "WHEEL should not be implemented by itself" << std::endl;
+          break;
+        }
+        case spObjectType::WAYPOINT:
+        {
+          std::cerr << "WAYPOINT should not be implemented by itself" << std::endl;
+          break;
+        }
+
       }
     }
   }
@@ -343,6 +364,17 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
           }
           break;
         }
+        case spObjectType::WHEEL:
+        {
+          std::cerr << "WHEEL should not be implemented by itself" << std::endl;
+          break;
+        }
+        case spObjectType::WAYPOINT:
+        {
+          std::cerr << "WAYPOINT should not be implemented by itself" << std::endl;
+          break;
+        }
+
       }
     }
   }

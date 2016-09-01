@@ -1,7 +1,9 @@
 #ifndef SP_BULLETWORLD_H__
 #define SP_BULLETWORLD_H__
 
+#warning "Comment the following line if using bullet in single precision mode"
 #define BT_USE_DOUBLE_PRECISION
+
 #include <iostream>
 #include <spirit/Physics/spPhysicsWorld.h>
 #include <bullet/btBulletDynamicsCommon.h>

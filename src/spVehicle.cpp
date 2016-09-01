@@ -45,6 +45,10 @@ void spVehicle::SetColor(const spColor& color) {
   obj_guichanged_ = true;
 }
 
+const spColor& spVehicle::GetColor() {
+  return color_;
+}
+
 const spPose& spVehicle::GetWheelOrigin(int index)
 {
   return wheel_[index]->GetPose();

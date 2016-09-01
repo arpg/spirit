@@ -56,6 +56,10 @@ void spWheel::SetColor(const spColor& color)
   obj_guichanged_ = true;
 }
 
+const spColor& spWheel::GetColor() {
+  return color_;
+}
+
 bool spWheel::IsDynamic()
 {
   if(mass_>0)

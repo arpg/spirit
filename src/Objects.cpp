@@ -13,6 +13,14 @@ int Objects::CreateBox(const spPose& pose, const spBoxSize& size, const double m
   return (objects_.size()-1);
 }
 
+int Objects::CreateWaypoint(const spPose& pose, const spColor& color) {
+  std::shared_ptr<spWaypoint> a_waypoint = std::make_shared<spWaypoint>();
+  a_waypoint->SetPose(pose);
+  a_waypoint->SetColor(color);
+  objects_.push_back(a_waypoint);
+  return (objects_.size()-1);
+}
+
 int Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_info) {
   switch (vehicle_info.vehicle_type) {
     case spVehicleConfig::AWSD:

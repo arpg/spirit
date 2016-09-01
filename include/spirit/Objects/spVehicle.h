@@ -17,6 +17,7 @@ class spVehicle : public spCommonObject {
   void SetPose(const spPose& pose);
   const spPose& GetPose();
   void SetColor(const spColor& color);
+  const spColor& GetColor();
   int GetNumberOfWheels();
   spWheel* GetWheel(int index);
   double GetChassisMass();
