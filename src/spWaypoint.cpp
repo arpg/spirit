@@ -9,12 +9,13 @@ spWaypoint::spWaypoint() {
   index_gui_ = -1;
   obj_phychanged_ = false;
   obj_guichanged_ = false;
+  is_gui_modifiable_ = true;
   object_type_ = spObjectType::WAYPOINT;
 }
 
 spWaypoint::~spWaypoint() {}
 
-void spWaypoint::SetLength(double& length) {
+void spWaypoint::SetLength(double length) {
   length_ = length;
   obj_guichanged_ = true;
 }

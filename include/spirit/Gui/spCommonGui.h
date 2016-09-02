@@ -15,7 +15,8 @@ class spCommonGUI {
   virtual void AddBox(spBox& box) = 0;
   virtual void AddWaypoint(spWaypoint& waypoint) = 0;
   virtual void AddVehicle(spVehicle& vehicle) = 0;
-  virtual void UpdateGuiObjects(Objects& spobjects) = 0;
+  virtual void UpdateGuiObjectsFromSpirit(Objects& spobjects) = 0;
+  virtual void UpdateSpiritObjectsFromGui(Objects& spobjects) = 0;
 };
 
 #endif  // SP_COMMONGUI_H__

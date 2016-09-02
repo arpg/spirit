@@ -8,6 +8,7 @@ spMesh::spMesh() {
   index_gui_ = -1;
   obj_phychanged_ = false;
   obj_guichanged_ = false;
+  is_gui_modifiable_ = false;
   object_type_ = spObjectType::BOX;
 }
 

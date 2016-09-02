@@ -100,9 +100,11 @@ void spirit::IterateWorld() {
     physics_.Iterate(objects_);
     fl++;
   }
+//  spWaypoint& waypoint = (spWaypoint&) objects_.GetObject(obj_waypoint_index);
 //  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
-  if(fl>100) {
+//  if(fl>100) {
 //    car.SetLocalCOG(spTranslation(0,-0.3,0));
-  }
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+//  std::cout << "pose is \n" << waypoint.GetPose().matrix() << std::endl;
+//  }
+//  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }

@@ -12,7 +12,7 @@ class spWaypoint : public spCommonObject {
   void SetColor(const spColor& color);
   const spColor& GetColor();
 
-  void SetLength(double& length);
+  void SetLength(double length);
   double GetLength();
 
 

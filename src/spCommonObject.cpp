@@ -50,3 +50,7 @@ bool spCommonObject::IsDynamic() {
   else
     return false;
 }
+
+bool spCommonObject::IsGuiModifiable() {
+  return is_gui_modifiable_;
+}

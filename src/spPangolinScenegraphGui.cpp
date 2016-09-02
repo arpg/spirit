@@ -124,7 +124,9 @@ void spPangolinScenegraphGui::AddBox(spBox &box) {
 void spPangolinScenegraphGui::AddWaypoint(spWaypoint& waypoint) {
   SceneGraph::GLWayPoint* glwaypoint = new SceneGraph::GLWayPoint();
   glwaypoint->SetPose(waypoint.GetPose().matrix());
+  glwaypoint->SetCubeDim(UI_WAYPOINT_BOX_DIM);
   glwaypoint->SetColor(waypoint.GetColor()[0],waypoint.GetColor()[1],waypoint.GetColor()[2]);
+  glwaypoint->SetVelocity(waypoint.GetLength());
   globjects_.push_back(glwaypoint);
   waypoint.SetGuiIndex(globjects_.size()-1);
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
@@ -152,20 +154,21 @@ void spPangolinScenegraphGui::AddVehicle(spVehicle& vehicle)
   }
 }
 
-void spPangolinScenegraphGui::UpdateBoxObject(spBox& spobj) {
+void spPangolinScenegraphGui::UpdateBoxGuiObject(spBox& spobj) {
   int gui_index = spobj.GetGuiIndex();
   globjects_[gui_index]->SetPose(spobj.GetPose().matrix());
   globjects_[gui_index]->SetScale(spobj.GetDimensions());
 }
 
-void spPangolinScenegraphGui::UpdateWaypointObject(spWaypoint& spobj) {
+void spPangolinScenegraphGui::UpdateWaypointGuiObject(spWaypoint& spobj) {
   int gui_index = spobj.GetGuiIndex();
   SceneGraph::GLWayPoint* glwaypoint = (SceneGraph::GLWayPoint*)globjects_[gui_index];
   glwaypoint->SetPose(spobj.GetPose().matrix());
   glwaypoint->SetColor(spobj.GetColor()[0],spobj.GetColor()[1],spobj.GetColor()[2]);
+  glwaypoint->SetVelocity(spobj.GetLength());
 }
 
-void spPangolinScenegraphGui::UpdateVehicleObject(spVehicle& vehicle) {
+void spPangolinScenegraphGui::UpdateVehicleGuiObject(spVehicle& vehicle) {
   int chassis_index = vehicle.GetGuiIndex();
   globjects_[chassis_index]->SetPose(vehicle.GetPose().matrix());
   globjects_[chassis_index]->SetScale(vehicle.GetChassisSize());
@@ -180,7 +183,7 @@ void spPangolinScenegraphGui::UpdateVehicleObject(spVehicle& vehicle) {
   }
 }
 
-void spPangolinScenegraphGui::UpdateGuiObjects(Objects& spobj) {
+void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
   // go through all spirit objects
   for(int ii=0; ii<spobj.GetNumOfObjects(); ii++) {
     //only update objects which had gui property changes
@@ -194,19 +197,50 @@ void spPangolinScenegraphGui::UpdateGuiObjects(Objects& spobj) {
         }
         case spObjectType::WAYPOINT:
         {
-          UpdateWaypointObject((spWaypoint&)spobj.GetObject(ii));
+          UpdateWaypointGuiObject((spWaypoint&)spobj.GetObject(ii));
           break;
         }
         case spObjectType::BOX:
         {
-          UpdateBoxObject((spBox&)spobj.GetObject(ii));
+          UpdateBoxGuiObject((spBox&)spobj.GetObject(ii));
           break;
         }
         case spObjectType::VEHICLE:
         {
-          UpdateVehicleObject((spVehicle&)spobj.GetObject(ii));
+          UpdateVehicleGuiObject((spVehicle&)spobj.GetObject(ii));
           break;
         }
+      }
+    }
+  }
+}
+
+void spPangolinScenegraphGui::UpdateSpiritObjectsFromGui(Objects& spobjects) {
+  for(int ii=0; ii<spobjects.GetNumOfObjects(); ii++) {
+    //only update objects which are dynamic
+    if(spobjects.GetObject(ii).IsGuiModifiable()) {
+      switch (spobjects.GetObject(ii).GetObjecType()) {
+        case spObjectType::BOX:
+        {
+          break;
+        }
+        case spObjectType::VEHICLE:
+        {
+          break;
+        }
+        case spObjectType::WHEEL:
+        {
+          break;
+        }
+        case spObjectType::WAYPOINT:
+        {
+          spWaypoint& spwaypoint = (spWaypoint&) spobjects.GetObject(ii);
+          SceneGraph::GLWayPoint* glwaypoint = (SceneGraph::GLWayPoint*) globjects_[spwaypoint.GetGuiIndex()];
+          spwaypoint.SetPose(spPose(glwaypoint->GetPose4x4_po()));
+          spwaypoint.SetLength(glwaypoint->GetVelocity());
+          break;
+        }
+
       }
     }
   }

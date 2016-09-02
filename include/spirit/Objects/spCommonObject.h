@@ -27,6 +27,7 @@ class spCommonObject {
   spObjectType GetObjecType();
   void SetPhyUpdated();
   void SetGuiUpdated();
+  bool IsGuiModifiable();
 
  protected:
   int index_phy_;
@@ -34,6 +35,7 @@ class spCommonObject {
   bool obj_guichanged_;
   bool obj_phychanged_;
   spObjectType object_type_;
+  bool is_gui_modifiable_;
 
   double mass_;
 };

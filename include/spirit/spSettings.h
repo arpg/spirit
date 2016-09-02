@@ -13,6 +13,7 @@
 #define WINDOW_HEIGHT 480
 #define UI_PANEL_WIDTH 200
 #define UI_PANEL_HEIGHT WINDOW_HEIGHT
+#define UI_WAYPOINT_BOX_DIM 0.3   // in centimeters
 
 class spSettings {
 public:

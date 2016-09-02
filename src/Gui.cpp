@@ -60,7 +60,8 @@ void Gui::AddObject(spCommonObject &obj) {
 }
 
 void Gui::Iterate(Objects& spobjects) {
-  gui_->UpdateGuiObjects(spobjects);
+  gui_->UpdateGuiObjectsFromSpirit(spobjects);
   gui_->Refresh();
+  gui_->UpdateSpiritObjectsFromGui(spobjects);
   gui_->CheckKeyboardAction();
 }

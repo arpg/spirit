@@ -21,13 +21,14 @@ class spPangolinScenegraphGui : public spCommonGUI {
   void AddBox(spBox& box);
   void AddWaypoint(spWaypoint& waypoint);
   void AddVehicle(spVehicle& vehicle);
-  void UpdateGuiObjects(Objects &spobj);
+  void UpdateGuiObjectsFromSpirit(Objects &spobj);
+  void UpdateSpiritObjectsFromGui(Objects& spobjects);
 
  private:
   static void KeyActionMethodSample();
-  void UpdateBoxObject(spBox& spobj);
-  void UpdateWaypointObject(spWaypoint& spobj);
-  void UpdateVehicleObject(spVehicle& spobj);
+  void UpdateBoxGuiObject(spBox& spobj);
+  void UpdateWaypointGuiObject(spWaypoint& spobj);
+  void UpdateVehicleGuiObject(spVehicle& spobj);
 
   // Safe and efficient binding of named variables.
   // Specialisations mean no conversions take place for exact types
