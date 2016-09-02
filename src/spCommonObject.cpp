@@ -52,5 +52,5 @@ bool spCommonObject::IsDynamic() {
 }
 
 bool spCommonObject::IsGuiModifiable() {
-  return is_gui_modifiable_;
+  return modifiable_gui_;
 }

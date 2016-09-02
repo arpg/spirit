@@ -6,6 +6,7 @@
 #include <Eigen/Eigen>
 #include <iostream>
 #include <vector>
+#include <atomic>
 
 // spirit types
 #define spPose Eigen::Transform<double,3,Eigen::Affine>
@@ -27,7 +28,7 @@
 enum spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum spPhyEngineType{PHY_NONE,PHY_BULLET};
-enum spObjectType{BOX,VEHICLE,WHEEL,WAYPOINT};
+enum spObjectType{BOX,VEHICLE,WHEEL,WAYPOINT,LINE};
 enum spVehicleConfig{AWSD};
 
 struct spVehicleConstructionInfo{

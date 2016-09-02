@@ -9,7 +9,7 @@ spWaypoint::spWaypoint() {
   index_gui_ = -1;
   obj_phychanged_ = false;
   obj_guichanged_ = false;
-  is_gui_modifiable_ = true;
+  modifiable_gui_ = true;
   object_type_ = spObjectType::WAYPOINT;
 }
 

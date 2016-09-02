@@ -35,7 +35,7 @@ class spCommonObject {
   bool obj_guichanged_;
   bool obj_phychanged_;
   spObjectType object_type_;
-  bool is_gui_modifiable_;
+  bool modifiable_gui_;
 
   double mass_;
 };
