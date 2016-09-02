@@ -36,8 +36,8 @@ void spirit::ScenarioWorldCarFall() {
   spVehicleConstructionInfo car_param;
   car_param.vehicle_type = spVehicleConfig::AWSD;
   car_param.pose.translate(spTranslation(0,0,0.24));
-  Eigen::AngleAxisd rot(M_PI/4+0.17355,Eigen::Vector3d::UnitY());
-  car_param.pose.rotate(rot);
+//  Eigen::AngleAxisd rot(M_PI/4+0.17355,Eigen::Vector3d::UnitY());
+//  car_param.pose.rotate(rot);
   car_param.wheels_anchor.push_back(spTranslation(-0.13,0.17,-0.003));
   car_param.wheels_anchor.push_back(spTranslation(-0.13,-0.17,-0.003));
   car_param.wheels_anchor.push_back(spTranslation(0.13,-0.17,-0.003));
@@ -96,7 +96,7 @@ void spirit::ScenarioWorldBoxFall() {
 void spirit::IterateWorld() {
   gui_.Iterate(objects_);
   static int fl = 0;
-  if(fl<0) {
+  if(fl<100) {
     physics_.Iterate(objects_);
     fl++;
   }
@@ -106,5 +106,5 @@ void spirit::IterateWorld() {
 //    car.SetLocalCOG(spTranslation(0,-0.3,0));
 //  std::cout << "pose is \n" << waypoint.GetPose().matrix() << std::endl;
 //  }
-//  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
