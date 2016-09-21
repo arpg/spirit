@@ -7,17 +7,20 @@
 #include <iostream>
 #include <vector>
 #include <atomic>
+#include <chrono>
+#include <thread>
 
 // spirit types
-#define spPose Eigen::Transform<double,3,Eigen::Affine>
-#define spRotation Eigen::Quaterniond
-#define spTranslation Eigen::Vector3d
-#define spBoxSize Eigen::Vector3d
-#define spCylinderSize Eigen::Vector3d
-#define spMeshSize Eigen::Vector2d
-#define spColor Eigen::Vector3d
-#define spInertiaTensor Eigen::Matrix3d
-#define spCubeInertiaTensor Eigen::Vector3d
+typedef Eigen::Transform<double,3,Eigen::Affine> spPose;
+typedef Eigen::Quaterniond spRotation;
+typedef Eigen::Vector3d spTranslation;
+typedef Eigen::Vector3d spBoxSize;
+typedef Eigen::Vector3d spCylinderSize;
+typedef Eigen::Vector2d spMeshSize;
+typedef Eigen::Vector3d spColor;
+typedef Eigen::Matrix3d spInertiaTensor;
+typedef Eigen::Vector3d spCubeInertiaTensor;
+typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 
 // bullet definitions
 #define USE_MOTIONSTATE 1
@@ -28,7 +31,7 @@
 enum spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum spPhyEngineType{PHY_NONE,PHY_BULLET};
-enum spObjectType{BOX,VEHICLE,WHEEL,WAYPOINT,LINE};
+enum spObjectType{BOX,VEHICLE,WHEEL,WAYPOINT,CURVE};
 enum spVehicleConfig{AWSD};
 
 struct spVehicleConstructionInfo{
@@ -76,6 +79,11 @@ struct spVehicleConstructionInfo{
 class spGeneralTools {
  public:
   static bool CheckFileExists(const std::string& file_name);
+  static spTimestamp Tick();
+  static double Tock_ms(spTimestamp tick_time);
+  static double Tock_us(spTimestamp tick_time);
+  static void Delay_ms(unsigned int delay_time);
+  static void Delay_us(unsigned int delay_time);
 };
 
 #endif  // SP_GENSERALTOOLS_H__
