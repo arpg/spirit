@@ -4,9 +4,9 @@
 #include <spirit/spSettings.h>
 #include <spirit/Gui/spCommonGui.h>
 #include <pangolin/pangolin.h>
-#include <spirit/spGeneralTools.h>
 #include <SceneGraph/SceneGraph.h>
-
+#include <spirit/Types/spTypes.h>
+#include <spirit/spGeneralTools.h>
 
 /// this class is the interface between Pangolin/Scenegraph and spGui
 class spPangolinScenegraphGui : public spCommonGUI {

@@ -30,6 +30,6 @@ void Physics::AddObject(spCommonObject &obj) {
 void Physics::Iterate(Objects& objects) {
   // step 100ms (0.1s)
   phyworld_->UpdatePhyObjectsFromSpirit(objects);
-  phyworld_->StepPhySimulation(0.1);
+  phyworld_->StepPhySimulation(1);
   phyworld_->UpdateSpiritObjectsFromPhy(objects);
 }

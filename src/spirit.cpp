@@ -1,6 +1,5 @@
 #include <spirit/spirit.h>
-#include <chrono>
-#include <thread>
+#include <spirit/Objects/spBezierCurve.h>
 
 spirit::spirit(spSettings& user_settings) {
   user_settings_ = user_settings;
@@ -57,12 +56,12 @@ void spirit::ScenarioWorldCarFall() {
   car_param.steering_servo_lower_limit = -SP_PI/2;;
   car_param.steering_servo_upper_limit = SP_PI/2;;
 
-//  for(int ii=0;ii<30;ii++) {
+  for(int ii=0;ii<1;ii++) {
     obj_car_index = objects_.CreateVehicle(car_param);
     physics_.AddObject(objects_.GetObject(obj_car_index));
     gui_.AddObject(objects_.GetObject(obj_car_index));
 //    car_param.pose.translate(spTranslation(0.1,0,0));
-//  }
+  }
   // create and add a ground as a box to objects_ vector
   spPose ground(spPose::Identity());
   ground.translate(spTranslation(0,0,-0.5));
@@ -96,15 +95,28 @@ void spirit::ScenarioWorldBoxFall() {
 void spirit::IterateWorld() {
   gui_.Iterate(objects_);
   static int fl = 0;
-  if(fl<100) {
+
+  if(fl<1) {
+    spTimestamp tick = spGeneralTools::Tick();
     physics_.Iterate(objects_);
+    double duration = spGeneralTools::Tock_ms(tick);
+    std::cout << "phy processing duration: " << duration << " mSeconds" << std::endl;
     fl++;
+    spPose ps(spPose::Identity());
+    spBezierCtrlPoints pts;
+    pts.col(0) = spPoint(0,0,0);
+    pts.col(1) = spPoint(1,2,0);
+    pts.col(2) = spPoint(2,-2,0);
+    pts.col(3) = spPoint(3,0,0);
+    spBezierCurve curve;
+    spPoints* p = curve.GetPoints(2);
   }
+
 //  spWaypoint& waypoint = (spWaypoint&) objects_.GetObject(obj_waypoint_index);
 //  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
 //  if(fl>100) {
 //    car.SetLocalCOG(spTranslation(0,-0.3,0));
 //  std::cout << "pose is \n" << waypoint.GetPose().matrix() << std::endl;
 //  }
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+//  spGeneralTools::Delay_ms(100);
 }

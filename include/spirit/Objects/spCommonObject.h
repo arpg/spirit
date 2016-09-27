@@ -1,7 +1,7 @@
 #ifndef SP_COMMONOBJECT_H__
 #define SP_COMMONOBJECT_H__
 
-#include <spirit/spGeneralTools.h>
+#include <spirit/Types/spTypes.h>
 
 /// Any spirit object should only have instances of spirit classes. like
 /// spphysics, spgui

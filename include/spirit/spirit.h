@@ -4,7 +4,7 @@
 #include <spirit/Gui.h>
 #include <spirit/Physics.h>
 #include <spirit/spSettings.h>
-#include <spirit/spGeneralTools.h>
+#include <spirit/Types/spTypes.h>
 #include <spirit/Objects.h>
 
 class spirit{

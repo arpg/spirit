@@ -3,7 +3,6 @@
 
 #include <spirit/Gui/spCommonGui.h>
 #include <spirit/Gui/spPangolinScenegraphGui.h>
-#include <spirit/spGeneralTools.h>
 #include <spirit/Objects.h>
 
 class Gui {

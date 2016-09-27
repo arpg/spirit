@@ -1,7 +1,7 @@
 #ifndef OBJECTS_H__
 #define OBJECTS_H__
 
-#include <spirit/spGeneralTools.h>
+#include <spirit/Types/spTypes.h>
 #include <vector>
 #include <spirit/Objects/spCommonObject.h>
 #include <spirit/Objects/spBox.h>

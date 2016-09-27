@@ -58,7 +58,6 @@ set( HDRS
 	include/spirit/spGeneralTools.h
 	include/spirit/spSettings.h
 	include/spirit/Objects/spBox.h
-	include/spirit/Objects/spLine.h
 	include/spirit/Objects/spCommonObject.h
 	include/spirit/Objects.h
 	include/spirit/Objects/spMesh.h
@@ -66,6 +65,12 @@ set( HDRS
 	include/spirit/Objects/spAWSDCar.h
 	include/spirit/Objects/spWheel.h
 	include/spirit/Objects/spWaypoint.h
+	include/spirit/Types/spTypes.h
+	include/spirit/Controllers/spControllerInterface.h
+	include/spirit/Planners/spLocalPlannerInterface.h
+	include/spirit/Planners/spGlobalPlannerInterface.h
+	include/spirit/Planners/spBezierPlanner.h
+	include/spirit/Objects/spBezierCurve.h
 	)
 set( SRCS
 	src/spirit.cpp
@@ -76,7 +81,6 @@ set( SRCS
 	src/spSettings.cpp
 	src/spBulletWorld.cpp
 	src/spBox.cpp
-	src/spLine.cpp
 	src/spWaypoint.cpp
 	src/spCommonObject.cpp
 	src/Objects.cpp
@@ -84,6 +88,8 @@ set( SRCS
 	src/spVehicle.cpp
 	src/spAWSDCar.cpp
 	src/spWheel.cpp
+	src/spBezierCurve.cpp
+	src/spBezierPlanner.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)

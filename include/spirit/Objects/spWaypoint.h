@@ -15,7 +15,6 @@ class spWaypoint : public spCommonObject {
   void SetLength(double length);
   double GetLength();
 
-
  private:
   double length_;
   spPose pose_;

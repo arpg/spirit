@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <memory>
 #include <iostream>
-#include <spirit/spGeneralTools.h>
+#include <spirit/Types/spTypes.h>
 
 #define SPIRITGUI_PARAM_FILE     "../../../config_files/PangolinGuiParams.cfg"
 #define SPIRITGUI_WINDOW_NAME    "Spirit GUI"
