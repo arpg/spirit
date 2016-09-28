@@ -28,6 +28,8 @@ private:
   int obj_box_index;
   int obj_car_index;
   int obj_waypoint_index;
+  int obj_curve_index;
+
 };
 
 #endif  //SPIRIT_H__

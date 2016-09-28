@@ -35,6 +35,7 @@ const spColor& spBezierCurve::GetColor() {
 
 void spBezierCurve::SetControlPoints(const spBezierCtrlPoints& pts) {
   ctrl_pts_ = pts;
+  obj_guichanged_ = true;
 }
 
 const spBezierCtrlPoints& spBezierCurve::GetControlPoints() {
@@ -50,16 +51,14 @@ void spBezierCurve::GetPoint(spPoint& point, double t) {
   point = pose_ * point;
 }
 
-spPoints* spBezierCurve::GetPoints(int num_mid_pts) {
-  spPoints* pts_vec = new spPoints;
+void spBezierCurve::GetPoints(spPoints& pts_vec, int num_mid_pts) {
   int num_pts = num_mid_pts-1;
   for(int t=0;t<=num_pts;t++) {
     spPoint point;
     this->GetPoint(point,t*(1.0/num_pts));
-    std::shared_ptr<spPoint> point_ptr = std::make_shared<spPoint>(point);
-    pts_vec->push_back(point_ptr);
+//    std::shared_ptr<spPoint> point_ptr = std::make_shared<spPoint>(point);
+    pts_vec.push_back(point);
   }
-  return pts_vec;
 }
 
 

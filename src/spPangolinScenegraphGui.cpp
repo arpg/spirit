@@ -53,6 +53,8 @@ void spPangolinScenegraphGui::InitGui() {
   SceneGraph::GLGrid grid(10, 1, false);
   globjects_.push_back(new SceneGraph::GLGrid(grid));
   globjects_.push_back(new SceneGraph::GLLight(1000, 1000, 1000));
+  globjects_.push_back(new SceneGraph::GLLight(0, 0, 10));
+  globjects_.push_back(new SceneGraph::GLLight(0, 0, 0));
 
   // Add already created globjects to glscenegraph_
   for (int ii = 0; ii < globjects_.size(); ii++) {
@@ -143,16 +145,28 @@ void spPangolinScenegraphGui::AddVehicle(spVehicle& vehicle)
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
 
   for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
-//    SceneGraph::GLBox glwheel;
     SceneGraph::GLCylinder glwheel;
     glwheel.Init(vehicle.GetWheel(ii)->GetRadius(),vehicle.GetWheel(ii)->GetRadius(),vehicle.GetWheel(ii)->GetWidth(),20,1);
     glwheel.SetPose(vehicle.GetWheel(ii)->GetPose().matrix());
     globjects_.push_back(new SceneGraph::GLCylinder(glwheel));
-//    globjects_.push_back(new SceneGraph::GLBox(glwheel));
     vehicle.GetWheel(ii)->SetGuiIndex(globjects_.size()-1);
     glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
   }
 }
+
+void spPangolinScenegraphGui::AddBezierCurve(spBezierCurve& curve) {
+  SceneGraph::GLLineStrip* glcurve = new SceneGraph::GLLineStrip;
+  glcurve->SetPose(curve.GetPose().matrix());
+  glcurve->SetLineWidth(2);
+  SceneGraph::Vector3dAlignedVec points;
+  curve.GetPoints(points,20);
+  glcurve->SetPointsFromTrajectory(points);
+  glcurve->SetColor(curve.GetColor()[0],curve.GetColor()[1],curve.GetColor()[2],1);
+  globjects_.push_back(std::move(glcurve));
+  curve.SetGuiIndex(globjects_.size()-1);
+  glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
+}
+
 
 void spPangolinScenegraphGui::UpdateBoxGuiObject(spBox& spobj) {
   int gui_index = spobj.GetGuiIndex();
@@ -183,6 +197,16 @@ void spPangolinScenegraphGui::UpdateVehicleGuiObject(spVehicle& vehicle) {
   }
 }
 
+void spPangolinScenegraphGui::UpdateBezierCurveGuiObject(spBezierCurve& spobj) {
+  int gui_index = spobj.GetGuiIndex();
+  SceneGraph::GLLineStrip* glcurve = (SceneGraph::GLLineStrip*) globjects_[gui_index];
+  glcurve->SetPose(spobj.GetPose().matrix());
+  glcurve->SetColor(spobj.GetColor()[0],spobj.GetColor()[1],spobj.GetColor()[2],1);
+  SceneGraph::Vector3dAlignedVec points;
+  spobj.GetPoints(points,20);
+  glcurve->SetPointsFromTrajectory(points);
+}
+
 void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
   // go through all spirit objects
   for(int ii=0; ii<spobj.GetNumOfObjects(); ii++) {
@@ -192,7 +216,7 @@ void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
       switch (spobj.GetObject(ii).GetObjecType()) {
         case spObjectType::WHEEL:
         {
-          std::cout << "WHEEL should not be created by itself" << std::endl;
+          std::cerr << "WHEEL should not be created by itself" << std::endl;
           break;
         }
         case spObjectType::WAYPOINT:
@@ -209,6 +233,15 @@ void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
         {
           UpdateVehicleGuiObject((spVehicle&)spobj.GetObject(ii));
           break;
+        }
+        case spObjectType::BEZIER_CURVE:
+        {
+          UpdateBezierCurveGuiObject((spBezierCurve&)spobj.GetObject(ii));
+          break;
+        }
+        default:
+        {
+          std::cerr << "Unknown spirit object type." << std::endl;
         }
       }
     }
@@ -240,7 +273,14 @@ void spPangolinScenegraphGui::UpdateSpiritObjectsFromGui(Objects& spobjects) {
           spwaypoint.SetLength(glwaypoint->GetVelocity());
           break;
         }
-
+        case spObjectType::BEZIER_CURVE:
+        {
+          break;
+        }
+        default:
+        {
+          std::cerr << "Unknown spirit object type." << std::endl;
+        }
       }
     }
   }

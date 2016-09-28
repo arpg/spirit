@@ -72,9 +72,20 @@ void spirit::ScenarioWorldCarFall() {
   physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
-  spPose waypoint_pose(spPose::Identity());
-  obj_waypoint_index = objects_.CreateWaypoint(waypoint_pose,spColor(0,0,1));
-  gui_.AddObject(objects_.GetObject(obj_waypoint_index));
+//  spPose waypoint_pose(spPose::Identity());
+//  obj_waypoint_index = objects_.CreateWaypoint(waypoint_pose,spColor(0,0,1));
+//  gui_.AddObject(objects_.GetObject(obj_waypoint_index));
+  spPose bezpos(spPose::Identity());
+  spBezierCtrlPoints pts;
+  pts.col(0) = spPoint(0,0,0);
+  pts.col(1) = spPoint(1,2,1);
+  pts.col(2) = spPoint(2,-2,-1);
+  pts.col(3) = spPoint(3,0,2);
+  obj_curve_index = objects_.CreateBezierCurve(bezpos,pts,spColor(0,1,0));
+  gui_.AddObject(objects_.GetObject(obj_curve_index));
+//  spBezierCurve& bez = (spBezierCurve&) objects_.GetObject(obj_curve_index);
+
+
 }
 
 void spirit::ScenarioWorldBoxFall() {
@@ -92,15 +103,20 @@ void spirit::ScenarioWorldBoxFall() {
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 }
 
+spBezierCtrlPoints ptss;
+
 void spirit::IterateWorld() {
+  spTimestamp gui_tick = spGeneralTools::Tick();
   gui_.Iterate(objects_);
+  double gui_cost = spGeneralTools::Tock_ms(gui_tick);
+  std::cout << "Gui Iteration time:   " << gui_cost << "ms" << std::endl;
   static int fl = 0;
 
   if(fl<1) {
-    spTimestamp tick = spGeneralTools::Tick();
+    spTimestamp phy_tick = spGeneralTools::Tick();
     physics_.Iterate(objects_);
-    double duration = spGeneralTools::Tock_ms(tick);
-    std::cout << "phy processing duration: " << duration << " mSeconds" << std::endl;
+    double phy_cost = spGeneralTools::Tock_ms(phy_tick);
+    std::cout << "Phy Iteration time:   " << phy_cost << "ms" << std::endl;
     fl++;
     spPose ps(spPose::Identity());
     spBezierCtrlPoints pts;
@@ -109,8 +125,25 @@ void spirit::IterateWorld() {
     pts.col(2) = spPoint(2,-2,0);
     pts.col(3) = spPoint(3,0,0);
     spBezierCurve curve;
-    spPoints* p = curve.GetPoints(2);
+    curve.SetControlPoints(pts);
+    curve.SetPose(ps);
+    spPoints p;
+    curve.GetPoints(p,10);
+//    std::cout << "num points -> " << p.size() << std::endl;
+    spPoint point = p[2];
+//    std::cout << "data \n" << point << std::endl;
   }
+
+  spBezierCurve& bez = (spBezierCurve&) objects_.GetObject(obj_curve_index);
+  ptss.col(0) = spPoint(0,0,0);
+  ptss.col(1) = spPoint(1,2,1);
+  ptss.col(2) = spPoint(2,-2,-1);
+  double rand = ((std::rand()%100)/100.0);
+  ptss.col(3) = spPoint(3,0,2+rand);
+  bez.SetControlPoints(ptss);
+//  spPose bezpos(bez.GetPose());
+//  bezpos.translate(spTranslation(0.001,0,0));
+//  bez.SetPose(bezpos);
 
 //  spWaypoint& waypoint = (spWaypoint&) objects_.GetObject(obj_waypoint_index);
 //  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
@@ -118,5 +151,5 @@ void spirit::IterateWorld() {
 //    car.SetLocalCOG(spTranslation(0,-0.3,0));
 //  std::cout << "pose is \n" << waypoint.GetPose().matrix() << std::endl;
 //  }
-//  spGeneralTools::Delay_ms(100);
+  spGeneralTools::Delay_ms(10);
 }

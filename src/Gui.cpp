@@ -56,6 +56,15 @@ void Gui::AddObject(spCommonObject &obj) {
       gui_->AddVehicle((spVehicle&) obj);
       break;
     }
+    case spObjectType::BEZIER_CURVE:
+    {
+      gui_->AddBezierCurve((spBezierCurve&) obj);
+      break;
+    }
+    default:
+    {
+      std::cerr << "Unknown spirit object type." << std::endl;
+    }
   }
 }
 

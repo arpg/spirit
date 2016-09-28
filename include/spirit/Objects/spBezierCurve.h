@@ -19,7 +19,7 @@ class spBezierCurve : public spCommonObject {
   const spBezierCtrlPoints& GetControlPoints();
 
   void GetPoint(spPoint& point, double t);
-  spPoints* GetPoints(int num_mid_pts);
+  void GetPoints(spPoints& pts_vec, int num_mid_pts);
 
  private:
   spColor color_;

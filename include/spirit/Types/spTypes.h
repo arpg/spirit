@@ -14,7 +14,7 @@ typedef Eigen::Vector3d spCylinderSize;
 typedef Eigen::Vector2d spMeshSize;
 typedef Eigen::Vector3d spColor;
 typedef Eigen::Vector3d spPoint;
-typedef std::vector<std::shared_ptr<Eigen::Vector3d>> spPoints;
+typedef std::vector<spPoint,Eigen::aligned_allocator<spPoint>> spPoints;
 typedef Eigen::Matrix3d spInertiaTensor;
 typedef Eigen::Vector3d spCubeInertiaTensor;
 typedef Eigen::Matrix<double, 3, 4> spBezierCtrlPoints;

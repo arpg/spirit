@@ -1,3 +1,4 @@
+
 #include <spirit/Planners/spLocalPlannerInterface.h>
 
 class spBezierPlanner : public spLocalPlannerInterface {

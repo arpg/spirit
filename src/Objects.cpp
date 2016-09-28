@@ -33,6 +33,16 @@ int Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_info) {
   return (objects_.size()-1);
 }
 
+int Objects::CreateBezierCurve(const spPose& pose, const spBezierCtrlPoints& ctrl_pts, const spColor& color) {
+  std::shared_ptr<spBezierCurve> a_curve = std::make_shared<spBezierCurve>();
+  a_curve->SetPose(pose);
+  a_curve->SetControlPoints(ctrl_pts);
+  a_curve->SetColor(color);
+  objects_.push_back(a_curve);
+  return (objects_.size()-1);
+}
+
+
 void Objects::RemoveObj(int obj_index) {
   objects_.erase(objects_.begin()+obj_index);
 }
