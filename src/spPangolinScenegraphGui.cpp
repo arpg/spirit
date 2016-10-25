@@ -156,6 +156,7 @@ void spPangolinScenegraphGui::AddVehicle(spVehicle& vehicle)
 
 void spPangolinScenegraphGui::AddBezierCurve(spBezierCurve& curve) {
   SceneGraph::GLLineStrip* glcurve = new SceneGraph::GLLineStrip;
+  glcurve->SetIgnoreDepth(true);
   glcurve->SetPose(curve.GetPose().matrix());
   glcurve->SetLineWidth(2);
   SceneGraph::Vector3dAlignedVec points;

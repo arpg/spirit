@@ -6,6 +6,7 @@
 class spWaypoint : public spCommonObject {
  public:
   spWaypoint();
+  spWaypoint(const spWaypoint&wp);
   ~spWaypoint();
   void SetPose(const spPose& pose);
   const spPose& GetPose();

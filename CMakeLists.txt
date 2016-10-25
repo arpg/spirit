@@ -67,8 +67,6 @@ set( HDRS
 	include/spirit/Objects/spWaypoint.h
 	include/spirit/Types/spTypes.h
 	include/spirit/Controllers/spControllerInterface.h
-	include/spirit/Planners/spLocalPlannerInterface.h
-	include/spirit/Planners/spGlobalPlannerInterface.h
 	include/spirit/Planners/spBezierPlanner.h
 	include/spirit/Objects/spBezierCurve.h
 	)

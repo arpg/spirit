@@ -13,6 +13,19 @@ spWaypoint::spWaypoint() {
   object_type_ = spObjectType::WAYPOINT;
 }
 
+spWaypoint::spWaypoint(const spWaypoint& wp) {
+  length_ = wp.length_;
+  pose_ = wp.pose_;
+  color_ = wp.color_;
+  mass_ = wp.mass_;
+  index_phy_ = wp.index_phy_;
+  index_gui_ = wp.index_gui_;
+  obj_guichanged_ = wp.obj_guichanged_;
+  obj_phychanged_ = wp.obj_phychanged_;
+  modifiable_gui_ = wp.modifiable_gui_;
+  object_type_ = wp.object_type_;
+}
+
 spWaypoint::~spWaypoint() {}
 
 void spWaypoint::SetLength(double length) {

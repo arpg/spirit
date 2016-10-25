@@ -24,12 +24,15 @@ void Physics::Create(const spPhyEngineType phy_type) {
 }
 
 void Physics::AddObject(spCommonObject &obj) {
+  if(!phyworld_) {
+    SPERROREXIT("phyworld_ object has not been created yet.");
+  }
   phyworld_->AddNewPhyObject(obj);
 }
 
 void Physics::Iterate(Objects& objects) {
   // step 100ms (0.1s)
   phyworld_->UpdatePhyObjectsFromSpirit(objects);
-  phyworld_->StepPhySimulation(1);
+  phyworld_->StepPhySimulation(0.001);
   phyworld_->UpdateSpiritObjectsFromPhy(objects);
 }

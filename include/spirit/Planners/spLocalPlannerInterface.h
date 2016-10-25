@@ -6,8 +6,7 @@
 
 class spLocalPlannerInterface {
 public:
-  virtual void RegisterPhysicsWorld() = 0;
-  virtual void PlanTrajectory(spPose start, spPose goal) = 0;
+  virtual const spBezierCtrlPoints& GetPlan(const spPose& start, const spPose& goal) = 0;
 };
 
 #endif // SP_LOCALPLANNER_H__

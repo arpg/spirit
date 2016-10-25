@@ -16,10 +16,12 @@ class spBezierCurve : public spCommonObject {
   const spColor& GetColor();
 
   void SetControlPoints(const spBezierCtrlPoints& pts);
-  const spBezierCtrlPoints& GetControlPoints();
+  void SetHermiteControlPoints(const spHermiteCtrlPoints& pts);
+  const spBezierCtrlPoints& GetBezierControlPoints();
 
   void GetPoint(spPoint& point, double t);
   void GetPoints(spPoints& pts_vec, int num_mid_pts);
+
 
  private:
   spColor color_;

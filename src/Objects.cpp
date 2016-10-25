@@ -44,11 +44,19 @@ int Objects::CreateBezierCurve(const spPose& pose, const spBezierCtrlPoints& ctr
 
 
 void Objects::RemoveObj(int obj_index) {
-  objects_.erase(objects_.begin()+obj_index);
+  if(obj_index<objects_.size()) {
+    objects_.erase(objects_.begin()+obj_index);
+  } else {
+    SPERROREXIT("Requested Object doesn't exist.");
+  }
 }
 
 spCommonObject& Objects::GetObject(int obj_index) {
-  return *objects_[obj_index].get();
+  if(obj_index<objects_.size()) {
+    return *objects_[obj_index].get();
+  } else {
+    SPERROREXIT("Requested Object doesn't exist.");
+  }
 }
 
 int Objects::GetNumOfObjects() {

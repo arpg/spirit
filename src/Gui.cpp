@@ -35,6 +35,9 @@ void Gui::CheckKeyboardAction() {
 }
 
 void Gui::AddObject(spCommonObject &obj) {
+  if(!gui_) {
+    SPERROREXIT("gui_ object has not been created yet.");
+  }
   switch(obj.GetObjecType()) {
     case spObjectType::WAYPOINT:
     {

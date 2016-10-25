@@ -385,9 +385,9 @@ void spBulletWorld::StepPhySimulation(double step_time) {
   // simulation_step/penetration -> http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=&f=&t=367
   // http://bulletphysics.org/mediawiki-1.5.8/index.php/Stepping_the_World
   // choose the number of iterations for the constraint solver in the range 4 to 10.
-  const btScalar fixed_time_step = 0.01;
+  const btScalar fixed_time_step = 0.001;
   if (step_time <= fixed_time_step) {
-    std::cerr << "step_time should be greater than fixed_time_step in Line:" << __LINE__ << ", " << __FILE__ << std::endl;
+//    std::cerr << "step_time should be greater than fixed_time_step in Line:" << __LINE__ << ", " << __FILE__ << std::endl;
   }
   // this is to guarantee that all steps are simulation steps rather than interpolation
   // timeStep < maxSubSteps * fixedTimeStep

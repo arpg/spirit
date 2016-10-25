@@ -17,8 +17,13 @@ typedef Eigen::Vector3d spPoint;
 typedef std::vector<spPoint,Eigen::aligned_allocator<spPoint>> spPoints;
 typedef Eigen::Matrix3d spInertiaTensor;
 typedef Eigen::Vector3d spCubeInertiaTensor;
-typedef Eigen::Matrix<double, 3, 4> spBezierCtrlPoints;
+typedef Eigen::Matrix<double, 3, 4> spHermiteCtrlPoints; // rows mean [P0;P1;P2;P3]
+typedef Eigen::Matrix<double, 3, 4> spBezierCtrlPoints; // rows mean [P0;D0;P3;D3]
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;
+typedef Eigen::Matrix4d spMat4x4;
+
+#define SPERROREXIT(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl; std::exit(EXIT_FAILURE)
+#define SPERROR  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl
 
 // bullet definitions
 #define USE_MOTIONSTATE 1

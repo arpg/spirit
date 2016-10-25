@@ -6,6 +6,8 @@
 #include <spirit/spSettings.h>
 #include <spirit/Types/spTypes.h>
 #include <spirit/Objects.h>
+#include <spirit/Planners/spBezierPlanner.h>
+#include <functional>
 
 class spirit{
 public:
@@ -21,13 +23,18 @@ private:
   Gui gui_;
   spSettings user_settings_;
   Physics physics_;
-
+  std::vector<Physics> physics_vec_;
+  std::vector<Objects> objects_vec_;
+  void runthread(int ind);
   Objects objects_;
+
+  std::thread threads_[42];
 
   int obj_gnd_index;
   int obj_box_index;
   int obj_car_index;
-  int obj_waypoint_index;
+  int obj_waypoint_index1;
+  int obj_waypoint_index2;
   int obj_curve_index;
 
 };
