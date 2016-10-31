@@ -2,7 +2,6 @@
 
 spAWSDCar::spAWSDCar(const spVehicleConstructionInfo& vehicle_info):spVehicle(vehicle_info) {
   for(int ii=0;ii<4;ii++)
-//  int ii =0;
   {
     spWheel* wheel = GetWheel(ii);
     wheel->SetHasSteeringServo(true);
@@ -12,7 +11,7 @@ spAWSDCar::spAWSDCar(const spVehicleConstructionInfo& vehicle_info):spVehicle(ve
     wheel->SetSteeringServoTargetAngle(0);
     wheel->SetHasDriveMotor(true);
     wheel->SetDriveMotorTargetVelocity(20);
-    wheel->SetDriveMotorTorque(0.91);
+    wheel->SetDriveMotorTorque(0);
   }
 }
 
@@ -29,8 +28,12 @@ void spAWSDCar::SetBackSteeringAngle(double angle) {
   GetWheel(2)->SetSteeringServoTargetAngle(angle);
 }
 
-void spAWSDCar::SetMotorTorque(double torque) {
-
+void spAWSDCar::SetEngineTorque(double torque) {
+  for(int ii=0;ii<4;ii++)
+  {
+    spWheel* wheel = GetWheel(ii);
+    wheel->SetDriveMotorTorque(torque);
+  }
 }
 
 void spAWSDCar::ApplyTransmissionDifferentialCoupling() {

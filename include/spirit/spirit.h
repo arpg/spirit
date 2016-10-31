@@ -19,17 +19,17 @@ public:
   void CheckKeyboardAction();
   void ScenarioWorldBoxFall();
   void ScenarioWorldCarFall();
+//  void LocalPlanTest(spWaypoint& w1, spWaypoint& w2);
 private:
+  void InitCarPool(int num_cars);
+  std::vector<Physics> pool_physics_vec_;
+  std::vector<Objects> pool_objects_vec_;
+  std::vector<std::thread> pool_threads_vec_;
+
   Gui gui_;
   spSettings user_settings_;
   Physics physics_;
-  std::vector<Physics> physics_vec_;
-  std::vector<Objects> objects_vec_;
-  void runthread(int ind);
   Objects objects_;
-
-  std::thread threads_[42];
-
   int obj_gnd_index;
   int obj_box_index;
   int obj_car_index;

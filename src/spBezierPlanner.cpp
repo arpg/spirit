@@ -2,17 +2,48 @@
 
 spBezierPlanner::spBezierPlanner(){
   has_loop_ = false;
+
+  spVehicleConstructionInfo car_param;
+  car_param.vehicle_type = spVehicleConfig::AWSD;
+  car_param.pose.translate(spTranslation(0,0,0.24));
+//  Eigen::AngleAxisd rot(M_PI/4+0.17355,Eigen::Vector3d::UnitY());
+//  car_param.pose.rotate(rot);
+  car_param.wheels_anchor.push_back(spTranslation(-0.13,0.17,-0.003));
+  car_param.wheels_anchor.push_back(spTranslation(-0.13,-0.17,-0.003));
+  car_param.wheels_anchor.push_back(spTranslation(0.13,-0.17,-0.003));
+  car_param.wheels_anchor.push_back(spTranslation(0.13,0.17,-0.003));
+  car_param.chassis_size = spBoxSize(0.2,0.42,0.05);
+  car_param.cog = spTranslation(0,0,0);
+  car_param.wheel_friction = 100;
+  car_param.wheel_width = 0.04;
+  car_param.wheel_radius = 0.057;
+  car_param.susp_damping = 10;
+  car_param.susp_stiffness = 100;
+  car_param.susp_preloading_spacer = 0.1;
+  car_param.susp_upper_limit = 0.013;
+  car_param.susp_lower_limit = -0.028;
+  car_param.wheel_mass = 0.1;
+  car_param.chassis_mass = 3;
+  car_param.steering_servo_lower_limit = -SP_PI/2;;
+  car_param.steering_servo_upper_limit = SP_PI/2;;
+  jac_physics_;
+  jac_physics_.Create(PHY_BULLET);
+  jac_car_handle = jac_objects_.CreateVehicle(car_param);
+  jac_physics_.AddObject(jac_objects_.GetObject(jac_car_handle));
+  spPose ground(spPose::Identity());
+  ground.translate(spTranslation(0,0,-0.5));
+  jac_physics_.AddObject(jac_objects_.GetObject(jac_objects_.CreateBox(ground,spBoxSize(10,10,1),0,spColor(0,1,0))));
 }
 
 spBezierPlanner::~spBezierPlanner(){
 
 }
 
-void spBezierPlanner::AddWaypoint(const spWaypoint& waypoint, int index=-1) {
+void spBezierPlanner::AddWaypoint(const spWaypoint& waypoint, unsigned int index) {
   std::shared_ptr<spWaypoint> new_waypoint = std::make_shared<spWaypoint>(waypoint);
-  std::shared_ptr<spBezierCurve> new_curve = std::make_shared<spBezierCurve>();
+  std::shared_ptr<spCurve> new_curve = std::make_shared<spCurve>(3,3);
   std::vector<std::shared_ptr<spWaypoint>>::iterator waypoint_it;
-  std::vector<std::shared_ptr<spBezierCurve>>::iterator curve_it;
+  std::vector<std::shared_ptr<spCurve>>::iterator curve_it;
   waypoint_it = planpoint_vec_.begin();
   planpoint_vec_.insert(waypoint_it+index, new_waypoint);
   curve_it = plancurve_vec_.begin();
@@ -24,18 +55,21 @@ void spBezierPlanner::AddWaypoint(const spWaypoint& waypoint, int index=-1) {
 
 void spBezierPlanner::AddWaypoint(const spWaypoint& waypoint) {
   std::shared_ptr<spWaypoint> new_waypoint = std::make_shared<spWaypoint>(waypoint);
-  std::shared_ptr<spBezierCurve> new_curve = std::make_shared<spBezierCurve>();
+  std::shared_ptr<spCurve> new_curve = std::make_shared<spCurve>(3,3);
   planpoint_vec_.push_back(new_waypoint);
   plancurve_vec_.push_back(new_curve);
   needs_curveupdate_vec_.push_back(false);
   std::cout << "plan point added to index: " << plancurve_vec_.size()-1 << std::endl;
 }
 
-const spWaypoint& spBezierPlanner::GetWaypoint(int index) {
+const spWaypoint& spBezierPlanner::GetWaypoint(unsigned int index) {
+  if(index>planpoint_vec_.size()-1) {
+    SPERROREXIT("Requested index doesn't exist.");
+  }
   return *planpoint_vec_[index];
 }
 
-void spBezierPlanner::UpdateWaypoint(const spWaypoint& planpoint,int index) {
+void spBezierPlanner::UpdateWaypoint(const spWaypoint& planpoint,unsigned int index) {
 //  std::shared_ptr<spWaypoint> new_waypoint = std::make_shared<spWaypoint>(waypoint);
 //  std::shared_ptr<spBezierCurve> new_curve = std::make_shared<spBezierCurve>();
 //  std::vector<std::shared_ptr<spWaypoint>>::iterator waypoint_it;
@@ -44,16 +78,30 @@ void spBezierPlanner::UpdateWaypoint(const spWaypoint& planpoint,int index) {
 //  planpoint_vec_.insert(waypoint_it+index, new_waypoint);
 //  curve_it = plancurve_vec_.begin();
 //  plancurve_vec_.insert(curve_it+index, new_curve);
+}
+
+const spCurve& spBezierPlanner::GetCurve(unsigned int index) {
 
 }
 
-const spBezierCurve& spBezierPlanner::GetCurve(int index) {
+void spBezierPlanner::RemoveWaypoint(unsigned int index_in_plan) {
 
 }
 
-void spBezierPlanner::RemoveWaypoint(int index_in_plan) {
+void spBezierPlanner::CalcJacobian(spPlannerJacob& jacob, const spCtrlPts3ord_2dof& cntrl_variables,unsigned int cntrl_sampling_res,double sim_epsilon) {
 
+  jac_physics_.Iterate(jac_objects_,0.001);
+  spAWSDCar& jac_car = (spAWSDCar&) jac_objects_.GetObject(jac_car_handle);
+  spCurve control_curve(3,2);
+  control_curve.SetBezierControlPoints(cntrl_variables);
+  spPointXd sample_control(2);
+  for(int ii=1;ii<=100;ii++) {
+    control_curve.GetPoint(sample_control,ii/(double)100);
+    jac_car.SetFrontSteeringAngle(sample_control[0]);
+    jac_car.SetEngineTorque(sample_control[1]);
+  }
 }
+
 
 int spBezierPlanner::GetNumWaypoints() {
   return planpoint_vec_.size();

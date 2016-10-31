@@ -13,12 +13,17 @@ typedef Eigen::Vector3d spBoxSize;
 typedef Eigen::Vector3d spCylinderSize;
 typedef Eigen::Vector2d spMeshSize;
 typedef Eigen::Vector3d spColor;
-typedef Eigen::Vector3d spPoint;
-typedef std::vector<spPoint,Eigen::aligned_allocator<spPoint>> spPoints;
+typedef Eigen::Vector3d spPoint3d;
+typedef Eigen::VectorXd spPointXd;
+typedef std::vector<spPoint3d,Eigen::aligned_allocator<spPoint3d>> spPoints3d;
+typedef std::vector<spPointXd,Eigen::aligned_allocator<spPointXd>> spPointsXd;
 typedef Eigen::Matrix3d spInertiaTensor;
 typedef Eigen::Vector3d spCubeInertiaTensor;
-typedef Eigen::Matrix<double, 3, 4> spHermiteCtrlPoints; // rows mean [P0;P1;P2;P3]
-typedef Eigen::Matrix<double, 3, 4> spBezierCtrlPoints; // rows mean [P0;D0;P3;D3]
+// ctrlpts for bezier curve mean [P0,P1,P2,P3]
+// ctrlpts for Hermite curve mean [P0,D0,P3,D3]
+typedef Eigen::Matrix<double,3,4> spCtrlPts3ord_3dof;
+typedef Eigen::Matrix<double,2,4> spCtrlPts3ord_2dof;
+typedef Eigen::Matrix<double,5,5> spPlannerJacob;
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 typedef Eigen::Matrix4d spMat4x4;
 
@@ -34,7 +39,7 @@ typedef Eigen::Matrix4d spMat4x4;
 enum spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum spPhyEngineType{PHY_NONE,PHY_BULLET};
-enum spObjectType{BOX,VEHICLE,WHEEL,WAYPOINT,BEZIER_CURVE};
+enum spObjectType{BOX,VEHICLE,WHEEL,WAYPOINT,LINESTRIP};
 enum spVehicleConfig{AWSD};
 
 struct spVehicleConstructionInfo{
@@ -79,4 +84,79 @@ struct spVehicleConstructionInfo{
   }
 };
 
+class spCurve {
+ public:
+
+  spCurve(int curve_order, int curve_dof): curve_order_(curve_order), curve_dof_(curve_dof) {
+  }
+
+  ~spCurve() {}
+
+  void SetBezierControlPoints(const Eigen::MatrixXd& pts) {
+    if((pts.rows() != curve_dof_)||(pts.cols() != curve_order_+1)) {
+      SPERROREXIT("Matrix dimension mismatch.");
+    }
+    ctrl_pts_ = pts;
+  }
+
+  void SetHermiteControlPoints(const Eigen::MatrixXd& pts) {
+    if((pts.rows() != curve_dof_)||(pts.cols() != curve_order_+1)) {
+      SPERROREXIT("Wrong matrix dimension requested.");
+    }
+    if(pts.cols() == 4) {
+      // hermite to bezier conversion matrix
+      spMat4x4 conv;
+      conv << 1, 0, 0, 0,
+          1, 1.0f/3, 0, 0,
+          0, 0, 1, -1.0f/3,
+          0, 0, 1, 0;
+      ctrl_pts_ =  pts*conv.transpose();
+    } else {
+      SPERROREXIT("Requested Order of curve has not been implemented");
+    }
+  }
+
+  const Eigen::MatrixXd& GetBezierControlPoints() {
+    return ctrl_pts_;
+  }
+
+  void GetPoint(Eigen::VectorXd& point, double t) {
+    if(point.rows() != curve_dof_) {
+      SPERROREXIT("Wrong point dimention requested.");
+    }
+
+    point = (pow((1 - t), 3) * ctrl_pts_.col(0)) +
+        (3 * pow((1 - t), 2) * t * ctrl_pts_.col(1)) +
+        (3 * (1 - t) * pow(t, 2) * ctrl_pts_.col(2)) +
+        (pow(t, 3) * ctrl_pts_.col(3));
+    // calc global coordinates of the point
+  //  point = pose_ * point;
+  }
+
+  void GetPointsXd(spPointsXd& pts_vec, int num_mid_pts) {
+    int num_pts = num_mid_pts - 1;
+    for (int t = 0; t <= num_pts; t++) {
+      spPointXd point(curve_dof_);
+      this->GetPoint(point, t * (1.0 / num_pts));
+  //    std::shared_ptr<spPoint> point_ptr = std::make_shared<spPoint>(point);
+      pts_vec.push_back(point);
+    }
+  }
+
+  // firs 3d dimentions (x,y,z) are used for visualization purposes
+  void GetPoints3d(spPoints3d& pts_vec, int num_mid_pts) {
+    int num_pts = num_mid_pts - 1;
+    for (int t = 0; t <= num_pts; t++) {
+      spPointXd point(curve_dof_);
+      this->GetPoint(point, t * (1.0 / num_pts));
+      pts_vec.push_back(point.head(3));
+    }
+  }
+
+private:
+ // Control points are in local coordinate of the curve
+ Eigen::MatrixXd ctrl_pts_;
+ int curve_dof_;
+ int curve_order_;
+};
 #endif  // SP_TYPES_H__

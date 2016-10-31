@@ -8,7 +8,7 @@
 #include <spirit/Objects/spVehicle.h>
 #include <spirit/Objects/spAWSDCar.h>
 #include <spirit/Objects/spWaypoint.h>
-#include <spirit/Objects/spBezierCurve.h>
+#include <spirit/Objects/spLineStrip.h>
 
 class Objects {
 public:
@@ -17,7 +17,7 @@ public:
   int CreateBox(const spPose& pose, const spBoxSize& size, const double mass,const spColor& color);
   int CreateWaypoint(const spPose& pose, const spColor& color);
   int CreateVehicle(const spVehicleConstructionInfo& vehicle_info);
-  int CreateBezierCurve(const spPose& pose, const spBezierCtrlPoints& ctrl_pts, const spColor& color);
+  int CreateLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, const spColor& color);
   void RemoveObj(int obj_index);
   int GetNumOfObjects();
   spCommonObject& GetObject(int obj_index);

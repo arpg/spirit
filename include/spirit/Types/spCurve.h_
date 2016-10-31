@@ -1,0 +1,27 @@
+#ifndef SP_CURVE_H__
+#define SP_CURVE_H__
+
+#include <spirit/Types/spTypes.h>
+
+class spCurve {
+ public:
+  spCurve(int curve_dof, int curve_order);
+  ~spCurve();
+
+  void SetBezierControlPoints(const Eigen::MatrixXd& pts);
+  void SetHermiteControlPoints(const Eigen::MatrixXd& pts);
+  const Eigen::MatrixXd& GetBezierControlPoints();
+
+  void GetPoint(spPointXd& point, double t);
+  void GetPointsXd(spPointsXd& pts_vec, int num_mid_pts);
+  // firs 3d dimentions (x,y,z) are used for visualization purposes
+  void GetPoints3d(spPoints3d& pts_vec, int num_mid_pts);
+
+ private:
+  // Control points are in local coordinate of the curve
+  Eigen::MatrixXd ctrl_pts_;
+  int curve_dof_;
+  int curve_order_;
+};
+
+#endif  //  SP_CURVE_H__

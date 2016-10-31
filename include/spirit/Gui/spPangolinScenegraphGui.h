@@ -21,7 +21,7 @@ class spPangolinScenegraphGui : public spCommonGUI {
   void AddBox(spBox& box);
   void AddWaypoint(spWaypoint& waypoint);
   void AddVehicle(spVehicle& vehicle);
-  void AddBezierCurve(spBezierCurve& curve);
+  void AddLineStrip(spLineStrip& linestrip);
   void UpdateGuiObjectsFromSpirit(Objects &spobj);
   void UpdateSpiritObjectsFromGui(Objects& spobjects);
 
@@ -30,7 +30,7 @@ class spPangolinScenegraphGui : public spCommonGUI {
   void UpdateBoxGuiObject(spBox& spobj);
   void UpdateWaypointGuiObject(spWaypoint& spobj);
   void UpdateVehicleGuiObject(spVehicle& spobj);
-  void UpdateBezierCurveGuiObject(spBezierCurve& spobj);
+  void UpdateLineStripGuiObject(spLineStrip& spobj);
 
   // Safe and efficient binding of named variables.
   // Specialisations mean no conversions take place for exact types

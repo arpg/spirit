@@ -11,7 +11,7 @@ class Physics {
   ~Physics();
   void Create(const spPhyEngineType phy_type);
   void AddObject(spCommonObject& obj);
-  void Iterate(Objects& objects);
+  void Iterate(Objects& objects, double sim_sec);
 
  private:
   std::shared_ptr<spPhysicsWorld> phyworld_;

@@ -33,10 +33,10 @@ int Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_info) {
   return (objects_.size()-1);
 }
 
-int Objects::CreateBezierCurve(const spPose& pose, const spBezierCtrlPoints& ctrl_pts, const spColor& color) {
-  std::shared_ptr<spBezierCurve> a_curve = std::make_shared<spBezierCurve>();
+int Objects::CreateLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, const spColor& color) {
+  std::shared_ptr<spLineStrip> a_curve = std::make_shared<spLineStrip>();
   a_curve->SetPose(pose);
-  a_curve->SetControlPoints(ctrl_pts);
+  a_curve->SetLineStripPoints(linestrip_pts);
   a_curve->SetColor(color);
   objects_.push_back(a_curve);
   return (objects_.size()-1);

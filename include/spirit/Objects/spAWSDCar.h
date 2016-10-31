@@ -10,7 +10,7 @@ public:
   ~spAWSDCar();
   void SetFrontSteeringAngle(double angle);
   void SetBackSteeringAngle(double angle);
-  void SetMotorTorque(double torque);
+  void SetEngineTorque(double torque);
 private:
   void ApplyTransmissionDifferentialCoupling();
 };

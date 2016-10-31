@@ -59,9 +59,9 @@ void Gui::AddObject(spCommonObject &obj) {
       gui_->AddVehicle((spVehicle&) obj);
       break;
     }
-    case spObjectType::BEZIER_CURVE:
+    case spObjectType::LINESTRIP:
     {
-      gui_->AddBezierCurve((spBezierCurve&) obj);
+      gui_->AddLineStrip((spLineStrip&) obj);
       break;
     }
     default:
