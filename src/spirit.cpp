@@ -1,5 +1,5 @@
 #include <spirit/spirit.h>
-
+#include <iomanip>
 spirit::spirit(spSettings& user_settings) { user_settings_ = user_settings; }
 
 spirit::~spirit() {}
@@ -50,7 +50,7 @@ void spirit::ScenarioWorldCarFall() {
   car_param.steering_servo_lower_limit = -SP_PI / 2;
   car_param.steering_servo_upper_limit = SP_PI / 2;
 
-  for (int ii = 0; ii < 42; ii++) {
+  for (int ii = 0; ii < 1; ii++) {
     obj_car_index = objects_.CreateVehicle(car_param);
     physics_.AddObject(objects_.GetObject(obj_car_index));
     gui_.AddObject(objects_.GetObject(obj_car_index));
@@ -203,11 +203,26 @@ void spirit::IterateWorld() {
 
   if (fl < 1) {
     spTimestamp phy_tick = spGeneralTools::Tick();
-    physics_.Iterate(objects_,0.01);
+    physics_.Iterate(objects_,0.1);
 
     fl++;
     double phy_cost = spGeneralTools::Tock_us(phy_tick);
     std::cout << "Phy Iteration time:   " << phy_cost << "us" << std::endl;
+
+//    Eigen::MatrixXd A(2,4);
+//    A = Eigen::MatrixXd::Random(2,4);
+//    std::cout << "a is: \n" << A << std::endl;
+//    Eigen::VectorXd b(Eigen::Map<Eigen::VectorXd>(A.data(), A.cols()*A.rows()));
+//    std::cout << "b is \n" << b << std::endl;
+//    A.data()[7] = 2;
+//    std::cout << "a 2 is now:\n" << A.data()[2] << std::endl;
+
+    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
+    Eigen::Array<double,1,13> a(car.GetStateVecor());
+    std::cout << std::fixed;
+    std::cout << std::setprecision(2);
+    std::cout << "state is:\n" << a << std::endl;
+
   }
 
   /*
@@ -278,10 +293,10 @@ void spirit::IterateWorld() {
 
   //  spWaypoint& waypoint = (spWaypoint&)
   //  objects_.GetObject(obj_waypoint_index);
-  //  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
+//    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
   //  if(fl>100) {
   //    car.SetLocalCOG(spTranslation(0,-0.3,0));
-  //  std::cout << "pose is \n" << waypoint.GetPose().matrix() << std::endl;
+//    std::cout << "pose is \n" << waypoint.GetPose().matrix() << std::endl;
   //  }
-  spGeneralTools::Delay_ms(10);
+//  spGeneralTools::Delay_ms(10);
 }

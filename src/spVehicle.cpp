@@ -26,6 +26,9 @@ spVehicle::~spVehicle() {}
 void spVehicle::SetPose(const spPose& pose) {
   // set chassis pose
   pose_ = pose;
+  state_vec_.head(3) = pose.translation();
+  spRotation quat(pose.rotation());
+  state_vec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
   obj_phychanged_ = true;
   obj_guichanged_ = true;
 }
@@ -81,4 +84,14 @@ int spVehicle::GetNumberOfWheels()
 spWheel*spVehicle::GetWheel(int index)
 {
   return wheel_[index].get();
+}
+
+void spVehicle::SetVelocity(const spVelocity& chassis_vel) {
+  state_vec_.tail<6>() = chassis_vel;
+  obj_phychanged_ = true;
+  obj_guichanged_ = true;
+}
+
+const spStateVec& spVehicle::GetStateVecor() {
+  return state_vec_;
 }

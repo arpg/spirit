@@ -5,13 +5,14 @@ spAWSDCar::spAWSDCar(const spVehicleConstructionInfo& vehicle_info):spVehicle(ve
   {
     spWheel* wheel = GetWheel(ii);
     wheel->SetHasSteeringServo(true);
-    wheel->SetSteeringServoMaxVelocity(0.2);
+    //    wheel->SetSteeringServoMaxVelocity(0.2);
+    wheel->SetSteeringServoMaxVelocity(0.4);
     wheel->SetSteeringServoTorque(10);
-//    wheel->SetSteeringServoTargetAngle(SP_PI/2);
-    wheel->SetSteeringServoTargetAngle(0);
+    wheel->SetSteeringServoTargetAngle(SP_PI/2);
+//    wheel->SetSteeringServoTargetAngle(0);
     wheel->SetHasDriveMotor(true);
-    wheel->SetDriveMotorTargetVelocity(20);
-    wheel->SetDriveMotorTorque(0);
+    wheel->SetDriveMotorTargetVelocity(10);
+    wheel->SetDriveMotorTorque(10);
   }
 }
 

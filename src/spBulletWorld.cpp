@@ -357,6 +357,14 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
           // update chassis
           btCollisionObject* chassis_obj = dynamics_world_->getCollisionObjectArray()[vehicle.GetPhyIndex()];
           vehicle.SetPose(btTransform2spPose(chassis_obj->getWorldTransform(),WSCALE_INV)*vehicle.GetLocalCOG().inverse());
+          // update chassis linear and angular velocities
+          btRigidBody* chassis_rigbody = btRigidBody::upcast(chassis_obj);
+          chassis_rigbody->setCollisionShape(chassis_obj->getCollisionShape());
+          spVelocity spvel;
+          spvel << chassis_rigbody->getLinearVelocity()[0],chassis_rigbody->getLinearVelocity()[1],chassis_rigbody->getLinearVelocity()[2],
+              chassis_rigbody->getAngularVelocity()[0],chassis_rigbody->getAngularVelocity()[1],chassis_rigbody->getAngularVelocity()[2];
+          vehicle.SetVelocity(spvel);
+
           // update wheels
           for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
             btCollisionObject* wheel_obj = dynamics_world_->getCollisionObjectArray()[vehicle.GetWheel(ii)->GetPhyIndex()];

@@ -88,17 +88,36 @@ void spBezierPlanner::RemoveWaypoint(unsigned int index_in_plan) {
 
 }
 
-void spBezierPlanner::CalcJacobian(spPlannerJacob& jacob, const spCtrlPts3ord_2dof& cntrl_variables,unsigned int cntrl_sampling_res,double sim_epsilon) {
-
-  jac_physics_.Iterate(jac_objects_,0.001);
+void spBezierPlanner::CalcJacobian(spPlannerJacob& jacobian, const spCtrlPts3ord_2dof& cntrl_variables,unsigned int cntrl_sampling_res,double sim_step, spPose& init_pose, double delta) {
   spAWSDCar& jac_car = (spAWSDCar&) jac_objects_.GetObject(jac_car_handle);
+  jac_car.SetPose(init_pose);
   spCurve control_curve(3,2);
-  control_curve.SetBezierControlPoints(cntrl_variables);
-  spPointXd sample_control(2);
-  for(int ii=1;ii<=100;ii++) {
-    control_curve.GetPoint(sample_control,ii/(double)100);
-    jac_car.SetFrontSteeringAngle(sample_control[0]);
-    jac_car.SetEngineTorque(sample_control[1]);
+  Eigen::VectorXd jac_col(8);
+  for(int jj=0;jj<8;jj++) {
+    control_curve.SetBezierControlPoints(cntrl_variables);
+    spPointXd sample_control(2);
+    // simulate final pose of vehicle with original control_variables
+    for(int ii=1;ii<=cntrl_sampling_res;ii++) {
+      control_curve.GetPoint(sample_control,ii/(double)cntrl_sampling_res);
+      jac_car.SetFrontSteeringAngle(sample_control[0]);
+      jac_car.SetEngineTorque(sample_control[1]);
+      jac_physics_.Iterate(jac_objects_,sim_step);
+    }
+    spPose end_pose = jac_car.GetPose();
+
+
+    // init vehicle pose to Init pose again
+    jac_car.SetPose(init_pose);
+    // apply Epsilon adjusted control_variables and simulate again
+
+    for(int ii=0;ii<8;ii++) {
+
+    }
+
+//    cntrl_variables
+    jac_col.head(3) = jac_car.GetPose().translation();
+    spRotation quat(jac_car.GetPose().rotation());
+
   }
 }
 

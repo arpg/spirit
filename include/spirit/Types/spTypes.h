@@ -15,6 +15,7 @@ typedef Eigen::Vector2d spMeshSize;
 typedef Eigen::Vector3d spColor;
 typedef Eigen::Vector3d spPoint3d;
 typedef Eigen::VectorXd spPointXd;
+typedef Eigen::Array<double,6,1> spVelocity;
 typedef std::vector<spPoint3d,Eigen::aligned_allocator<spPoint3d>> spPoints3d;
 typedef std::vector<spPointXd,Eigen::aligned_allocator<spPointXd>> spPointsXd;
 typedef Eigen::Matrix3d spInertiaTensor;
@@ -23,7 +24,9 @@ typedef Eigen::Vector3d spCubeInertiaTensor;
 // ctrlpts for Hermite curve mean [P0,D0,P3,D3]
 typedef Eigen::Matrix<double,3,4> spCtrlPts3ord_3dof;
 typedef Eigen::Matrix<double,2,4> spCtrlPts3ord_2dof;
-typedef Eigen::Matrix<double,5,5> spPlannerJacob;
+typedef Eigen::Matrix<double,14,8> spPlannerJacob;
+// spStateVec means [x,y,z,q1,q2,q3,q4,x_d,y_d,z_d,q1_d,q2_d,q3_d,q4_d]
+typedef Eigen::Array<double,13,1> spStateVec;
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 typedef Eigen::Matrix4d spMat4x4;
 
