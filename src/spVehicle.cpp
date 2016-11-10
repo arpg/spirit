@@ -26,9 +26,9 @@ spVehicle::~spVehicle() {}
 void spVehicle::SetPose(const spPose& pose) {
   // set chassis pose
   pose_ = pose;
-  state_vec_.head(3) = pose.translation();
+  statevec_.head(3) = pose.translation();
   spRotation quat(pose.rotation());
-  state_vec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
+  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
   obj_phychanged_ = true;
   obj_guichanged_ = true;
 }
@@ -36,8 +36,13 @@ void spVehicle::SetPose(const spPose& pose) {
 void spVehicle::MoveWheelsToAnchors(void) {
   for(int ii=0; ii<wheel_.size(); ii++) {
     spPose sp(spPose::Identity());
-    sp.translate(pose_*wheel_[ii]->GetChassisAnchor());
-    sp.rotate(pose_.rotation());
+    spPose tr = pose_;
+//    sp.translate(pose_*(wheel_[ii]->GetChassisAnchor()));
+    sp.translate(pose_*(wheel_[ii]->GetChassisAnchor()+spTranslation(wheel_[ii]->GetWidth()/2,0,0)));
+    Eigen::AngleAxisd ang1(-SP_PI/2,Eigen::Vector3d::UnitY());
+    tr.rotate(ang1);
+    sp.rotate(tr.rotation());
+//    sp.rotate(pose_.rotation());
     wheel_[ii]->SetPose(sp);
   }
 }
@@ -87,11 +92,11 @@ spWheel*spVehicle::GetWheel(int index)
 }
 
 void spVehicle::SetVelocity(const spVelocity& chassis_vel) {
-  state_vec_.tail<6>() = chassis_vel;
+  statevec_.tail<6>() = chassis_vel;
   obj_phychanged_ = true;
   obj_guichanged_ = true;
 }
 
 const spStateVec& spVehicle::GetStateVecor() {
-  return state_vec_;
+  return statevec_;
 }

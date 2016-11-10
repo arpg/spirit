@@ -141,6 +141,11 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
   // set the correct index for spVehicle object so we can access this object later
   bodyA->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
   source_obj.SetPhyIndex(bodyA->getUserIndex());
+  // set body velocities to zero
+  bodyA->setLinearVelocity(btVector3(0,0,0));
+  bodyA->setAngularVelocity(btVector3(0,0,0));
+  // set damping to zero since we are moving in air
+  bodyA->setDamping(0,0);
   // now create and add wheels
   for(int ii=0 ; ii<source_obj.GetNumberOfWheels() ; ii++) {
     spWheel* spwheel = source_obj.GetWheel(ii);
@@ -158,6 +163,9 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
     spwheel->SetPhyIndex(bodyB->getUserIndex());
     bodyB->setFriction(spwheel->GetFriction());
     bodyB->setActivationState(DISABLE_DEACTIVATION);
+    // set wheel velocity to zero
+//    bodyB->setLinearVelocity(btVector3(0,0,0));
+//    bodyB->setAngularVelocity(btVector3(0,0,0));
     btVector3 parent_axis(0,0,1);
     btVector3 child_axis(1,0,0);
     btVector3 anchor = tr.getOrigin();

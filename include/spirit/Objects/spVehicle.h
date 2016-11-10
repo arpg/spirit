@@ -32,7 +32,7 @@ class spVehicle : public spCommonObject {
  private:
   std::vector<std::shared_ptr<spWheel>> wheel_;
   spPose pose_;        // this pose will represent geometric center of the car
-  spStateVec state_vec_;  // this should be updated from phy engine only
+  spStateVec statevec_;  // this should be updated from phy engine only
   spPose cog_local_;  // center of gravity
   spColor color_;
   spBoxSize chassis_size_;

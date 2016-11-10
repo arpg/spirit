@@ -28,9 +28,11 @@ void spirit::ScenarioWorldCarFall() {
   // create and add a car
   spVehicleConstructionInfo car_param;
   car_param.vehicle_type = spVehicleConfig::AWSD;
-  car_param.pose.translate(spTranslation(0, 0, 0.24));
-  //  Eigen::AngleAxisd rot(M_PI/4+0.17355,Eigen::Vector3d::UnitY());
-  //  car_param.pose.rotate(rot);
+  car_param.pose.translate(spTranslation(1, 1, 0.06));
+//  Eigen::AngleAxisd rot1(M_PI/4+0.17355,Eigen::Vector3d::UnitX());
+//  car_param.pose.rotate(rot1);
+//  Eigen::AngleAxisd rot2(M_PI/4,Eigen::Vector3d::UnitY());
+//  car_param.pose.rotate(rot2);
   car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
   car_param.wheels_anchor.push_back(spTranslation(-0.13, -0.17, -0.003));
   car_param.wheels_anchor.push_back(spTranslation(0.13, -0.17, -0.003));
@@ -59,36 +61,36 @@ void spirit::ScenarioWorldCarFall() {
   // create and add a ground as a box to objects_ vector
   spPose ground(spPose::Identity());
   ground.translate(spTranslation(0, 0, -0.5));
-  Eigen::AngleAxisd ang(M_PI / 20, Eigen::Vector3d::UnitX());
-  //  ground.rotate(ang);
+//  Eigen::AngleAxisd ang(M_PI / 20, Eigen::Vector3d::UnitX());
+//  ground.rotate(ang);
 
   obj_gnd_index =
       objects_.CreateBox(ground, spBoxSize(10, 10, 1), 0, spColor(0, 1, 0));
   physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
-  spPose waypoint_pose(spPose::Identity());
-  obj_waypoint_index1 =
-      objects_.CreateWaypoint(waypoint_pose, spColor(0, 0, 1));
-  gui_.AddObject(objects_.GetObject(obj_waypoint_index1));
+//  spPose waypoint_pose(spPose::Identity());
+//  obj_waypoint_index1 =
+//      objects_.CreateWaypoint(waypoint_pose, spColor(0, 0, 1));
+//  gui_.AddObject(objects_.GetObject(obj_waypoint_index1));
 
-  waypoint_pose.translate(spTranslation(1, 1, 0));
-  obj_waypoint_index2 =
-      objects_.CreateWaypoint(waypoint_pose, spColor(0, 0, 1));
-  gui_.AddObject(objects_.GetObject(obj_waypoint_index2));
+//  waypoint_pose.translate(spTranslation(1, 1, 0));
+//  obj_waypoint_index2 =
+//      objects_.CreateWaypoint(waypoint_pose, spColor(0, 0, 1));
+//  gui_.AddObject(objects_.GetObject(obj_waypoint_index2));
 
-  spPose bezpos(spPose::Identity());
-  spCtrlPts3ord_3dof pts;
-  pts.col(0) = spPoint3d(0, 0, 0);
-  pts.col(1) = spPoint3d(1, 2, 1);
-  pts.col(2) = spPoint3d(2, -2, -1);
-  pts.col(3) = spPoint3d(3, 0, 2);
-  spCurve curve(3,3);
-  curve.SetBezierControlPoints(pts);
-  spPoints3d line_points;
-  curve.GetPoints3d(line_points,10);
-  obj_curve_index = objects_.CreateLineStrip(bezpos, line_points, spColor(1, 0, 0));
-  gui_.AddObject(objects_.GetObject(obj_curve_index));
+//  spPose bezpos(spPose::Identity());
+//  spCtrlPts3ord_3dof pts;
+//  pts.col(0) = spPoint3d(0, 0, 0);
+//  pts.col(1) = spPoint3d(1, 2, 1);
+//  pts.col(2) = spPoint3d(2, -2, -1);
+//  pts.col(3) = spPoint3d(3, 0, 2);
+//  spCurve curve(3,3);
+//  curve.SetBezierControlPoints(pts);
+//  spPoints3d line_points;
+//  curve.GetPoints3d(line_points,10);
+//  obj_curve_index = objects_.CreateLineStrip(bezpos, line_points, spColor(1, 0, 0));
+//  gui_.AddObject(objects_.GetObject(obj_curve_index));
 }
 
 /*
@@ -201,10 +203,12 @@ void spirit::IterateWorld() {
 //               std::endl;
 //  plan.UpdateCurves();
 
-  if (fl < 1) {
+  if (fl<2) {
+    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
+    std::cout << "wheel pose is\n" << car.GetWheel(0)->GetPose().matrix() << std::endl;
     spTimestamp phy_tick = spGeneralTools::Tick();
-    physics_.Iterate(objects_,0.1);
-
+    physics_.Iterate(objects_,0.01);
+    std::cout << "wheel pose is\n" << car.GetWheel(0)->GetPose().matrix() << std::endl;
     fl++;
     double phy_cost = spGeneralTools::Tock_us(phy_tick);
     std::cout << "Phy Iteration time:   " << phy_cost << "us" << std::endl;
@@ -217,11 +221,11 @@ void spirit::IterateWorld() {
 //    A.data()[7] = 2;
 //    std::cout << "a 2 is now:\n" << A.data()[2] << std::endl;
 
-    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
     Eigen::Array<double,1,13> a(car.GetStateVecor());
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
     std::cout << "state is:\n" << a << std::endl;
+    spGeneralTools::Delay_ms(2000);
 
   }
 
@@ -298,5 +302,5 @@ void spirit::IterateWorld() {
   //    car.SetLocalCOG(spTranslation(0,-0.3,0));
 //    std::cout << "pose is \n" << waypoint.GetPose().matrix() << std::endl;
   //  }
-//  spGeneralTools::Delay_ms(10);
+  spGeneralTools::Delay_ms(10);
 }

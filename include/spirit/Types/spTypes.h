@@ -24,14 +24,16 @@ typedef Eigen::Vector3d spCubeInertiaTensor;
 // ctrlpts for Hermite curve mean [P0,D0,P3,D3]
 typedef Eigen::Matrix<double,3,4> spCtrlPts3ord_3dof;
 typedef Eigen::Matrix<double,2,4> spCtrlPts3ord_2dof;
-typedef Eigen::Matrix<double,14,8> spPlannerJacob;
-// spStateVec means [x,y,z,q1,q2,q3,q4,x_d,y_d,z_d,q1_d,q2_d,q3_d,q4_d]
+// rows = [x,y,z,q1,q2,q3,q4,x_d,y_d,z_d,roll_d,pitch_d,yaw_d]
+// cols = [bezP1x,bezP1y,bezP2x,bezP2y,bezP3x,bezP3y,bezP4x,bezP4y]
+typedef Eigen::Matrix<double,13,8> spPlannerJacobian;
+// spStateVec means [x,y,z,q1,q2,q3,q4,x_d,y_d,z_d,p_d,q_d,r_d]
 typedef Eigen::Array<double,13,1> spStateVec;
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 typedef Eigen::Matrix4d spMat4x4;
 
 #define SPERROREXIT(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl; std::exit(EXIT_FAILURE)
-#define SPERROR  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl
+#define SPERROR  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << std::endl
 
 // bullet definitions
 #define USE_MOTIONSTATE 1
@@ -91,9 +93,25 @@ class spCurve {
  public:
 
   spCurve(int curve_order, int curve_dof): curve_order_(curve_order), curve_dof_(curve_dof) {
+    perturbation_value_ = 0;
+    perturbation_dim_ = 0;
   }
 
   ~spCurve() {}
+
+  void PerturbControlPoint(unsigned int dim2perturb, double delta) {
+    if(dim2perturb>((curve_dof_*(curve_order_+1)-1))) {
+      SPERROREXIT("Requested Dim doesn't exist");
+    }
+    perturbation_value_ = delta;
+    perturbation_dim_ = dim2perturb;
+    ctrl_pts_.data()[perturbation_dim_] += perturbation_value_;
+  }
+
+  void RemoveLastPerturbation() {
+    ctrl_pts_.data()[perturbation_dim_] -= perturbation_value_;
+    perturbation_value_ = 0;
+  }
 
   void SetBezierControlPoints(const Eigen::MatrixXd& pts) {
     if((pts.rows() != curve_dof_)||(pts.cols() != curve_order_+1)) {
@@ -161,5 +179,7 @@ private:
  Eigen::MatrixXd ctrl_pts_;
  int curve_dof_;
  int curve_order_;
+ double perturbation_value_;
+ int perturbation_dim_;
 };
 #endif  // SP_TYPES_H__

@@ -88,37 +88,41 @@ void spBezierPlanner::RemoveWaypoint(unsigned int index_in_plan) {
 
 }
 
-void spBezierPlanner::CalcJacobian(spPlannerJacob& jacobian, const spCtrlPts3ord_2dof& cntrl_variables,unsigned int cntrl_sampling_res,double sim_step, spPose& init_pose, double delta) {
-  spAWSDCar& jac_car = (spAWSDCar&) jac_objects_.GetObject(jac_car_handle);
-  jac_car.SetPose(init_pose);
+void spBezierPlanner::CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, spPose& init_pose, double fd_delta) {
+  spAWSDCar& car = (spAWSDCar&) jac_objects_.GetObject(jac_car_handle);
   spCurve control_curve(3,2);
-  Eigen::VectorXd jac_col(8);
-  for(int jj=0;jj<8;jj++) {
-    control_curve.SetBezierControlPoints(cntrl_variables);
-    spPointXd sample_control(2);
-    // simulate final pose of vehicle with original control_variables
-    for(int ii=1;ii<=cntrl_sampling_res;ii++) {
-      control_curve.GetPoint(sample_control,ii/(double)cntrl_sampling_res);
-      jac_car.SetFrontSteeringAngle(sample_control[0]);
-      jac_car.SetEngineTorque(sample_control[1]);
-      jac_physics_.Iterate(jac_objects_,sim_step);
-    }
-    spPose end_pose = jac_car.GetPose();
-
-
-    // init vehicle pose to Init pose again
-    jac_car.SetPose(init_pose);
-    // apply Epsilon adjusted control_variables and simulate again
-
-    for(int ii=0;ii<8;ii++) {
-
-    }
-
-//    cntrl_variables
-    jac_col.head(3) = jac_car.GetPose().translation();
-    spRotation quat(jac_car.GetPose().rotation());
-
+  // 8+1 simulations required to fill the jacobian
+  control_curve.SetBezierControlPoints(cntrl_vars);
+  spPointXd sample_control(2);
+  // simulate final pose of vehicle with current control_vars
+  for(int ii=1;ii<=num_sim_steps;ii++) {
+    control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
+    car.SetFrontSteeringAngle(sample_control[0]);
+    car.SetEngineTorque(sample_control[1]);
+    jac_physics_.Iterate(jac_objects_,sim_step_size);
   }
+  spStateVec end_state = car.GetStateVecor();
+  // now do the same thing with fd_delta applied to spCurve
+  control_curve.SetBezierControlPoints(cntrl_vars);
+  for(int jj=0;jj<8;jj++) {
+    // set state of vehicle
+    car.SetPose(init_pose);
+    // perturb a control signal
+    control_curve.RemoveLastPerturbation();
+    control_curve.PerturbControlPoint(jj,fd_delta);
+    spPointXd sample_control(2);
+    // simulate final pose of vehicle with perturbed control_vars
+    for(int ii=1;ii<=num_sim_steps;ii++) {
+      control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
+      car.SetFrontSteeringAngle(sample_control[0]);
+      car.SetEngineTorque(sample_control[1]);
+      jac_physics_.Iterate(jac_objects_,sim_step_size);
+    }
+    spStateVec end_state_delta = car.GetStateVecor();
+    // find forward finite difference value and put in jacobian
+    jacobian.col(jj) = (end_state_delta-end_state)/fd_delta;
+  }
+  std::cout << "jacobian is : \n" << jacobian << std::endl;
 }
 
 

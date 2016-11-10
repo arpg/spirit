@@ -7,7 +7,6 @@
 #include <spirit/Objects.h>
 #include <spirit/Physics.h>
 #include <thread>
-
 // Local planner includes a set of
 
 class spBezierPlanner {
@@ -26,7 +25,7 @@ public:
   void UpdateCurves();
 
 private:
-  void CalcJacobian(spPlannerJacob& jacobian, const spCtrlPts3ord_2dof& cntrl_variables, unsigned int cntrl_sampling_res, double sim_step, spPose& init_pose, double delta);
+  void CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3ord_2dof& cntrl_vars, unsigned int num_sim_steps, double sim_step_size, spPose& init_pose, double fd_delta);
   Physics jac_physics_;
   Objects jac_objects_;
   int jac_car_handle;

@@ -215,7 +215,7 @@ void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
       switch (spobj.GetObject(ii).GetObjecType()) {
         case spObjectType::WHEEL:
         {
-          std::cerr << "WHEEL should not be created by itself" << std::endl;
+          SPERROREXIT("WHEEL object should not be created by itself.");
           break;
         }
         case spObjectType::WAYPOINT:
@@ -240,7 +240,7 @@ void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
         }
         default:
         {
-          std::cerr << "Unknown spirit object type." << std::endl;
+          SPERROREXIT("Unknown spirit object type.");
         }
       }
     }
