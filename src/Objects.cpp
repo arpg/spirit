@@ -23,7 +23,7 @@ int Objects::CreateWaypoint(const spPose& pose, const spColor& color) {
 
 int Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_info) {
   switch (vehicle_info.vehicle_type) {
-    case spVehicleConfig::AWSD:
+    case spObjectType::VEHICLE_AWSD:
     {
       std::shared_ptr<spAWSDCar> a_vehicle = std::make_shared<spAWSDCar>(vehicle_info);
       objects_.push_back(a_vehicle);

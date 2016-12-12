@@ -18,6 +18,8 @@ class spBox : public spCommonObject {
   void SetDimensions(const spBoxSize& dims);
   spBoxSize GetDimensions();
 
+  void ClampToSurface();
+
  private:
   spBoxSize dims_;
   spPose pose_;

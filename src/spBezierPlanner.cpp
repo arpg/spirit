@@ -1,10 +1,10 @@
 #include <spirit/Planners/spBezierPlanner.h>
 
 spBezierPlanner::spBezierPlanner(){
-  has_loop_ = false;
+  is_loop_ = false;
 
   spVehicleConstructionInfo car_param;
-  car_param.vehicle_type = spVehicleConfig::AWSD;
+  car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
   car_param.pose.translate(spTranslation(0,0,0.24));
 //  Eigen::AngleAxisd rot(M_PI/4+0.17355,Eigen::Vector3d::UnitY());
 //  car_param.pose.rotate(rot);
@@ -108,7 +108,6 @@ void spBezierPlanner::CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3
     // set state of vehicle
     car.SetPose(init_pose);
     // perturb a control signal
-    control_curve.RemoveLastPerturbation();
     control_curve.PerturbControlPoint(jj,fd_delta);
     spPointXd sample_control(2);
     // simulate final pose of vehicle with perturbed control_vars
@@ -118,6 +117,7 @@ void spBezierPlanner::CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3
       car.SetEngineTorque(sample_control[1]);
       jac_physics_.Iterate(jac_objects_,sim_step_size);
     }
+    control_curve.RemoveLastPerturbation();
     spStateVec end_state_delta = car.GetStateVecor();
     // find forward finite difference value and put in jacobian
     jacobian.col(jj) = (end_state_delta-end_state)/fd_delta;
@@ -130,8 +130,8 @@ int spBezierPlanner::GetNumWaypoints() {
   return planpoint_vec_.size();
 }
 
-void spBezierPlanner::HasLoop(bool has_loop) {
-  has_loop_ = has_loop;
+void spBezierPlanner::IsLoop(bool is_loop) {
+  is_loop_ = is_loop;
 }
 
 void spBezierPlanner::UpdateCurves() {

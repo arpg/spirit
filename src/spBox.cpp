@@ -2,6 +2,8 @@
 
 spBox::spBox() {
   mass_ = 0;
+  rolling_friction = 0;
+  friction = 1;
   color_ = spColor(1,1,1);
   pose_ = spPose::Identity();
   dims_ = spBoxSize(1,1,1);
@@ -10,6 +12,7 @@ spBox::spBox() {
   obj_phychanged_ = false;
   obj_guichanged_ = false;
   modifiable_gui_ = false;
+  obj_clamptosurface_ = false;
   object_type_ = spObjectType::BOX;
 }
 
@@ -53,4 +56,8 @@ void spBox::SetMass(double mass) {
 
 double spBox::GetMass() {
   return mass_;
+}
+
+void spBox::ClampToSurface() {
+  obj_clamptosurface_ = true;
 }

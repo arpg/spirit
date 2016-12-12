@@ -14,9 +14,6 @@ public:
 
   bool IsDynamic();
 
-  double GetFriction();
-  void SetFriction(double friction);
-
   double GetRadius();
   void SetRadius(double radius);
 
@@ -82,7 +79,6 @@ public:
 
 private:
   spTranslation chassis_anchor;
-  double friction_;  // unit less
   double width_;     // in meters
   double radius_;    // in meters
   double susp_damping_;

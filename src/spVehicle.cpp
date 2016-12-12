@@ -1,24 +1,45 @@
 #include <spirit/Objects/spVehicle.h>
 
 spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info) {
+//  mass_ = vehicle_info.chassis_mass;
+//  for(int ii=0; ii<vehicle_info.wheels_anchor.size(); ii++) {
+//    wheel_.push_back(std::make_shared<spWheel>(vehicle_info));
+//    wheel_[ii]->SetChassisAnchor(vehicle_info.wheels_anchor[ii]);
+//  }
+
+//  pose_ = vehicle_info.pose;
+//  MoveWheelsToAnchors();
+//  color_ = vehicle_info.color;
+//  cog_local_ = spPose::Identity();
+//  cog_local_.translation() = vehicle_info.cog;
+//  chassis_size_ = vehicle_info.chassis_size;
+//  index_phy_ = -1;
+//  index_gui_ = -1;
+//  obj_phychanged_ = false;
+//  obj_guichanged_ = false;
+//  modifiable_gui_ = false;
+//  obj_clamptosurface_ = false;
+//  object_type_ = spObjectType::VEHICLE;
+  friction = vehicle_info.chassis_friction;
+  index_phy_ = -1;
+  index_gui_ = -1;
+  obj_phychanged_ = false;
+  obj_guichanged_ = false;
+  modifiable_gui_ = false;
+  obj_clamptosurface_ = false;
   mass_ = vehicle_info.chassis_mass;
   for(int ii=0; ii<vehicle_info.wheels_anchor.size(); ii++) {
     wheel_.push_back(std::make_shared<spWheel>(vehicle_info));
     wheel_[ii]->SetChassisAnchor(vehicle_info.wheels_anchor[ii]);
   }
 
-  pose_ = vehicle_info.pose;
+  SetPose(vehicle_info.pose);
   MoveWheelsToAnchors();
-  color_ = vehicle_info.color;
+  SetColor(vehicle_info.color);
   cog_local_ = spPose::Identity();
   cog_local_.translation() = vehicle_info.cog;
   chassis_size_ = vehicle_info.chassis_size;
-  index_phy_ = -1;
-  index_gui_ = -1;
-  obj_phychanged_ = false;
-  obj_guichanged_ = false;
-  modifiable_gui_ = false;
-  object_type_ = spObjectType::VEHICLE;
+  object_type_ = vehicle_info.vehicle_type;
 }
 
 spVehicle::~spVehicle() {}
@@ -37,10 +58,10 @@ void spVehicle::MoveWheelsToAnchors(void) {
   for(int ii=0; ii<wheel_.size(); ii++) {
     spPose sp(spPose::Identity());
     spPose tr = pose_;
-//    sp.translate(pose_*(wheel_[ii]->GetChassisAnchor()));
-    sp.translate(pose_*(wheel_[ii]->GetChassisAnchor()+spTranslation(wheel_[ii]->GetWidth()/2,0,0)));
-    Eigen::AngleAxisd ang1(-SP_PI/2,Eigen::Vector3d::UnitY());
-    tr.rotate(ang1);
+    sp.translate(pose_*(wheel_[ii]->GetChassisAnchor()));
+//    sp.translate(pose_*(wheel_[ii]->GetChassisAnchor()+spTranslation(wheel_[ii]->GetWidth()/2,0,0)));
+//    Eigen::AngleAxisd ang1(-SP_PI/2,Eigen::Vector3d::UnitY());
+//    tr.rotate(ang1);
     sp.rotate(tr.rotation());
 //    sp.rotate(pose_.rotation());
     wheel_[ii]->SetPose(sp);
@@ -99,4 +120,8 @@ void spVehicle::SetVelocity(const spVelocity& chassis_vel) {
 
 const spStateVec& spVehicle::GetStateVecor() {
   return statevec_;
+}
+
+void spVehicle::ClampToSurface() {
+  obj_clamptosurface_ = true;
 }

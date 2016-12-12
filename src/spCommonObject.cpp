@@ -6,8 +6,7 @@ spCommonObject::~spCommonObject() {}
 
 void spCommonObject::SetPhyIndex(int index) {
   if (index < 0) {
-    std::cerr << "Line:" << __LINE__ << " File: " << __FILE__
-              << " Error: Wrong Index for Phy Object Detected" << std::endl;
+    SPERROREXIT("Wrong Index for Phy Object Detected");
   }
 
   index_phy_ = index;
@@ -53,4 +52,30 @@ bool spCommonObject::IsDynamic() {
 
 bool spCommonObject::IsGuiModifiable() {
   return modifiable_gui_;
+}
+
+bool spCommonObject::NeedsClampToSurface() {
+  return obj_clamptosurface_;
+}
+
+void spCommonObject::SetClamped() {
+  obj_clamptosurface_ = false;
+}
+
+void spCommonObject::SetRolligFriction(double fric) {
+  obj_phychanged_ = true;
+  rolling_friction = fric;
+}
+
+double spCommonObject::GetRollingFriction(void) {
+  return rolling_friction;
+}
+
+void spCommonObject::SetFriction(double fric) {
+  obj_phychanged_ = true;
+  friction = fric;
+}
+
+double spCommonObject::GetFriction(void) {
+  return friction;
 }

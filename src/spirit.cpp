@@ -27,11 +27,11 @@ void spirit::CheckKeyboardAction() { gui_.CheckKeyboardAction(); }
 void spirit::ScenarioWorldCarFall() {
   // create and add a car
   spVehicleConstructionInfo car_param;
-  car_param.vehicle_type = spVehicleConfig::AWSD;
-  car_param.pose.translate(spTranslation(1, 1, 0.06));
+  car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
+  car_param.pose.translate(spTranslation(0, 0, 0));
 //  Eigen::AngleAxisd rot1(M_PI/4+0.17355,Eigen::Vector3d::UnitX());
 //  car_param.pose.rotate(rot1);
-//  Eigen::AngleAxisd rot2(M_PI/4,Eigen::Vector3d::UnitY());
+//  Eigen::AngleAxisd rot2(M_PI/20,Eigen::Vector3d::UnitY());
 //  car_param.pose.rotate(rot2);
   car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
   car_param.wheels_anchor.push_back(spTranslation(-0.13, -0.17, -0.003));
@@ -39,7 +39,9 @@ void spirit::ScenarioWorldCarFall() {
   car_param.wheels_anchor.push_back(spTranslation(0.13, 0.17, -0.003));
   car_param.chassis_size = spBoxSize(0.2, 0.42, 0.05);
   car_param.cog = spTranslation(0, 0, 0);
-  car_param.wheel_friction = 100;
+  car_param.chassis_friction = 0;
+  car_param.wheel_rollingfriction = 0;
+  car_param.wheel_friction = 0.3;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.057;
   car_param.susp_damping = 10;
@@ -48,7 +50,7 @@ void spirit::ScenarioWorldCarFall() {
   car_param.susp_upper_limit = 0.013;
   car_param.susp_lower_limit = -0.028;
   car_param.wheel_mass = 0.1;
-  car_param.chassis_mass = 3;
+  car_param.chassis_mass = 5;
   car_param.steering_servo_lower_limit = -SP_PI / 2;
   car_param.steering_servo_upper_limit = SP_PI / 2;
 
@@ -56,16 +58,22 @@ void spirit::ScenarioWorldCarFall() {
     obj_car_index = objects_.CreateVehicle(car_param);
     physics_.AddObject(objects_.GetObject(obj_car_index));
     gui_.AddObject(objects_.GetObject(obj_car_index));
-    //    car_param.pose.translate(spTranslation(0.1,0,0));
+    spAWSDCar& car = (spAWSDCar&)objects_.GetObject(obj_car_index);
+    car.ClampToSurface();
+    car.SetEngineTorque(10);
+    car.SetEngineMaxVel(100);
+    car.SetFrontSteeringAngle(SP_PI/9);
+//    car.SetFrontSteeringAngle(0);
+    car.SetRearSteeringAngle(0);
+    car_param.pose.translate(spTranslation(0.1,0,0));
   }
   // create and add a ground as a box to objects_ vector
   spPose ground(spPose::Identity());
   ground.translate(spTranslation(0, 0, -0.5));
-//  Eigen::AngleAxisd ang(M_PI / 20, Eigen::Vector3d::UnitX());
+//  Eigen::AngleAxisd ang(-M_PI / 10, Eigen::Vector3d::UnitX());
 //  ground.rotate(ang);
 
-  obj_gnd_index =
-      objects_.CreateBox(ground, spBoxSize(10, 10, 1), 0, spColor(0, 1, 0));
+  obj_gnd_index = objects_.CreateBox(ground, spBoxSize(10, 10, 1), 0, spColor(0, 1, 0));
   physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
@@ -139,12 +147,13 @@ std::endl;
 */
 void spirit::ScenarioWorldBoxFall() {
   spPose pose(spPose::Identity());
-  pose.translate(spTranslation(0, 0, 8));
-  Eigen::AngleAxisd ang(M_PI / 5, Eigen::Vector3d::UnitY());
-  pose.rotate(ang);
-  obj_box_index =
-      objects_.CreateBox(pose, spBoxSize(1, 1, 1), 1, spColor(1, 0, 0));
+  pose.translate(spTranslation(0, 0, 6));
+//  Eigen::AngleAxisd ang(M_PI / 5, Eigen::Vector3d::UnitY());
+//  pose.rotate(ang);
+  obj_box_index = objects_.CreateBox(pose, spBoxSize(1, 1, 1), 1, spColor(1, 0, 0));
   physics_.AddObject(objects_.GetObject(obj_box_index));
+  spBox& box = (spBox&)objects_.GetObject(obj_box_index);
+  box.ClampToSurface();
   gui_.AddObject(objects_.GetObject(obj_box_index));
 
   // create and add a ground as a box to objects_ vector
@@ -184,7 +193,6 @@ void spirit::IterateWorld() {
   gui_.Iterate(objects_);
   //  double gui_cost = spGeneralTools::Tock_ms(gui_tick);
   //  std::cout << "Gui Iteration time:   " << gui_cost << "ms" << std::endl;
-
   static int fl = 0;
 
   // local planner tests
@@ -203,15 +211,16 @@ void spirit::IterateWorld() {
 //               std::endl;
 //  plan.UpdateCurves();
 
-  if (fl<2) {
-    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
-    std::cout << "wheel pose is\n" << car.GetWheel(0)->GetPose().matrix() << std::endl;
+  if (fl<300) {
+    spGeneralTools::Delay_ms(10);
+//    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
+//    std::cout << "wheel is \n" << car.GetWheel(1)->GetPose().rotation() << std::endl;
     spTimestamp phy_tick = spGeneralTools::Tick();
     physics_.Iterate(objects_,0.01);
-    std::cout << "wheel pose is\n" << car.GetWheel(0)->GetPose().matrix() << std::endl;
+//    std::cout << "wheel pose is\n" << car.GetWheel(0)->GetPose().matrix() << std::endl;
     fl++;
     double phy_cost = spGeneralTools::Tock_us(phy_tick);
-    std::cout << "Phy Iteration time:   " << phy_cost << "us" << std::endl;
+    std::cout << "Phy Iteration time:   " << phy_cost/1000 << "ms" << std::endl;
 
 //    Eigen::MatrixXd A(2,4);
 //    A = Eigen::MatrixXd::Random(2,4);
@@ -221,11 +230,12 @@ void spirit::IterateWorld() {
 //    A.data()[7] = 2;
 //    std::cout << "a 2 is now:\n" << A.data()[2] << std::endl;
 
-    Eigen::Array<double,1,13> a(car.GetStateVecor());
-    std::cout << std::fixed;
-    std::cout << std::setprecision(2);
-    std::cout << "state is:\n" << a << std::endl;
-    spGeneralTools::Delay_ms(2000);
+//    // sstate vector test
+//    Eigen::Array<double,1,13> a(car.GetStateVecor());
+//    std::cout << std::fixed;
+//    std::cout << std::setprecision(2);
+//    std::cout << "state is:\n" << a << std::endl;
+//    spGeneralTools::Delay_ms(2000);
 
   }
 
@@ -302,5 +312,5 @@ void spirit::IterateWorld() {
   //    car.SetLocalCOG(spTranslation(0,-0.3,0));
 //    std::cout << "pose is \n" << waypoint.GetPose().matrix() << std::endl;
   //  }
-  spGeneralTools::Delay_ms(10);
+
 }

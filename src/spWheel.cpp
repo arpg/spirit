@@ -3,7 +3,8 @@
 
 spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info)
 {
-  friction_ = vehicle_info.wheel_friction;
+  friction = vehicle_info.wheel_friction;
+  rolling_friction = vehicle_info.wheel_rollingfriction;
   width_ = vehicle_info.wheel_width;
   radius_ = vehicle_info.wheel_radius;
   susp_damping_ = vehicle_info.susp_damping;
@@ -67,17 +68,6 @@ bool spWheel::IsDynamic()
     return true;
   else
     return false;
-}
-
-double spWheel::GetFriction()
-{
-  return friction_;
-}
-
-void spWheel::SetFriction(double friction)
-{
-  friction_ = friction;
-  obj_phychanged_ = true;
 }
 
 double spWheel::GetRadius()

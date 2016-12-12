@@ -20,7 +20,7 @@ public:
   void UpdateWaypoint(const spWaypoint& planpoint,unsigned int index);
   const spCurve& GetCurve(unsigned int index);
   void RemoveWaypoint(unsigned int index_in_plan);
-  void HasLoop(bool has_loop);
+  void IsLoop(bool is_loop);
   int GetNumWaypoints();
   void UpdateCurves();
 
@@ -31,7 +31,7 @@ private:
   int jac_car_handle;
 
   void SolveBVP();
-  bool has_loop_;
+  bool is_loop_;
   spCtrlPts3ord_3dof ctrl_pts_;
 
   std::vector<std::shared_ptr<spWaypoint>> planpoint_vec_;

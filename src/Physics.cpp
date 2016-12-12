@@ -31,7 +31,8 @@ void Physics::AddObject(spCommonObject &obj) {
 }
 
 void Physics::Iterate(Objects& objects, double sim_sec) {
-  // step 100ms (0.1s)
+#warning "UpdatePhyObjectsFromSpirit takes about 100us and needs to be optimized"
+  phyworld_->ClampObjectsToSurfaces(objects);
   phyworld_->UpdatePhyObjectsFromSpirit(objects);
   phyworld_->StepPhySimulation(sim_sec);
   phyworld_->UpdateSpiritObjectsFromPhy(objects);

@@ -4,6 +4,7 @@
 #include <spirit/Physics/spPhysicsWorld.h>
 #include <spirit/Physics/spBulletWorld.h>
 #include <spirit/spSettings.h>
+#include <spirit/spGeneralTools.h>
 
 class Physics {
  public:

@@ -33,7 +33,7 @@ typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 typedef Eigen::Matrix4d spMat4x4;
 
 #define SPERROREXIT(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl; std::exit(EXIT_FAILURE)
-#define SPERROR  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << std::endl
+#define SPERROR(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl
 
 // bullet definitions
 #define USE_MOTIONSTATE 1
@@ -44,19 +44,20 @@ typedef Eigen::Matrix4d spMat4x4;
 enum spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum spPhyEngineType{PHY_NONE,PHY_BULLET};
-enum spObjectType{BOX,VEHICLE,WHEEL,WAYPOINT,LINESTRIP};
-enum spVehicleConfig{AWSD};
+enum spObjectType{BOX,VEHICLE_AWSD,VEHICLE_AWD,VEHICLE_GENERAL,VEHICLE_RWD,WHEEL,WAYPOINT,LINESTRIP};
 
 struct spVehicleConstructionInfo{
-  spVehicleConfig vehicle_type;
+  spObjectType vehicle_type;
   spPose pose;
   spTranslation cog; // Center Of Gravity in chassis frame
   std::vector<spTranslation> wheels_anchor;
   double chassis_mass;
   spColor color;
   spBoxSize chassis_size;
+  double chassis_friction;
   // wheel info
   double wheel_friction;  // unit less
+  double wheel_rollingfriction;  // unit less
   double wheel_width;     // in meters
   double wheel_radius;    // in meters
   double susp_damping;
@@ -69,7 +70,7 @@ struct spVehicleConstructionInfo{
   double wheel_mass;
 
   spVehicleConstructionInfo(){
-    vehicle_type = spVehicleConfig::AWSD;
+    vehicle_type = spObjectType::VEHICLE_GENERAL;
     pose = spPose::Identity();
     color = spColor(0,1,0);
     cog = spTranslation(0,0,0);

@@ -9,8 +9,12 @@ public:
   spAWSDCar(const spVehicleConstructionInfo& vehicle_info);
   ~spAWSDCar();
   void SetFrontSteeringAngle(double angle);
-  void SetBackSteeringAngle(double angle);
+  void SetRearSteeringAngle(double angle);
+  void SetEngineMaxVel(double vel);
   void SetEngineTorque(double torque);
+  void SetSteeringServoMaxVel(double vel);
+  void SetSteeringServoTorque(double torque);
+
 private:
   void ApplyTransmissionDifferentialCoupling();
 };

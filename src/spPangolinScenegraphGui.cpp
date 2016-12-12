@@ -38,7 +38,7 @@ void spPangolinScenegraphGui::InitGui() {
       pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
                                  WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.1,
                                  1000),
-      pangolin::ModelViewLookAt(2, 2, 2, 0, 0, 0, pangolin::AxisZ));
+      pangolin::ModelViewLookAt(5, 5, 5, 0, 0, 0, pangolin::AxisZ));
 
   handler_scenegraph_ = new SceneGraph::HandlerSceneGraph(
       glscenegraph_, glrenderstate_, pangolin::AxisZ, 0.01f);
@@ -228,7 +228,7 @@ void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
           UpdateBoxGuiObject((spBox&)spobj.GetObject(ii));
           break;
         }
-        case spObjectType::VEHICLE:
+        case spObjectType::VEHICLE_AWD||spObjectType::VEHICLE_AWSD || spObjectType::VEHICLE_GENERAL || spObjectType::VEHICLE_RWD :
         {
           UpdateVehicleGuiObject((spVehicle&)spobj.GetObject(ii));
           break;
@@ -256,7 +256,7 @@ void spPangolinScenegraphGui::UpdateSpiritObjectsFromGui(Objects& spobjects) {
         {
           break;
         }
-        case spObjectType::VEHICLE:
+        case spObjectType::VEHICLE_AWD||spObjectType::VEHICLE_AWSD||spObjectType::VEHICLE_GENERAL || spObjectType::VEHICLE_RWD :
         {
           break;
         }
