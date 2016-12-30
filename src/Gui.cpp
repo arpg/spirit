@@ -44,11 +44,6 @@ void Gui::AddObject(spCommonObject &obj) {
       gui_->AddWaypoint((spWaypoint&) obj);
       break;
     }
-    case spObjectType::WHEEL:
-    {
-      std::cerr << "WHEEL should not be created by itself" << std::endl;
-      break;
-    }
     case spObjectType::BOX:
     {
       gui_->AddBox((spBox&) obj);

@@ -1,4 +1,5 @@
 #include <spirit/Physics/spBulletWorld.h>
+#include <spirit/spGeneralTools.h>
 // Bullet spring model Ref  -->  http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?t=9997
 
 
@@ -125,6 +126,7 @@ void spBulletWorld::AddNewPhyObject(spCommonObject &sp_obj) {
 }
 
 btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
+  spTimestamp tt = spGeneralTools::Tick();
   // Here we are gonna create a bullet vehicle from scratch
   // Create a bullet compound shape
   btCompoundShape* compound = new btCompoundShape();
@@ -158,6 +160,8 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
     btCollisionShape* wheel_shape = new btCapsuleShapeX(source_obj.GetWheel(ii)->GetRadius()*WSCALE,(source_obj.GetWheel(ii)->GetWidth()/2)*WSCALE);
     btRigidBody* bodyB = CreateRigidBody(spwheel->GetMass(),tr,wheel_shape);
     bodyB->setDamping(0.0,0.0);
+    bodyB->setAngularVelocity(btVector3(spwheel->GetRotVel()[0],spwheel->GetRotVel()[1],spwheel->GetRotVel()[2]));
+    bodyB->setLinearVelocity(btVector3(spwheel->GetLinVel()[0],spwheel->GetLinVel()[1],spwheel->GetLinVel()[2]));
     dynamics_world_->addRigidBody(bodyB,BulletCollissionType::COL_WHEEL,wheel_collides_with_);
     bodyB->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
     spwheel->SetPhyIndex(bodyB->getUserIndex());
@@ -196,11 +200,15 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
     // add the hinge constraint to the world and disable collision between bodyA/bodyB
     dynamics_world_->addConstraint(hinge,true);
   }
+  broadphase_->resetPool(dispatcher_);
+  double time = spGeneralTools::Tock_us(tt);
+  std::cout << "creating takes " << time << std::endl;
   return bodyA;
 }
 
 
 void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody* dest_obj) {
+  spTimestamp tt = spGeneralTools::Tick();
   // update phy object in the case spirit objects has been changed anywhere other than phy engine
   // get compoundshape from rigidbody
   btCompoundShape* compound = (btCompoundShape*) dest_obj->getCollisionShape();
@@ -218,6 +226,8 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
   // set chassis friction
   dest_obj->setFriction(source_obj.GetFriction());
   dest_obj->setRollingFriction(source_obj.GetRollingFriction());
+  dest_obj->setLinearVelocity(btVector3(source_obj.GetLinVel()[0],source_obj.GetLinVel()[1],source_obj.GetLinVel()[2]));
+  dest_obj->setAngularVelocity(btVector3(source_obj.GetRotVel()[0],source_obj.GetRotVel()[1],source_obj.GetRotVel()[2]));
 
   // Update wheel
   for(int ii=0; ii<source_obj.GetNumberOfWheels(); ii++){
@@ -227,7 +237,6 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
     wheel_body->setGravity(dynamics_world_->getGravity());
     // set wheel pose. since we have moved the chassis, wheels need to move too
     wheel_body->setWorldTransform(spPose2btTransform(spwheel->GetPose(),WSCALE));
-
     // calculate and set inertia/mass
     btVector3 wheel_local_inertia(0,0,0);
     double wheel_mass = spwheel->GetMass();
@@ -236,8 +245,26 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
     // reset wheel friction and damping
     wheel_body->setRollingFriction(spwheel->GetRollingFriction());
     wheel_body->setFriction(spwheel->GetFriction());
+
+    wheel_body->setAngularVelocity(btVector3(spwheel->GetRotVel()[0],spwheel->GetRotVel()[1],spwheel->GetRotVel()[2]));
+    wheel_body->setLinearVelocity(btVector3(spwheel->GetLinVel()[0],spwheel->GetLinVel()[1],spwheel->GetLinVel()[2]));
+
     // reset suspension damping to 2-axis of constraint only (z direction)
-    btHinge2Constraint* hinge = (btHinge2Constraint*) dest_obj->getConstraintRef(ii);
+    btHinge2Constraint* hinge = (btHinge2Constraint*) dest_obj->getConstraintRef(ii);    
+
+
+//wheel_body->removeConstraintRef(hinge);
+//dynamics_world_->removeRigidBody(wheel_body);
+//dynamics_world_->addRigidBody(wheel_body);
+//wheel_body->addConstraintRef(hinge);
+//    hinge->calculateTransforms();
+//    std::cout << "relpovot " << hinge->getRelativePivotPosition(2) << std::endl;
+//    if(ii==3){
+//    std::cout << "impulse for " << ii << " is " << hinge->getAppliedImpulse() << std::endl;
+//      hinge->setLowerLimit(0.7);
+//      std::cout << "angle1 is " << hinge->getAngle1() << "\t angle2 is \t" << hinge->getAngle2() << std::endl;
+//    }
+
     hinge->setDamping(2,spwheel->GetSuspDamping());
     hinge->setStiffness(2,spwheel->GetSuspStiffness());
     // fix x,y linear movement directions and only move in z direction
@@ -260,6 +287,8 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
       hinge->setServoTarget(steering_servo_axis,spwheel->GetSteeringServoTargetAngle());
     }
   }
+  double time = spGeneralTools::Tock_us(tt);
+//  std::cout << "update takes " << time << std::endl;
 }
 
 btTransform& spBulletWorld::spPose2btTransform(const spPose& pose, double btworld_scale) {
@@ -337,10 +366,9 @@ void spBulletWorld::ClampObjectsToSurfaces(Objects &spobj) {
         switch (spobj.GetObject(ii).GetObjecType()) {
           case spObjectType::VEHICLE_AWD||spObjectType::VEHICLE_AWSD||spObjectType::VEHICLE_GENERAL || spObjectType::VEHICLE_RWD :
           {
-            std::cout << "now clamping the car" << std::endl;
             spVehicle& vehicle = (spVehicle&) spobj.GetObject(ii);
             for(int jj=0; jj<vehicle.GetNumberOfWheels(); jj++) {
-              btHinge2Constraint* hinge = (btHinge2Constraint*) bulletbody->getConstraintRef(ii);
+              btHinge2Constraint* hinge = (btHinge2Constraint*) bulletbody->getConstraintRef(jj);
               hinge->setTargetVelocity(0,0);
               hinge->setTargetVelocity(1,0);
               hinge->setTargetVelocity(2,0);
@@ -356,7 +384,7 @@ void spBulletWorld::ClampObjectsToSurfaces(Objects &spobj) {
   }
   // run simulation to clamp the object to surface
   if(sim_required) {
-    for(int ii=0;ii<20;ii++) {
+    for(int ii=0;ii<60;ii++) {
       this->StepPhySimulation(0.001);
     }
   }
@@ -448,11 +476,18 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
           spvel << chassis_rigbody->getLinearVelocity()[0],chassis_rigbody->getLinearVelocity()[1],chassis_rigbody->getLinearVelocity()[2],
               chassis_rigbody->getAngularVelocity()[0],chassis_rigbody->getAngularVelocity()[1],chassis_rigbody->getAngularVelocity()[2];
           vehicle.SetVelocity(spvel);
+          vehicle.SetLinVel(spLinVel(chassis_rigbody->getLinearVelocity()[0],chassis_rigbody->getLinearVelocity()[1],chassis_rigbody->getLinearVelocity()[2]));
 
           // update wheels
           for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
-            btCollisionObject* wheel_obj = dynamics_world_->getCollisionObjectArray()[vehicle.GetWheel(ii)->GetPhyIndex()];
+            btCollisionObject* wheel_col = dynamics_world_->getCollisionObjectArray()[vehicle.GetWheel(ii)->GetPhyIndex()];
+            btRigidBody* wheel_obj = btRigidBody::upcast(wheel_col);
             vehicle.GetWheel(ii)->SetPose(btTransform2spPose(wheel_obj->getWorldTransform(),WSCALE_INV));
+            vehicle.GetWheel(ii)->SetRotVel(spRotVel(wheel_obj->getAngularVelocity()[0],wheel_obj->getAngularVelocity()[1],wheel_obj->getAngularVelocity()[2]));
+            vehicle.GetWheel(ii)->SetLinVel(spLinVel(wheel_obj->getLinearVelocity()[0],wheel_obj->getLinearVelocity()[1],wheel_obj->getLinearVelocity()[2]));
+            vehicle.GetWheel(ii)->SetRotVel(spLinVel(wheel_obj->getAngularVelocity()[0],wheel_obj->getAngularVelocity()[1],wheel_obj->getAngularVelocity()[2]));
+            btHinge2Constraint* hinge = (btHinge2Constraint*) chassis_rigbody->getConstraintRef(ii);
+            vehicle.GetWheel(ii)->wheel_angle = hinge->getAngle1();
           }
           break;
         }

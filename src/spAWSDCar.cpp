@@ -41,6 +41,9 @@ void spAWSDCar::SetEngineMaxVel(double vel) {
 }
 
 void spAWSDCar::SetEngineTorque(double torque) {
+  if(torque == 0) {
+    torque = 0.000000001;
+  }
   for(int ii=0;ii<4;ii++)
   {
     spWheel* wheel = GetWheel(ii);
@@ -63,7 +66,6 @@ void spAWSDCar::SetSteeringServoTorque(double torque){
     wheel->SetSteeringServoTorque(torque);
   }
 }
-
 
 void spAWSDCar::ApplyTransmissionDifferentialCoupling() {
 

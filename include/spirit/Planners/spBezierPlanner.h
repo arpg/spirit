@@ -7,11 +7,13 @@
 #include <spirit/Objects.h>
 #include <spirit/Physics.h>
 #include <thread>
+#include <spirit/Gui.h>
+
 // Local planner includes a set of
 
 class spBezierPlanner {
 public:
-  spBezierPlanner();
+  spBezierPlanner(Gui* gui);
   ~spBezierPlanner();
 
   void AddWaypoint(const spWaypoint& waypoint, unsigned int index);
@@ -23,10 +25,11 @@ public:
   void IsLoop(bool is_loop);
   int GetNumWaypoints();
   void UpdateCurves();
+  void CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3ord_2dof& cntrl_vars, unsigned int num_sim_steps, double sim_step_size, const spPose& init_pose, double fd_delta);
 
 private:
-  void CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3ord_2dof& cntrl_vars, unsigned int num_sim_steps, double sim_step_size, spPose& init_pose, double fd_delta);
   Physics jac_physics_;
+  Gui*     jac_gui_;
   Objects jac_objects_;
   int jac_car_handle;
 
@@ -37,6 +40,7 @@ private:
   std::vector<std::shared_ptr<spWaypoint>> planpoint_vec_;
   std::vector<std::shared_ptr<spCurve>> plancurve_vec_;
   std::vector<bool> needs_curveupdate_vec_;
+
 };
 
 #endif  //  SP_BEZIERPLANNER_H__

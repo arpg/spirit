@@ -28,6 +28,8 @@ spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info) {
   modifiable_gui_ = false;
   obj_clamptosurface_ = false;
   mass_ = vehicle_info.chassis_mass;
+  rot_vel = spRotVel(0,0,0);
+  lin_vel = spLinVel(0,0,0);
   for(int ii=0; ii<vehicle_info.wheels_anchor.size(); ii++) {
     wheel_.push_back(std::make_shared<spWheel>(vehicle_info));
     wheel_[ii]->SetChassisAnchor(vehicle_info.wheels_anchor[ii]);
@@ -50,6 +52,7 @@ void spVehicle::SetPose(const spPose& pose) {
   statevec_.head(3) = pose.translation();
   spRotation quat(pose.rotation());
   statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
+  MoveWheelsToAnchors();
   obj_phychanged_ = true;
   obj_guichanged_ = true;
 }
@@ -109,6 +112,7 @@ int spVehicle::GetNumberOfWheels()
 
 spWheel*spVehicle::GetWheel(int index)
 {
+
   return wheel_[index].get();
 }
 
@@ -122,6 +126,22 @@ const spStateVec& spVehicle::GetStateVecor() {
   return statevec_;
 }
 
-void spVehicle::ClampToSurface() {
+void spVehicle::SetClampToSurfaceFlag() {
   obj_clamptosurface_ = true;
+}
+
+const spLinVel& spVehicle::GetLinVel(){
+  return lin_vel;
+}
+
+void spVehicle::SetLinVel(const spLinVel& vel) {
+ lin_vel = vel;
+}
+
+const spRotVel& spVehicle::GetRotVel(){
+  return rot_vel;
+}
+
+void spVehicle::SetRotVel(const spRotVel& vel) {
+ rot_vel = vel;
 }

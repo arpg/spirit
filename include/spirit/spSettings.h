@@ -8,7 +8,7 @@
 #include <spirit/Types/spTypes.h>
 
 #define SPIRITGUI_PARAM_FILE     "../../../config_files/PangolinGuiParams.cfg"
-#define SPIRITGUI_WINDOW_NAME    "Spirit GUI"
+#define SPIRITGUI_WINDOW_NAME    "Spirit GUI "
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
 #define UI_PANEL_WIDTH 200

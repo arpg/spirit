@@ -1,5 +1,7 @@
 #include <spirit/Gui/spPangolinScenegraphGui.h>
 
+int spPangolinScenegraphGui::gui_counter = 0;
+
 spPangolinScenegraphGui::spPangolinScenegraphGui()
     : a_button_("ui.A_Button", false, false),
       a_double_("ui.A_Double", 3, 0, 5),
@@ -7,7 +9,12 @@ spPangolinScenegraphGui::spPangolinScenegraphGui()
       a_double_log_("ui.Log_scale var", 3, 1, 1E4, true),
       a_checkbox_("ui.A_Checkbox", false, true),
       an_int_no_input_("ui.An_Int_No_Input", 2),
-      save_window_("ui.Save_Window", false, false) {}
+      save_window_("ui.Save_Window", false, false) {
+  if(gui_counter>0) {
+    SPERROREXIT("Pangolin doese not allow multi-window GUIs.");
+  }
+  gui_counter++;
+}
 
 spPangolinScenegraphGui::~spPangolinScenegraphGui() {
   // remove globjects in row
@@ -15,6 +22,7 @@ spPangolinScenegraphGui::~spPangolinScenegraphGui() {
     glscenegraph_.RemoveChild(globjects_[ii]);
     delete (globjects_[ii]);
   }
+  gui_counter--;
 }
 
 void spPangolinScenegraphGui::InitGui() {
@@ -38,7 +46,7 @@ void spPangolinScenegraphGui::InitGui() {
       pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
                                  WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.1,
                                  1000),
-      pangolin::ModelViewLookAt(5, 5, 5, 0, 0, 0, pangolin::AxisZ));
+      pangolin::ModelViewLookAt(2, 2, 2, 0, 0, 0, pangolin::AxisZ));
 
   handler_scenegraph_ = new SceneGraph::HandlerSceneGraph(
       glscenegraph_, glrenderstate_, pangolin::AxisZ, 0.01f);
@@ -62,7 +70,6 @@ void spPangolinScenegraphGui::InitGui() {
   }
 
   pangolin::DisplayBase().AddDisplay(pangoview_);
-
   // Add named Panel and bind to variables beginning 'ui'
   // A Panel is just a View with a default layout and input handling
   pangolin::CreatePanel("ui")
@@ -87,7 +94,6 @@ void spPangolinScenegraphGui::Refresh() {
 
   // Activate efficiently by object
   pangoview_.Activate(glrenderstate_);
-
   // Swap frames and Process Events
   pangolin::FinishFrame();
 }

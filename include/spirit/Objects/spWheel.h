@@ -76,6 +76,12 @@ public:
   void SetHasDriveMotor(bool status);
   void SetHasSteeringServo(bool status);
   void SetAirborneState(bool status);
+  const spRotVel& GetRotVel();
+  void SetRotVel(const spRotVel& vel);
+  const spLinVel& GetLinVel();
+  void SetLinVel(const spLinVel& vel);
+  void SetAngle(double angle);
+  double wheel_angle;
 
 private:
   spTranslation chassis_anchor;
@@ -96,6 +102,8 @@ private:
   double steering_servo_upper_limit_;
   double steering_servo_target_angle_;
   double steering_servo_angle_;
+  spRotVel rot_vel;
+  spLinVel lin_vel;
   const int drive_motor_axis = 3;
   const int steering_servo_axis = 5;
   bool airborne_;

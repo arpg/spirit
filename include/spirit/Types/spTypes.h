@@ -10,6 +10,8 @@ typedef Eigen::Transform<double,3,Eigen::Affine> spPose;
 typedef Eigen::Quaterniond spRotation;
 typedef Eigen::Vector3d spTranslation;
 typedef Eigen::Vector3d spBoxSize;
+typedef Eigen::Vector3d spLinVel;
+typedef Eigen::Vector3d spRotVel;
 typedef Eigen::Vector3d spCylinderSize;
 typedef Eigen::Vector2d spMeshSize;
 typedef Eigen::Vector3d spColor;
@@ -106,6 +108,7 @@ class spCurve {
     }
     perturbation_value_ = delta;
     perturbation_dim_ = dim2perturb;
+//    std::cout << "dim is " << perturbation_dim_ << "and data is " << ctrl_pts_.data()[perturbation_dim_] << std::endl;
     ctrl_pts_.data()[perturbation_dim_] += perturbation_value_;
   }
 
@@ -123,6 +126,8 @@ class spCurve {
 
   void SetHermiteControlPoints(const Eigen::MatrixXd& pts) {
     if((pts.rows() != curve_dof_)||(pts.cols() != curve_order_+1)) {
+      std::cout << "Matrix has " << pts.rows() << " rows and " << pts.cols() << " colums." << std::endl;
+      std::cout << "curve dof is " << curve_dof_ << " curve order is " << curve_order_ << std::endl;
       SPERROREXIT("Wrong matrix dimension requested.");
     }
     if(pts.cols() == 4) {

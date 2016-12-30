@@ -14,6 +14,8 @@ spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info)
   susp_lower_limit_ = vehicle_info.susp_lower_limit;
   has_drive_motor_ = false;
   drive_motor_target_velocity_ = 0;
+  rot_vel = spRotVel(0,0,0);
+  lin_vel = spLinVel(0,0,0);
   drive_motor_torque_ = 0;
   mass_ = vehicle_info.wheel_mass;
 
@@ -296,4 +298,25 @@ int spWheel::GetDriveMotorAxis()
 int spWheel::GetSteeringServoAxis()
 {
   return steering_servo_axis;
+}
+
+const spRotVel& spWheel::GetRotVel(){
+  return rot_vel;
+}
+
+void spWheel::SetRotVel(const spRotVel& vel){
+  rot_vel = vel;
+}
+
+const spLinVel& spWheel::GetLinVel(){
+  return lin_vel;
+}
+
+void spWheel::SetLinVel(const spLinVel& vel) {
+ lin_vel = vel;
+}
+
+void spWheel::SetAngle(double angle){
+  Eigen::AngleAxisd rot(wheel_angle-angle,Eigen::Vector3d::UnitZ());
+  pose_.rotate(rot);
 }

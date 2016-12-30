@@ -7,6 +7,7 @@
 #include <SceneGraph/SceneGraph.h>
 #include <spirit/Types/spTypes.h>
 #include <spirit/spGeneralTools.h>
+#include <string>
 
 /// this class is the interface between Pangolin/Scenegraph and spGui
 class spPangolinScenegraphGui : public spCommonGUI {
@@ -48,6 +49,8 @@ class spPangolinScenegraphGui : public spCommonGUI {
   SceneGraph::GLSceneGraph glscenegraph_;
   SceneGraph::HandlerSceneGraph* handler_scenegraph_;
   std::vector<SceneGraph::GLObject*> globjects_;
+
+  static int gui_counter;
 };
 
 #endif  // SP_PANGOLINSCENEGRAPHGUI_H__
