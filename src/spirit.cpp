@@ -1,6 +1,9 @@
 #include <spirit/spirit.h>
-#include <iomanip>
-spirit::spirit(spSettings& user_settings) { user_settings_ = user_settings; }
+#include <spirit/CarSimFunctor.h>
+//#include <iomanip>
+spirit::spirit(spSettings& user_settings) {
+  user_settings_ = user_settings;
+}
 
 spirit::~spirit() {}
 
@@ -21,6 +24,58 @@ bool spirit::ShouldRun() {
   } else {
     return true;
   }
+}
+
+void spirit::CalcLocalPlannerJacobian(){
+  spVehicleConstructionInfo car_param;
+  car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
+  car_param.pose.translate(spTranslation(0, 0, 0.15));
+//  Eigen::AngleAxisd rot1(M_PI/4+0.17355,Eigen::Vector3d::UnitX());
+//  car_param.pose.rotate(rot1);
+//  Eigen::AngleAxisd rot2(M_PI/20,Eigen::Vector3d::UnitY());
+//  car_param.pose.rotate(rot2);
+  car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(-0.13, -0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(0.13, -0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(0.13, 0.17, -0.003));
+  car_param.chassis_size = spBoxSize(0.2, 0.42, 0.05);
+  car_param.cog = spTranslation(0, 0, 0);
+  car_param.chassis_friction = 0;
+  car_param.wheel_rollingfriction = 0;
+  car_param.wheel_friction = 0.3;
+  car_param.wheel_width = 0.04;
+  car_param.wheel_radius = 0.057;
+  car_param.susp_damping = 10;
+  car_param.susp_stiffness = 100;
+  car_param.susp_preloading_spacer = 0.1;
+//  car_param.susp_upper_limit = 0.013;
+//  car_param.susp_lower_limit = -0.028;
+  car_param.susp_upper_limit = 0;
+  car_param.susp_lower_limit = 0;
+  car_param.wheel_mass = 0.1;
+  car_param.chassis_mass = 5;
+  car_param.steering_servo_lower_limit = -SP_PI / 4;
+  car_param.steering_servo_upper_limit = SP_PI / 4;
+
+//  CarSimFunctor sim_functor(car_param,spPhyEngineType::PHY_BULLET);
+  ctpl::thread_pool pool(9);
+  spTimestamp t = spGeneralTools::Tick();
+  std::vector<std::shared_ptr<CarSimFunctor>> sims;
+  for(int ii=0;ii<9;ii++) {
+    sims.push_back(std::make_shared<CarSimFunctor>(car_param,spPhyEngineType::PHY_BULLET));
+  }
+  t = spGeneralTools::Tick();
+  for(int kk=0;kk<1;kk++){
+//    std::cout << "i"  << std::endl;
+    pool.reinit(79);
+    for(int ii=0;ii<9;ii++) {
+      pool.push(std::ref(*sims[ii].get()));
+    }
+    pool.stop(true);
+    pool.clear_queue();
+  }
+  double stamp1 = spGeneralTools::Tock_ms(t);
+  std::cout << "stamps are " << stamp1 << std::endl;
 }
 
 void spirit::CheckKeyboardAction() { gui_.CheckKeyboardAction(); }
@@ -316,7 +371,7 @@ void spirit::ScenarioWorldCarFall() {
     spAWSDCar& car = (spAWSDCar&)objects_.GetObject(obj_car_index);
     car.SetClampToSurfaceFlag();
     car.SetEngineTorque(10);
-    car.SetEngineMaxVel(0);
+    car.SetEngineMaxVel(10);
     car.SetSteeringServoMaxVel(1);
     car.SetSteeringServoTorque(100);
     car.SetFrontSteeringAngle(SP_PI/4);
@@ -487,7 +542,7 @@ void spirit::IterateWorld() {
 //  plan.UpdateCurves();
   spGeneralTools::Delay_ms(50);
 
-  if (fl<300) {
+  if (fl<100) {
     spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
     if(fl==0)
       car.GetWheel(3)->SetAngle(3*SP_PI/4);

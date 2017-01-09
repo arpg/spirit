@@ -2,7 +2,9 @@
 
 spSettings::spSettings()
   : gui_type_(GUI_NONE)
-{}
+{
+  num_threads_ = 1;
+}
 
 spSettings::~spSettings() {}
 
@@ -22,3 +24,10 @@ void spSettings::SetPhysicsEngineType(const spPhyEngineType &phy_type) {
   phy_type_ = phy_type;
 }
 
+void spSettings::SetNumThreads(unsigned int num_threads) {
+  num_threads_ = num_threads;
+}
+
+int spSettings::GetNumThreads() {
+  return num_threads_;
+}

@@ -75,7 +75,7 @@ bool spBulletWorld::InitEmptyDynamicsWorld() {
   }
 
   dynamics_world_->setGravity(btVector3(0,0,-9.80665)*WSCALE);
-  dynamics_world_->getSolverInfo().m_numIterations = 100;
+  dynamics_world_->getSolverInfo().m_numIterations = BULLET_SOLVER_NUM_ITERATIONS;
   return true;
 }
 
@@ -126,6 +126,12 @@ void spBulletWorld::AddNewPhyObject(spCommonObject &sp_obj) {
 }
 
 btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
+//  btVehicleRaycaster* vehicle_raycaster = new btVehicleRaycaster(dynamics_world_);
+//  btVehicleTuning tuning;
+//  btRigidBody* chasi = new btBoxShape(btVector3(chassis_size[0]/2,chassis_size[1]/2,chassis_size[2]/2)*WSCALE);
+//  btRaycastVehicle* m_vehicle = new btRaycastVehicle(tuning,chasi,vehicle_raycaster);
+//  chasi->setActivationState(DISABLE_DEACTIVATION);
+
   spTimestamp tt = spGeneralTools::Tick();
   // Here we are gonna create a bullet vehicle from scratch
   // Create a bullet compound shape
@@ -202,7 +208,7 @@ btRigidBody* spBulletWorld::CreateBulletVehicleObject(spVehicle& source_obj) {
   }
   broadphase_->resetPool(dispatcher_);
   double time = spGeneralTools::Tock_us(tt);
-  std::cout << "creating takes " << time << std::endl;
+//  std::cout << "creating takes " << time << std::endl;
   return bodyA;
 }
 
@@ -384,7 +390,7 @@ void spBulletWorld::ClampObjectsToSurfaces(Objects &spobj) {
   }
   // run simulation to clamp the object to surface
   if(sim_required) {
-    for(int ii=0;ii<60;ii++) {
+    for(int ii=0;ii<20;ii++) {
       this->StepPhySimulation(0.001);
     }
   }

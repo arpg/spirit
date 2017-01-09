@@ -10,7 +10,7 @@ class Physics {
  public:
   Physics();
   ~Physics();
-  void Create(const spPhyEngineType phy_type);
+  void Create(const spPhyEngineType& phy_type);
   void AddObject(spCommonObject& obj);
   void Iterate(Objects& objects, double sim_sec);
 

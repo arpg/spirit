@@ -25,11 +25,14 @@ public:
   spPhyEngineType GetPhysicsEngineType();
   void SetGuiParamFilePath(std::string& file_path);
   std::string GetGuiParamFilePath();
+  void SetNumThreads(unsigned int num_threads);
+  int GetNumThreads();
 
 private:
   spGuiType gui_type_;
   spPhyEngineType phy_type_;
   std::string gui_param_file_path_;
+  int num_threads_;
 };
 
 #endif  // SP_SETTINGS_H__

@@ -8,7 +8,7 @@ Physics::~Physics(){
 
 }
 
-void Physics::Create(const spPhyEngineType phy_type) {
+void Physics::Create(const spPhyEngineType& phy_type) {
   switch(phy_type) {
     case spPhyEngineType::PHY_NONE:
       std::cout << "Initializing spirit without PhysicsEngine" << std::endl;
@@ -35,6 +35,8 @@ void Physics::Iterate(Objects& objects, double sim_sec) {
   phyworld_->UpdatePhyObjectsFromSpirit(objects);
   phyworld_->ClampObjectsToSurfaces(objects);
   phyworld_->UpdatePhyObjectsFromSpirit(objects);
+//  spTimestamp t = spGeneralTools::Tick();
   phyworld_->StepPhySimulation(sim_sec);
+//  std::cout << "time was " << spGeneralTools::Tock_us(t) << std::endl;
   phyworld_->UpdateSpiritObjectsFromPhy(objects);
 }

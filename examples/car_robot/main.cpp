@@ -61,13 +61,15 @@ int main(int argc, char** argv) {
   spSettings settings_obj;
   settings_obj.SetGuiType(spGuiType::GUI_PANGOSCENEGRAPH);
   settings_obj.SetPhysicsEngineType(spPhyEngineType::PHY_BULLET);
+  settings_obj.SetNumThreads(1);
 
   spirit sp_world(settings_obj);
   sp_world.Create();
+//  sp_world.CalcLocalPlannerJacobian();
 //  sp_world.ScenarioWorldBoxFall();
 //  sp_world.ScenarioWorldCarFall();
-//  sp_world.ScenarioPlannerTest();
-  sp_world.ScenarioGNTest();
+  sp_world.ScenarioPlannerTest();
+//  sp_world.ScenarioGNTest();
   while(sp_world.ShouldRun()) {
     sp_world.IterateWorld();
     sp_world.CheckKeyboardAction();

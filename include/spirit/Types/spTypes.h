@@ -78,7 +78,9 @@ struct spVehicleConstructionInfo{
     cog = spTranslation(0,0,0);
     chassis_mass = 0;
     chassis_size = spBoxSize(0,0,0);
+    chassis_friction = 0;
     wheel_friction = 0;
+    wheel_rollingfriction = 0;
     wheel_width = 0;
     wheel_radius = 0;
     susp_damping = 0;
@@ -89,6 +91,30 @@ struct spVehicleConstructionInfo{
     steering_servo_lower_limit = 0;
     steering_servo_upper_limit = 0;
     wheel_mass = 0;
+  }
+  spVehicleConstructionInfo(const spVehicleConstructionInfo& v)
+    : vehicle_type(v.vehicle_type),
+      pose(v.pose),
+      cog(v.cog),
+      chassis_mass(v.chassis_mass),
+      color(v.color),
+      chassis_size(v.chassis_size),
+      chassis_friction(v.chassis_friction),
+      wheel_friction(v.wheel_friction),
+      wheel_rollingfriction(v.wheel_rollingfriction),
+      wheel_width(v.wheel_width),
+      wheel_radius(v.wheel_radius),
+      susp_damping(v.susp_damping),
+      susp_stiffness(v.susp_stiffness),
+      susp_preloading_spacer(v.susp_preloading_spacer),
+      susp_lower_limit(v.susp_lower_limit),
+      susp_upper_limit(v.susp_upper_limit),
+      steering_servo_lower_limit(v.steering_servo_lower_limit),
+      steering_servo_upper_limit(v.steering_servo_upper_limit),
+      wheel_mass(v.wheel_mass) {
+    for(int ii=0;ii<v.wheels_anchor.size();ii++) {
+      wheels_anchor.push_back(v.wheels_anchor[ii]);
+    }
   }
 };
 

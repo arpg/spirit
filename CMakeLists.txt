@@ -26,7 +26,7 @@ find_package( Bullet REQUIRED )
 find_package( SceneGraph 0.1 REQUIRED )
 find_package( Eigen3 REQUIRED )
 find_package( Sophus REQUIRED)
-find_package( tbb REQUIRED)
+#find_package( tbb REQUIRED)
 
 
 set( _INCLUDE_DIRS
@@ -34,19 +34,16 @@ set( _INCLUDE_DIRS
 	${Pangolin_INCLUDE_DIRS}
 	${SceneGraph_INCLUDE_DIRS}
 	${BULLET_INCLUDE_DIR}
-	${Sophus_INCLUDE_DIR}
-	${TBB_INCLUDE_DIRS}
+	${Sophus_INCLUDE_DIRS}
+#	${TBB_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	)
 set( _LIBRARIES
 	${Pangolin_LIBRARIES}
 	${SceneGraph_LIBRARIES}
 	${BULLET_LIBRARIES}
-	${EIGEN3_INCLUDE_DIR}
-	${Sophus_LIBRARIES}
-	${TBB_LIBRARY_DIRS}
+#	${TBB_LIBRARY_DIRS}
 	)
-
 
 include_directories( ${_INCLUDE_DIRS} )
 
@@ -72,7 +69,8 @@ set( HDRS
 	include/spirit/Controllers/spControllerInterface.h
 	include/spirit/Planners/spBezierPlanner.h
 	include/spirit/Objects/spLineStrip.h
-#	include/spirit/Types/spCurve.h
+	include/spirit/CarSimFunctor.h
+	include/spirit/Types/ctpl_stl.h
 	)
 set( SRCS
 	src/spirit.cpp
@@ -90,7 +88,6 @@ set( SRCS
 	src/spVehicle.cpp
 	src/spAWSDCar.cpp
 	src/spWheel.cpp
-#	src/spCurve.cpp
 	src/spLineStrip.cpp
 	src/spBezierPlanner.cpp
 	)

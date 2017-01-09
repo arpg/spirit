@@ -22,7 +22,7 @@ public:
   void ScenarioPlannerTest();
   void CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts3ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, const spPose& init_pose, double fd_delta);
   void ScenarioGNTest();
-//  void LocalPlanTest(spWaypoint& w1, spWaypoint& w2);
+  void CalcLocalPlannerJacobian();
 private:
   void InitCarPool(int num_cars);
   std::vector<Physics> pool_physics_vec_;
@@ -39,7 +39,6 @@ private:
   int obj_waypoint_index1;
   int obj_waypoint_index2;
   int obj_linestrip_index;
-
 };
 
 #endif  //SPIRIT_H__
