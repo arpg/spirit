@@ -481,7 +481,7 @@ void spirit::ScenarioWorldBoxFall() {
 //  pose.rotate(ang);
   obj_box_index = objects_.CreateBox(pose, spBoxSize(1, 1, 1), 1, spColor(1, 0, 0));
   gui_.AddObject(objects_.GetObject(obj_box_index));
-  std::cout << "box gui index is " << objects_.GetObject(obj_box_index).GetGuiIndex() << std::endl;
+//  std::cout << "box gui index is " << objects_.GetObject(obj_box_index).GetGuiIndex() << std::endl;
 //  physics_.AddObject(objects_.GetObject(obj_box_index));
 //  spBox& box = (spBox&)objects_.GetObject(obj_box_index);
 //  box.ClampToSurface();
@@ -489,7 +489,8 @@ void spirit::ScenarioWorldBoxFall() {
   // create and add a ground as a box to objects_ vector
   obj_gnd_index = objects_.CreateBox(spPose::Identity(), spBoxSize(10, 10, 1),0, spColor(0, 1, 0));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
-std::cout << "gnd gui index is " << objects_.GetObject(obj_gnd_index).GetGuiIndex() << std::endl;}
+//std::cout << "gnd gui index is " << objects_.GetObject(obj_gnd_index).GetGuiIndex() << std::endl;
+}
 
 spCtrlPts3ord_3dof ptss;
 spCurve curve(3,3);

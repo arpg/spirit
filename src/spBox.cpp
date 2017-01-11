@@ -14,7 +14,8 @@ spBox::spBox(const spPose& pose, const spBoxSize& size, double mass, const spCol
   this->SetDimensions(size);
   int box_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH | BulletCollissionType::COL_CHASSIS | BulletCollissionType::COL_WHEEL;
   dynamics_world_->addRigidBody(rigid_body_,BulletCollissionType::COL_BOX,box_collides_with_);
-//  rigid_body_->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
+  rigid_body_->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
+  std::cout << "user index is " << rigid_body_->getUserIndex() << std::endl;
   rigid_body_->setActivationState(DISABLE_DEACTIVATION);
   rigid_body_->setGravity(dynamics_world_->getGravity());
   obj_guichanged_ = true;
@@ -22,7 +23,6 @@ spBox::spBox(const spPose& pose, const spBoxSize& size, double mass, const spCol
 
 spBox::~spBox() {
   delete(rigid_body_);
-  std::cout << "dest" << std::endl;
 }
 
 void spBox::SetFriction(double fric_coeff) {
@@ -59,7 +59,8 @@ void spBox::SetPose(const spPose& pose) {
 }
 
 const spPose& spBox::GetPose(){
-//  std::cout << "origin is " << rigid_body_->getWorldTransform().getOrigin()[2] << " --- " << rigid_body_<< std::endl;
+  btCollisionObject* obj = dynamics_world_->getCollisionObjectArray()[0];
+  std::cout << "origin is " << obj->getWorldTransform().getOrigin()[2]*WSCALE_INV << std::endl;
   return btTransform2spPose(rigid_body_->getWorldTransform());
 }
 
