@@ -6,7 +6,7 @@
 
 class spAWSDCar : public spVehicle {
 public:
-  spAWSDCar(const spVehicleConstructionInfo& vehicle_info);
+  spAWSDCar(const spVehicleConstructionInfo& vehicle_info, btDiscreteDynamicsWorld* dyn_world, btAlignedObjectArray<btCollisionShape*>& col_shapes);
   ~spAWSDCar();
   void SetFrontSteeringAngle(double angle);
   void SetRearSteeringAngle(double angle);

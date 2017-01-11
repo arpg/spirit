@@ -5,7 +5,7 @@
 
 class spWheel : public spCommonObject {
 public:
-  spWheel(const spVehicleConstructionInfo& vehicle_info);
+  spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index, btRigidBody* chassis_body, btDiscreteDynamicsWorld* dyn_world, btAlignedObjectArray<btCollisionShape*>& col_shapes);
   ~spWheel();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
@@ -56,8 +56,6 @@ public:
   double GetMass();
   void SetMass(double mass);
 
-  bool GetAirborneState();
-
   const spTranslation& GetChassisAnchor();
   void SetChassisAnchor(const spTranslation anchor);
 
@@ -75,12 +73,11 @@ public:
 
   void SetHasDriveMotor(bool status);
   void SetHasSteeringServo(bool status);
-  void SetAirborneState(bool status);
   const spRotVel& GetRotVel();
   void SetRotVel(const spRotVel& vel);
   const spLinVel& GetLinVel();
   void SetLinVel(const spLinVel& vel);
-  void SetAngle(double angle);
+//  void SetAngle(double angle);
   double wheel_angle;
 
 private:
@@ -89,26 +86,25 @@ private:
   double radius_;    // in meters
   double susp_damping_;
   double susp_stiffness_;
-  double susp_preloading_spacer_;
-  double susp_lower_limit_;
-  double susp_upper_limit_;
-  double has_drive_motor_;
-  double has_steering_servo_;
   double drive_motor_target_velocity_;
+  double susp_preloading_spacer_;
   double drive_motor_torque_;
+  double susp_upper_limit_;
+  double susp_lower_limit_;
   double steering_servo_torque_;
   double steering_servo_max_velocity_;
   double steering_servo_lower_limit_;
   double steering_servo_upper_limit_;
   double steering_servo_target_angle_;
   double steering_servo_angle_;
+  bool has_drive_motor_;
+  bool has_steering_servo_;
   spRotVel rot_vel;
   spLinVel lin_vel;
   const int drive_motor_axis = 3;
   const int steering_servo_axis = 5;
-  bool airborne_;
-  spPose pose_;
   spColor color_;
+  btHinge2Constraint* hinge_;
 };
 
 #endif  //  SP_WHEEL_H__

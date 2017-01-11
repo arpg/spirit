@@ -14,7 +14,7 @@ void spirit::Create() {
   }
   // add physics world
   if (user_settings_.GetPhysicsEngineType() != spPhyEngineType::PHY_NONE) {
-    physics_.Create(user_settings_.GetPhysicsEngineType());
+//    physics_.Create(user_settings_.GetPhysicsEngineType());
   }
 }
 
@@ -124,7 +124,7 @@ for(int ii=0;ii<100;ii++) {
 
 void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts3ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, const spPose& init_pose, double fd_delta) {
   obj_cars_index[0] = objects_.CreateVehicle(car_param);
-  physics_.AddObject(objects_.GetObject(obj_cars_index[0]));
+//  physics_.AddObject(objects_.GetObject(obj_cars_index[0]));
   gui_.AddObject(objects_.GetObject(obj_cars_index[0]));
   spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_cars_index[0]);
 
@@ -155,7 +155,7 @@ void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state
     control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
     car.SetFrontSteeringAngle(sample_control[0]);
     car.SetEngineMaxVel(sample_control[1]);
-    physics_.Iterate(objects_,sim_step_size);
+//    physics_.Iterate(objects_,sim_step_size);
     gui_.Iterate(objects_);
 //    spGeneralTools::Delay_ms(100);
   }
@@ -169,7 +169,7 @@ void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state
 
   for(int jj=0;jj<8;jj++) {
     obj_cars_index[jj+1] = objects_.CreateVehicle(car_param);
-    physics_.AddObject(objects_.GetObject(obj_cars_index[jj+1]));
+//    physics_.AddObject(objects_.GetObject(obj_cars_index[jj+1]));
     gui_.AddObject(objects_.GetObject(obj_cars_index[jj+1]));
     spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_cars_index[jj+1]);
     car.SetEngineTorque(1000);
@@ -208,7 +208,7 @@ void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state
       control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
       car.SetFrontSteeringAngle(sample_control[0]);
       car.SetEngineMaxVel(sample_control[1]);
-      physics_.Iterate(objects_,sim_step_size);
+//      physics_.Iterate(objects_,sim_step_size);
       gui_.Iterate(objects_);
 //      spGeneralTools::Delay_ms(100);
     }
@@ -272,7 +272,7 @@ void spirit::ScenarioPlannerTest() {
 //  ground.rotate(ang);
 
   obj_gnd_index = objects_.CreateBox(ground, spBoxSize(10, 10, 1), 0, spColor(0, 1, 0));
-  physics_.AddObject(objects_.GetObject(obj_gnd_index));
+//  physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
   spPose waypoint_pose(spPose::Identity());
@@ -366,7 +366,7 @@ void spirit::ScenarioWorldCarFall() {
 
   for (int ii = 0; ii < 1; ii++) {
     obj_car_index = objects_.CreateVehicle(car_param);
-    physics_.AddObject(objects_.GetObject(obj_car_index));
+//    physics_.AddObject(objects_.GetObject(obj_car_index));
     gui_.AddObject(objects_.GetObject(obj_car_index));
     spAWSDCar& car = (spAWSDCar&)objects_.GetObject(obj_car_index);
     car.SetClampToSurfaceFlag();
@@ -386,7 +386,7 @@ void spirit::ScenarioWorldCarFall() {
 //  ground.rotate(ang);
 
   obj_gnd_index = objects_.CreateBox(ground, spBoxSize(10, 10, 1), 0, spColor(0, 1, 0));
-  physics_.AddObject(objects_.GetObject(obj_gnd_index));
+//  physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
 
 //  spPose waypoint_pose(spPose::Identity());
@@ -476,21 +476,20 @@ std::endl;
 */
 void spirit::ScenarioWorldBoxFall() {
   spPose pose(spPose::Identity());
-  pose.translate(spTranslation(0, 0, 6));
+  pose.translate(spTranslation(0, 0, 2));
 //  Eigen::AngleAxisd ang(M_PI / 5, Eigen::Vector3d::UnitY());
 //  pose.rotate(ang);
   obj_box_index = objects_.CreateBox(pose, spBoxSize(1, 1, 1), 1, spColor(1, 0, 0));
-  physics_.AddObject(objects_.GetObject(obj_box_index));
-  spBox& box = (spBox&)objects_.GetObject(obj_box_index);
-  box.ClampToSurface();
   gui_.AddObject(objects_.GetObject(obj_box_index));
+  std::cout << "box gui index is " << objects_.GetObject(obj_box_index).GetGuiIndex() << std::endl;
+//  physics_.AddObject(objects_.GetObject(obj_box_index));
+//  spBox& box = (spBox&)objects_.GetObject(obj_box_index);
+//  box.ClampToSurface();
 
   // create and add a ground as a box to objects_ vector
-  obj_gnd_index = objects_.CreateBox(spPose::Identity(), spBoxSize(10, 10, 1),
-                                     0, spColor(0, 1, 0));
-  physics_.AddObject(objects_.GetObject(obj_gnd_index));
+  obj_gnd_index = objects_.CreateBox(spPose::Identity(), spBoxSize(10, 10, 1),0, spColor(0, 1, 0));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
-}
+std::cout << "gnd gui index is " << objects_.GetObject(obj_gnd_index).GetGuiIndex() << std::endl;}
 
 spCtrlPts3ord_3dof ptss;
 spCurve curve(3,3);
@@ -540,16 +539,19 @@ void spirit::IterateWorld() {
 //  std::cout << "waypoint is " << planpoint.GetPose().translation() <<
 //               std::endl;
 //  plan.UpdateCurves();
-  spGeneralTools::Delay_ms(50);
+  spGeneralTools::Delay_ms(10);
 
-  if (fl<100) {
-    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
-    if(fl==0)
-      car.GetWheel(3)->SetAngle(3*SP_PI/4);
+  if (fl<500) {
+//    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
+//    if(fl==0)
+//      car.GetWheel(3)->SetAngle(3*SP_PI/4);
 //    std::cout << "wheel is \n" << car.GetWheel(1)->GetPose().rotation() << std::endl;
     spTimestamp phy_tick = spGeneralTools::Tick();
-    physics_.Iterate(objects_,0.01);
-//    std::cout << "wheel pose is\n" << car.GetWheel(0)->GetPose().matrix() << std::endl;
+//    spBox& box1 = (spBox&) objects_.GetObject(obj_gnd_index);
+//    std::cout << "z is " << box1.GetPose().translation()[2] << std::endl;
+    objects_.StepPhySimulation(0.01);
+
+    //    std::cout << "wheel pose is\n" << car.GetWheel(0)->GetPose().matrix() << std::endl;
     fl++;
     double phy_cost = spGeneralTools::Tock_us(phy_tick);
 //    std::cout << "Phy Iteration time:   " << phy_cost/1000 << "ms" << std::endl;

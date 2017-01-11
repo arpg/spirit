@@ -2,7 +2,6 @@
 #define SPIRIT_H__
 
 #include <spirit/Gui.h>
-#include <spirit/Physics.h>
 #include <spirit/spSettings.h>
 #include <spirit/Types/spTypes.h>
 #include <spirit/Objects.h>
@@ -25,12 +24,10 @@ public:
   void CalcLocalPlannerJacobian();
 private:
   void InitCarPool(int num_cars);
-  std::vector<Physics> pool_physics_vec_;
   std::vector<Objects> pool_objects_vec_;
   std::vector<std::thread> pool_threads_vec_;
   Gui gui_;
   spSettings user_settings_;
-  Physics physics_;
   Objects objects_;
   int obj_gnd_index;
   int obj_box_index;

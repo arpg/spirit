@@ -1,37 +1,57 @@
 #include <spirit/Objects/spWheel.h>
 
 
-spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info)
-{
-  friction = vehicle_info.wheel_friction;
-  rolling_friction = vehicle_info.wheel_rollingfriction;
-  width_ = vehicle_info.wheel_width;
-  radius_ = vehicle_info.wheel_radius;
-  susp_damping_ = vehicle_info.susp_damping;
-  susp_stiffness_ = vehicle_info.susp_stiffness;
-  susp_preloading_spacer_ = vehicle_info.susp_preloading_spacer;
-  susp_upper_limit_ = vehicle_info.susp_upper_limit;
-  susp_lower_limit_ = vehicle_info.susp_lower_limit;
-  has_drive_motor_ = false;
-  drive_motor_target_velocity_ = 0;
+spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index, btRigidBody* chassis_body, btDiscreteDynamicsWorld* dyn_world, btAlignedObjectArray<btCollisionShape*>& col_shapes) {
+  dynamics_world_ = dyn_world;
+  // calculate wheel origin in world
+  chassis_anchor = vehicle_info.wheels_anchor[wheel_index];
+  btTransform tr;
+  tr.setIdentity();
+  tr.setOrigin(btVector3(chassis_anchor[0],chassis_anchor[1],chassis_anchor[2]-vehicle_info.susp_preloading_spacer)*WSCALE);
+//  btCollisionShape* wheel_shape = new btCylinderShapeX(btVector3(vehicle_info.wheel_width/2,vehicle_info.wheel_radius,vehicle_info.wheel_radius)*WSCALE);
+  btCollisionShape* wheel_shape = new btCapsuleShapeX(vehicle_info.wheel_radius*WSCALE,(vehicle_info.wheel_width/2)*WSCALE);
+  mass_ = vehicle_info.wheel_mass;
+  btRigidBody* bodyB = CreateRigidBody(mass_,tr,wheel_shape);
+  bodyB->setDamping(0,0);
+  bodyB->setAngularVelocity(btVector3(0,0,0));
+  bodyB->setLinearVelocity(btVector3(0,0,0));
+  int wheel_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
+  dynamics_world_->addRigidBody(bodyB,BulletCollissionType::COL_WHEEL,wheel_collides_with_);
+  bodyB->setRollingFriction(vehicle_info.wheel_rollingfriction);
+  bodyB->setFriction(vehicle_info.wheel_friction);
+  bodyB->setActivationState(DISABLE_DEACTIVATION);
+  btVector3 parent_axis(0,0,1);
+  btVector3 child_axis(1,0,0);
+  btVector3 anchor = tr.getOrigin();
+  hinge_ = new btHinge2Constraint(*chassis_body,*bodyB,anchor, parent_axis, child_axis);
+  // set suspension damping to axis 2 of constraint only (z direction)
+  hinge_->setDamping(2,vehicle_info.susp_damping);
+  hinge_->setStiffness(2,vehicle_info.susp_stiffness);
+  // fix x,y linear movement directions and only move in z direction
+  hinge_->setLinearLowerLimit(btVector3(0,0,vehicle_info.susp_preloading_spacer+vehicle_info.susp_lower_limit)*WSCALE);
+  hinge_->setLinearUpperLimit(btVector3(0,0,vehicle_info.susp_preloading_spacer+vehicle_info.susp_upper_limit)*WSCALE);
+  // set rotational directions
+  // unlimitted in tire axis, fixed in one direction and limitted in steering direction(set upper/lower to 0/0 if its not supposed to be steering)
+  hinge_->setAngularLowerLimit(btVector3(1,0,vehicle_info.steering_servo_lower_limit));
+  hinge_->setAngularUpperLimit(btVector3(-1,0,vehicle_info.steering_servo_upper_limit));
+  // add motors if required
+  hinge_->enableMotor(drive_motor_axis,false);
+  hinge_->setTargetVelocity(drive_motor_axis,0);
+  hinge_->setMaxMotorForce(drive_motor_axis,0*WSCALE*WSCALE);
+  // create a servo motor for this joint.
+  hinge_->enableMotor(steering_servo_axis,false);
+  hinge_->setTargetVelocity(steering_servo_axis,0);
+  hinge_->setMaxMotorForce(steering_servo_axis,0*WSCALE*WSCALE);
+  hinge_->setServo(steering_servo_axis,false);
+  hinge_->setServoTarget(steering_servo_axis,0);
+  // add the hinge constraint to the world and disable collision between bodyA/bodyB
+  dynamics_world_->addConstraint(hinge_,true);
+  rigid_body_ = bodyB;
+
   rot_vel = spRotVel(0,0,0);
   lin_vel = spLinVel(0,0,0);
-  drive_motor_torque_ = 0;
-  mass_ = vehicle_info.wheel_mass;
-
-  has_steering_servo_ = false;
-  steering_servo_torque_ = 0;
-  steering_servo_max_velocity_ = 0;
-  steering_servo_target_angle_ = 0;
-  steering_servo_lower_limit_ = vehicle_info.steering_servo_lower_limit;
-  steering_servo_upper_limit_ = vehicle_info.steering_servo_upper_limit;
-
-  airborne_ = false;
   color_ = spColor(0,0,0);
-  pose_ = spPose::Identity();
-  index_phy_ = -1;
   index_gui_ = -1;
-  obj_phychanged_ = false;
   obj_guichanged_ = false;
   modifiable_gui_ = false;
   object_type_ = spObjectType::WHEEL;
@@ -44,14 +64,13 @@ spWheel::~spWheel()
 
 void spWheel::SetPose(const spPose& pose)
 {
-  pose_ = pose;
-  obj_phychanged_ = true;
+  rigid_body_->setWorldTransform(spPose2btTransform(pose));
   obj_guichanged_ = true;
 }
 
 const spPose& spWheel::GetPose()
 {
-  return pose_;
+  return btTransform2spPose(rigid_body_->getWorldTransform());
 }
 
 void spWheel::SetColor(const spColor& color)
@@ -74,7 +93,7 @@ bool spWheel::IsDynamic()
 
 double spWheel::GetRadius()
 {
-  return radius_;
+  return rigid_body_->getCollisionShape()->getMargin();
 }
 
 void spWheel::SetRadius(double radius)
@@ -250,16 +269,6 @@ void spWheel::SetMass(double mass)
   obj_phychanged_ = true;
 }
 
-bool spWheel::GetAirborneState()
-{
-  return airborne_;
-}
-
-void spWheel::SetAirborneState(bool status)
-{
-  airborne_ = status;
-}
-
 const Eigen::Vector3d&spWheel::GetChassisAnchor()
 {
   return chassis_anchor;
@@ -316,7 +325,7 @@ void spWheel::SetLinVel(const spLinVel& vel) {
  lin_vel = vel;
 }
 
-void spWheel::SetAngle(double angle){
-  Eigen::AngleAxisd rot(wheel_angle-angle,Eigen::Vector3d::UnitZ());
-  pose_.rotate(rot);
-}
+//void spWheel::SetAngle(double angle){
+//  Eigen::AngleAxisd rot(wheel_angle-angle,Eigen::Vector3d::UnitZ());
+//  pose_.rotate(rot);
+//}

@@ -1,9 +1,10 @@
 #include <spirit/Objects/spLineStrip.h>
 
-spLineStrip::spLineStrip() {
+spLineStrip::spLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, const spColor& color) {
   mass_ = 0;
-  color_ = spColor(1, 1, 1);
-  pose_ = spPose::Identity();
+  color_ = color;
+  pose_ = pose;
+  this->SetLineStripPoints(linestrip_pts);
   index_phy_ = -1;
   index_gui_ = -1;
   obj_phychanged_ = false;

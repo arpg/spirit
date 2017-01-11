@@ -5,6 +5,34 @@
 #include <vector>
 #include <iostream>
 
+#warning "Comment the following line if using bullet in single precision mode"
+#define BT_USE_DOUBLE_PRECISION
+
+#include <bullet/btBulletDynamicsCommon.h>
+#include <bullet/BulletDynamics/MLCPSolvers/btDantzigSolver.h>
+#include <bullet/BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h>
+#include <bullet/BulletDynamics/MLCPSolvers/btMLCPSolver.h>
+
+// bullet definitions
+#define USE_MOTIONSTATE 1
+#define SP_PI 3.14159265359
+#define SP_PI_HALF 1.57079632679
+#define SP_PI_QUART 0.78539816339
+
+// for a stable physics result use a scale of 2-10
+#define WSCALE 10
+#define WSCALE_INV 0.1
+#define BULLET_SOLVER_NUM_ITERATIONS 100
+
+#define BIT(x) (1<<(x))
+enum BulletCollissionType{
+  COL_NOTHING = 0,      // Collide with nothing
+  COL_BOX = BIT(0),     // Collide with box
+  COL_MESH = BIT(1),    // Collide with mesh
+  COL_CHASSIS = BIT(2), // Collide with car chassis
+  COL_WHEEL = BIT(3)    // Collide with wheel
+};
+
 // spirit types
 typedef Eigen::Transform<double,3,Eigen::Affine> spPose;
 typedef Eigen::Quaterniond spRotation;
@@ -36,12 +64,6 @@ typedef Eigen::Matrix4d spMat4x4;
 
 #define SPERROREXIT(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl; std::exit(EXIT_FAILURE)
 #define SPERROR(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl
-
-// bullet definitions
-#define USE_MOTIONSTATE 1
-#define SP_PI 3.14159265359
-#define SP_PI_HALF 1.57079632679
-#define SP_PI_QUART 0.78539816339
 
 enum spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};

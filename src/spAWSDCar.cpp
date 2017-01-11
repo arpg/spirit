@@ -1,6 +1,6 @@
 #include <spirit/Objects/spAWSDCar.h>
 
-spAWSDCar::spAWSDCar(const spVehicleConstructionInfo& vehicle_info):spVehicle(vehicle_info) {
+spAWSDCar::spAWSDCar(const spVehicleConstructionInfo& vehicle_info, btDiscreteDynamicsWorld* dyn_world, btAlignedObjectArray<btCollisionShape*>& col_shapes):spVehicle(vehicle_info,dyn_world,col_shapes) {
   // check if object has been initialized with four wheels
   if(vehicle_info.wheels_anchor.size() != 4) {
     SPERROREXIT("AWSDCar should have four wheels.");

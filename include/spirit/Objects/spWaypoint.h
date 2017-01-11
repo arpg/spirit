@@ -5,7 +5,7 @@
 
 class spWaypoint : public spCommonObject {
  public:
-  spWaypoint();
+  spWaypoint(const spPose& pose, const spColor& color);
   spWaypoint(const spWaypoint&wp);
   ~spWaypoint();
   void SetPose(const spPose& pose);

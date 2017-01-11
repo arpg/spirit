@@ -5,7 +5,7 @@
 
 class spBox : public spCommonObject {
  public:
-  spBox();
+  spBox(const spPose& pose, const spBoxSize& size, double mass, const spColor& color, btDiscreteDynamicsWorld* dyn_world, btAlignedObjectArray<btCollisionShape*>& col_shapes);
   ~spBox();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
@@ -18,11 +18,14 @@ class spBox : public spCommonObject {
   void SetDimensions(const spBoxSize& dims);
   spBoxSize GetDimensions();
 
+  void SetFriction(double fric_coeff);
+  double GetFriction();
+  void SetRollingFriction(double fric_coeff);
+  double GetRollingFriction();
+
   void ClampToSurface();
 
  private:
-  spBoxSize dims_;
-  spPose pose_;
   spColor color_;
 };
 

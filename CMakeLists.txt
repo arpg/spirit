@@ -50,11 +50,11 @@ include_directories( ${_INCLUDE_DIRS} )
 set( HDRS
 	include/spirit/spirit.h
 	include/spirit/Gui.h
-	include/spirit/Physics.h
+#	include/spirit/Physics.h
 	include/spirit/Gui/spCommonGui.h
 	include/spirit/Gui/spPangolinScenegraphGui.h
-	include/spirit/Physics/spPhysicsWorld.h
-	include/spirit/Physics/spBulletWorld.h
+#	include/spirit/Physics/spPhysicsWorld.h
+#	include/spirit/Physics/spBulletWorld.h
 	include/spirit/spGeneralTools.h
 	include/spirit/spSettings.h
 	include/spirit/Objects/spBox.h
@@ -75,11 +75,11 @@ set( HDRS
 set( SRCS
 	src/spirit.cpp
 	src/Gui.cpp
-	src/Physics.cpp
+#	src/Physics.cpp
 	src/spPangolinScenegraphGui.cpp
 	src/spGeneralTools.cpp
 	src/spSettings.cpp
-	src/spBulletWorld.cpp
+#	src/spBulletWorld.cpp
 	src/spBox.cpp
 	src/spWaypoint.cpp
 	src/spCommonObject.cpp

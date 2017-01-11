@@ -27,13 +27,13 @@ spBezierPlanner::spBezierPlanner(Gui* gui) : jac_gui_(gui){
   car_param.chassis_mass = 5;
   car_param.steering_servo_lower_limit = -SP_PI / 2;
   car_param.steering_servo_upper_limit = SP_PI / 2;
-  jac_physics_;
-  jac_physics_.Create(PHY_BULLET);
+//  jac_physics_;
+//  jac_physics_.Create(PHY_BULLET);
   jac_car_handle = jac_objects_.CreateVehicle(car_param);
-  jac_physics_.AddObject(jac_objects_.GetObject(jac_car_handle));
+//  jac_physics_.AddObject(jac_objects_.GetObject(jac_car_handle));
   spPose ground(spPose::Identity());
   ground.translate(spTranslation(0,0,-0.5));
-  jac_physics_.AddObject(jac_objects_.GetObject(jac_objects_.CreateBox(ground,spBoxSize(10,10,1),0,spColor(0,1,0))));
+//  jac_physics_.AddObject(jac_objects_.GetObject(jac_objects_.CreateBox(ground,spBoxSize(10,10,1),0,spColor(0,1,0))));
   jac_gui_->AddObject(jac_objects_.GetObject(jac_car_handle));
 }
 
@@ -103,7 +103,7 @@ void spBezierPlanner::CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3
     control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
     car.SetFrontSteeringAngle(sample_control[0]);
     car.SetEngineTorque(sample_control[1]);
-    jac_physics_.Iterate(jac_objects_,sim_step_size);
+//    jac_physics_.Iterate(jac_objects_,sim_step_size);
     jac_gui_->Iterate(jac_objects_);
     spGeneralTools::Delay_ms(100);
   }
@@ -122,7 +122,7 @@ void spBezierPlanner::CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3
       control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
       car.SetFrontSteeringAngle(sample_control[0]);
       car.SetEngineTorque(sample_control[1]);
-      jac_physics_.Iterate(jac_objects_,sim_step_size);
+//      jac_physics_.Iterate(jac_objects_,sim_step_size);
     }
     control_curve.RemoveLastPerturbation();
     spStateVec perturbed_state_delta = car.GetStateVecor();

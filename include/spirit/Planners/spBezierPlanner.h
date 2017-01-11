@@ -5,7 +5,6 @@
 #include <spirit/Objects/spWaypoint.h>
 #include <spirit/Objects/spLineStrip.h>
 #include <spirit/Objects.h>
-#include <spirit/Physics.h>
 #include <thread>
 #include <spirit/Gui.h>
 
@@ -28,7 +27,7 @@ public:
   void CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3ord_2dof& cntrl_vars, unsigned int num_sim_steps, double sim_step_size, const spPose& init_pose, double fd_delta);
 
 private:
-  Physics jac_physics_;
+//  Physics jac_physics_;
   Gui*     jac_gui_;
   Objects jac_objects_;
   int jac_car_handle;

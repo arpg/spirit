@@ -1,9 +1,9 @@
 #include <spirit/Objects/spWaypoint.h>
 
-spWaypoint::spWaypoint() {
+spWaypoint::spWaypoint(const spPose& pose, const spColor& color) {
   mass_ = 0;
-  color_ = spColor(1,1,0);
-  pose_ = spPose::Identity();
+  color_ = color;
+  pose_ = pose;
   length_ = 1;
   index_phy_ = -1;
   index_gui_ = -1;

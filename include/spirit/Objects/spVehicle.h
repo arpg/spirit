@@ -12,7 +12,7 @@
 // in its fucntion name.
 class spVehicle : public spCommonObject {
  public:
-  spVehicle(const spVehicleConstructionInfo& vehicle_info);
+  spVehicle(const spVehicleConstructionInfo& vehicle_info, btDiscreteDynamicsWorld* dyn_world, btAlignedObjectArray<btCollisionShape*>& col_shapes);
   ~spVehicle();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
@@ -34,7 +34,7 @@ class spVehicle : public spCommonObject {
   void SetRotVel(const spRotVel& vel);
 
  private:
-  void MoveWheelsToAnchors(void);
+  void MoveWheelsToAnchors(const spPose& chasis_pose);
   std::vector<std::shared_ptr<spWheel>> wheel_;
   spPose pose_;        // this pose will represent geometric center of the car
   spStateVec statevec_;  // this should be updated from phy engine only

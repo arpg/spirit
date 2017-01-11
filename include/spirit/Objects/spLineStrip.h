@@ -5,7 +5,7 @@
 
 class spLineStrip : public spCommonObject {
  public:
-  spLineStrip();
+  spLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, const spColor& color);
   ~spLineStrip();
 
   // SetPose here corresponds to the base of the curve

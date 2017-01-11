@@ -4,99 +4,14 @@
 
 
 spBulletWorld::spBulletWorld() {
-  world_params_.worldMax.setValue(1000*WSCALE,1000*WSCALE,1000*WSCALE);
-  world_params_.worldMin.setValue(-1000*WSCALE,-1000*WSCALE,-1000*WSCALE);
-  world_params_.solver = spPhysolver::SEQUENTIAL_IMPULSE;
-  chassis_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
-  wheel_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
-  box_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH | BulletCollissionType::COL_CHASSIS | BulletCollissionType::COL_WHEEL;
 }
 
 spBulletWorld::~spBulletWorld() {
-	//delete collision shapes
-	for (int j=0;j<collisionShapes_.size();j++)
-	{
-		btCollisionShape* shape = collisionShapes_[j];
-		delete shape;
-	}
 
-  delete(dynamics_world_);
-  switch(world_params_.solver) {
-    case spPhysolver::MLCP_DANTZIG:
-      delete(solver_dantzig_);
-      break;
-    case spPhysolver::MLCP_PROJECTEDGAUSSSEIDEL:
-      delete(solver_gseidel_);
-      break;
-    case spPhysolver::SEQUENTIAL_IMPULSE:
-      // do nothing
-      break;
-  }
-  delete(solver_);
-  delete(broadphase_);
-  delete(dispatcher_);
-  delete(collisionConfiguration_);
 }
 
-bool spBulletWorld::InitEmptyDynamicsWorld() {
 
-  collisionConfiguration_ = new btDefaultCollisionConfiguration();
-  dispatcher_ = new btCollisionDispatcher(collisionConfiguration_);
-  broadphase_ = new btAxisSweep3(world_params_.worldMin,world_params_.worldMax);
-  switch(world_params_.solver) {
-    case spPhysolver::MLCP_DANTZIG:
-      solver_dantzig_ = new btDantzigSolver();
-      solver_ = new btMLCPSolver(solver_dantzig_);
-      break;
-    case spPhysolver::MLCP_PROJECTEDGAUSSSEIDEL:
-      solver_gseidel_ = new btSolveProjectedGaussSeidel;
-      solver_ = new btMLCPSolver(solver_gseidel_);
-      break;
-    case spPhysolver::SEQUENTIAL_IMPULSE:
-      solver_ = new btSequentialImpulseConstraintSolver();
-      break;
-  }
 
-  dynamics_world_ = new btDiscreteDynamicsWorld(dispatcher_,broadphase_,solver_,collisionConfiguration_);
-
-  switch(world_params_.solver) {
-    case spPhysolver::MLCP_DANTZIG:
-      //for direct solver it is better to have a small A matrix
-      dynamics_world_->getSolverInfo().m_minimumSolverBatchSize = 1;
-      break;
-    case spPhysolver::MLCP_PROJECTEDGAUSSSEIDEL:
-      //for direct solver it is better to have a small A matrix
-      dynamics_world_->getSolverInfo().m_minimumSolverBatchSize = 1;
-      break;
-    case spPhysolver::SEQUENTIAL_IMPULSE:
-      //for direct solver, it is better to solve multiple objects together, small batches have high overhead
-      dynamics_world_->getSolverInfo().m_minimumSolverBatchSize = 128;
-      break;
-  }
-
-  dynamics_world_->setGravity(btVector3(0,0,-9.80665)*WSCALE);
-  dynamics_world_->getSolverInfo().m_numIterations = BULLET_SOLVER_NUM_ITERATIONS;
-  return true;
-}
-
-btRigidBody* spBulletWorld::CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape) {
-	//rigidbody is dynamic if and only if mass is non zero, otherwise static
-	bool isDynamic = (mass != 0.f);
-
-	btVector3 localInertia(0,0,0);
-	if (isDynamic)
-		shape->calculateLocalInertia(mass,localInertia);
-
-	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-	btDefaultMotionState* myMotionState = new btDefaultMotionState(tr);
-
-	btRigidBody::btRigidBodyConstructionInfo cInfo(mass,myMotionState,shape,localInertia);
-
-	btRigidBody* body = new btRigidBody(cInfo);
-//	body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
-
-	return body;
-}
 
 void spBulletWorld::AddNewPhyObject(spCommonObject &sp_obj) {
   switch (sp_obj.GetObjecType()) {
@@ -297,57 +212,14 @@ void spBulletWorld::UpdateBulletVehicleObject(spVehicle& source_obj, btRigidBody
 //  std::cout << "update takes " << time << std::endl;
 }
 
-btTransform& spBulletWorld::spPose2btTransform(const spPose& pose, double btworld_scale) {
-  std::shared_ptr<btTransform> tr = std::make_shared<btTransform>();
-  tr->setOrigin(btVector3(pose.translation()[0],pose.translation()[1],pose.translation()[2])*btworld_scale);
-  spRotation q(pose.rotation());
-  tr->setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
-  return *tr.get();
-}
-
-spPose& spBulletWorld::btTransform2spPose(const btTransform& tr, double btworld_scale_inv) {
-  std::shared_ptr<spPose> pose = std::make_shared<spPose>(spPose::Identity());
-  btVector3 origin = tr.getOrigin();
-  pose->translate(spTranslation(origin[0],origin[1],origin[2])*btworld_scale_inv);
-  btQuaternion btrot = tr.getRotation();
-  spRotation spangle(btrot.w(),btrot.x(),btrot.y(),btrot.z());
-  pose->rotate(spangle);
-  return *pose.get();
-}
 
 
 btRigidBody* spBulletWorld::CreateBulletBoxObject(spBox &source_obj) {
-  btCollisionShape* shape = new btBoxShape(btVector3(1,1,1));
-  collisionShapes_.push_back(shape);
-  btTransform tr;
-  tr.setIdentity();
-  btRigidBody* dest_obj = CreateRigidBody(1,tr,shape);
-  dynamics_world_->addRigidBody(dest_obj,BulletCollissionType::COL_BOX,box_collides_with_);
-  dest_obj->setUserIndex(dynamics_world_->getNumCollisionObjects()-1);
-  dest_obj->setActivationState(DISABLE_DEACTIVATION);
-  source_obj.SetPhyIndex(dest_obj->getUserIndex());
-  return dest_obj;
 }
 
 
 // update all parameters of a box
 void spBulletWorld::UpdateBulletBoxObject(spBox &source_obj, btRigidBody *dest_obj) {
-  // reset box size
-  spBoxSize dims(source_obj.GetDimensions());
-  dest_obj->getCollisionShape()->setLocalScaling(btVector3(dims[0]/2,dims[1]/2,dims[2]/2)*WSCALE);
-  //rigidbody is dynamic if and only if mass is non zero, otherwise static
-  btVector3 localInertia(0,0,0);
-  if (source_obj.IsDynamic()) {
-      // bullet calculates inertia tensor for a cuboid shape (it only has diagonal values).
-      dest_obj->getCollisionShape()->calculateLocalInertia(source_obj.GetMass(),localInertia);
-  }
-  // reset object mass
-  dest_obj->setMassProps(source_obj.GetMass(),localInertia);
-  // transform phy object
-  dest_obj->setWorldTransform(spPose2btTransform(source_obj.GetPose(),WSCALE));
-  dest_obj->setGravity(dynamics_world_->getGravity());
-  dest_obj->setFriction(source_obj.GetFriction());
-  dest_obj->setRollingFriction(source_obj.GetRollingFriction());
 }
 
 // This goes through objects and if they require clamping to surface it moves the object in given direction until it hits a surface
@@ -510,21 +382,6 @@ void spBulletWorld::UpdateSpiritObjectsFromPhy(Objects &spobjects) {
       }
     }
   }
-}
-
-void spBulletWorld::StepPhySimulation(double step_time) {
-
-  // simulation_step/penetration -> http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=&f=&t=367
-  // http://bulletphysics.org/mediawiki-1.5.8/index.php/Stepping_the_World
-  // choose the number of iterations for the constraint solver in the range 4 to 10.
-  const btScalar fixed_time_step = 0.001;
-  if (step_time < fixed_time_step) {
-    SPERROREXIT("step_time should be greater than fixed_time_step in Line:");
-  }
-  // this is to guarantee that all steps are simulation steps rather than interpolation
-  // timeStep < maxSubSteps * fixedTimeStep
-  int max_sub_steps = (step_time/fixed_time_step)+1;
-  dynamics_world_->stepSimulation(step_time,max_sub_steps,fixed_time_step);
 }
 
 
