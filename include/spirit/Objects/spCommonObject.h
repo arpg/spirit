@@ -36,14 +36,11 @@ class spCommonObject {
   int index_phy_;
   int index_gui_;
   bool obj_guichanged_;
-  bool obj_phychanged_;
   bool obj_clamptosurface_;
   spObjectType object_type_;
   bool modifiable_gui_;
   double mass_;
   btRigidBody* rigid_body_;
-  // pointer to the dynamics_world object which this object will live in
-  btDiscreteDynamicsWorld* dynamics_world_;
 //  btAlignedObjectArray<btCollisionShape*>*	collisionShapes_;
   btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
   btTransform& spPose2btTransform(const spPose& pose);

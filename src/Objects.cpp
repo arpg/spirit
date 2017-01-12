@@ -8,11 +8,11 @@ Objects::Objects(){
 }
 Objects::~Objects(){
 	//delete collision shapes
-	for (int j=0;j<collisionShapes_.size();j++)
-	{
-		btCollisionShape* shape = collisionShapes_[j];
-		delete shape;
-	}
+//	for (int j=0;j<collisionShapes_.size();j++)
+//	{
+//		btCollisionShape* shape = collisionShapes_[j];
+//		delete shape;
+//	}
 
   delete(dynamics_world_);
   switch(world_params_.solver) {
@@ -70,14 +70,56 @@ void Objects::InitEmptyDynamicsWorld() {
 
   dynamics_world_->setGravity(btVector3(0,0,-9.80665)*WSCALE);
   dynamics_world_->getSolverInfo().m_numIterations = BULLET_SOLVER_NUM_ITERATIONS;
+//  collisionShapes_.clear();
+  dynamics_world_->clearForces();
 }
 
 
 int Objects::CreateBox(const spPose& pose, const spBoxSize& size, double mass,const spColor& color) {
-  std::shared_ptr<spBox> a_box = std::make_shared<spBox>(pose,size,mass,color,dynamics_world_,collisionShapes_);
+  std::shared_ptr<spBox> a_box = std::make_shared<spBox>(pose,size,mass,color,dynamics_world_);
   objects_.push_back(a_box);
   return (objects_.size()-1);
 }
+///////////////////////////////////////////////////////////////
+
+btRigidBody* Objects::CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape) {
+	//rigidbody is dynamic if and only if mass is non zero, otherwise static
+	bool isDynamic = (mass != 0.f);
+
+	btVector3 localInertia(0,0,0);
+	if (isDynamic)
+		shape->calculateLocalInertia(mass,localInertia);
+
+	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(tr);
+
+	btRigidBody::btRigidBodyConstructionInfo cInfo(mass,myMotionState,shape,localInertia);
+
+	btRigidBody* body = new btRigidBody(cInfo);
+//	body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
+
+	return body;
+}
+
+btTransform& Objects::spPose2btTransform(const spPose& pose, double btworld_scale) {
+  std::shared_ptr<btTransform> tr = std::make_shared<btTransform>();
+  tr->setOrigin(btVector3(pose.translation()[0],pose.translation()[1],pose.translation()[2])*btworld_scale);
+  spRotation q(pose.rotation());
+  tr->setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
+  return *tr.get();
+}
+
+spPose& Objects::btTransform2spPose(const btTransform& tr, double btworld_scale_inv) {
+  std::shared_ptr<spPose> pose = std::make_shared<spPose>(spPose::Identity());
+  btVector3 origin = tr.getOrigin();
+  pose->translate(spTranslation(origin[0],origin[1],origin[2])*btworld_scale_inv);
+  btQuaternion btrot = tr.getRotation();
+  spRotation spangle(btrot.w(),btrot.x(),btrot.y(),btrot.z());
+  pose->rotate(spangle);
+  return *pose.get();
+}
+
+
 
 int Objects::CreateWaypoint(const spPose& pose, const spColor& color) {
   std::shared_ptr<spWaypoint> a_waypoint = std::make_shared<spWaypoint>(pose,color);
@@ -89,7 +131,8 @@ int Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_info) {
   switch (vehicle_info.vehicle_type) {
     case spObjectType::VEHICLE_AWSD:
     {
-      std::shared_ptr<spAWSDCar> a_vehicle = std::make_shared<spAWSDCar>(vehicle_info,dynamics_world_,collisionShapes_);
+      btAlignedObjectArray<btCollisionShape*>	collisionShapes_;
+      std::shared_ptr<spAWSDCar> a_vehicle = std::make_shared<spAWSDCar>(vehicle_info,dynamics_world_);
       objects_.push_back(a_vehicle);
       break;
     }

@@ -64,16 +64,16 @@ int main(int argc, char** argv) {
   gamepad.RegisterGamepadDataCallback(&GamepadCallback);
 
   // Connect to NinjaV3Car
-  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/cu.usbserial-00002014A]//");
+//  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/cu.usbserial-00002014A]//");
 
-  ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
+//  ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
 
   // initialize command packet
   commandMSG.set_steering_angle(0);
   commandMSG.set_throttle_percent(0);
 
   while(1) {
-    ninja_car.UpdateCarCommand(commandMSG);
+//    ninja_car.UpdateCarCommand(commandMSG);
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
   return 0;

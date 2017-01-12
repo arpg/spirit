@@ -7,7 +7,6 @@ spLineStrip::spLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, co
   this->SetLineStripPoints(linestrip_pts);
   index_phy_ = -1;
   index_gui_ = -1;
-  obj_phychanged_ = false;
   obj_guichanged_ = false;
   modifiable_gui_ = false;
   object_type_ = spObjectType::LINESTRIP;

@@ -16,6 +16,7 @@ class Objects {
     spPhysolver solver;
   };
 
+
 public:
   Objects();
   ~Objects();
@@ -28,9 +29,15 @@ public:
   int GetNumOfObjects();
   spCommonObject& GetObject(int obj_index);
 
-private:
-  std::vector<std::shared_ptr<spCommonObject>> objects_;
+int boxtest();
 
+private:
+
+spPose& btTransform2spPose(const btTransform& tr, double btworld_scale_inv);
+btTransform& spPose2btTransform(const spPose& pose, double btworld_scale);
+btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
+
+  std::vector<std::shared_ptr<spCommonObject>> objects_;
   void InitEmptyDynamicsWorld();
   BulletWorldParams world_params_;
   btDefaultCollisionConfiguration* collisionConfiguration_;
@@ -40,7 +47,7 @@ private:
   btDiscreteDynamicsWorld* dynamics_world_;
   btDantzigSolver* solver_dantzig_;
   btSolveProjectedGaussSeidel* solver_gseidel_;
-  btAlignedObjectArray<btCollisionShape*>	collisionShapes_;
+//  btAlignedObjectArray<btCollisionShape*>	collisionShapes_;
 };
 
 #endif  //  OBJECTS_H__

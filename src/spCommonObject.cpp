@@ -26,18 +26,7 @@ bool spCommonObject::HasChangedGui() {
 }
 
 // tells if object has been modified since last query
-bool spCommonObject::HasChangedPhy() {
-  bool status = obj_phychanged_;
-  obj_phychanged_ = false;
-  return status;
-}
-
 spObjectType spCommonObject::GetObjecType() { return object_type_; }
-
-void spCommonObject::SetPhyUpdated()
-{
-  obj_phychanged_ = false;
-}
 
 void spCommonObject::SetGuiUpdated()
 {

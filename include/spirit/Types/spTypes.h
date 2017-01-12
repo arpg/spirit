@@ -22,7 +22,7 @@
 // for a stable physics result use a scale of 2-10
 #define WSCALE 10
 #define WSCALE_INV 0.1
-#define BULLET_SOLVER_NUM_ITERATIONS 100
+#define BULLET_SOLVER_NUM_ITERATIONS 10
 
 #define BIT(x) (1<<(x))
 enum BulletCollissionType{

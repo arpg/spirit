@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
   spirit sp_world(settings_obj);
   sp_world.Create();
 //  sp_world.CalcLocalPlannerJacobian();
-  sp_world.ScenarioWorldBoxFall();
+//  sp_world.ScenarioWorldBoxFall();
 //  sp_world.ScenarioWorldCarFall();
 //  sp_world.ScenarioPlannerTest();
 //  sp_world.ScenarioGNTest();

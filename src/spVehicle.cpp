@@ -1,32 +1,27 @@
 #include <spirit/Objects/spVehicle.h>
 
-spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info,btDiscreteDynamicsWorld* dyn_world, btAlignedObjectArray<btCollisionShape*>& col_shapes) {
-  dynamics_world_ = dyn_world;
+spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info,btDiscreteDynamicsWorld* dynamics_world) {
   mass_ = vehicle_info.chassis_mass;
+  chassis_size_ = vehicle_info.chassis_size;
   // Create a bullet compound shape
-  btCompoundShape* compound = new btCompoundShape();
-  col_shapes.push_back(compound);
+  chassis_compound = new btCompoundShape();
   // add chassis as a box to compound shape
-  btCollisionShape* chassis_shape = new btBoxShape(btVector3(vehicle_info.chassis_size[0]/2,vehicle_info.chassis_size[1]/2,vehicle_info.chassis_size[2]/2)*WSCALE);
-  col_shapes.push_back(chassis_shape);
+  btCollisionShape* chassis_shape = new btBoxShape(btVector3(vehicle_info.chassis_size[0]/2.0,vehicle_info.chassis_size[1]/2.0,vehicle_info.chassis_size[2]/2.0)*WSCALE);
   // this transform is to put the cog in the right spot
   cog_local_ = spPose::Identity();
   cog_local_.translation() = vehicle_info.cog;
-  compound->addChildShape(spPose2btTransform(cog_local_.inverse()),chassis_shape);
+  chassis_compound->addChildShape(spPose2btTransform(cog_local_.inverse()),chassis_shape);
   // create a rigidbody from compound shape and add it to world
-  btRigidBody* bodyA = CreateRigidBody(vehicle_info.chassis_mass,spPose2btTransform(cog_local_),compound);
-  bodyA->setFriction(vehicle_info.chassis_friction);
+  rigid_body_ = CreateRigidBody(vehicle_info.chassis_mass,spPose2btTransform(cog_local_),chassis_compound);
+  rigid_body_->setFriction(vehicle_info.chassis_friction);
   int chassis_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
-  dynamics_world_->addRigidBody(bodyA,BulletCollissionType::COL_CHASSIS,chassis_collides_with_);
+  dynamics_world->addRigidBody(rigid_body_,BulletCollissionType::COL_CHASSIS,chassis_collides_with_);
   // set body velocities to zero
-  bodyA->setLinearVelocity(btVector3(0,0,0));
-  bodyA->setAngularVelocity(btVector3(0,0,0));
+  rigid_body_->setLinearVelocity(btVector3(0,0,0));
+  rigid_body_->setAngularVelocity(btVector3(0,0,0));
   // set damping to zero since we are moving in air
-  bodyA->setDamping(0,0);
-  bodyA->setActivationState(DISABLE_DEACTIVATION);
-
-  rigid_body_ = bodyA;
-//  mass_ = vehicle_info.chassis_mass;
+  rigid_body_->setDamping(0,0);
+  rigid_body_->setActivationState(DISABLE_DEACTIVATION);
 //  for(int ii=0; ii<vehicle_info.wheels_anchor.size(); ii++) {
 //    wheel_.push_back(std::make_shared<spWheel>(vehicle_info));
 //    wheel_[ii]->SetChassisAnchor(vehicle_info.wheels_anchor[ii]);
@@ -45,36 +40,32 @@ spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info,btDiscreteDyn
 //  modifiable_gui_ = false;
 //  obj_clamptosurface_ = false;
 //  object_type_ = spObjectType::VEHICLE;
-  index_phy_ = -1;
-  index_gui_ = -1;
-  obj_guichanged_ = false;
-  modifiable_gui_ = false;
-  obj_clamptosurface_ = false;
-  rot_vel = spRotVel(0,0,0);
-  lin_vel = spLinVel(0,0,0);
   // now create and add wheels
   for(int ii=0; ii<vehicle_info.wheels_anchor.size(); ii++) {
-    wheel_.push_back(std::make_shared<spWheel>(vehicle_info,ii,rigid_body_,dynamics_world_,col_shapes));
+    wheel_.push_back(std::make_shared<spWheel>(vehicle_info,ii,rigid_body_,dynamics_world));
   }
   SetPose(vehicle_info.pose);
   MoveWheelsToAnchors(vehicle_info.pose);
   SetColor(vehicle_info.color);
   chassis_size_ = vehicle_info.chassis_size;
   object_type_ = vehicle_info.vehicle_type;
+  index_phy_ = -1;
+  index_gui_ = -1;
+  obj_guichanged_ = false;
+  modifiable_gui_ = false;
+  obj_clamptosurface_ = false;
+//  rot_vel = spRotVel(0,0,0);
+//  lin_vel = spLinVel(0,0,0);
 }
 
 spVehicle::~spVehicle() {}
 
 void spVehicle::SetPose(const spPose& pose) {
-  rigid_body_->setWorldTransform(spPose2btTransform(pose));
-
-  // set chassis pose
-//  pose_ = pose;
-  statevec_.head(3) = pose.translation();
-  spRotation quat(pose.rotation());
-  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
+  rigid_body_->setWorldTransform(spPose2btTransform(pose*GetLocalCOG()));
+//  statevec_.head(3) = pose.translation();
+//  spRotation quat(pose.rotation());
+//  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
   MoveWheelsToAnchors(pose);
-//  obj_phychanged_ = true;
   obj_guichanged_ = true;
 }
 
@@ -92,7 +83,10 @@ void spVehicle::MoveWheelsToAnchors(const spPose& chasis_pose) {
   }
 }
 
-const spPose& spVehicle::GetPose() { return pose_; }
+const spPose& spVehicle::GetPose() {
+  std::shared_ptr<spPose> pose = std::make_shared<spPose>(btTransform2spPose(rigid_body_->getWorldTransform())*GetLocalCOG().inverse());
+  return *pose.get();
+}
 
 void spVehicle::SetColor(const spColor& color) {
   color_ = color;
@@ -113,8 +107,11 @@ double spVehicle::GetChassisMass() {
 }
 
 void spVehicle::SetChassisMass(double mass) {
+  btVector3 localInertia(0,0,0);
+  // bullet calculates inertia tensor for a cuboid shape (it only has diagonal values).
+  chassis_compound->calculateLocalInertia(mass,localInertia);
+  rigid_body_->setMassProps(mass,localInertia);
   mass_ = mass;
-  obj_phychanged_ = true;
 }
 
 
@@ -131,19 +128,24 @@ int spVehicle::GetNumberOfWheels()
   return wheel_.size();
 }
 
-spWheel*spVehicle::GetWheel(int index)
+spWheel* spVehicle::GetWheel(int index)
 {
 
   return wheel_[index].get();
 }
 
 void spVehicle::SetVelocity(const spVelocity& chassis_vel) {
-  statevec_.tail<6>() = chassis_vel;
-  obj_phychanged_ = true;
-  obj_guichanged_ = true;
+//  statevec_.tail<6>() = chassis_vel;
+//  obj_guichanged_ = true;
+  SPERROREXIT("SetVel not implemented !");
 }
 
 const spStateVec& spVehicle::GetStateVecor() {
+  spPose pose = btTransform2spPose(rigid_body_->getWorldTransform());
+  statevec_.head(3) = pose.translation();
+  spRotation quat(pose.rotation());
+  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
+//  statevec_.segment()
   return statevec_;
 }
 
@@ -152,17 +154,21 @@ void spVehicle::SetClampToSurfaceFlag() {
 }
 
 const spLinVel& spVehicle::GetLinVel(){
-  return lin_vel;
+//  return lin_vel;
+  SPERROREXIT("GETLinVel not implemented !");
 }
 
 void spVehicle::SetLinVel(const spLinVel& vel) {
- lin_vel = vel;
+// lin_vel = vel;
+  SPERROREXIT("SetLinVel not implemented !");
 }
 
 const spRotVel& spVehicle::GetRotVel(){
-  return rot_vel;
+//  return rot_vel;
+  SPERROREXIT("GETRotVel not implemented !");
 }
 
 void spVehicle::SetRotVel(const spRotVel& vel) {
- rot_vel = vel;
+// rot_vel = vel;
+  SPERROREXIT("SetRotVel not implemented !");
 }

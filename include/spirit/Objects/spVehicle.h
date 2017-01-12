@@ -12,7 +12,7 @@
 // in its fucntion name.
 class spVehicle : public spCommonObject {
  public:
-  spVehicle(const spVehicleConstructionInfo& vehicle_info, btDiscreteDynamicsWorld* dyn_world, btAlignedObjectArray<btCollisionShape*>& col_shapes);
+  spVehicle(const spVehicleConstructionInfo& vehicle_info, btDiscreteDynamicsWorld* dynamics_world_);
   ~spVehicle();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
@@ -36,15 +36,16 @@ class spVehicle : public spCommonObject {
  private:
   void MoveWheelsToAnchors(const spPose& chasis_pose);
   std::vector<std::shared_ptr<spWheel>> wheel_;
-  spPose pose_;        // this pose will represent geometric center of the car
+//  spPose pose_;        // this pose will represent geometric center of the car
   spStateVec statevec_;  // this should be updated from phy engine only
   spPose cog_local_;  // center of gravity
   spColor color_;
-  spRotVel rot_vel;
-  spLinVel lin_vel;
+//  spRotVel rot_vel;
+//  spLinVel lin_vel;
   spBoxSize chassis_size_;
   void SetWheelOrigin(int index, const spPose& pose);
   void SetWheelAnchor(int index, const spTranslation& tr);
+  btCompoundShape* chassis_compound;
 };
 
 #endif  //  SP_VEHICLE_H__

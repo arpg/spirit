@@ -6,7 +6,6 @@ spMesh::spMesh() {
   pose_ = spPose::Identity();
   index_phy_ = -1;
   index_gui_ = -1;
-  obj_phychanged_ = false;
   obj_guichanged_ = false;
   modifiable_gui_ = false;
   object_type_ = spObjectType::BOX;
@@ -17,7 +16,6 @@ spMesh::~spMesh() {}
 void spMesh::SetDimensions(const spMeshSize& dims) {
   dims_ = dims;
   obj_guichanged_ = true;
-  obj_phychanged_ = true;
 }
 
 spMeshSize spMesh::GetDimensions() {
@@ -27,7 +25,6 @@ spMeshSize spMesh::GetDimensions() {
 
 void spMesh::SetPose(const spPose& pose) {
   pose_ = pose;
-  obj_phychanged_ = true;
   obj_guichanged_ = true;
 }
 
