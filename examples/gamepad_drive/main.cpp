@@ -53,7 +53,7 @@ void CarSensorCallback(hal::CarStateMsg msg) {
 //              << msg.wheel_speed_fl() << ", "
 //              << msg.wheel_speed_rl() << ", "
 //              << msg.wheel_speed_rr() << ", "
-//              << msg.steer_angle() << ", "
+              << msg.steer_angle() << ", "
               << std::endl;
 }
 

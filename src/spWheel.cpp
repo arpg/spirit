@@ -284,6 +284,15 @@ double spWheel::GetSteeringServoCurrentAngle()
 void spWheel::SetSteeringServoTargetAngle(double angle)
 {
 //  steering_servo_target_angle_ = angle;
+  btVector3 limit;
+  hinge_->getAngularUpperLimit(limit);
+  if(angle>limit[2]) {
+    angle = limit[2];
+  }
+  hinge_->getAngularLowerLimit(limit);
+  if(angle<limit[2]) {
+    angle = limit[2];
+  }
   hinge_->setServoTarget(steering_servo_axis,angle);
 }
 

@@ -23,7 +23,7 @@ class CarSimFunctor {
   void operator()(int thread_id ) {
     // create ground at zero
     gnd_pose_.translate(spTranslation(0,0,-0.5));
-    int gnd_index = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
+    spObjectHandle gnd_index = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
 //    physics_.AddObject(objects_.GetObject(gnd_index));
     obj_index_ = objects_.CreateVehicle(vehicle_info_);
 //    physics_.AddObject(objects_.GetObject(obj_index_));
@@ -49,7 +49,7 @@ class CarSimFunctor {
 //  Physics physics_;
   Objects objects_;
   spPose gnd_pose_;
-  int obj_index_;
+  spObjectHandle obj_index_;
 };
 
 #endif  // THREADPOOL_H__

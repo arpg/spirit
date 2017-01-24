@@ -69,6 +69,7 @@ int main(int argc, char** argv) {
 //  sp_world.ScenarioWorldBoxFall();
 //  sp_world.ScenarioWorldCarFall();
 //  sp_world.ScenarioPlannerTest();
+  sp_world.ScenarioPIDController();
 //  sp_world.ScenarioGNTest();
   while(sp_world.ShouldRun()) {
     sp_world.IterateWorld();

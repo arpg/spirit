@@ -34,6 +34,10 @@ void Gui::CheckKeyboardAction() {
   gui_->CheckKeyboardAction();
 }
 
+//void Gui::RemoveObject(spCommonObject &obj) {
+
+//}
+
 void Gui::AddObject(spCommonObject &obj) {
   if(!gui_) {
     SPERROREXIT("gui_ object has not been created yet.");
@@ -57,6 +61,38 @@ void Gui::AddObject(spCommonObject &obj) {
     case spObjectType::LINESTRIP:
     {
       gui_->AddLineStrip((spLineStrip&) obj);
+      break;
+    }
+    default:
+    {
+      std::cerr << "Unknown spirit object type." << std::endl;
+    }
+  }
+}
+
+void Gui::RemoveObject(spCommonObject &obj) {
+  if(!gui_) {
+    SPERROREXIT("gui_ object has not been created yet.");
+  }
+  switch(obj.GetObjecType()) {
+    case spObjectType::WAYPOINT:
+    {
+//      gui_->AddWaypoint((spWaypoint&) obj);
+      break;
+    }
+    case spObjectType::BOX:
+    {
+//      gui_->AddBox((spBox&) obj);
+      break;
+    }
+    case spObjectType::VEHICLE_AWD||spObjectType::VEHICLE_AWSD||spObjectType::VEHICLE_GENERAL || spObjectType::VEHICLE_RWD :
+    {
+      gui_->RemoveVehicle((spVehicle&) obj);
+      break;
+    }
+    case spObjectType::LINESTRIP:
+    {
+//      gui_->AddLineStrip((spLineStrip&) obj);
       break;
     }
     default:

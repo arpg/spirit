@@ -25,6 +25,8 @@ class spPangolinScenegraphGui : public spCommonGUI {
   void AddLineStrip(spLineStrip& linestrip);
   void UpdateGuiObjectsFromSpirit(Objects &spobj);
   void UpdateSpiritObjectsFromGui(Objects& spobjects);
+  void RemoveVehicle(spVehicle& vehicle);
+
 
  private:
   static void KeyActionMethodSample();

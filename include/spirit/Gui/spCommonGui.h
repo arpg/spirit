@@ -18,6 +18,7 @@ class spCommonGUI {
   virtual void AddLineStrip(spLineStrip& curve) = 0;
   virtual void UpdateGuiObjectsFromSpirit(Objects& spobjects) = 0;
   virtual void UpdateSpiritObjectsFromGui(Objects& spobjects) = 0;
+  virtual void RemoveVehicle(spVehicle& vehicle) = 0;
 };
 
 #endif  // SP_COMMONGUI_H__

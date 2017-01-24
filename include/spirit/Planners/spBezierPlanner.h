@@ -30,7 +30,7 @@ private:
 //  Physics jac_physics_;
   Gui*     jac_gui_;
   Objects jac_objects_;
-  int jac_car_handle;
+  spObjectHandle jac_car_handle;
 
   void SolveBVP();
   bool is_loop_;

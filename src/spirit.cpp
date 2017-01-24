@@ -1,6 +1,8 @@
 #include <spirit/spirit.h>
 #include <spirit/CarSimFunctor.h>
 //#include <iomanip>
+#include <spirit/Planners/spTrajectory.h>
+
 spirit::spirit(spSettings& user_settings) {
   user_settings_ = user_settings;
 }
@@ -122,22 +124,21 @@ for(int ii=0;ii<100;ii++) {
 }
 
 
-void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts3ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, const spPose& init_pose, double fd_delta) {
+void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts2ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, const spPose& init_pose, double fd_delta) {
   obj_cars_index[0] = objects_.CreateVehicle(car_param);
-//  physics_.AddObject(objects_.GetObject(obj_cars_index[0]));
   gui_.AddObject(objects_.GetObject(obj_cars_index[0]));
   spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_cars_index[0]);
-
-  car.SetEngineTorque(1000);
+  car.SetEngineTorque(1);
   car.SetSteeringServoTorque(100);
   car.SetSteeringServoMaxVel(100);
 
-  spCurve control_curve(3,2);
+//  spCurve control_curve(3,2);
+  spCurve control_curve(2,2);
   // 8+1 simulations required to fill the jacobian
   control_curve.SetBezierControlPoints(cntrl_vars);
   spPointXd sample_control(2);
 //  car.SetPose(init_pose);
-  car.SetClampToSurfaceFlag();
+//  car.SetClampToSurfaceFlag();
 //  physics_.Iterate(objects_,0.001);
   spPose clamp_pose(car.GetPose());
   spPose clamp_wheel[4];
@@ -155,70 +156,54 @@ void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state
     control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
     car.SetFrontSteeringAngle(sample_control[0]);
     car.SetEngineMaxVel(sample_control[1]);
-//    physics_.Iterate(objects_,sim_step_size);
+    objects_.StepPhySimulation(sim_step_size);
     gui_.Iterate(objects_);
 //    spGeneralTools::Delay_ms(100);
   }
   end_state = car.GetStateVecor();
-
-  spWaypoint& waypoint1 = (spWaypoint&) objects_.GetObject(obj_waypoint_index1);
+  spWaypoint& waypoint1 = (spWaypoint&)(objects_.GetObject(obj_waypoint_index1));
+  std::cout << "pose is \n" << car.GetPose().matrix() << std::endl;
   waypoint1.SetPose(car.GetPose());
+  gui_.RemoveObject(car);
+  objects_.RemoveObj(obj_cars_index[0]);
+//  std::cout << "state vec is \n" << end_state << std::endl;
 
   // now do the same thing with fd_delta applied to spCurve
   control_curve.SetBezierControlPoints(cntrl_vars);
-
-  for(int jj=0;jj<8;jj++) {
+  for(int jj=0;jj<2;jj++) {
     obj_cars_index[jj+1] = objects_.CreateVehicle(car_param);
-//    physics_.AddObject(objects_.GetObject(obj_cars_index[jj+1]));
-    gui_.AddObject(objects_.GetObject(obj_cars_index[jj+1]));
+//    gui_.AddObject(objects_.GetObject(obj_cars_index[jj+1]));
     spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_cars_index[jj+1]);
-    car.SetEngineTorque(1000);
+    car.SetEngineTorque(1);
     car.SetSteeringServoTorque(100);
     car.SetSteeringServoMaxVel(100);
 
-//    car.SetPose(spPos?:Le(spPose::Identity()));
-    car.SetClampToSurfaceFlag();
-//    physics_.Iterate(objects_,0.001);
-//    car.SetPose(clamp_pose);
-//    for(int ii=0;ii<4;ii++){
-//      car.GetWheel(ii)->SetPose(clamp_wheel[ii]);
-//      car.GetWheel(ii)->SetRotVel(spRotVel(0,0,0));
-//      car.GetWheel(ii)->SetLinVel(spLinVel(0,0,0));
-//      car.GetWheel(ii)->SetAngle(0);
-//    }
-//    car.SetLinVel(spLinVel(0,0,0));
-//    car.SetRotVel(spRotVel(0,0,0));
-
-
-    // set state of vehicle
-//    car.SetPose(init_pose);
-//    car.ClampToSurface();
-    int ii=0;
-    while(ii--) {
-        gui_.Iterate(objects_);
-    }
     // perturb a control signal
     double a = SP_PI;
     if(jj%2==1)
-      a = 1000;
-    control_curve.PerturbControlPoint(jj,a*fd_delta);
+      a = 10;
+    control_curve.PerturbControlPoint(jj+4,a*fd_delta);
     spPointXd sample_control(2);
     // simulate final pose of vehicle with perturbed control_vars
     for(int ii=1;ii<=num_sim_steps;ii++) {
       control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
       car.SetFrontSteeringAngle(sample_control[0]);
       car.SetEngineMaxVel(sample_control[1]);
-//      physics_.Iterate(objects_,sim_step_size);
-      gui_.Iterate(objects_);
+      objects_.StepPhySimulation(sim_step_size);
+//      gui_.Iterate(objects_);
 //      spGeneralTools::Delay_ms(100);
     }
+//    gui_.RemoveObject(car);
+    objects_.RemoveObj(obj_cars_index[jj+1]);
+
+
     control_curve.RemoveLastPerturbation();
     spStateVec perturbed_state_delta = car.GetStateVecor();
     // find forward finite difference value and put in jacobian
     jacobian.col(jj) = (perturbed_state_delta-end_state)/(a*fd_delta);
   }
-  Eigen::IOFormat OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");;
-  std::cout << "jacobian is : \n" << jacobian.format(OctaveFmt) << std::endl;
+//  Eigen::IOFormat OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");;
+//  std::cout << "jacobian is : \n" << jacobian.format(OctaveFmt) << std::endl;
   Eigen::MatrixXd jtj(jacobian.transpose()*jacobian);
 
   Eigen::JacobiSVD<Eigen::MatrixXd> svd(jtj);
@@ -229,9 +214,9 @@ void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state
 void spirit::ScenarioPlannerTest() {
   // create and add a car
   car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
-  car_param.pose.translate(spTranslation(0, 0, 0));
-//  Eigen::AngleAxisd rot1(M_PI/4+0.17355,Eigen::Vector3d::UnitX());
-//  car_param.pose.rotate(rot1);
+  car_param.pose.translate(spTranslation(0, 0, 0.07));
+  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
+  car_param.pose.rotate(rot1);
 //  Eigen::AngleAxisd rot2(M_PI/20,Eigen::Vector3d::UnitY());
 //  car_param.pose.rotate(rot2);
   car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
@@ -241,17 +226,15 @@ void spirit::ScenarioPlannerTest() {
   car_param.chassis_size = spBoxSize(0.2, 0.42, 0.05);
   car_param.cog = spTranslation(0, 0, 0);
   car_param.chassis_friction = 0;
-  car_param.wheel_rollingfriction = 0;
-  car_param.wheel_friction = 0.3;
+  car_param.wheel_rollingfriction = 0.6;
+  car_param.wheel_friction = 0.6;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.057;
-  car_param.susp_damping = 10;
-  car_param.susp_stiffness = 100;
+  car_param.susp_damping = 0;
+  car_param.susp_stiffness = 10;
   car_param.susp_preloading_spacer = 0.1;
-//  car_param.susp_upper_limit = 0.013;
-//  car_param.susp_lower_limit = -0.028;
-  car_param.susp_upper_limit = 0;
-  car_param.susp_lower_limit = 0;
+  car_param.susp_upper_limit = 0.013;
+  car_param.susp_lower_limit = -0.028;
   car_param.wheel_mass = 0.1;
   car_param.chassis_mass = 5;
   car_param.steering_servo_lower_limit = -SP_PI / 4;
@@ -272,14 +255,14 @@ void spirit::ScenarioPlannerTest() {
 //  ground.rotate(ang);
 
   obj_gnd_index = objects_.CreateBox(ground, spBoxSize(10, 10, 1), 0, spColor(0, 1, 0));
-//  physics_.AddObject(objects_.GetObject(obj_gnd_index));
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
-
+  spBox& gnd = (spBox&) objects_.GetObject(obj_gnd_index);
+  gnd.SetFriction(1);
+  gnd.SetPose(ground);
   spPose waypoint_pose(spPose::Identity());
   obj_waypoint_index1 =
       objects_.CreateWaypoint(waypoint_pose, spColor(0, 0, 1));
   gui_.AddObject(objects_.GetObject(obj_waypoint_index1));
-
 //  waypoint_pose.translate(spTranslation(1, 1, 0));
 //  obj_waypoint_index2 =
 //      objects_.CreateWaypoint(waypoint_pose, spColor(0, 0, 1));
@@ -291,43 +274,181 @@ void spirit::ScenarioPlannerTest() {
 //  bezplanner.AddWaypoint(waypoint2);
 //  bezplanner.IsLoop(false);
   spPlannerJacobian jacobian;
-  spCtrlPts3ord_2dof inputcmd_curve;
-//  inputcmd_curve.col(0) = Eigen::Vector2d(-SP_PI_HALF,0);
-//  inputcmd_curve.col(1) = Eigen::Vector2d(-0.25*SP_PI_HALF,10);
-//  inputcmd_curve.col(2) = Eigen::Vector2d(0.25*SP_PI_HALF,100);
-//  inputcmd_curve.col(3) = Eigen::Vector2d(SP_PI_HALF,200);
-  inputcmd_curve.col(0) = Eigen::Vector2d(0,100);
-  inputcmd_curve.col(1) = Eigen::Vector2d(0,0);
-  inputcmd_curve.col(2) = Eigen::Vector2d(0,0);
-  inputcmd_curve.col(3) = Eigen::Vector2d(0,100);
-for(int jj=0;jj<10;jj++) {
+//  spCtrlPts3ord_2dof inputcmd_curve;
+  spCtrlPts2ord_2dof inputcmd_curve;
+  inputcmd_curve.col(0) = Eigen::Vector2d(0,10);
+  inputcmd_curve.col(1) = Eigen::Vector2d(-SP_PI_QUART/5,10);
+  inputcmd_curve.col(2) = Eigen::Vector2d(-SP_PI_QUART,200);
+//  inputcmd_curve.col(3) = Eigen::Vector2d(-SP_PI_QUART/3,30);
+
+for(int jj=0;jj<100;jj++) {
   spPose Startpose(spPose::Identity());
   spStateVec hx;
-  CalcJacobianTest(jacobian,hx,inputcmd_curve,10,0.1,Startpose,0.0001);
-  std::cout << "hx is " << hx << std::endl;
+  CalcJacobianTest(jacobian,hx,inputcmd_curve,10,0.1,Startpose,0.00001);
+//  std::cout << "hx is " << hx << std::endl;
   spStateVec z;
-  z << 0,2,0.0600042,0.999405,0,0,0.0344877,-0.857567,19.596,0.000207682,0,0,1.61495;
-//  z <<  0.246979,1.2,0.0600042,0.999405,7.42208e-06,-1.11024e-06,0.0344877,-0.857567,19.596,0.000207682,4.495e-05,2.07909e-06,1.61495;
-//  z << 0.100207816,1.45602,0.0599957,1,-1.61806e-06,-2.98278e-07,0.000543913,-0.00760412,30.6918,-0.0229283,-0.00734955,-0.00855209,0.00156885;
-  Eigen::MatrixXd R(13,13);
-  R = Eigen::MatrixXd::Identity(13,13);
-//  R.row(3).setZero();
-//  R.row(4).setZero();
-//  R.row(5).setZero();
-//  R.row(6).setZero();
-//  R.row(7).setZero();
-//  R.row(8).setZero();
-//  R.row(9).setZero();
-//  R.row(10).setZero();
-//  R.row(11).setZero();
-//  R.row(12).setZero();
+//  z << 0.871389,0.206215,-1.06108,10,9.88804,1.93296;
+  z << /*0.771389*/1,/*0.206215*/1,-SP_PI_HALF,10.9993,9.88804,1.93296;
+//  Eigen::MatrixXd R(6,6);
+//  R = Eigen::MatrixXd::Identity(6,6);
+  Eigen::VectorXd vec_diag(6);
+//  vec_diag << 1.2,1.2,1.2,0.1,0.1,0.1;
+//  vec_diag << 100.2,100.2,100,0.2,0.2,0.2;
+  vec_diag << 0.2,0.2,0.2,200,200,200;
+//  vec_diag << 0.4,0.4,0.4,1,1,1;
+//  vec_diag << 0.1,0.1,0.1,0.1,0.1,0.1;
+//  vec_diag << 1,1,1,1,1,1;
+  Eigen::MatrixXd R = vec_diag.asDiagonal();
   Eigen::MatrixXd jtj(jacobian.transpose()*R*jacobian);
   Eigen::VectorXd jtb(jacobian.transpose()*R*(Eigen::VectorXd)(z-hx));
   Eigen::VectorXd x_update = jtj.ldlt().solve(jtb);
-  std::cout << "update is " << x_update << std::endl;
-  for(int ii=0;ii<8;ii++) {
-    inputcmd_curve.data()[ii] += x_update[ii];
+//  std::cout << "update is \n" << x_update << std::endl;
+//  std::cout << "norm is " << x_update.norm() << std::endl;
+  std::cout << "solution is" << std::endl;
+  for(int ii=4;ii<6;ii++) {
+    inputcmd_curve.data()[ii+2] += x_update[ii];
+    std::cout << inputcmd_curve.data()[ii+2] << std::endl;
   }
+}
+
+}
+
+double test_plant(double vin, spTimestamp curr_time) {
+  static double cap_voltage = 0;
+  static bool flag = false;
+  static spTimestamp prev_time = spGeneralTools::Tick();
+  if(flag == false){
+    prev_time = curr_time;
+    flag = true;
+    return 0;
+  }
+  // limit vin
+  if(vin>100) {
+    vin = 100;
+  }
+  if(vin<-100) {
+    vin = -100;
+  }
+  cap_voltage += (vin-cap_voltage)*(spGeneralTools::TickTock_ms(prev_time,curr_time)*0.001);
+  prev_time = curr_time;
+  return cap_voltage;
+}
+
+void PIDController_test() {
+  // simulate rc circuit
+//  for(int ii=0; ii<1000; ii++) {
+//    double sim_result = test_plant(10,spGeneralTools::Tick());
+//    std::cout << "sim output is " << sim_result << std::endl;
+//    spGeneralTools::Delay_ms(10);
+//  }
+//  for(int ii=0; ii<1000; ii++) {
+//    double sim_result = test_plant(5,spGeneralTools::Tick());
+//    std::cout << "sim output is " << sim_result << std::endl;
+//    spGeneralTools::Delay_ms(10);
+//  }
+
+  // test pid for rc circuit
+  spPID rc_pid(10);
+  double target_v = 10;
+  double current_v = 0;
+  rc_pid.SetGainP(20);
+  rc_pid.SetGainI(12);
+  rc_pid.SetGainD(0.1);
+  for(int ii=0; ii<10000; ii++) {
+    rc_pid.SetPlantError(target_v-current_v);
+    double cntrl_effort = rc_pid.GetControlOutput();
+    current_v = test_plant(cntrl_effort,spGeneralTools::Tick());
+    std::cout << "sim output is " << current_v << std::endl;
+    spGeneralTools::Delay_ms(10);
+  }
+}
+
+void spirit::ScenarioPIDController() {
+//  PIDController_test();
+
+  car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
+  car_param.pose.translate(spTranslation(0, 0, 0.06));
+  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
+  car_param.pose.rotate(rot1);
+//  Eigen::AngleAxisd rot2(M_PI/20,Eigen::Vector3d::UnitY());
+//  car_param.pose.rotate(rot2);
+  car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(-0.13, -0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(0.13, -0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(0.13, 0.17, -0.003));
+  car_param.chassis_size = spBoxSize(0.2, 0.42, 0.05);
+  car_param.cog = spTranslation(0, 0, 0);
+  car_param.chassis_friction = 0;
+  car_param.wheel_rollingfriction = 0.6;
+  car_param.wheel_friction = 0.6;
+  car_param.wheel_width = 0.04;
+  car_param.wheel_radius = 0.057;
+  car_param.susp_damping = 0;
+  car_param.susp_stiffness = 10;
+  car_param.susp_preloading_spacer = 0.1;
+  car_param.susp_upper_limit = 0.013;
+  car_param.susp_lower_limit = -0.028;
+  car_param.wheel_mass = 0.1;
+  car_param.chassis_mass = 5;
+  car_param.steering_servo_lower_limit = -SP_PI / 4;
+  car_param.steering_servo_upper_limit = SP_PI / 4;
+
+  obj_car_index = objects_.CreateVehicle(car_param);
+  gui_.AddObject(objects_.GetObject(obj_car_index));
+  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
+  car.SetEngineMaxVel(10);
+  car.SetEngineTorque(10);
+  // create and add a ground as a box to objects_ vector
+  spPose ground(spPose::Identity());
+  ground.translate(spTranslation(0, 0, -0.5));
+  obj_gnd_index = objects_.CreateBox(ground, spBoxSize(10, 10, 1), 0, spColor(0, 1, 0));
+  gui_.AddObject(objects_.GetObject(obj_gnd_index));
+  spBox& gnd = (spBox&) objects_.GetObject(obj_gnd_index);
+  gnd.SetFriction(1);
+  spPose waypoint_pose(spPose::Identity());
+//  obj_waypoint_index0 = objects_.CreateWaypoint(waypoint_pose, spColor(0, 0, 1));
+//  gui_.AddObject(objects_.GetObject(obj_waypoint_index0));
+//  waypoint_pose.translate(spTranslation(1, 1, 0));
+//  obj_waypoint_index1 = objects_.CreateWaypoint(waypoint_pose, spColor(0, 0, 1));
+//  gui_.AddObject(objects_.GetObject(obj_waypoint_index1));
+//  spWaypoint& waypoint0 = (spWaypoint&) objects_.GetObject(obj_waypoint_index0);
+//  spWaypoint& waypoint1 = (spWaypoint&) objects_.GetObject(obj_waypoint_index1);
+//  // example hermite between two waypoints
+//  spCtrlPts3ord_3dof pts;
+//  pts.col(0) = waypoint0.GetPose().translation();
+//  pts.col(1) = waypoint0.GetPose().rotation()*spTranslation(1,0,0)*waypoint0.GetLength();
+//  pts.col(2) = waypoint1.GetPose().translation();
+//  pts.col(3) = waypoint1.GetPose().rotation()*spTranslation(1,0,0)*waypoint1.GetLength();
+//  spCurve curve(3,3);
+//  curve.SetHermiteControlPoints(pts);
+//  spPoints3d line_pts(50);
+//  curve.GetPoints3d(line_pts);
+//  obj_linestrip_index = objects_.CreateLineStrip(waypoint0.GetPose(), line_pts, spColor(1, 0, 0));
+//  gui_.AddObject(objects_.GetObject(obj_linestrip_index));
+//  spLineStrip& strip = (spLineStrip&) objects_.GetObject(obj_linestrip_index);
+
+  spTrajectory traj(gui_,objects_);
+  spPose pose(spPose::Identity());
+  traj.AddWaypoint(pose);
+  pose.translate(spTranslation(1,1,0));
+  traj.AddWaypoint(pose);
+  pose.translate(spTranslation(1,-1,0));
+  traj.AddWaypoint(pose);
+  pose.translate(spTranslation(-1,-1,0));
+  traj.AddWaypoint(pose);
+
+while(1){
+//  pts.col(0) = waypoint0.GetPose().translation();
+//  pts.col(1) = waypoint0.GetPose().rotation()*spTranslation(1,0,0)*waypoint0.GetLength();
+//  pts.col(2) = waypoint0.GetPose().translation();
+//  pts.col(3) = waypoint0.GetPose().rotation()*spTranslation(1,0,0)*waypoint0.GetLength();
+//  curve.SetHermiteControlPoints(pts);
+//  curve.GetPoints3d(line_pts);
+//  strip.SetLineStripPoints(line_pts);
+
+  traj.UpdateCurves();
+  gui_.Iterate(objects_);
+//  objects_.StepPhySimulation(0.001);
 }
 
 }
@@ -371,7 +492,7 @@ void spirit::ScenarioWorldCarFall() {
     car.SetEngineMaxVel(100);
     car.SetSteeringServoMaxVel(1);
     car.SetSteeringServoTorque(100);
-    car.SetFrontSteeringAngle(SP_PI/4);
+    car.SetFrontSteeringAngle(SP_PI/2);
 //    car.SetFrontSteeringAngle(0);
 //    car.SetRearSteeringAngle(0);
 //    car_param.pose.translate(spTranslation(0.1,0,0));
@@ -539,12 +660,13 @@ void spirit::IterateWorld() {
 //  std::cout << "waypoint is " << planpoint.GetPose().translation() <<
 //               std::endl;
 //  plan.UpdateCurves();
-  spGeneralTools::Delay_ms(10);
+  spGeneralTools::Delay_ms(100);
 
   if (fl<500) {
-//    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
-    spPose pose(spPose::Identity());
-    pose.translate(spTranslation(1, 1, 1));
+    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
+    car.GetStateVecor();
+//    spPose pose(spPose::Identity());
+//    pose.translate(spTranslation(1, 1, 1));
 
 //    if(fl==300)
 //      car.SetPose(pose);

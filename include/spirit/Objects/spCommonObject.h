@@ -16,16 +16,13 @@ class spCommonObject {
 
   spCommonObject();
   ~spCommonObject();
-  void SetPhyIndex(int index);
   void SetGuiIndex(int index);
   int GetGuiIndex();
-  int GetPhyIndex();
   void Create();
   void Delete();
   bool HasChangedGui();
   bool HasChangedPhy();
   spObjectType GetObjecType();
-  void SetPhyUpdated();
   void SetGuiUpdated();
   bool IsGuiModifiable();
   bool NeedsClampToSurface();
@@ -33,7 +30,6 @@ class spCommonObject {
   btRigidBody* GetRigidbody();
 
  protected:
-  int index_phy_;
   int index_gui_;
   bool obj_guichanged_;
   bool obj_clamptosurface_;

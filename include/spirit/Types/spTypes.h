@@ -3,6 +3,7 @@
 
 #include <Eigen/Eigen>
 #include <vector>
+#include <list>
 #include <iostream>
 
 #warning "Comment the following line if using bullet in single precision mode"
@@ -54,11 +55,13 @@ typedef Eigen::Vector3d spCubeInertiaTensor;
 // ctrlpts for Hermite curve mean [P0,D0,P3,D3]
 typedef Eigen::Matrix<double,3,4> spCtrlPts3ord_3dof;
 typedef Eigen::Matrix<double,2,4> spCtrlPts3ord_2dof;
+typedef Eigen::Matrix<double,2,3> spCtrlPts2ord_2dof;
 // rows = [x,y,z,q1,q2,q3,q4,x_d,y_d,z_d,roll_d,pitch_d,yaw_d]
 // cols = [bezP1x,bezP1y,bezP2x,bezP2y,bezP3x,bezP3y,bezP4x,bezP4y]
-typedef Eigen::Matrix<double,13,8> spPlannerJacobian;
-// spStateVec means [x,y,z,q1,q2,q3,q4,x_d,y_d,z_d,p_d,q_d,r_d]
-typedef Eigen::Array<double,13,1> spStateVec;
+//typedef Eigen::Matrix<double,6,6> spPlannerJacobian;
+typedef Eigen::Matrix<double,6,2> spPlannerJacobian;
+// spStateVec means [x,y,yaw,x_d,y_d,yaw_d]
+typedef Eigen::Array<double,6,1> spStateVec;
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 typedef Eigen::Matrix4d spMat4x4;
 
@@ -219,12 +222,17 @@ class spCurve {
   }
 
   // firs 3d dimentions (x,y,z) are used for visualization purposes
-  void GetPoints3d(spPoints3d& pts_vec, int num_mid_pts) {
-    int num_pts = num_mid_pts - 1;
+  void GetPoints3d(spPoints3d& pts_vec/*, int num_mid_pts*/) {
+//    int num_pts = num_mid_pts - 1;
+    if(pts_vec.size()<1) {
+      SPERROREXIT("array size must be greater than zero !");
+    }
+    int num_pts = pts_vec.size() - 1;
     for (int t = 0; t <= num_pts; t++) {
       spPointXd point(curve_dof_);
       this->GetPoint(point, t * (1.0 / num_pts));
-      pts_vec.push_back(point.head(3));
+//      pts_vec.push_back(point.head(3));
+      pts_vec[t] = point.head(3);
     }
   }
 

@@ -2,21 +2,14 @@
 
 spCommonObject::spCommonObject() {}
 
-spCommonObject::~spCommonObject() {}
-
-void spCommonObject::SetPhyIndex(int index) {
-  if (index < 0) {
-    SPERROREXIT("Wrong Index for Phy Object Detected");
-  }
-
-  index_phy_ = index;
+spCommonObject::~spCommonObject() {
+  delete(rigid_body_->getMotionState());
+  delete(rigid_body_);
 }
 
 void spCommonObject::SetGuiIndex(int index) { index_gui_ = index; }
 
 int spCommonObject::GetGuiIndex() { return index_gui_; }
-
-int spCommonObject::GetPhyIndex() { return index_phy_; }
 
 bool spCommonObject::HasChangedGui() {
 //  bool status = obj_guichanged_;

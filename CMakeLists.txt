@@ -71,6 +71,8 @@ set( HDRS
 	include/spirit/Objects/spLineStrip.h
 	include/spirit/CarSimFunctor.h
 	include/spirit/Types/ctpl_stl.h
+	include/spirit/Controllers/spPID.h
+	include/spirit/Planners/spTrajectory.h
 	)
 set( SRCS
 	src/spirit.cpp
@@ -90,6 +92,8 @@ set( SRCS
 	src/spWheel.cpp
 	src/spLineStrip.cpp
 	src/spBezierPlanner.cpp
+	src/spPID.cpp
+	src/spTrajectory.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)

@@ -13,7 +13,9 @@ Objects::~Objects(){
 //		btCollisionShape* shape = collisionShapes_[j];
 //		delete shape;
 //	}
-
+  for (spObjectHandle ii=objects_.begin();ii!=objects_.end();ii++) {
+    RemoveObj(ii);
+  }
   delete(dynamics_world_);
   switch(world_params_.solver) {
     case spPhysolver::MLCP_DANTZIG:
@@ -75,59 +77,19 @@ void Objects::InitEmptyDynamicsWorld() {
 }
 
 
-int Objects::CreateBox(const spPose& pose, const spBoxSize& size, double mass,const spColor& color) {
+spObjectHandle Objects::CreateBox(const spPose& pose, const spBoxSize& size, double mass,const spColor& color) {
   std::shared_ptr<spBox> a_box = std::make_shared<spBox>(pose,size,mass,color,dynamics_world_);
   objects_.push_back(a_box);
-  return (objects_.size()-1);
-}
-///////////////////////////////////////////////////////////////
-
-btRigidBody* Objects::CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape) {
-	//rigidbody is dynamic if and only if mass is non zero, otherwise static
-	bool isDynamic = (mass != 0.f);
-
-	btVector3 localInertia(0,0,0);
-	if (isDynamic)
-		shape->calculateLocalInertia(mass,localInertia);
-
-	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-	btDefaultMotionState* myMotionState = new btDefaultMotionState(tr);
-
-	btRigidBody::btRigidBodyConstructionInfo cInfo(mass,myMotionState,shape,localInertia);
-
-	btRigidBody* body = new btRigidBody(cInfo);
-//	body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
-
-	return body;
+  return (--objects_.end());
 }
 
-btTransform& Objects::spPose2btTransform(const spPose& pose, double btworld_scale) {
-  std::shared_ptr<btTransform> tr = std::make_shared<btTransform>();
-  tr->setOrigin(btVector3(pose.translation()[0],pose.translation()[1],pose.translation()[2])*btworld_scale);
-  spRotation q(pose.rotation());
-  tr->setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
-  return *tr.get();
-}
-
-spPose& Objects::btTransform2spPose(const btTransform& tr, double btworld_scale_inv) {
-  std::shared_ptr<spPose> pose = std::make_shared<spPose>(spPose::Identity());
-  btVector3 origin = tr.getOrigin();
-  pose->translate(spTranslation(origin[0],origin[1],origin[2])*btworld_scale_inv);
-  btQuaternion btrot = tr.getRotation();
-  spRotation spangle(btrot.w(),btrot.x(),btrot.y(),btrot.z());
-  pose->rotate(spangle);
-  return *pose.get();
-}
-
-
-
-int Objects::CreateWaypoint(const spPose& pose, const spColor& color) {
+spObjectHandle Objects::CreateWaypoint(const spPose& pose, const spColor& color) {
   std::shared_ptr<spWaypoint> a_waypoint = std::make_shared<spWaypoint>(pose,color);
   objects_.push_back(a_waypoint);
-  return (objects_.size()-1);
+  return (--objects_.end());
 }
 
-int Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_info) {
+spObjectHandle Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_info) {
   switch (vehicle_info.vehicle_type) {
     case spObjectType::VEHICLE_AWSD:
     {
@@ -136,28 +98,44 @@ int Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_info) {
       objects_.push_back(a_vehicle);
       break;
     }
+    default:
+      std::cout << "this is not supported" << std::endl;
   }
-  return (objects_.size()-1);
+  return (--objects_.end());
 }
 
-int Objects::CreateLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, const spColor& color) {
+spObjectHandle Objects::CreateLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, const spColor& color) {
   std::shared_ptr<spLineStrip> a_curve = std::make_shared<spLineStrip>(pose,linestrip_pts,color);
   objects_.push_back(a_curve);
-  return (objects_.size()-1);
+  return (--objects_.end());
 }
 
-
-void Objects::RemoveObj(int obj_index) {
-  if(obj_index<objects_.size()) {
-    objects_.erase(objects_.begin()+obj_index);
+void Objects::RemoveObj(spObjectHandle& obj_handle) {
+  if(obj_handle != NULL_HANDLE) {
+    if(GetObject(obj_handle).GetObjecType() == spObjectType::VEHICLE_AWSD) {
+      spAWSDCar& car = (spAWSDCar&) GetObject(obj_handle);
+      dynamics_world_->removeRigidBody(car.GetWheel(3)->GetRigidbody());
+      dynamics_world_->removeConstraint(car.GetWheel(3)->GetRigidbody()->getConstraintRef(0));
+      dynamics_world_->removeRigidBody(car.GetWheel(2)->GetRigidbody());
+      dynamics_world_->removeConstraint(car.GetWheel(2)->GetRigidbody()->getConstraintRef(0));
+      dynamics_world_->removeRigidBody(car.GetWheel(1)->GetRigidbody());
+      dynamics_world_->removeConstraint(car.GetWheel(1)->GetRigidbody()->getConstraintRef(0));
+      dynamics_world_->removeRigidBody(car.GetWheel(0)->GetRigidbody());
+      dynamics_world_->removeConstraint(car.GetWheel(0)->GetRigidbody()->getConstraintRef(0));
+      dynamics_world_->removeRigidBody(car.GetRigidbody());
+    } else {
+      SPERROREXIT("Removing other objects not implemented.");
+    }
+    objects_.erase(obj_handle);
+    obj_handle = NULL_HANDLE;
   } else {
     SPERROREXIT("Requested Object doesn't exist.");
   }
 }
 
-spCommonObject& Objects::GetObject(int obj_index) {
-  if(obj_index<objects_.size()) {
-    return *objects_[obj_index].get();
+spCommonObject& Objects::GetObject(spObjectHandle& obj_handle) {
+  if(obj_handle != NULL_HANDLE) {
+    return *(obj_handle->get());
   } else {
     SPERROREXIT("Requested Object doesn't exist.");
   }
@@ -165,6 +143,14 @@ spCommonObject& Objects::GetObject(int obj_index) {
 
 int Objects::GetNumOfObjects() {
   return objects_.size();
+}
+
+spObjectHandle Objects::GetListBegin() {
+  return objects_.begin();
+}
+
+spObjectHandle Objects::GetListEnd() {
+  return objects_.end();
 }
 
 

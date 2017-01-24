@@ -4,8 +4,7 @@ spLineStrip::spLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, co
   mass_ = 0;
   color_ = color;
   pose_ = pose;
-  this->SetLineStripPoints(linestrip_pts);
-  index_phy_ = -1;
+  SetLineStripPoints(linestrip_pts);
   index_gui_ = -1;
   obj_guichanged_ = false;
   modifiable_gui_ = false;

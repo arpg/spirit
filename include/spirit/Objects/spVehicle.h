@@ -28,10 +28,6 @@ class spVehicle : public spCommonObject {
   void SetVelocity(const spVelocity& chassis_vel);
   const spStateVec& GetStateVecor();  // returns [x,y,z,q1,q2,q3,q4,x_d,y_d,z_d,p_d,q_d,r_d]
   void SetClampToSurfaceFlag();
-  const spLinVel& GetLinVel();
-  void SetLinVel(const spLinVel& vel);
-  const spRotVel& GetRotVel();
-  void SetRotVel(const spRotVel& vel);
 
  private:
   void MoveWheelsToAnchors(const spPose& chasis_pose);

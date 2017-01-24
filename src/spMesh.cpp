@@ -4,7 +4,6 @@ spMesh::spMesh() {
   mass_ = 0;
   color_ = spColor(1,1,1);
   pose_ = spPose::Identity();
-  index_phy_ = -1;
   index_gui_ = -1;
   obj_guichanged_ = false;
   modifiable_gui_ = false;

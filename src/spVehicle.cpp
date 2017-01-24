@@ -49,7 +49,6 @@ spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info,btDiscreteDyn
   SetColor(vehicle_info.color);
   chassis_size_ = vehicle_info.chassis_size;
   object_type_ = vehicle_info.vehicle_type;
-  index_phy_ = -1;
   index_gui_ = -1;
   obj_guichanged_ = false;
   modifiable_gui_ = false;
@@ -142,33 +141,21 @@ void spVehicle::SetVelocity(const spVelocity& chassis_vel) {
 
 const spStateVec& spVehicle::GetStateVecor() {
   spPose pose = btTransform2spPose(rigid_body_->getWorldTransform());
-  statevec_.head(3) = pose.translation();
-  spRotation quat(pose.rotation());
-  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
-//  statevec_.segment()
+  statevec_[0] = pose.translation()[0];
+  statevec_[1] = pose.translation()[1];
+  Eigen::Vector3d v = pose.rotation().eulerAngles(1,2,3);
+  // take the yaw angle, for some reason its on v[1] instead of expected v[2] position
+  statevec_[2] = v[1];
+  btVector3 lin_vel = rigid_body_->getLinearVelocity();
+  statevec_[3] = lin_vel[0];
+  statevec_[4] = lin_vel[1];
+  btVector3 rot_vel = rigid_body_->getAngularVelocity();
+  statevec_[5] = rot_vel[2];
+//  spRotation quat(pose.rotation());
+//  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
   return statevec_;
 }
 
 void spVehicle::SetClampToSurfaceFlag() {
   obj_clamptosurface_ = true;
-}
-
-const spLinVel& spVehicle::GetLinVel(){
-//  return lin_vel;
-  SPERROREXIT("GETLinVel not implemented !");
-}
-
-void spVehicle::SetLinVel(const spLinVel& vel) {
-// lin_vel = vel;
-  SPERROREXIT("SetLinVel not implemented !");
-}
-
-const spRotVel& spVehicle::GetRotVel(){
-//  return rot_vel;
-  SPERROREXIT("GETRotVel not implemented !");
-}
-
-void spVehicle::SetRotVel(const spRotVel& vel) {
-// rot_vel = vel;
-  SPERROREXIT("SetRotVel not implemented !");
 }

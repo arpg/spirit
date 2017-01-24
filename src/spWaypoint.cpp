@@ -5,7 +5,6 @@ spWaypoint::spWaypoint(const spPose& pose, const spColor& color) {
   color_ = color;
   pose_ = pose;
   length_ = 1;
-  index_phy_ = -1;
   index_gui_ = -1;
   obj_guichanged_ = false;
   modifiable_gui_ = true;
@@ -17,7 +16,6 @@ spWaypoint::spWaypoint(const spWaypoint& wp) {
   pose_ = wp.pose_;
   color_ = wp.color_;
   mass_ = wp.mass_;
-  index_phy_ = wp.index_phy_;
   index_gui_ = wp.index_gui_;
   obj_guichanged_ = wp.obj_guichanged_;
   modifiable_gui_ = wp.modifiable_gui_;

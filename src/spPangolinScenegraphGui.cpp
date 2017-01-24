@@ -160,6 +160,18 @@ void spPangolinScenegraphGui::AddVehicle(spVehicle& vehicle)
   }
 }
 
+void spPangolinScenegraphGui::RemoveVehicle(spVehicle& vehicle)
+{
+  glscenegraph_.RemoveChild(globjects_[vehicle.GetGuiIndex()]);
+//  delete(globjects_[vehicle.GetGuiIndex()]);
+  globjects_[vehicle.GetGuiIndex()] = NULL;
+  for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
+    glscenegraph_.RemoveChild(globjects_[vehicle.GetWheel(ii)->GetGuiIndex()]);
+//    delete(globjects_[vehicle.GetWheel(ii)->GetGuiIndex()]);
+    globjects_[vehicle.GetWheel(ii)->GetGuiIndex()] = NULL;
+  }
+}
+
 void spPangolinScenegraphGui::AddLineStrip(spLineStrip& linestrip) {
   SceneGraph::GLLineStrip* gllinestrip = new SceneGraph::GLLineStrip;
   gllinestrip->SetIgnoreDepth(true);
@@ -214,7 +226,7 @@ void spPangolinScenegraphGui::UpdateLineStripGuiObject(spLineStrip& spobj) {
 
 void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
   // go through all spirit objects
-  for(int ii=0; ii<spobj.GetNumOfObjects(); ii++) {
+  for(spObjectHandle ii=spobj.GetListBegin(); ii!=spobj.GetListEnd(); ++ii) {
     //only update objects which had gui property changes
     if(spobj.GetObject(ii).HasChangedGui()) {
       // update the gui object
@@ -254,7 +266,7 @@ void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
 }
 
 void spPangolinScenegraphGui::UpdateSpiritObjectsFromGui(Objects& spobjects) {
-  for(int ii=0; ii<spobjects.GetNumOfObjects(); ii++) {
+  for(spObjectHandle ii=spobjects.GetListBegin(); ii!=spobjects.GetListEnd(); ++ii) {
     //only update objects which are dynamic
     if(spobjects.GetObject(ii).IsGuiModifiable()) {
       switch (spobjects.GetObject(ii).GetObjecType()) {
