@@ -81,7 +81,6 @@ void spirit::CalcLocalPlannerJacobian(){
 }
 
 void spirit::CheckKeyboardAction() { gui_.CheckKeyboardAction(); }
-spVehicleConstructionInfo car_param;
 
 double f1(double x){
   return 100*(10-(x))*(10-(x));
@@ -124,24 +123,26 @@ for(int ii=0;ii<100;ii++) {
 }
 
 
-void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts2ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, const spPose& init_pose, double fd_delta) {
-  obj_cars_index[0] = objects_.CreateVehicle(car_param);
-  gui_.AddObject(objects_.GetObject(obj_cars_index[0]));
-  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_cars_index[0]);
-  car.SetEngineTorque(1);
-  car.SetSteeringServoTorque(100);
-  car.SetSteeringServoMaxVel(100);
+void spirit::CalcJacobianTest(spVehicleConstructionInfo& car_param,spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts2ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, const spPose& init_pose, double fd_delta) {
+  spObjectHandle obj_cars_ind = objects_.CreateVehicle(car_param);
+  gui_.AddObject(objects_.GetObject(obj_cars_ind));
+  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_cars_ind);
+  car.SetSteeringServoTorque(1000);
+  car.SetSteeringServoMaxVel(1000);
+  car.SetEngineMaxVel(1000);
+  car.SetEngineTorque(1000);
 
 //  spCurve control_curve(3,2);
   spCurve control_curve(2,2);
   // 8+1 simulations required to fill the jacobian
   control_curve.SetBezierControlPoints(cntrl_vars);
   spPointXd sample_control(2);
+
 //  car.SetPose(init_pose);
 //  car.SetClampToSurfaceFlag();
 //  physics_.Iterate(objects_,0.001);
-  spPose clamp_pose(car.GetPose());
-  spPose clamp_wheel[4];
+//  spPose clamp_pose(car.GetPose());
+//  spPose clamp_wheel[4];
 //  for(int ii=0;ii<4;ii++){
 //    car.GetWheel(ii)->SetRotVel(spRotVel(0,0,0));
 //    car.GetWheel(ii)->SetLinVel(spLinVel(0,0,0));
@@ -162,27 +163,28 @@ void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state
   }
   end_state = car.GetStateVecor();
   spWaypoint& waypoint1 = (spWaypoint&)(objects_.GetObject(obj_waypoint_index1));
-  std::cout << "pose is \n" << car.GetPose().matrix() << std::endl;
+//  std::cout << "pose is \n" << car.GetPose().matrix() << std::endl;
   waypoint1.SetPose(car.GetPose());
   gui_.RemoveObject(car);
-  objects_.RemoveObj(obj_cars_index[0]);
-//  std::cout << "state vec is \n" << end_state << std::endl;
+  objects_.RemoveObj(obj_cars_ind);
+  std::cout << "state vec is \n" << end_state.transpose() << std::endl;
 
   // now do the same thing with fd_delta applied to spCurve
   control_curve.SetBezierControlPoints(cntrl_vars);
-  for(int jj=0;jj<2;jj++) {
+  for(int jj=0;jj<4;jj++) {
     obj_cars_index[jj+1] = objects_.CreateVehicle(car_param);
 //    gui_.AddObject(objects_.GetObject(obj_cars_index[jj+1]));
     spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_cars_index[jj+1]);
-    car.SetEngineTorque(1);
-    car.SetSteeringServoTorque(100);
-    car.SetSteeringServoMaxVel(100);
+    car.SetSteeringServoTorque(1000);
+    car.SetSteeringServoMaxVel(1000);
+    car.SetEngineMaxVel(1000);
+    car.SetEngineTorque(1000);
 
     // perturb a control signal
     double a = SP_PI;
     if(jj%2==1)
-      a = 10;
-    control_curve.PerturbControlPoint(jj+4,a*fd_delta);
+      a = 100;
+    control_curve.PerturbControlPoint(jj+2,a*fd_delta);
     spPointXd sample_control(2);
     // simulate final pose of vehicle with perturbed control_vars
     for(int ii=1;ii<=num_sim_steps;ii++) {
@@ -200,18 +202,21 @@ void spirit::CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state
     control_curve.RemoveLastPerturbation();
     spStateVec perturbed_state_delta = car.GetStateVecor();
     // find forward finite difference value and put in jacobian
-    jacobian.col(jj) = (perturbed_state_delta-end_state)/(a*fd_delta);
+    jacobian.col(jj) = (perturbed_state_delta-end_state)*(1/(a*fd_delta));
   }
-//  Eigen::IOFormat OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");;
-//  std::cout << "jacobian is : \n" << jacobian.format(OctaveFmt) << std::endl;
+  Eigen::IOFormat OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");;
+  std::cout << "jacobian is : \n" << jacobian.format(OctaveFmt) << std::endl;
   Eigen::MatrixXd jtj(jacobian.transpose()*jacobian);
 
   Eigen::JacobiSVD<Eigen::MatrixXd> svd(jtj);
   double cond = svd.singularValues()(0) / svd.singularValues()(svd.singularValues().size()-1);
   std::cout << "jtj condition number is " << cond << std::endl;
+
 }
 
 void spirit::ScenarioPlannerTest() {
+  spVehicleConstructionInfo car_param;
+
   // create and add a car
   car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
   car_param.pose.translate(spTranslation(0, 0, 0.07));
@@ -227,7 +232,7 @@ void spirit::ScenarioPlannerTest() {
   car_param.cog = spTranslation(0, 0, 0);
   car_param.chassis_friction = 0;
   car_param.wheel_rollingfriction = 0.6;
-  car_param.wheel_friction = 0.6;
+  car_param.wheel_friction = 0.3;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.057;
   car_param.susp_damping = 0;
@@ -277,35 +282,36 @@ void spirit::ScenarioPlannerTest() {
 //  spCtrlPts3ord_2dof inputcmd_curve;
   spCtrlPts2ord_2dof inputcmd_curve;
   inputcmd_curve.col(0) = Eigen::Vector2d(0,10);
-  inputcmd_curve.col(1) = Eigen::Vector2d(-SP_PI_QUART/5,10);
-  inputcmd_curve.col(2) = Eigen::Vector2d(-SP_PI_QUART,200);
+  inputcmd_curve.col(1) = Eigen::Vector2d(-SP_PI_QUART/5,20);
+  inputcmd_curve.col(2) = Eigen::Vector2d(-SP_PI_QUART/2,0);
 //  inputcmd_curve.col(3) = Eigen::Vector2d(-SP_PI_QUART/3,30);
 
-for(int jj=0;jj<100;jj++) {
+for(int jj=0;jj<1000;jj++) {
+  std::cout << "jj is " << jj << std::endl;
   spPose Startpose(spPose::Identity());
   spStateVec hx;
-  CalcJacobianTest(jacobian,hx,inputcmd_curve,10,0.1,Startpose,0.00001);
+  CalcJacobianTest(car_param,jacobian,hx,inputcmd_curve,10,0.1,Startpose,0.000001);
 //  std::cout << "hx is " << hx << std::endl;
   spStateVec z;
-//  z << 0.871389,0.206215,-1.06108,10,9.88804,1.93296;
-  z << /*0.771389*/1,/*0.206215*/1,-SP_PI_HALF,10.9993,9.88804,1.93296;
+  z << 0.892789,0.360659,-0.880967,10.2074,11.1997,1.47071;
+//  z << /*0.771389*/1,/*0.206215*/1,-SP_PI_HALF,10.9993,9.88804,1.93296;
 //  Eigen::MatrixXd R(6,6);
 //  R = Eigen::MatrixXd::Identity(6,6);
   Eigen::VectorXd vec_diag(6);
 //  vec_diag << 1.2,1.2,1.2,0.1,0.1,0.1;
 //  vec_diag << 100.2,100.2,100,0.2,0.2,0.2;
-  vec_diag << 0.2,0.2,0.2,200,200,200;
+//  vec_diag << 0.2,0.2,0.2,200,200,200;
 //  vec_diag << 0.4,0.4,0.4,1,1,1;
 //  vec_diag << 0.1,0.1,0.1,0.1,0.1,0.1;
-//  vec_diag << 1,1,1,1,1,1;
+  vec_diag << 1,1,1,1,1,1;
   Eigen::MatrixXd R = vec_diag.asDiagonal();
   Eigen::MatrixXd jtj(jacobian.transpose()*R*jacobian);
   Eigen::VectorXd jtb(jacobian.transpose()*R*(Eigen::VectorXd)(z-hx));
   Eigen::VectorXd x_update = jtj.ldlt().solve(jtb);
-//  std::cout << "update is \n" << x_update << std::endl;
-//  std::cout << "norm is " << x_update.norm() << std::endl;
+  std::cout << "update is \n" << x_update.transpose() << std::endl;
+  std::cout << "norm is " << x_update.norm() << std::endl;
   std::cout << "solution is" << std::endl;
-  for(int ii=4;ii<6;ii++) {
+  for(int ii=0;ii<4;ii++) {
     inputcmd_curve.data()[ii+2] += x_update[ii];
     std::cout << inputcmd_curve.data()[ii+2] << std::endl;
   }
@@ -364,7 +370,9 @@ void PIDController_test() {
 }
 
 void spirit::ScenarioPIDController() {
-//  PIDController_test();
+  spVehicleConstructionInfo car_param;
+
+  //  PIDController_test();
 
   car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
   car_param.pose.translate(spTranslation(0, 0, 0.06));

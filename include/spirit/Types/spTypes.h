@@ -59,7 +59,7 @@ typedef Eigen::Matrix<double,2,3> spCtrlPts2ord_2dof;
 // rows = [x,y,z,q1,q2,q3,q4,x_d,y_d,z_d,roll_d,pitch_d,yaw_d]
 // cols = [bezP1x,bezP1y,bezP2x,bezP2y,bezP3x,bezP3y,bezP4x,bezP4y]
 //typedef Eigen::Matrix<double,6,6> spPlannerJacobian;
-typedef Eigen::Matrix<double,6,2> spPlannerJacobian;
+typedef Eigen::Matrix<double,6,4> spPlannerJacobian;
 // spStateVec means [x,y,yaw,x_d,y_d,yaw_d]
 typedef Eigen::Array<double,6,1> spStateVec;
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;
@@ -198,16 +198,25 @@ class spCurve {
     return ctrl_pts_;
   }
 
+
+
   void GetPoint(Eigen::VectorXd& point, double t) {
     if(point.rows() != curve_dof_) {
       SPERROREXIT("Wrong point dimention requested.");
     }
-
-    point = (pow((1 - t), 3) * ctrl_pts_.col(0)) +
-        (3 * pow((1 - t), 2) * t * ctrl_pts_.col(1)) +
-        (3 * (1 - t) * pow(t, 2) * ctrl_pts_.col(2)) +
-        (pow(t, 3) * ctrl_pts_.col(3));
-    // calc global coordinates of the point
+    if(curve_order_ == 3) {
+      point = (pow((1 - t), 3) * ctrl_pts_.col(0)) +
+          (3 * pow((1 - t), 2) * t * ctrl_pts_.col(1)) +
+          (3 * (1 - t) * pow(t, 2) * ctrl_pts_.col(2)) +
+          (pow(t, 3) * ctrl_pts_.col(3));
+    } else if(curve_order_ == 2) {
+      point = (pow((1 - t), 2) * ctrl_pts_.col(0)) +
+          (2 * (1 - t) * t * ctrl_pts_.col(1)) +
+          (pow(t, 2) * ctrl_pts_.col(2));
+    } else {
+      SPERROREXIT("Not Implemented.");
+    }
+  // calc global coordinates of the point
   //  point = pose_ * point;
   }
 
@@ -221,7 +230,7 @@ class spCurve {
     }
   }
 
-  // firs 3d dimentions (x,y,z) are used for visualization purposes
+  // first 3d dimentions (x,y,z) are used for visualization purposes
   void GetPoints3d(spPoints3d& pts_vec/*, int num_mid_pts*/) {
 //    int num_pts = num_mid_pts - 1;
     if(pts_vec.size()<1) {
@@ -234,6 +243,13 @@ class spCurve {
 //      pts_vec.push_back(point.head(3));
       pts_vec[t] = point.head(3);
     }
+  }
+
+  // given number of circles find that many curvatures along curve and return max
+  double GetMaxCurvature(unsigned int num_circles) {
+    spPointsXd points;
+    GetPointsXd(points,2*num_circles+1);
+
   }
 
 private:

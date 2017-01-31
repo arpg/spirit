@@ -20,7 +20,7 @@ public:
   void ScenarioWorldBoxFall();
   void ScenarioWorldCarFall();
   void ScenarioPlannerTest();
-  void CalcJacobianTest(spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts2ord_2dof& cntrl_vars, unsigned int num_sim_steps, double sim_step_size, const spPose& init_pose, double fd_delta);
+  void CalcJacobianTest(spVehicleConstructionInfo& car_param,spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts2ord_2dof& cntrl_vars, unsigned int num_sim_steps, double sim_step_size, const spPose& init_pose, double fd_delta);
   void ScenarioGNTest();
   void ScenarioPIDController();
   void CalcLocalPlannerJacobian();

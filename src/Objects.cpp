@@ -123,6 +123,7 @@ void Objects::RemoveObj(spObjectHandle& obj_handle) {
       dynamics_world_->removeRigidBody(car.GetWheel(0)->GetRigidbody());
       dynamics_world_->removeConstraint(car.GetWheel(0)->GetRigidbody()->getConstraintRef(0));
       dynamics_world_->removeRigidBody(car.GetRigidbody());
+      dynamics_world_->clearForces();
     } else {
       SPERROREXIT("Removing other objects not implemented.");
     }
