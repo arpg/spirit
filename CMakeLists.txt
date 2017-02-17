@@ -26,6 +26,7 @@ find_package( Bullet REQUIRED )
 find_package( SceneGraph 0.1 REQUIRED )
 find_package( Eigen3 REQUIRED )
 find_package( Sophus REQUIRED)
+find_package( CeresSolver REQUIRED)
 #find_package( tbb REQUIRED)
 
 
@@ -35,6 +36,7 @@ set( _INCLUDE_DIRS
 	${SceneGraph_INCLUDE_DIRS}
 	${BULLET_INCLUDE_DIR}
 	${Sophus_INCLUDE_DIRS}
+	${CeresSolver_INCLUDE_DIRS}
 #	${TBB_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	)
@@ -42,6 +44,7 @@ set( _LIBRARIES
 	${Pangolin_LIBRARIES}
 	${SceneGraph_LIBRARIES}
 	${BULLET_LIBRARIES}
+	${CeresSolver_LIBRARIES}
 #	${TBB_LIBRARY_DIRS}
 	)
 
@@ -73,7 +76,9 @@ set( HDRS
 	include/spirit/Types/ctpl_stl.h
 	include/spirit/Controllers/spPID.h
 	include/spirit/Planners/spTrajectory.h
+	include/spirit/VehicleCeresCostFunc.h
 	)
+
 set( SRCS
 	src/spirit.cpp
 	src/Gui.cpp

@@ -91,6 +91,7 @@ void spBezierPlanner::RemoveWaypoint(unsigned int index_in_plan) {
 }
 
 void spBezierPlanner::CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, const spPose& init_pose, double fd_delta) {
+/*
   spAWSDCar& car = (spAWSDCar&) jac_objects_.GetObject(jac_car_handle);
   spCurve control_curve(3,2);
   // 8+1 simulations required to fill the jacobian
@@ -130,6 +131,7 @@ void spBezierPlanner::CalcJacobian(spPlannerJacobian& jacobian, const spCtrlPts3
     jacobian.col(jj) = (perturbed_state_delta-end_state)/fd_delta;
   }
   std::cout << "jacobian is : \n" << jacobian << std::endl;
+*/
 }
 
 

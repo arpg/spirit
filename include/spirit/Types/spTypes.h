@@ -23,7 +23,7 @@
 // for a stable physics result use a scale of 2-10
 #define WSCALE 10
 #define WSCALE_INV 0.1
-#define BULLET_SOLVER_NUM_ITERATIONS 10
+#define BULLET_SOLVER_NUM_ITERATIONS 20
 
 #define BIT(x) (1<<(x))
 enum BulletCollissionType{
@@ -59,13 +59,16 @@ typedef Eigen::Matrix<double,2,3> spCtrlPts2ord_2dof;
 // rows = [x,y,z,q1,q2,q3,q4,x_d,y_d,z_d,roll_d,pitch_d,yaw_d]
 // cols = [bezP1x,bezP1y,bezP2x,bezP2y,bezP3x,bezP3y,bezP4x,bezP4y]
 //typedef Eigen::Matrix<double,6,6> spPlannerJacobian;
-typedef Eigen::Matrix<double,6,4> spPlannerJacobian;
+typedef Eigen::Matrix<double,8,4> spPlannerJacobian;
 // spStateVec means [x,y,yaw,x_d,y_d,yaw_d]
 typedef Eigen::Array<double,6,1> spStateVec;
+typedef Eigen::Array<double,8,1> spResidualVec;
+
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 typedef Eigen::Matrix4d spMat4x4;
 
 #define SPERROREXIT(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl; std::exit(EXIT_FAILURE)
+#define SPERROR(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl
 #define SPERROR(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl
 
 enum spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
@@ -175,6 +178,10 @@ class spCurve {
     ctrl_pts_ = pts;
   }
 
+  const Eigen::MatrixXd& GetBezierControlPoints() {
+    return ctrl_pts_;
+  }
+
   void SetHermiteControlPoints(const Eigen::MatrixXd& pts) {
     if((pts.rows() != curve_dof_)||(pts.cols() != curve_order_+1)) {
       std::cout << "Matrix has " << pts.rows() << " rows and " << pts.cols() << " colums." << std::endl;
@@ -194,11 +201,16 @@ class spCurve {
     }
   }
 
-  const Eigen::MatrixXd& GetBezierControlPoints() {
-    return ctrl_pts_;
+  void Get2ndDrivativeCurveArea(Eigen::VectorXd& der_curve_pt) {
+    if(curve_order_ == 3) {
+      SPERROREXIT("Not Implemented.");
+    } else if(curve_order_ == 2) {
+      // calculate second derivative of given points
+      der_curve_pt = 2*ctrl_pts_.col(2)-4*ctrl_pts_.col(1)+2*ctrl_pts_.col(0);
+    } else {
+      SPERROREXIT("Not Implemented.");
+    }
   }
-
-
 
   void GetPoint(Eigen::VectorXd& point, double t) {
     if(point.rows() != curve_dof_) {

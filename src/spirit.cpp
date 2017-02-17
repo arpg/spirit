@@ -2,6 +2,7 @@
 #include <spirit/CarSimFunctor.h>
 //#include <iomanip>
 #include <spirit/Planners/spTrajectory.h>
+#include <spirit/VehicleCeresCostFunc.h>
 
 spirit::spirit(spSettings& user_settings) {
   user_settings_ = user_settings;
@@ -27,7 +28,7 @@ bool spirit::ShouldRun() {
     return true;
   }
 }
-
+/*
 void spirit::CalcLocalPlannerJacobian(){
   spVehicleConstructionInfo car_param;
   car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
@@ -79,49 +80,112 @@ void spirit::CalcLocalPlannerJacobian(){
   double stamp1 = spGeneralTools::Tock_ms(t);
   std::cout << "stamps are " << stamp1 << std::endl;
 }
-
+*/
 void spirit::CheckKeyboardAction() { gui_.CheckKeyboardAction(); }
 
-double f1(double x){
-  return 100*(10-(x))*(10-(x));
-}
-double f2(double x){
-  return 0.1*(2-(x))*(2-(x));
-}
+void spirit::SenarioCeresTest() {
+  spVehicleConstructionInfo car_param;
+  car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
+  car_param.pose.translate(spTranslation(0, 0, 0.07));
+  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
+  car_param.pose.rotate(rot1);
+//  Eigen::AngleAxisd rot2(M_PI/20,Eigen::Vector3d::UnitY());
+//  car_param.pose.rotate(rot2);
+  car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(-0.13, -0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(0.13, -0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(0.13, 0.17, -0.003));
+  car_param.chassis_size = spBoxSize(0.2, 0.42, 0.05);
+  car_param.cog = spTranslation(0, 0, 0);
+  car_param.chassis_friction = 0;
+  car_param.wheel_rollingfriction = 0.6;
+  car_param.wheel_friction = 0.3;
+  car_param.wheel_width = 0.04;
+  car_param.wheel_radius = 0.057;
+  car_param.susp_damping = 0;
+  car_param.susp_stiffness = 10;
+  car_param.susp_preloading_spacer = 0.1;
+  car_param.susp_upper_limit = 0.013;
+  car_param.susp_lower_limit = -0.028;
+  car_param.wheel_mass = 0.1;
+  car_param.chassis_mass = 5;
+  car_param.steering_servo_lower_limit = -SP_PI / 4;
+  car_param.steering_servo_upper_limit = SP_PI / 4;
 
-double fd1(double x, double step){
-  return (f1(x+step)-f1(x))/step;
-}
-double fd2(double x, double step){
-  return (f2(x+step)-f2(x))/step;
-}
+  spCtrlPts2ord_2dof inputcmd_curve;
+  inputcmd_curve.col(0) = Eigen::Vector2d(0,0);
+  inputcmd_curve.col(1) = Eigen::Vector2d(0.01,2);
+  inputcmd_curve.col(2) = Eigen::Vector2d(0.02,2);
+  double param[6];
+  for(int ii=0; ii<6; ii++) {
+    param[ii] = inputcmd_curve.data()[ii];
+  }
+  ceres::Problem problem;
+  spStateVec targetstate;
+  targetstate << 0.483252, 0.0525651 , -1.70123  , 9.85097  , 2.05154  , 0.34601;
+//  targetstate << 1, 1,  0 ,    20 ,  30 , 1;
 
-void spirit::ScenarioGNTest() {
-  Eigen::VectorXd x_curr(2);
-  x_curr.setOnes();
-  x_curr*=0.1;
-for(int ii=0;ii<100;ii++) {
-  Eigen::MatrixXd jac(2,2);
-  double del = 0.000001;
-  jac(0,0) = fd1(x_curr[0],del*x_curr[0]);
-  jac(0,1) = 0;//fd1(x_curr[1],0.001);
-  jac(1,0) = 0;//fd2(x_curr[0],0.001);
-  jac(1,1) = fd2(x_curr[1],del*x_curr[1]);
+//  Eigen::VectorXd cost_surf(100);
+//  for(int ii=0;ii<100;ii++) {
+//    CarSimFunctor sims(car_param);
+//    inputcmd_curve.col(2) = Eigen::Vector2d(-SP_PI_QUART+(SP_PI_HALF/100)*ii,10);
+//    sims(0,10,0.1,inputcmd_curve,0,-1);
+//    Eigen::VectorXd res = targetstate-sims.GetStateVec();
+//    cost_surf[ii] = res.dot(res.transpose());
 
-  Eigen::MatrixXd jtj(2,2);
-  jtj = jac.transpose()*jac;
-  Eigen::VectorXd b(2);
-  b(0) = -f1(x_curr[0]);
-  b(1) = -f2(x_curr[1]);
-  Eigen::VectorXd jtb(jac.transpose()*b);
-  Eigen::VectorXd x_update(jtj.ldlt().solve(jtb));
-  x_curr += x_update;
-  std::cout << "x is -> \n" << x_curr << "\n ii is: " << ii<< std::endl;
-  if(x_update.norm()<0.00001)
-    break;
-}
-}
+//  }
+//  std::cout << "cost surf is \n" << cost_surf << std::endl;
+//  SPERROREXIT("done");
 
+
+   CarSimFunctor sims(car_param);
+   sims(0,10,0.1,inputcmd_curve,0,-1);
+   std::cout << "state is -> " << sims.GetStateVec().transpose() << std::endl;
+  ceres::CostFunction* cost_function = new VehicleCeresCostFunc(car_param,targetstate);
+//   ceres::NumericDiffOptions numericdiff_options;
+//  numericdiff_options.relative_step_size = 1e-1;
+//  ceres::CostFunction* cost_function =
+//      new ceres::NumericDiffCostFunction<CarCostFunction, ceres::CENTRAL, 6, 6>(new CarCostFunction(car_param,targetstate),ceres::Ownership::TAKE_OWNERSHIP,6,numericdiff_options);
+  problem.AddResidualBlock(cost_function, NULL, inputcmd_curve.data());
+  std::vector<int> fix_param_vec;
+  fix_param_vec.push_back(0);
+  fix_param_vec.push_back(1);
+//  fix_param_vec.push_back(2);
+//  fix_param_vec.push_back(3);
+//  fix_param_vec.push_back(5);
+  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(6,fix_param_vec);
+  problem.SetParameterization(inputcmd_curve.data(),subparam);
+
+  problem.SetParameterLowerBound(inputcmd_curve.data(),0,-SP_PI/4);
+  problem.SetParameterLowerBound(inputcmd_curve.data(),2,-SP_PI/4);
+  problem.SetParameterLowerBound(inputcmd_curve.data(),4,-SP_PI/4);
+  problem.SetParameterLowerBound(inputcmd_curve.data(),1,-100);
+  problem.SetParameterLowerBound(inputcmd_curve.data(),3,-100);
+  problem.SetParameterLowerBound(inputcmd_curve.data(),5,-100);
+  problem.SetParameterUpperBound(inputcmd_curve.data(),0,SP_PI/4);
+  problem.SetParameterUpperBound(inputcmd_curve.data(),2,SP_PI/4);
+  problem.SetParameterUpperBound(inputcmd_curve.data(),4,SP_PI/4);
+  problem.SetParameterUpperBound(inputcmd_curve.data(),1,100);
+  problem.SetParameterUpperBound(inputcmd_curve.data(),3,100);
+  problem.SetParameterUpperBound(inputcmd_curve.data(),5,100);
+  // Run the solver!
+  ceres::Solver::Options options;
+//  options.check_gradients = true;
+//  options.gradient_check_numeric_derivative_relative_step_size = 0.05;
+  options.update_state_every_iteration = true;
+//  options.minimizer_type = ceres::MinimizerType::LINE_SEARCH;
+  options.linear_solver_type = ceres::DENSE_QR;
+  options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
+  options.minimizer_progress_to_stdout = true;
+  ceres::Solver::Summary summary;
+  ceres::Solve(options, &problem, &summary);
+
+  std::cout << summary.FullReport() << "\n";
+  std::cout << "sol is \n" << inputcmd_curve << std::endl;
+  CarSimFunctor sims2(car_param);
+  sims2(0,10,0.1,inputcmd_curve,0,-1);
+  std::cout << "state is -> " << sims2.GetStateVec().transpose() << std::endl;
+}
 
 void spirit::CalcJacobianTest(spVehicleConstructionInfo& car_param,spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts2ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, const spPose& init_pose, double fd_delta) {
   spObjectHandle obj_cars_ind = objects_.CreateVehicle(car_param);
@@ -137,7 +201,9 @@ void spirit::CalcJacobianTest(spVehicleConstructionInfo& car_param,spPlannerJaco
   // 8+1 simulations required to fill the jacobian
   control_curve.SetBezierControlPoints(cntrl_vars);
   spPointXd sample_control(2);
-
+  spPointXd curvature_cost(2);
+  control_curve.Get2ndDrivativeCurveArea(curvature_cost);
+  std::cout << "cur cost   " << curvature_cost.transpose() << std::endl;
 //  car.SetPose(init_pose);
 //  car.SetClampToSurfaceFlag();
 //  physics_.Iterate(objects_,0.001);
@@ -151,7 +217,6 @@ void spirit::CalcJacobianTest(spVehicleConstructionInfo& car_param,spPlannerJaco
 //  }
 //  car.SetLinVel(spLinVel(0,0,0));
 //  car.SetRotVel(spRotVel(0,0,0));
-
   // simulate final pose of vehicle with current control_vars
   for(int ii=1;ii<=num_sim_steps;ii++) {
     control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
@@ -198,11 +263,13 @@ void spirit::CalcJacobianTest(spVehicleConstructionInfo& car_param,spPlannerJaco
 //    gui_.RemoveObject(car);
     objects_.RemoveObj(obj_cars_index[jj+1]);
 
-
-    control_curve.RemoveLastPerturbation();
     spStateVec perturbed_state_delta = car.GetStateVecor();
+    spPointXd pert_curvaturecost(2);
+    control_curve.Get2ndDrivativeCurveArea(pert_curvaturecost);
+    control_curve.RemoveLastPerturbation();
+    Eigen::Vector2d diff = pert_curvaturecost-curvature_cost;
     // find forward finite difference value and put in jacobian
-    jacobian.col(jj) = (perturbed_state_delta-end_state)*(1/(a*fd_delta));
+    jacobian.col(jj) << (perturbed_state_delta-end_state)*(1/(a*fd_delta)),diff;
   }
   Eigen::IOFormat OctaveFmt(Eigen::StreamPrecision, 0, ", ", ";\n", "", "", "[", "]");;
   std::cout << "jacobian is : \n" << jacobian.format(OctaveFmt) << std::endl;
@@ -282,39 +349,47 @@ void spirit::ScenarioPlannerTest() {
 //  spCtrlPts3ord_2dof inputcmd_curve;
   spCtrlPts2ord_2dof inputcmd_curve;
   inputcmd_curve.col(0) = Eigen::Vector2d(0,10);
-  inputcmd_curve.col(1) = Eigen::Vector2d(-SP_PI_QUART/5,20);
-  inputcmd_curve.col(2) = Eigen::Vector2d(-SP_PI_QUART/2,0);
+  inputcmd_curve.col(1) = Eigen::Vector2d(-SP_PI_QUART/10,5);
+  inputcmd_curve.col(2) = Eigen::Vector2d(-SP_PI_QUART/10,30);
 //  inputcmd_curve.col(3) = Eigen::Vector2d(-SP_PI_QUART/3,30);
-
-for(int jj=0;jj<1000;jj++) {
+double prev_norm = 100000;
+for(int jj=0;jj<100;jj++) {
   std::cout << "jj is " << jj << std::endl;
   spPose Startpose(spPose::Identity());
-  spStateVec hx;
-  CalcJacobianTest(car_param,jacobian,hx,inputcmd_curve,10,0.1,Startpose,0.000001);
-//  std::cout << "hx is " << hx << std::endl;
-  spStateVec z;
-  z << 0.892789,0.360659,-0.880967,10.2074,11.1997,1.47071;
-//  z << /*0.771389*/1,/*0.206215*/1,-SP_PI_HALF,10.9993,9.88804,1.93296;
-//  Eigen::MatrixXd R(6,6);
-//  R = Eigen::MatrixXd::Identity(6,6);
-  Eigen::VectorXd vec_diag(6);
-//  vec_diag << 1.2,1.2,1.2,0.1,0.1,0.1;
-//  vec_diag << 100.2,100.2,100,0.2,0.2,0.2;
-//  vec_diag << 0.2,0.2,0.2,200,200,200;
-//  vec_diag << 0.4,0.4,0.4,1,1,1;
+  spStateVec state_vec;
+  CalcJacobianTest(car_param,jacobian,state_vec,inputcmd_curve,10,0.1,Startpose,0.00001);
+  spResidualVec z;
+  z << 0.385925, 0.0905907 ,  -1.8649 ,  4.01045 ,  2.85222,  0.888181,-1.25664 ,20;
+  Eigen::VectorXd vec_diag(8);
 //  vec_diag << 0.1,0.1,0.1,0.1,0.1,0.1;
-  vec_diag << 1,1,1,1,1,1;
+  vec_diag << 1,1,1,1,1,1,1,1;
   Eigen::MatrixXd R = vec_diag.asDiagonal();
   Eigen::MatrixXd jtj(jacobian.transpose()*R*jacobian);
+  spCurve control_curve(2,2);
+  // 8+1 simulations required to fill the jacobian
+  control_curve.SetBezierControlPoints(inputcmd_curve);
+  spResidualVec hx;
+  spPointXd curvature_cost(2);
+  control_curve.Get2ndDrivativeCurveArea(curvature_cost);
+  hx << state_vec,curvature_cost;
   Eigen::VectorXd jtb(jacobian.transpose()*R*(Eigen::VectorXd)(z-hx));
   Eigen::VectorXd x_update = jtj.ldlt().solve(jtb);
   std::cout << "update is \n" << x_update.transpose() << std::endl;
   std::cout << "norm is " << x_update.norm() << std::endl;
+  if(x_update.norm()>=prev_norm){
+    std::cout << "done here" << std::endl;
+    std::cout << "last pose is " << state_vec.transpose() << std::endl;
+    break;
+  }
+  prev_norm = x_update.norm();
   std::cout << "solution is" << std::endl;
   for(int ii=0;ii<4;ii++) {
-    inputcmd_curve.data()[ii+2] += x_update[ii];
+    inputcmd_curve.data()[ii+2] += 0.9*x_update[ii];
     std::cout << inputcmd_curve.data()[ii+2] << std::endl;
   }
+}
+while(1){
+  gui_.Iterate(objects_);
 }
 
 }
@@ -669,10 +744,10 @@ void spirit::IterateWorld() {
 //               std::endl;
 //  plan.UpdateCurves();
   spGeneralTools::Delay_ms(100);
-
+SPERROREXIT("ENDOFPROGRAM");
   if (fl<500) {
-    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
-    car.GetStateVecor();
+//    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
+//    car.GetStateVecor();
 //    spPose pose(spPose::Identity());
 //    pose.translate(spTranslation(1, 1, 1));
 
@@ -683,7 +758,7 @@ void spirit::IterateWorld() {
     spTimestamp phy_tick = spGeneralTools::Tick();
 //    spBox& box1 = (spBox&) objects_.GetObject(obj_gnd_index);
 //    std::cout << "z is " << box1.GetPose().translation()[2] << std::endl;
-    objects_.StepPhySimulation(0.01);
+//    objects_.StepPhySimulation(0.01);
 
     //    std::cout << "wheel pose is\n" << car.GetWheel(0)->GetPose().matrix() << std::endl;
     fl++;

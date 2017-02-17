@@ -68,7 +68,8 @@ int main(int argc, char** argv) {
 //  sp_world.CalcLocalPlannerJacobian();
 //  sp_world.ScenarioWorldBoxFall();
 //  sp_world.ScenarioWorldCarFall();
-  sp_world.ScenarioPlannerTest();
+//  sp_world.ScenarioPlannerTest();
+  sp_world.SenarioCeresTest();
 //  sp_world.ScenarioPIDController();
 //  sp_world.ScenarioGNTest();
   while(sp_world.ShouldRun()) {

@@ -13,9 +13,14 @@ Objects::~Objects(){
 //		btCollisionShape* shape = collisionShapes_[j];
 //		delete shape;
 //	}
-  for (spObjectHandle ii=objects_.begin();ii!=objects_.end();ii++) {
+  spObjectHandle ii = objects_.begin();
+  while(ii != objects_.end()){
     RemoveObj(ii);
+    ii = objects_.begin();
   }
+//  for (spObjectHandle ii=objects_.begin();ii!=objects_.end();++ii) {
+//    RemoveObj(--ii);
+//  }
   delete(dynamics_world_);
   switch(world_params_.solver) {
     case spPhysolver::MLCP_DANTZIG:
@@ -124,13 +129,17 @@ void Objects::RemoveObj(spObjectHandle& obj_handle) {
       dynamics_world_->removeConstraint(car.GetWheel(0)->GetRigidbody()->getConstraintRef(0));
       dynamics_world_->removeRigidBody(car.GetRigidbody());
       dynamics_world_->clearForces();
+    } else if(GetObject(obj_handle).GetObjecType() == spObjectType::BOX) {
+      spBox& box = (spBox&) GetObject(obj_handle);
+      dynamics_world_->removeRigidBody(box.GetRigidbody());
+      dynamics_world_->clearForces();
     } else {
       SPERROREXIT("Removing other objects not implemented.");
     }
     objects_.erase(obj_handle);
     obj_handle = NULL_HANDLE;
   } else {
-    SPERROREXIT("Requested Object doesn't exist.");
+    SPERROREXIT("Requested Handle is NULL.");
   }
 }
 
