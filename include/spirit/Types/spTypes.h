@@ -23,7 +23,7 @@
 // for a stable physics result use a scale of 2-10
 #define WSCALE 10
 #define WSCALE_INV 0.1
-#define BULLET_SOLVER_NUM_ITERATIONS 20
+#define BULLET_SOLVER_NUM_ITERATIONS 10
 
 #define BIT(x) (1<<(x))
 enum BulletCollissionType{
@@ -61,7 +61,7 @@ typedef Eigen::Matrix<double,2,3> spCtrlPts2ord_2dof;
 //typedef Eigen::Matrix<double,6,6> spPlannerJacobian;
 typedef Eigen::Matrix<double,8,4> spPlannerJacobian;
 // spStateVec means [x,y,yaw,x_d,y_d,yaw_d]
-typedef Eigen::Array<double,6,1> spStateVec;
+typedef Eigen::Array<double,12,1> spStateVec;
 typedef Eigen::Array<double,8,1> spResidualVec;
 
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;

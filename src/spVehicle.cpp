@@ -143,14 +143,21 @@ const spStateVec& spVehicle::GetStateVecor() {
   spPose pose = btTransform2spPose(rigid_body_->getWorldTransform());
   statevec_[0] = pose.translation()[0];
   statevec_[1] = pose.translation()[1];
+  statevec_[2] = pose.translation()[2];
   Eigen::Vector3d v = pose.rotation().eulerAngles(1,2,3);
+  // roll and pich are in the following
+  statevec_[3] = v[0];
+  statevec_[4] = v[2];
   // take the yaw angle, for some reason its on v[1] instead of expected v[2] position
-  statevec_[2] = v[1];
+  statevec_[5] = v[1];
   btVector3 lin_vel = rigid_body_->getLinearVelocity();
-  statevec_[3] = lin_vel[0];
-  statevec_[4] = lin_vel[1];
+  statevec_[6] = lin_vel[0];
+  statevec_[7] = lin_vel[1];
+  statevec_[8] = lin_vel[2];
   btVector3 rot_vel = rigid_body_->getAngularVelocity();
-  statevec_[5] = rot_vel[2];
+  statevec_[9] = rot_vel[2];
+  statevec_[10] = rot_vel[0];
+  statevec_[11] = rot_vel[1];
 //  spRotation quat(pose.rotation());
 //  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
   return statevec_;

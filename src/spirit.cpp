@@ -114,15 +114,15 @@ void spirit::SenarioCeresTest() {
 
   spCtrlPts2ord_2dof inputcmd_curve;
   inputcmd_curve.col(0) = Eigen::Vector2d(0,0);
-  inputcmd_curve.col(1) = Eigen::Vector2d(0.01,2);
-  inputcmd_curve.col(2) = Eigen::Vector2d(0.02,2);
-  double param[6];
-  for(int ii=0; ii<6; ii++) {
-    param[ii] = inputcmd_curve.data()[ii];
-  }
+  inputcmd_curve.col(1) = Eigen::Vector2d(0,10);
+  inputcmd_curve.col(2) = Eigen::Vector2d(0,10);
+
   ceres::Problem problem;
   spStateVec targetstate;
-  targetstate << 0.483252, 0.0525651 , -1.70123  , 9.85097  , 2.05154  , 0.34601;
+  targetstate << 0.483252,   0.0525651 ,  0.0469795,     3.14148,     3.14151 ,   -1.70123 ,    9.85097 ,    2.05154,  -0.0211807 ,    0.34601 , -0.0193395 ,-0.00510512;
+//  targetstate << 0.482476,    0.0519377,    0.0859993,  1.81986e-06,   2.0501e-06,     -1.44179,      9.81992,       2.0248, -4.98532e-06,     0.344223,  -1.4591e-06,  7.56714e-06;
+//  targetstate << 0.482476,    0.0519377,    0.0469993,  1.81986e-06,   2.0501e-06,     -1.44179,      9.81992,       2.0248, -4.98532e-06,     0.344223,  -1.4591e-06,  7.56714e-06;
+//  targetstate << 0.483252, 0.0525651 , -1.70123  , 9.85097  , 2.05154  , 0.34601;
 //  targetstate << 1, 1,  0 ,    20 ,  30 , 1;
 
 //  Eigen::VectorXd cost_surf(100);
@@ -146,28 +146,57 @@ void spirit::SenarioCeresTest() {
 //  numericdiff_options.relative_step_size = 1e-1;
 //  ceres::CostFunction* cost_function =
 //      new ceres::NumericDiffCostFunction<CarCostFunction, ceres::CENTRAL, 6, 6>(new CarCostFunction(car_param,targetstate),ceres::Ownership::TAKE_OWNERSHIP,6,numericdiff_options);
-  problem.AddResidualBlock(cost_function, NULL, inputcmd_curve.data());
+  double parameters[7];
+  for (int ii = 0; ii < 6; ++ii) {
+    parameters[ii] = inputcmd_curve.data()[ii];
+  }
+  double sim_length = 1.0;
+  parameters[6] =  sim_length;
+//  std::cout << "val is " << *parameters[0] << std::endl;
+//    problem.AddResidualBlock(cost_function, NULL, inputcmd_curve.data());
+  problem.AddResidualBlock(cost_function, NULL, parameters);
+//  problem.AddResidualBlock(cost_function, new ceres::CauchyLoss(0.9), parameters);
+
   std::vector<int> fix_param_vec;
   fix_param_vec.push_back(0);
   fix_param_vec.push_back(1);
 //  fix_param_vec.push_back(2);
 //  fix_param_vec.push_back(3);
 //  fix_param_vec.push_back(5);
-  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(6,fix_param_vec);
-  problem.SetParameterization(inputcmd_curve.data(),subparam);
+  fix_param_vec.push_back(6);
 
-  problem.SetParameterLowerBound(inputcmd_curve.data(),0,-SP_PI/4);
-  problem.SetParameterLowerBound(inputcmd_curve.data(),2,-SP_PI/4);
-  problem.SetParameterLowerBound(inputcmd_curve.data(),4,-SP_PI/4);
-  problem.SetParameterLowerBound(inputcmd_curve.data(),1,-100);
-  problem.SetParameterLowerBound(inputcmd_curve.data(),3,-100);
-  problem.SetParameterLowerBound(inputcmd_curve.data(),5,-100);
-  problem.SetParameterUpperBound(inputcmd_curve.data(),0,SP_PI/4);
-  problem.SetParameterUpperBound(inputcmd_curve.data(),2,SP_PI/4);
-  problem.SetParameterUpperBound(inputcmd_curve.data(),4,SP_PI/4);
-  problem.SetParameterUpperBound(inputcmd_curve.data(),1,100);
-  problem.SetParameterUpperBound(inputcmd_curve.data(),3,100);
-  problem.SetParameterUpperBound(inputcmd_curve.data(),5,100);
+  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(7,fix_param_vec);
+//  problem.SetParameterization(inputcmd_curve.data(),subparam);
+  problem.SetParameterization(parameters,subparam);
+
+//  problem.SetParameterLowerBound(inputcmd_curve.data(),0,-SP_PI/4);
+//  problem.SetParameterLowerBound(inputcmd_curve.data(),2,-SP_PI/4);
+//  problem.SetParameterLowerBound(inputcmd_curve.data(),4,-SP_PI/4);
+//  problem.SetParameterLowerBound(inputcmd_curve.data(),1,-100);
+//  problem.SetParameterLowerBound(inputcmd_curve.data(),3,-100);
+//  problem.SetParameterLowerBound(inputcmd_curve.data(),5,-100);
+//  problem.SetParameterUpperBound(inputcmd_curve.data(),0,SP_PI/4);
+//  problem.SetParameterUpperBound(inputcmd_curve.data(),2,SP_PI/4);
+//  problem.SetParameterUpperBound(inputcmd_curve.data(),4,SP_PI/4);
+//  problem.SetParameterUpperBound(inputcmd_curve.data(),1,100);
+//  problem.SetParameterUpperBound(inputcmd_curve.data(),3,100);
+//  problem.SetParameterUpperBound(inputcmd_curve.data(),5,100);
+
+//  problem.SetParameterLowerBound(parameters,0,-SP_PI/4);
+//  problem.SetParameterLowerBound(parameters,2,-SP_PI/4);
+//  problem.SetParameterLowerBound(parameters,4,-SP_PI/4);
+//  problem.SetParameterLowerBound(parameters,1,-100);
+//  problem.SetParameterLowerBound(parameters,3,-100);
+//  problem.SetParameterLowerBound(parameters,5,-100);
+//  problem.SetParameterUpperBound(parameters,0,SP_PI/4);
+//  problem.SetParameterUpperBound(parameters,2,SP_PI/4);
+//  problem.SetParameterUpperBound(parameters,4,SP_PI/4);
+//  problem.SetParameterUpperBound(parameters,1,100);
+//  problem.SetParameterUpperBound(parameters,3,100);
+//  problem.SetParameterUpperBound(parameters,5,100);
+//  problem.SetParameterUpperBound(parameters,6,5);
+//  problem.SetParameterLowerBound(parameters,6,0.1);
+
   // Run the solver!
   ceres::Solver::Options options;
 //  options.check_gradients = true;
@@ -180,11 +209,18 @@ void spirit::SenarioCeresTest() {
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
 
+  for (int ii = 0; ii < 6; ++ii) {
+    inputcmd_curve.data()[ii] = parameters[ii];
+  }
+  sim_length = parameters[6];
+
   std::cout << summary.FullReport() << "\n";
   std::cout << "sol is \n" << inputcmd_curve << std::endl;
   CarSimFunctor sims2(car_param);
-  sims2(0,10,0.1,inputcmd_curve,0,-1);
+  sims2(0,(int)(10),0.1,inputcmd_curve,0,-1);
   std::cout << "state is -> " << sims2.GetStateVec().transpose() << std::endl;
+  std::cout << "vs       -> " << targetstate.transpose() << std::endl;
+  std::cout << "simulation length is " << sim_length << std::endl;
 }
 
 void spirit::CalcJacobianTest(spVehicleConstructionInfo& car_param,spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts2ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, const spPose& init_pose, double fd_delta) {
