@@ -6,7 +6,6 @@
 #include <spirit/spSettings.h>
 #include <spirit/Types/spTypes.h>
 #include <spirit/Objects.h>
-#include <spirit/Planners/spBezierPlanner.h>
 #include <functional>
 
 class spirit{
@@ -24,6 +23,7 @@ public:
   void ScenarioPIDController();
   void CalcLocalPlannerJacobian();
   void SenarioCeresTest();
+  void SenarioTrajectoryTest();
 private:
   void InitCarPool(int num_cars);
   std::vector<Objects> pool_objects_vec_;

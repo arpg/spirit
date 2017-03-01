@@ -12,32 +12,6 @@
 #include <spirit/CarSimFunctor.h>
 #include <iomanip>
 
-/*
-struct CarCostFunction {
-  CarCostFunction(const spVehicleConstructionInfo& info, const spStateVec&
-target_state) : vehicle_info_(info), target_state_(target_state){
-  }
-
-  bool operator()(const double* const parameters, double* residual) const {
-    spCtrlPts2ord_2dof cntrl_vars;
-    for(int ii=0; ii<6; ii++) {
-      cntrl_vars.data()[ii] = parameters[ii];
-    }
-//    std::cout << "params are \n" << std::setprecision(12) << std::fixed <<
-cntrl_vars << std::endl;
-    Eigen::Map<Eigen::Vector6d> res(residual);
-    CarSimFunctor sims(vehicle_info_);
-    sims(0,10,0.1,cntrl_vars,0,-1);
-    res = target_state_-sims.GetStateVec();
-//    std::cout << "res is " << res.transpose() << std::endl;
-    return true;
-  }
-private:
-  spVehicleConstructionInfo vehicle_info_;
-  spStateVec target_state_;
-};
-*/
-
 class VehicleCeresCostFunc : public ceres::SizedCostFunction<12,7> {
  public:
   VehicleCeresCostFunc(const spVehicleConstructionInfo& info,

@@ -52,12 +52,12 @@ include_directories( ${_INCLUDE_DIRS} )
 
 set( HDRS
 	include/spirit/spirit.h
-	include/spirit/Gui.h
-#	include/spirit/Physics.h
 	include/spirit/Gui/spCommonGui.h
 	include/spirit/Gui/spPangolinScenegraphGui.h
 #	include/spirit/Physics/spPhysicsWorld.h
 #	include/spirit/Physics/spBulletWorld.h
+	include/spirit/Objects.h
+	include/spirit/Gui.h
 	include/spirit/spGeneralTools.h
 	include/spirit/spSettings.h
 	include/spirit/Objects/spBox.h
@@ -70,23 +70,22 @@ set( HDRS
 	include/spirit/Objects/spWaypoint.h
 	include/spirit/Types/spTypes.h
 	include/spirit/Controllers/spControllerInterface.h
-	include/spirit/Planners/spBezierPlanner.h
 	include/spirit/Objects/spLineStrip.h
 	include/spirit/CarSimFunctor.h
 	include/spirit/Types/ctpl_stl.h
 	include/spirit/Controllers/spPID.h
 	include/spirit/Planners/spTrajectory.h
 	include/spirit/VehicleCeresCostFunc.h
+	include/spirit/Planners/spLocalPlanner.h
 	)
 
 set( SRCS
 	src/spirit.cpp
 	src/Gui.cpp
-#	src/Physics.cpp
+	src/spLocalPlanner.cpp
 	src/spPangolinScenegraphGui.cpp
 	src/spGeneralTools.cpp
 	src/spSettings.cpp
-#	src/spBulletWorld.cpp
 	src/spBox.cpp
 	src/spWaypoint.cpp
 	src/spCommonObject.cpp
@@ -96,7 +95,6 @@ set( SRCS
 	src/spAWSDCar.cpp
 	src/spWheel.cpp
 	src/spLineStrip.cpp
-	src/spBezierPlanner.cpp
 	src/spPID.cpp
 	src/spTrajectory.cpp
 	)

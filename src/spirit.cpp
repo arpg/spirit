@@ -28,15 +28,15 @@ bool spirit::ShouldRun() {
     return true;
   }
 }
-/*
-void spirit::CalcLocalPlannerJacobian(){
+
+void spirit::CheckKeyboardAction() { gui_.CheckKeyboardAction(); }
+
+void spirit::SenarioTrajectoryTest() {
   spVehicleConstructionInfo car_param;
   car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
-  car_param.pose.translate(spTranslation(0, 0, 0.15));
-//  Eigen::AngleAxisd rot1(M_PI/4+0.17355,Eigen::Vector3d::UnitX());
-//  car_param.pose.rotate(rot1);
-//  Eigen::AngleAxisd rot2(M_PI/20,Eigen::Vector3d::UnitY());
-//  car_param.pose.rotate(rot2);
+  car_param.pose.translate(spTranslation(0, 0, 0.07));
+  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
+  car_param.pose.rotate(rot1);
   car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
   car_param.wheels_anchor.push_back(spTranslation(-0.13, -0.17, -0.003));
   car_param.wheels_anchor.push_back(spTranslation(0.13, -0.17, -0.003));
@@ -44,44 +44,53 @@ void spirit::CalcLocalPlannerJacobian(){
   car_param.chassis_size = spBoxSize(0.2, 0.42, 0.05);
   car_param.cog = spTranslation(0, 0, 0);
   car_param.chassis_friction = 0;
-  car_param.wheel_rollingfriction = 0;
+  car_param.wheel_rollingfriction = 0.6;
   car_param.wheel_friction = 0.3;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.057;
-  car_param.susp_damping = 10;
-  car_param.susp_stiffness = 100;
+  car_param.susp_damping = 0;
+  car_param.susp_stiffness = 10;
   car_param.susp_preloading_spacer = 0.1;
-//  car_param.susp_upper_limit = 0.013;
-//  car_param.susp_lower_limit = -0.028;
-  car_param.susp_upper_limit = 0;
-  car_param.susp_lower_limit = 0;
+  car_param.susp_upper_limit = 0.013;
+  car_param.susp_lower_limit = -0.028;
   car_param.wheel_mass = 0.1;
   car_param.chassis_mass = 5;
   car_param.steering_servo_lower_limit = -SP_PI / 4;
   car_param.steering_servo_upper_limit = SP_PI / 4;
 
-//  CarSimFunctor sim_functor(car_param,spPhyEngineType::PHY_BULLET);
-  ctpl::thread_pool pool(9);
-  spTimestamp t = spGeneralTools::Tick();
-  std::vector<std::shared_ptr<CarSimFunctor>> sims;
-  for(int ii=0;ii<9;ii++) {
-    sims.push_back(std::make_shared<CarSimFunctor>(car_param,spPhyEngineType::PHY_BULLET));
+  spPose gnd_pose_ = spPose::Identity();
+  gnd_pose_.translate(spTranslation(0,0,-0.5));
+  spObjectHandle gnd_handle = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
+  gui_.AddObject(objects_.GetObject(gnd_handle));
+
+  spTrajectory traj(gui_,objects_);
+  // put waypoints on a elliptical path
+  double a = 3;
+  double b = 2;
+  for(int ii=0; ii<10; ii++) {
+    // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
+    double theta = ii*(2*SP_PI)/10;
+    double r = (a*b)/sqrt(b*b*pow(cos(theta),2)+a*a*pow(sin(theta),2));
+    double x = r*cos(theta);
+    double y = r*sin(theta);
+    // slope of the line is
+    double m = -(x*b*b)/(y*a*a);
+    double angle = atan2(-(x*b*b),(y*a*a));
+    spPose pose(spPose::Identity());
+    pose.translate(spTranslation(x,y,0));
+    Eigen::AngleAxisd rot(angle+SP_PI,Eigen::Vector3d::UnitZ());
+    pose.rotate(rot);
+    traj.AddWaypoint(pose);
   }
-  t = spGeneralTools::Tick();
-  for(int kk=0;kk<1;kk++){
-//    std::cout << "i"  << std::endl;
-    pool.reinit(79);
-    for(int ii=0;ii<9;ii++) {
-      pool.push(std::ref(*sims[ii].get()));
-    }
-    pool.stop(true);
-    pool.clear_queue();
-  }
-  double stamp1 = spGeneralTools::Tock_ms(t);
-  std::cout << "stamps are " << stamp1 << std::endl;
+
+while(1){
+
+  traj.UpdateCurves();
+  gui_.Iterate(objects_);
 }
-*/
-void spirit::CheckKeyboardAction() { gui_.CheckKeyboardAction(); }
+
+
+}
 
 void spirit::SenarioCeresTest() {
   spVehicleConstructionInfo car_param;
@@ -222,6 +231,7 @@ void spirit::SenarioCeresTest() {
   std::cout << "vs       -> " << targetstate.transpose() << std::endl;
   std::cout << "simulation length is " << sim_length << std::endl;
 }
+
 
 void spirit::CalcJacobianTest(spVehicleConstructionInfo& car_param,spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts2ord_2dof& cntrl_vars,unsigned int num_sim_steps,double sim_step_size, const spPose& init_pose, double fd_delta) {
   spObjectHandle obj_cars_ind = objects_.CreateVehicle(car_param);

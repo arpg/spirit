@@ -60,9 +60,11 @@ void spPangolinScenegraphGui::InitGui() {
   // Create Globjects
   SceneGraph::GLGrid grid(10, 1, false);
   globjects_.push_back(new SceneGraph::GLGrid(grid));
-  globjects_.push_back(new SceneGraph::GLLight(1000, 1000, 1000));
   globjects_.push_back(new SceneGraph::GLLight(0, 0, 10));
-  globjects_.push_back(new SceneGraph::GLLight(0, 0, 0));
+  globjects_.push_back(new SceneGraph::GLLight(-20, 20, 10));
+  globjects_.push_back(new SceneGraph::GLLight(20, -20, 10));
+  globjects_.push_back(new SceneGraph::GLLight(20, 20, 0));
+  globjects_.push_back(new SceneGraph::GLLight(-20, -20, 0));
 
   // Add already created globjects to glscenegraph_
   for (int ii = 0; ii < globjects_.size(); ii++) {

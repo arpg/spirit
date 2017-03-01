@@ -38,7 +38,7 @@ private:
   std::vector<spWaypoint*> waypoint_vec_;
   std::vector<std::shared_ptr<spCurve>> curve_vec_;
   std::vector<bool> needs_update_vec_;
-
+  const int num_pts_per_curve = 50;
 };
 
 #endif  //  SP_TRAJECTORY_H__
