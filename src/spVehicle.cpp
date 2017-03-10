@@ -139,11 +139,20 @@ void spVehicle::SetVelocity(const spVelocity& chassis_vel) {
   SPERROREXIT("SetVel not implemented !");
 }
 
-const spStateVec& spVehicle::GetStateVecor() {
-  spPose pose = btTransform2spPose(rigid_body_->getWorldTransform());
-  statevec_[0] = pose.translation()[0];
-  statevec_[1] = pose.translation()[1];
-  statevec_[2] = pose.translation()[2];
+const spState& spVehicle::GetState() {
+  // bullet uses Euler ZYX(yaw,pitch,roll) convention for rotations
+//  spPose pose = btTransform2spPose(rigid_body_->getWorldTransform());
+  state_.pose = btTransform2spPose(rigid_body_->getWorldTransform());
+  state_.linvel = (spLinVel)rigid_body_->getLinearVelocity();
+  btQuaternion btrotvel(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
+  state_.rotvel = spRotation(btrotvel);
+
+
+
+
+  state_[0] = pose.translation()[0];
+  state_[1] = pose.translation()[1];
+  state_[2] = pose.translation()[2];
   Eigen::Vector3d v = pose.rotation().eulerAngles(1,2,3);
   // roll and pich are in the following
   statevec_[3] = v[0];

@@ -34,9 +34,6 @@ void spirit::CheckKeyboardAction() { gui_.CheckKeyboardAction(); }
 void spirit::SenarioTrajectoryTest() {
   spVehicleConstructionInfo car_param;
   car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
-  car_param.pose.translate(spTranslation(0, 0, 0.07));
-  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
-  car_param.pose.rotate(rot1);
   car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
   car_param.wheels_anchor.push_back(spTranslation(-0.13, -0.17, -0.003));
   car_param.wheels_anchor.push_back(spTranslation(0.13, -0.17, -0.003));
@@ -80,24 +77,22 @@ void spirit::SenarioTrajectoryTest() {
     pose.translate(spTranslation(x,y,0));
     Eigen::AngleAxisd rot(angle+SP_PI,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
-    traj.AddWaypoint(pose);
+    traj.AddWaypoint(pose,false);
   }
-
-while(1){
-
-  traj.UpdateCurves();
-  gui_.Iterate(objects_);
-}
-
-
+  spLocalPlanner localplanner(traj,car_param);
+  localplanner.CalcInitialPlans();
+  while(1){
+    traj.UpdateCurves();
+    gui_.Iterate(objects_);
+  }
 }
 
 void spirit::SenarioCeresTest() {
   spVehicleConstructionInfo car_param;
   car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
-  car_param.pose.translate(spTranslation(0, 0, 0.07));
-  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
-  car_param.pose.rotate(rot1);
+//  car_param.pose.translate(spTranslation(0, 0, 0.07));
+//  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
+//  car_param.pose.rotate(rot1);
 //  Eigen::AngleAxisd rot2(M_PI/20,Eigen::Vector3d::UnitY());
 //  car_param.pose.rotate(rot2);
   car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
@@ -558,13 +553,13 @@ void spirit::ScenarioPIDController() {
 
   spTrajectory traj(gui_,objects_);
   spPose pose(spPose::Identity());
-  traj.AddWaypoint(pose);
+  traj.AddWaypoint(pose,true);
   pose.translate(spTranslation(1,1,0));
-  traj.AddWaypoint(pose);
+  traj.AddWaypoint(pose,true);
   pose.translate(spTranslation(1,-1,0));
-  traj.AddWaypoint(pose);
+  traj.AddWaypoint(pose,true);
   pose.translate(spTranslation(-1,-1,0));
-  traj.AddWaypoint(pose);
+  traj.AddWaypoint(pose,true);
 
 while(1){
 //  pts.col(0) = waypoint0.GetPose().translation();
@@ -587,8 +582,8 @@ void spirit::ScenarioWorldCarFall() {
   spVehicleConstructionInfo car_param;
   car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
   car_param.pose.translate(spTranslation(0, 0, 0.06));
-//  Eigen::AngleAxisd rot1(M_PI/4+0.17355,Eigen::Vector3d::UnitX());
-//  car_param.pose.rotate(rot1);
+  Eigen::AngleAxisd rot1(M_PI/4+0.17355,Eigen::Vector3d::UnitX());
+  car_param.pose.rotate(rot1);
 //  Eigen::AngleAxisd rot2(SP_PI/2,Eigen::Vector3d::UnitZ());
 //  car_param.pose.rotate(rot2);
   car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
@@ -616,6 +611,9 @@ void spirit::ScenarioWorldCarFall() {
     obj_car_index = objects_.CreateVehicle(car_param);
     gui_.AddObject(objects_.GetObject(obj_car_index));
     spAWSDCar& car = (spAWSDCar&)objects_.GetObject(obj_car_index);
+    spPose carpose(spPose::Identity());
+    carpose.translate(spTranslation(0,0,0.07));
+    car.SetPose(carpose);
 //    car.SetClampToSurfaceFlag();
     car.SetEngineTorque(10);
     car.SetEngineMaxVel(100);

@@ -7,6 +7,7 @@
 #include <spirit/Types/spTypes.h>
 #include <spirit/Objects.h>
 #include <functional>
+#include <spirit/Planners/spLocalPlanner.h>
 
 class spirit{
 public:

@@ -72,7 +72,19 @@ int main(int argc, char** argv) {
 //  sp_world.SenarioCeresTest();
 //  sp_world.ScenarioPIDController();
 //  sp_world.ScenarioGNTest();
-  sp_world.SenarioTrajectoryTest();
+
+//  sp_world.SenarioTrajectoryTest();
+  spPose a(spPose::Identity());
+  spPose b(spPose::Identity());
+  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
+  b.rotate(rot1);
+  std::cout << "b is \n" << b.rotation() << std::endl;
+  Eigen::Transform<double,3,Eigen::Affine>::LinearMatrixType rot;
+  rot = b.rotation();
+
+  a.rotate(rot);
+  std::cout << "a is \n" << a.rotation() << std::endl;
+  std::cout << "text" << std::endl;
 
   while(sp_world.ShouldRun()) {
     sp_world.IterateWorld();

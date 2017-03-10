@@ -20,6 +20,11 @@
 #define SP_PI_HALF 1.57079632679
 #define SP_PI_QUART 0.78539816339
 
+// error print formatting
+#define SPERROREXIT(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl; std::exit(EXIT_FAILURE)
+#define SPERROR(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl
+#define SPERROR(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl
+
 // for a stable physics result use a scale of 2-10
 #define WSCALE 10
 #define WSCALE_INV 0.1
@@ -40,7 +45,7 @@ typedef Eigen::Quaterniond spRotation;
 typedef Eigen::Vector3d spTranslation;
 typedef Eigen::Vector3d spBoxSize;
 typedef Eigen::Vector3d spLinVel;
-typedef Eigen::Vector3d spRotVel;
+typedef Eigen::Quaterniond spRotVel;
 typedef Eigen::Vector3d spCylinderSize;
 typedef Eigen::Vector2d spMeshSize;
 typedef Eigen::Vector3d spColor;
@@ -60,16 +65,36 @@ typedef Eigen::Matrix<double,2,3> spCtrlPts2ord_2dof;
 // cols = [bezP1x,bezP1y,bezP2x,bezP2y,bezP3x,bezP3y,bezP4x,bezP4y]
 //typedef Eigen::Matrix<double,6,6> spPlannerJacobian;
 typedef Eigen::Matrix<double,8,4> spPlannerJacobian;
-// spStateVec means [x,y,yaw,x_d,y_d,yaw_d]
-typedef Eigen::Array<double,12,1> spStateVec;
+//typedef Eigen::Array<double,12,1> spStateVec;
 typedef Eigen::Array<double,8,1> spResidualVec;
+
+class spState {
+public:
+  spState() {
+    SPERROREXIT("TODO:initialize everything here");
+  }
+  spState(const spState& state) {
+    SPERROREXIT("not implemented");
+  }
+//  spPose& GetPose() {
+//    pose_= spTranslation(vec[0],vec[1],vec[2])*Eigen::AngleAxisd(vec[6],Eigen::Vector3d(vec[3],vec[4],vec[5]));;
+//    return pose;
+//  }
+//  spLinVel& LinVel() {
+//    return linvel;
+//  }
+//  spRotVel& RotVel() {
+
+//  }
+
+  spPose pose;
+  spLinVel linvel;
+  spRotVel rotvel;
+  Eigen::Vector4d wheel_speed;
+};
 
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 typedef Eigen::Matrix4d spMat4x4;
-
-#define SPERROREXIT(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl; std::exit(EXIT_FAILURE)
-#define SPERROR(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl
-#define SPERROR(X)  std::cerr << "Error in file:" << __FILE__ << " Line:" << __LINE__ << " " << X << std::endl
 
 enum spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
 enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
@@ -152,6 +177,8 @@ class spCurve {
   spCurve(int curve_order, int curve_dof): curve_order_(curve_order), curve_dof_(curve_dof) {
     perturbation_value_ = 0;
     perturbation_dim_ = 0;
+    // Initialze control points at zero
+    ctrl_pts_ = Eigen::ArrayXXd::Zero(curve_dof,curve_order+1);
   }
 
   ~spCurve() {}
@@ -212,7 +239,7 @@ class spCurve {
     }
   }
 
-  void GetPoint(Eigen::VectorXd& point, double t) {
+  void GetPoint(Eigen::VectorXd& point, double t) const {
     if(point.rows() != curve_dof_) {
       SPERROREXIT("Wrong point dimention requested.");
     }
@@ -243,7 +270,7 @@ class spCurve {
   }
 
   // first 3d dimentions (x,y,z) are used for visualization purposes
-  void GetPoints3d(spPoints3d& pts_vec/*, int num_mid_pts*/) {
+  void GetPoints3d(spPoints3d& pts_vec/*, int num_mid_pts*/) const {
 //    int num_pts = num_mid_pts - 1;
     if(pts_vec.size()<1) {
       SPERROREXIT("array size must be greater than zero !");
@@ -251,7 +278,7 @@ class spCurve {
     int num_pts = pts_vec.size() - 1;
     for (int t = 0; t <= num_pts; t++) {
       spPointXd point(curve_dof_);
-      this->GetPoint(point, t * (1.0 / num_pts));
+      GetPoint(point, t * (1.0 / num_pts));
 //      pts_vec.push_back(point.head(3));
       pts_vec[t] = point.head(3);
     }

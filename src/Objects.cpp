@@ -114,6 +114,11 @@ spObjectHandle Objects::CreateLineStrip(const spPose& pose, const spPoints3d& li
   objects_.push_back(a_curve);
   return (--objects_.end());
 }
+spObjectHandle Objects::CreateLineStrip(const spPose& pose, const spCurve& curve, int num_pts, const spColor& color) {
+  std::shared_ptr<spLineStrip> a_curve = std::make_shared<spLineStrip>(pose,curve,num_pts,color);
+  objects_.push_back(a_curve);
+  return (--objects_.end());
+}
 
 void Objects::RemoveObj(spObjectHandle& obj_handle) {
   if(obj_handle != NULL_HANDLE) {

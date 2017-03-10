@@ -6,6 +6,7 @@
 class spLineStrip : public spCommonObject {
  public:
   spLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, const spColor& color);
+  spLineStrip(const spPose& pose, const spCurve& curve,int num_points, const spColor& color);
   ~spLineStrip();
 
   // SetPose here corresponds to the base of the curve
@@ -16,12 +17,13 @@ class spLineStrip : public spCommonObject {
   const spColor& GetColor();
 
   void SetLineStripPoints(const spPoints3d& pts);
+  void SetLineStripPointsFromCurve(const spCurve& curve, int num_pts);
   const spPoints3d& GetLineStripPoints();
 
  private:
   spColor color_;
   spPose pose_;
-  spPoints3d points_;
+  std::shared_ptr<spPoints3d> points_;
 };
 
 #endif  //  SP_LINESTRIP_H__

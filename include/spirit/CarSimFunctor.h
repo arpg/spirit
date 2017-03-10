@@ -10,22 +10,29 @@
 
 class CarSimFunctor {
  public:
-  CarSimFunctor(const spVehicleConstructionInfo& info) : vehicle_info_(info) {
+//  CarSimFunctor(const spVehicleConstructionInfo& info ,const spState& initial_state) : vehicle_info_(info), initial_state_(initial_state){
+//    spPose gnd_pose_ = spPose::Identity();
+//    gnd_pose_.translate(spTranslation(0,0,-0.5));
+//    gnd_handle_ = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
+//    car_handle_ = objects_.CreateVehicle(vehicle_info_);
+//  }
+
+  CarSimFunctor(const spVehicleConstructionInfo& info ) : vehicle_info_(info)/*, initial_state_(spState())*/ {
+    spPose gnd_pose_ = spPose::Identity();
+    gnd_pose_.translate(spTranslation(0,0,-0.5));
+    gnd_handle_ = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
+    car_handle_ = objects_.CreateVehicle(vehicle_info_);
   }
 
   ~CarSimFunctor() {
-    objects_.RemoveObj(car_handle);
-    objects_.RemoveObj(gnd_handle);
+    objects_.RemoveObj(car_handle_);
+    objects_.RemoveObj(gnd_handle_);
   }
 
   void operator()(int thread_id,double num_sim_steps, double step_size,const spCtrlPts2ord_2dof& cntrl_vars, double epsilon, int pert_index) {
-    spPose gnd_pose_ = spPose::Identity();
-    gnd_pose_.translate(spTranslation(0,0,-0.5));
-    gnd_handle = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
-    spBox& gnd = (spBox&) objects_.GetObject(gnd_handle);
+    spBox& gnd = (spBox&) objects_.GetObject(gnd_handle_);
     gnd.SetFriction(1);
-    car_handle = objects_.CreateVehicle(vehicle_info_);
-    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
+    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle_);
     car.SetEngineMaxVel(10);
     car.SetEngineTorque(10);
     car.SetSteeringServoMaxVel(10);
@@ -47,6 +54,7 @@ class CarSimFunctor {
       car.SetFrontSteeringAngle(sample_control[0]);
       car.SetEngineMaxVel(sample_control[1]);
       objects_.StepPhySimulation(step_size);
+      traj_points_.push_back(car.GetPose().translation());
     }
     state_vec_ = car.GetStateVecor();
 //    std::cout << "state is " << state_vec_.transpose() << std::endl;
@@ -56,12 +64,25 @@ class CarSimFunctor {
     return state_vec_;
   }
 
+  spCtrlPts3ord_3dof& GetEstimatedTrajectoryCurve() {
+    // fit a curve to traj_points;
+    SPERROREXIT("TODO");
+    return traj_curve_;
+  }
+
+  spPoints3d& GetTrajectoryPoints() {
+    return traj_points_;
+  }
+
  private:
-  spVehicleConstructionInfo vehicle_info_;
+  const spVehicleConstructionInfo& vehicle_info_;
+  spCtrlPts3ord_3dof traj_curve_;
+  spPoints3d traj_points_;
   Objects objects_;
-  spObjectHandle gnd_handle;
-  spObjectHandle car_handle;
+  spObjectHandle gnd_handle_;
+  spObjectHandle car_handle_;
   spStateVec state_vec_;
+//  const spState& initial_state_;
 };
 
 #endif  // THREADPOOL_H__

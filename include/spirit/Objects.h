@@ -27,6 +27,7 @@ public:
   spObjectHandle CreateWaypoint(const spPose& pose, const spColor& color);
   spObjectHandle CreateVehicle(const spVehicleConstructionInfo& vehicle_info);
   spObjectHandle CreateLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, const spColor& color);
+  spObjectHandle CreateLineStrip(const spPose& pose, const spCurve& curve, int num_pts, const spColor& color);
   void StepPhySimulation(double step_time);
   void RemoveObj(spObjectHandle& obj_handle);
   int GetNumOfObjects();
