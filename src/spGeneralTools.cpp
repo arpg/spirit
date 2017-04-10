@@ -31,3 +31,45 @@ double spGeneralTools::Tock_us(spTimestamp tick_time) {
 double spGeneralTools::TickTock_ms(spTimestamp tick_time,spTimestamp tock_time) {
   return std::chrono::duration_cast<std::chrono::milliseconds>( tock_time - tick_time ).count();
 }
+
+void spGeneralTools::PlotXY(std::vector<double>& x_axis, std::string xlabel, std::string ylabel) {
+  pangolin::CreateWindowAndBind("Main",640,480);
+
+  // Data logger object
+  pangolin::DataLog log;
+
+  // Optionally add named labels
+  std::vector<std::string> labels;
+  labels.push_back(xlabel);
+  labels.push_back(ylabel);
+  log.SetLabels(labels);
+  const double tinc = 0.01;
+  double min_value = 0;
+  double max_value = 0;
+  for(int ii=0; ii<x_axis.size(); ii++) {
+    log.Log(x_axis[ii]);
+    if(x_axis[ii]<min_value)
+      min_value = x_axis[ii];
+    if(x_axis[ii]>max_value)
+      max_value = x_axis[ii];
+  }
+  double x_diff = max_value-min_value;
+  x_diff *= 0.1;
+  // OpenGL 'view' of data. We might have many views of the same data.
+  pangolin::Plotter plotter(&log,-1,1,min_value-x_diff,max_value+x_diff,0.01,1);
+  plotter.SetBounds(0.0, 1.0, 0.0, 1.0);
+//  plotter.Track("$i");
+//  pangolin::XYRangef window_range();
+
+//  plotter.SetDefaultView(window_range);
+  pangolin::DisplayBase().AddDisplay(plotter);
+
+  // Default hooks for exiting (Esc) and fullscreen (tab).
+  while(!pangolin::ShouldQuit())
+  {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Render graph, Swap frames and Process Events
+    pangolin::FinishFrame();
+  }
+
+}

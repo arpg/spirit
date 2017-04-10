@@ -43,7 +43,7 @@ void spAWSDCar::SetEngineMaxVel(double vel) {
 void spAWSDCar::SetEngineTorque(double torque) {
   // bullet doesn't like zero torque
   if(torque == 0) {
-    torque = 0.000000001;
+    torque = 1e-10;
   }
   for(int ii=0;ii<4;ii++)
   {

@@ -22,13 +22,14 @@ void spTrajectory::AddWaypoint(const spWaypoint& waypoint, unsigned int index) {
 //  needs_curveupdate_vec_.insert(flag_it+index,true);
 }
 
-spObjectHandle spTrajectory::AddWaypoint(const spPose& pose, bool en_def_3ord3dof_traj) {
+spObjectHandle spTrajectory::AddWaypoint(const spPose& pose, double velocity, bool en_default_3ord3dof_traj) {
   spObjectHandle waypoint_handle = objects_.CreateWaypoint(pose,spColor(1, 1, 0));
+  ((spWaypoint&)objects_.GetObject(waypoint_handle)).SetLinearVelocityNorm(velocity);
   gui_.AddObject(objects_.GetObject(waypoint_handle));
   waypoint_vec_.push_back(&(spWaypoint&)objects_.GetObject(waypoint_handle));
   std::shared_ptr<spCurve> new_curve = std::make_shared<spCurve>(3,3);
   spCtrlPts3ord_3dof pts;
-  has_def_traj_vec_.push_back(en_def_3ord3dof_traj);
+  has_def_traj_vec_.push_back(en_default_3ord3dof_traj);
 //    pts.col(0) = waypoint_vec_[waypoint_vec_.size()-1]->GetPose().translation();
 //    pts.col(1) = waypoint_vec_[waypoint_vec_.size()-1]->GetPose().rotation()*spTranslation(1,0,0)*waypoint_vec_[waypoint_vec_.size()-1]->GetLength();
 //    pts.col(2) = waypoint_vec_[waypoint_vec_.size()-1]->GetPose().translation();
@@ -50,13 +51,13 @@ spObjectHandle spTrajectory::AddWaypoint(const spPose& pose, bool en_def_3ord3do
 void spTrajectory::InitControlCommand(spCtrlPts2ord_2dof* cntrl_cmd){
   // for now set it to a zero angle steering and some reasonable acceleration
   // TODO(sina) : later I should come up with a better initialization based on waypoint locations
-  cntrl_cmd->col(0) = Eigen::Vector2d(0,10);
-  cntrl_cmd->col(1) = Eigen::Vector2d(-0.2,10);
-  cntrl_cmd->col(2) = Eigen::Vector2d(-0.4,20);
+  cntrl_cmd->col(0) = Eigen::Vector2d(0,0);
+  cntrl_cmd->col(1) = Eigen::Vector2d(0,0);
+  cntrl_cmd->col(2) = Eigen::Vector2d(0,0);
 }
 
 spVehicleConstructionInfo* spTrajectory::GetVehicleInfo(int waypoint_index) {
-
+SPERROREXIT("NOT IMPLEMENTED.");
 }
 
 void spTrajectory::SetTrajectoryPoints(int waypoint_index, const spPoints3d& traj_pts) {
@@ -73,12 +74,11 @@ spCtrlPts2ord_2dof& spTrajectory::GetControls(int waypoint_index) {
   return *control_command_vec_[waypoint_index];
 }
 
-const spWaypoint& spTrajectory::GetWaypoint(unsigned int index) {
-  SPERROREXIT("This function has not been implemented yet");
-//  if(index>planpoint_vec_.size()-1) {
-//    SPERROREXIT("Requested index doesn't exist.");
-//  }
-//  return *planpoint_vec_[index];
+spWaypoint& spTrajectory::GetWaypoint(unsigned int index) {
+  if(index>waypoint_vec_.size()-1) {
+    SPERROREXIT("Requested index doesn't exist.");
+  }
+  return *waypoint_vec_[index];
 }
 
 void spTrajectory::UpdateWaypoint(const spWaypoint& planpoint,unsigned int index) {
@@ -117,14 +117,18 @@ void spTrajectory::UpdateCurves() {
       spCtrlPts3ord_3dof pts;
       if(ii == waypoint_vec_.size()-1) {
         pts.col(0) = waypoint_vec_[ii]->GetPose().translation();
-        pts.col(1) = waypoint_vec_[ii]->GetPose().rotation()*spTranslation(1,0,0)*waypoint_vec_[ii]->GetLength();
+//        pts.col(1) = waypoint_vec_[ii]->GetPose().rotation()*spTranslation(1,0,0)*waypoint_vec_[ii]->GetLength();
+        pts.col(1) = waypoint_vec_[ii]->GetPose().rotation()*waypoint_vec_[ii]->GetLinearVelocity();
         pts.col(2) = waypoint_vec_[0]->GetPose().translation();
-        pts.col(3) = waypoint_vec_[0]->GetPose().rotation()*spTranslation(1,0,0)*waypoint_vec_[0]->GetLength();
+//        pts.col(3) = waypoint_vec_[0]->GetPose().rotation()*spTranslation(1,0,0)*waypoint_vec_[0]->GetLength();
+        pts.col(3) = waypoint_vec_[0]->GetPose().rotation()*waypoint_vec_[0]->GetLinearVelocity();
       } else {
         pts.col(0) = waypoint_vec_[ii]->GetPose().translation();
-        pts.col(1) = waypoint_vec_[ii]->GetPose().rotation()*spTranslation(1,0,0)*waypoint_vec_[ii]->GetLength();
+//        pts.col(1) = waypoint_vec_[ii]->GetPose().rotation()*spTranslation(1,0,0)*waypoint_vec_[ii]->GetLength();
+        pts.col(1) = waypoint_vec_[ii]->GetPose().rotation()*waypoint_vec_[ii]->GetLinearVelocity();
         pts.col(2) = waypoint_vec_[ii+1]->GetPose().translation();
-        pts.col(3) = waypoint_vec_[ii+1]->GetPose().rotation()*spTranslation(1,0,0)*waypoint_vec_[ii+1]->GetLength();
+//        pts.col(3) = waypoint_vec_[ii+1]->GetPose().rotation()*spTranslation(1,0,0)*waypoint_vec_[ii+1]->GetLength();
+        pts.col(3) = waypoint_vec_[ii+1]->GetPose().rotation()*waypoint_vec_[ii+1]->GetLinearVelocity();
       }
       curve_vec_[ii]->SetHermiteControlPoints(pts);
       ((spLineStrip&)objects_.GetObject(linestrip_handle_vec_[ii])).SetLineStripPointsFromCurve(*curve_vec_[ii],num_pts_per_curve);

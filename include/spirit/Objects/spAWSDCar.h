@@ -14,8 +14,6 @@ public:
   void SetEngineTorque(double torque);
   void SetSteeringServoMaxVel(double vel);
   void SetSteeringServoTorque(double torque);
-  void SetState();
-  void GetState();
 //  void Initialize(const spPose& pose, const spLinVel& chassis_lin_vel, const spRotVel& chassis_rot_vel, double steering_angle, double engine_torque, double wheel_speeds);
 private:
   void ApplyTransmissionDifferentialCoupling();

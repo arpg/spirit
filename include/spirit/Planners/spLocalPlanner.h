@@ -3,12 +3,13 @@
 
 #include <spirit/Planners/spTrajectory.h>
 #include <spirit/CarSimFunctor.h>
+#include <spirit/VehicleCeresCostFunc.h>
 
 class spLocalPlanner {
  public:
   spLocalPlanner(spTrajectory& initial_trajectory,const spVehicleConstructionInfo& vehicle_info);
   ~spLocalPlanner();
-  void SolveLocalPlans();
+  spState SolveLocalPlan(int ii);
   void CalcInitialPlans();
 
  private:

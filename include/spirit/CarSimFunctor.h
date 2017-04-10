@@ -10,12 +10,12 @@
 
 class CarSimFunctor {
  public:
-//  CarSimFunctor(const spVehicleConstructionInfo& info ,const spState& initial_state) : vehicle_info_(info), initial_state_(initial_state){
-//    spPose gnd_pose_ = spPose::Identity();
-//    gnd_pose_.translate(spTranslation(0,0,-0.5));
-//    gnd_handle_ = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
-//    car_handle_ = objects_.CreateVehicle(vehicle_info_);
-//  }
+  CarSimFunctor(const spVehicleConstructionInfo& info ,const spState& initial_state) : vehicle_info_(info), initial_state_(initial_state){
+    spPose gnd_pose_ = spPose::Identity();
+    gnd_pose_.translate(spTranslation(0,0,-0.5));
+    gnd_handle_ = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
+    car_handle_ = objects_.CreateVehicle(vehicle_info_);
+  }
 
   CarSimFunctor(const spVehicleConstructionInfo& info ) : vehicle_info_(info)/*, initial_state_(spState())*/ {
     spPose gnd_pose_ = spPose::Identity();
@@ -33,8 +33,10 @@ class CarSimFunctor {
     spBox& gnd = (spBox&) objects_.GetObject(gnd_handle_);
     gnd.SetFriction(1);
     spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle_);
+
+    car.SetPose(initial_state_.pose);
     car.SetEngineMaxVel(10);
-    car.SetEngineTorque(10);
+    car.SetEngineTorque(100);
     car.SetSteeringServoMaxVel(10);
     car.SetSteeringServoTorque(10);
     car.SetFrontSteeringAngle(0);
@@ -46,8 +48,6 @@ class CarSimFunctor {
     control_curve.Get2ndDrivativeCurveArea(curvature_cost);
     if (pert_index >= 0) {
       control_curve.PerturbControlPoint(pert_index,epsilon/**std::abs(cntrl_vars.data()[pert_index])*/);
-//    } else if (pert_index == 0) {
-//      control_curve.PerturbControlPoint(pert_index,0.05*(epsilon/std::abs(epsilon)));
     }
     for(int ii=0;ii<num_sim_steps;ii++) {
       control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
@@ -56,19 +56,19 @@ class CarSimFunctor {
       objects_.StepPhySimulation(step_size);
       traj_points_.push_back(car.GetPose().translation());
     }
-    state_vec_ = car.GetStateVecor();
-//    std::cout << "state is " << state_vec_.transpose() << std::endl;
+    state_ = car.GetState();
   }
 
-  const spStateVec& GetStateVec(){
-    return state_vec_;
+  const spState& GetState(){
+//    std::cout  << state_ << std::endl;
+    return state_;
   }
 
-  spCtrlPts3ord_3dof& GetEstimatedTrajectoryCurve() {
-    // fit a curve to traj_points;
-    SPERROREXIT("TODO");
-    return traj_curve_;
-  }
+//  spCtrlPts3ord_3dof& GetEstimatedTrajectoryCurve() {
+//    // fit a curve to traj_points;
+//    SPERROREXIT("TODO");
+//    return traj_curve_;
+//  }
 
   spPoints3d& GetTrajectoryPoints() {
     return traj_points_;
@@ -81,8 +81,8 @@ class CarSimFunctor {
   Objects objects_;
   spObjectHandle gnd_handle_;
   spObjectHandle car_handle_;
-  spStateVec state_vec_;
-//  const spState& initial_state_;
+  spState state_;
+  spState initial_state_;
 };
 
 #endif  // THREADPOOL_H__

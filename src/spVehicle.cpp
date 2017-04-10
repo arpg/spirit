@@ -22,25 +22,7 @@ spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info,btDiscreteDyn
   // set damping to zero since we are moving in air
   rigid_body_->setDamping(0,0);
   rigid_body_->setActivationState(DISABLE_DEACTIVATION);
-//  for(int ii=0; ii<vehicle_info.wheels_anchor.size(); ii++) {
-//    wheel_.push_back(std::make_shared<spWheel>(vehicle_info));
-//    wheel_[ii]->SetChassisAnchor(vehicle_info.wheels_anchor[ii]);
-//  }
-
-//  pose_ = vehicle_info.pose;
-//  MoveWheelsToAnchors();
-//  color_ = vehicle_info.color;
-//  cog_local_ = spPose::Identity();
-//  cog_local_.translation() = vehicle_info.cog;
-//  chassis_size_ = vehicle_info.chassis_size;
-//  index_phy_ = -1;
-//  index_gui_ = -1;
-//  obj_phychanged_ = false;
-//  obj_guichanged_ = false;
-//  modifiable_gui_ = false;
-//  obj_clamptosurface_ = false;
-//  object_type_ = spObjectType::VEHICLE;
-  // now create and add wheels
+  // create and add wheels
   for(int ii=0; ii<vehicle_info.wheels_anchor.size(); ii++) {
     wheel_.push_back(std::make_shared<spWheel>(vehicle_info,ii,rigid_body_,dynamics_world));
   }
@@ -53,8 +35,6 @@ spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info,btDiscreteDyn
   obj_guichanged_ = false;
   modifiable_gui_ = false;
   obj_clamptosurface_ = false;
-//  rot_vel = spRotVel(0,0,0);
-//  lin_vel = spLinVel(0,0,0);
 }
 
 spVehicle::~spVehicle() {}
@@ -133,43 +113,52 @@ spWheel* spVehicle::GetWheel(int index)
   return wheel_[index].get();
 }
 
-void spVehicle::SetVelocity(const spVelocity& chassis_vel) {
-//  statevec_.tail<6>() = chassis_vel;
-//  obj_guichanged_ = true;
-  SPERROREXIT("SetVel not implemented !");
+void spVehicle::SetLinearVelocity(const spLinVel& linear_vel) {
+  SPERROREXIT("boom");
+  rigid_body_->setLinearVelocity(btVector3(linear_vel[0],linear_vel[1],linear_vel[2]));
+  for(int ii=0; ii<GetNumberOfWheels(); ii++) {
+    GetWheel(ii)->SetLinVel(linear_vel);
+  }
+}
+
+const spLinVel& spVehicle::GetLinearVelocity() {
+  std::shared_ptr<spLinVel> linvel = std::make_shared<spLinVel>(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2]);
+  return *linvel;
+}
+
+void spVehicle::SetAngularVelocity(const spRotVel& angular_vel) {
+//  btVector3 btrotvel(angular_vel.axis()[0]*angular_vel.angle(),angular_vel.axis()[1]*angular_vel.angle(),angular_vel.axis()[2]*angular_vel.angle());
+  //  rigid_body_->setAngularVelocity(btrotvel);
+  rigid_body_->setAngularVelocity(btVector3(angular_vel[0],angular_vel[1],angular_vel[2]));
+}
+
+const spRotVel& spVehicle::GetAngularVelocity() {
+//  btVector3 btvel_normalized = rigid_body_->getAngularVelocity().normalized();
+//  std::shared_ptr<spRotVel> angular_vel = std::make_shared<spRotVel>(rigid_body_->getAngularVelocity().norm(),spVector3(btvel_normalized[0],btvel_normalized[1],btvel_normalized[2]));
+  std::shared_ptr<spRotVel> angular_vel = std::make_shared<spRotVel>(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
+  return *angular_vel;
 }
 
 const spState& spVehicle::GetState() {
-  // bullet uses Euler ZYX(yaw,pitch,roll) convention for rotations
-//  spPose pose = btTransform2spPose(rigid_body_->getWorldTransform());
-  state_.pose = btTransform2spPose(rigid_body_->getWorldTransform());
-  state_.linvel = (spLinVel)rigid_body_->getLinearVelocity();
-  btQuaternion btrotvel(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
-  state_.rotvel = spRotation(btrotvel);
+  std::shared_ptr<spState> state = std::make_shared<spState>();
+  // bullet uses Euler XYZ(yaw,pitch,roll) convention for rotations
+  state->pose = btTransform2spPose(rigid_body_->getWorldTransform());
+//  state->linvel = (spLinVel)rigid_body_->getLinearVelocity();
+  state->linvel = GetLinearVelocity();
+//  btQuaternion btrotvel(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
+  state->rotvel = GetAngularVelocity();
+  for(int ii=0; ii<GetNumberOfWheels(); ii++) {
+    state->wheel_speeds[ii] = GetWheel(ii)->GetWheelSpeed();
+  }
+  return *state;
+}
 
+void spVehicle::SetState(const spState& state){
+  SetPose(state.pose);
 
-
-
-  state_[0] = pose.translation()[0];
-  state_[1] = pose.translation()[1];
-  state_[2] = pose.translation()[2];
-  Eigen::Vector3d v = pose.rotation().eulerAngles(1,2,3);
-  // roll and pich are in the following
-  statevec_[3] = v[0];
-  statevec_[4] = v[2];
-  // take the yaw angle, for some reason its on v[1] instead of expected v[2] position
-  statevec_[5] = v[1];
-  btVector3 lin_vel = rigid_body_->getLinearVelocity();
-  statevec_[6] = lin_vel[0];
-  statevec_[7] = lin_vel[1];
-  statevec_[8] = lin_vel[2];
-  btVector3 rot_vel = rigid_body_->getAngularVelocity();
-  statevec_[9] = rot_vel[2];
-  statevec_[10] = rot_vel[0];
-  statevec_[11] = rot_vel[1];
-//  spRotation quat(pose.rotation());
-//  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
-  return statevec_;
+//  SetVelocities(state.linvel,state.rotvel);
+//  SetWheelSpeeds(state.wheel_speeds);
+  SPERROREXIT("TODO: set suspension length aswell for complete state initialization");
 }
 
 void spVehicle::SetClampToSurfaceFlag() {

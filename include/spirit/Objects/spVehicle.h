@@ -25,15 +25,18 @@ class spVehicle : public spCommonObject {
   const spPose& GetWheelOrigin(int index);
   const spBoxSize& GetChassisSize();
   const spPose& GetLocalCOG();
-  void SetVelocity(const spVelocity& chassis_vel);
-  const spState& GetState();  // returns [x,y,z,q1,q2,q3,q4,x_d,y_d,z_d,p_d,q_d,r_d]
+  const spState& GetState();
+  void SetState(const spState& state);
   void SetClampToSurfaceFlag();
+  void SetLinearVelocity(const spLinVel& linear_vel);
+  void SetAngularVelocity(const spRotVel& angular_vel);
+  const spRotVel& GetAngularVelocity();
+  const spLinVel& GetLinearVelocity();
 
  private:
   void MoveWheelsToAnchors(const spPose& chasis_pose);
   std::vector<std::shared_ptr<spWheel>> wheel_;
 //  spPose pose_;        // this pose will represent geometric center of the car
-  spState state_;  // this should be updated from phy engine only
   spPose cog_local_;  // center of gravity
   spColor color_;
 //  spRotVel rot_vel;

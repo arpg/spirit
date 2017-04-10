@@ -18,9 +18,9 @@ public:
   void IterateWorld();
   void CheckKeyboardAction();
   void ScenarioWorldBoxFall();
+  void DummyTests();
   void ScenarioWorldCarFall();
-  void ScenarioPlannerTest();
-  void CalcJacobianTest(spVehicleConstructionInfo& car_param,spPlannerJacobian& jacobian, spStateVec& end_state, const spCtrlPts2ord_2dof& cntrl_vars, unsigned int num_sim_steps, double sim_step_size, const spPose& init_pose, double fd_delta);
+  void SenarioCostSurf();
   void ScenarioPIDController();
   void CalcLocalPlannerJacobian();
   void SenarioCeresTest();

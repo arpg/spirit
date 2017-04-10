@@ -12,12 +12,14 @@ class spWaypoint : public spCommonObject {
   const spPose& GetPose();
   void SetColor(const spColor& color);
   const spColor& GetColor();
+  const spLinVel& GetLinearVelocity();
+//  void SetLinearVelocityDirection(const spLinVel& linvel);
 
-  void SetLength(double length);
-  double GetLength();
+  void SetLinearVelocityNorm(double length);
+  double GetLinearVelocityNorm();
 
  private:
-  double length_;
+  double linvelnorm_;
   spPose pose_;
   spColor color_;
 };

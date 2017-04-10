@@ -16,8 +16,8 @@ public:
   ~spTrajectory();
 
   void AddWaypoint(const spWaypoint& waypoint, unsigned int index);
-  spObjectHandle AddWaypoint(const spPose& pose, bool en_def_3ord3dof_traj);
-  const spWaypoint& GetWaypoint(unsigned int index);
+  spObjectHandle AddWaypoint(const spPose& pose, double velocity=1, bool en_default_3ord3dof_traj=false);
+  spWaypoint& GetWaypoint(unsigned int index);
   void UpdateWaypoint(const spWaypoint& planpoint,unsigned int index);
   const spCurve& GetCurve(unsigned int index);
   void RemoveWaypoint(unsigned int index_in_plan);

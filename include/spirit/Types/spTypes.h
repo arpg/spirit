@@ -28,7 +28,7 @@
 // for a stable physics result use a scale of 2-10
 #define WSCALE 10
 #define WSCALE_INV 0.1
-#define BULLET_SOLVER_NUM_ITERATIONS 10
+#define BULLET_SOLVER_NUM_ITERATIONS 5
 
 #define BIT(x) (1<<(x))
 enum BulletCollissionType{
@@ -43,9 +43,12 @@ enum BulletCollissionType{
 typedef Eigen::Transform<double,3,Eigen::Affine> spPose;
 typedef Eigen::Quaterniond spRotation;
 typedef Eigen::Vector3d spTranslation;
+typedef Eigen::Vector4d spWheelSpeedVec;
 typedef Eigen::Vector3d spBoxSize;
 typedef Eigen::Vector3d spLinVel;
-typedef Eigen::Quaterniond spRotVel;
+typedef Eigen::Vector3d spVector3;
+//typedef Eigen::AngleAxisd spRotVel;
+typedef Eigen::Vector3d spRotVel;
 typedef Eigen::Vector3d spCylinderSize;
 typedef Eigen::Vector2d spMeshSize;
 typedef Eigen::Vector3d spColor;
@@ -65,32 +68,119 @@ typedef Eigen::Matrix<double,2,3> spCtrlPts2ord_2dof;
 // cols = [bezP1x,bezP1y,bezP2x,bezP2y,bezP3x,bezP3y,bezP4x,bezP4y]
 //typedef Eigen::Matrix<double,6,6> spPlannerJacobian;
 typedef Eigen::Matrix<double,8,4> spPlannerJacobian;
-//typedef Eigen::Array<double,12,1> spStateVec;
+typedef Eigen::Array<double,12,1> spStateVec;
 typedef Eigen::Array<double,8,1> spResidualVec;
 
 class spState {
 public:
-  spState() {
-    SPERROREXIT("TODO:initialize everything here");
-  }
-  spState(const spState& state) {
-    SPERROREXIT("not implemented");
-  }
-//  spPose& GetPose() {
-//    pose_= spTranslation(vec[0],vec[1],vec[2])*Eigen::AngleAxisd(vec[6],Eigen::Vector3d(vec[3],vec[4],vec[5]));;
-//    return pose;
-//  }
-//  spLinVel& LinVel() {
-//    return linvel;
-//  }
-//  spRotVel& RotVel() {
+  spState() : pose(spPose::Identity()),
+//    wheel_speeds(spWheelSpeedVec::Zero()),
+    linvel(spLinVel::Zero()),
+    /*rotvel(spRotVel(0,spVector3(0,0,0))*/rotvel(spRotVel(0,0,0)) {}
 
+  spState(const spState& state) {
+    pose = state.pose;
+    linvel = state.linvel;
+    rotvel = state.rotvel;
+    wheel_speeds = state.wheel_speeds;
+  }
+
+  spState& operator=(const spState& rhs) {
+    // check for self-assignment
+    if(&rhs == this)
+        return *this;
+    // reuse storage when possible
+    pose = rhs.pose;
+    linvel = rhs.linvel;
+    rotvel = rhs.rotvel;
+    wheel_speeds = rhs.wheel_speeds;
+    return *this;
+  }
+
+  friend std::ostream& operator<<(std::ostream& os, const spState& obj)
+  {
+    os << "**************** State **************"
+       << "\nTranslation:\n" << obj.pose.translation().transpose() << std::endl
+       << "\nRotation:\n" << obj.pose.rotation() << std::endl
+       << "\nLinear Velocity:\n" << obj.linvel.transpose() << std::endl
+//       << "\nRotational Velocity:\n" << obj.rotvel.axis()[0] << ", " << obj.rotvel.axis()[1] << ", " << obj.rotvel.axis()[2] << ", " << obj.rotvel.angle() << std::endl
+       << "*************************************";
+    return os;
+  }
+
+  // TODO : check for efficiency
+  const spState operator-(const spState &rhs) const {
+    spState result;
+    result.pose.translate(pose.translation()-rhs.pose.translation());
+    result.pose.rotate(pose.rotation()*rhs.pose.rotation().inverse());
+    result.linvel = linvel-rhs.linvel;
+//    Eigen::Quaterniond rhs_rotvel(rhs.rotvel);
+//    Eigen::Quaterniond this_rotvel(rotvel);
+//    Eigen::Quaterniond diff_rotvel(this_rotvel*rhs_rotvel.inverse());
+//    result.rotvel = Eigen::AngleAxisd(diff_rotvel);
+    result.rotvel = rotvel-rhs.rotvel;
+//    result.rotvel = rotvel*rhs.rotvel.inverse();
+//    result.rotvel.angle() = rotvel.angle()-rhs.rotvel.angle();
+//    result.rotvel.axis() = rotvel.axis()-rhs.rotvel.axis();
+    return result;
+  }
+
+  const spStateVec vector() const{
+    spStateVec vec;
+    vec[0] = pose.translation()[0];
+    vec[1] = pose.translation()[1];
+    vec[2] = pose.translation()[2];
+
+    Eigen::AngleAxisd angleaxis(pose.rotation());
+    Eigen::Vector3d rotvec(angleaxis.angle()*angleaxis.axis());
+    vec[3] = rotvec[0];
+    vec[4] = rotvec[1];
+    vec[5] = rotvec[2];
+
+    vec[6] = linvel[0];
+    vec[7] = linvel[1];
+    vec[8] = linvel[2];
+
+//    Eigen::Vector3d rotvelvec(rotvel.angle()*rotvel.axis());
+    Eigen::Vector3d rotvelvec(rotvel);
+    vec[9] = rotvelvec[0];
+    vec[10] = rotvelvec[1];
+    vec[11] = rotvelvec[2];
+
+    return vec;
+  }
+//  const spStateVec vector() const{
+//    std::shared_ptr<spStateVec> vec = std::make_shared<spStateVec>();
+//    (*vec)[0] = pose.translation()[0];
+//    (*vec)[1] = pose.translation()[1];
+//    (*vec)[2] = pose.translation()[2];
+
+//    Eigen::AngleAxisd angleaxis(pose.rotation());
+//    Eigen::Vector3d rotvec(angleaxis.angle()*angleaxis.axis());
+//    (*vec)[3] = rotvec[0];
+//    (*vec)[4] = rotvec[1];
+//    (*vec)[5] = rotvec[2];
+
+//    (*vec)[6] = linvel[0];
+//    (*vec)[7] = linvel[1];
+//    (*vec)[8] = linvel[2];
+
+//    Eigen::Vector3d rotvelvec(rotvel.angle()*rotvel.axis());
+//    std::cout << "rotvel angle is " << rotvel.angle() << "rotvel axis is "<< rotvel.axis().transpose() << std::endl;
+//    (*vec)[9] = rotvelvec[0];
+//    (*vec)[10] = rotvelvec[1];
+//    (*vec)[11] = rotvelvec[2];
+
+//    return *vec;
 //  }
 
   spPose pose;
   spLinVel linvel;
   spRotVel rotvel;
-  Eigen::Vector4d wheel_speed;
+  spWheelSpeedVec wheel_speeds;
+
+private:
+  spStateVec state_vec_;
 };
 
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;
@@ -174,7 +264,7 @@ struct spVehicleConstructionInfo{
 class spCurve {
  public:
 
-  spCurve(int curve_order, int curve_dof): curve_order_(curve_order), curve_dof_(curve_dof) {
+  spCurve(int curve_order, int curve_dof): curve_dof_(curve_dof), curve_order_(curve_order) {
     perturbation_value_ = 0;
     perturbation_dim_ = 0;
     // Initialze control points at zero
@@ -229,9 +319,7 @@ class spCurve {
   }
 
   void Get2ndDrivativeCurveArea(Eigen::VectorXd& der_curve_pt) {
-    if(curve_order_ == 3) {
-      SPERROREXIT("Not Implemented.");
-    } else if(curve_order_ == 2) {
+    if(curve_order_ == 2) {
       // calculate second derivative of given points
       der_curve_pt = 2*ctrl_pts_.col(2)-4*ctrl_pts_.col(1)+2*ctrl_pts_.col(0);
     } else {
@@ -286,8 +374,9 @@ class spCurve {
 
   // given number of circles find that many curvatures along curve and return max
   double GetMaxCurvature(unsigned int num_circles) {
-    spPointsXd points;
-    GetPointsXd(points,2*num_circles+1);
+    SPERROREXIT("not implemented .");
+//    spPointsXd points;
+//    GetPointsXd(points,2*num_circles+1);
 
   }
 

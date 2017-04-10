@@ -46,7 +46,7 @@ void spPangolinScenegraphGui::InitGui() {
       pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
                                  WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.1,
                                  1000),
-      pangolin::ModelViewLookAt(2, 2, 2, 0, 0, 0, pangolin::AxisZ));
+      pangolin::ModelViewLookAt(6, 6, 6, 0, 0, 0, pangolin::AxisZ));
 
   handler_scenegraph_ = new SceneGraph::HandlerSceneGraph(
       glscenegraph_, glrenderstate_, pangolin::AxisZ, 0.01f);
@@ -136,7 +136,7 @@ void spPangolinScenegraphGui::AddWaypoint(spWaypoint& waypoint) {
   glwaypoint->SetPose(waypoint.GetPose().matrix());
   glwaypoint->SetCubeDim(UI_WAYPOINT_BOX_DIM);
   glwaypoint->SetColor(waypoint.GetColor()[0],waypoint.GetColor()[1],waypoint.GetColor()[2]);
-  glwaypoint->SetVelocity(waypoint.GetLength());
+  glwaypoint->SetVelocity(waypoint.GetLinearVelocityNorm());
   globjects_.push_back(glwaypoint);
   waypoint.SetGuiIndex(globjects_.size()-1);
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
@@ -197,9 +197,11 @@ void spPangolinScenegraphGui::UpdateBoxGuiObject(spBox& spobj) {
 void spPangolinScenegraphGui::UpdateWaypointGuiObject(spWaypoint& spobj) {
   int gui_index = spobj.GetGuiIndex();
   SceneGraph::GLWayPoint* glwaypoint = (SceneGraph::GLWayPoint*)globjects_[gui_index];
+  glwaypoint->SetZAxisDown(false);
+  glwaypoint->SetVelocityAxis(1);
   glwaypoint->SetPose(spobj.GetPose().matrix());
   glwaypoint->SetColor(spobj.GetColor()[0],spobj.GetColor()[1],spobj.GetColor()[2]);
-  glwaypoint->SetVelocity(spobj.GetLength());
+  glwaypoint->SetVelocity(spobj.GetLinearVelocityNorm());
 }
 
 void spPangolinScenegraphGui::UpdateVehicleGuiObject(spVehicle& vehicle) {
@@ -289,7 +291,7 @@ void spPangolinScenegraphGui::UpdateSpiritObjectsFromGui(Objects& spobjects) {
           spWaypoint& spwaypoint = (spWaypoint&) spobjects.GetObject(ii);
           SceneGraph::GLWayPoint* glwaypoint = (SceneGraph::GLWayPoint*) globjects_[spwaypoint.GetGuiIndex()];
           spwaypoint.SetPose(spPose(glwaypoint->GetPose4x4_po()));
-          spwaypoint.SetLength(glwaypoint->GetVelocity());
+          spwaypoint.SetLinearVelocityNorm(glwaypoint->GetVelocity());
           break;
         }
         case spObjectType::LINESTRIP:
