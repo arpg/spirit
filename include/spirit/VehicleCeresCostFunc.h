@@ -27,7 +27,7 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
     // setup a weight vector/matrix
     Eigen::VectorXd vec_diag(13);
 //    vec_diag << 2, 2, 2, 2, 2, 2,0.09, 0.09, 0.09, 1, 1, 1,0.5;
-    vec_diag << 3, 3, 3, 3, 3, 3,0.07, 0.07, 0.07, 1, 1, 1,0.5;
+    vec_diag << 4, 4, 4, 3, 3, 3,0.07, 0.07, 0.07, 1, 1, 1,0.5;
     Eigen::MatrixXd R = vec_diag.asDiagonal();
 
     spCtrlPts2ord_2dof cntrl_vars;

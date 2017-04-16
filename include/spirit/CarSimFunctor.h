@@ -15,6 +15,7 @@ class CarSimFunctor {
     gnd_pose_.translate(spTranslation(0,0,-0.5));
     gnd_handle_ = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
     car_handle_ = objects_.CreateVehicle(vehicle_info_);
+    ((spAWSDCar&)objects_.GetObject(car_handle_)).SetState(initial_state);
   }
 
   CarSimFunctor(const spVehicleConstructionInfo& info ) : vehicle_info_(info)/*, initial_state_(spState())*/ {

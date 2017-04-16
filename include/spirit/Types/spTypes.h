@@ -76,13 +76,27 @@ public:
   spState() : pose(spPose::Identity()),
 //    wheel_speeds(spWheelSpeedVec::Zero()),
     linvel(spLinVel::Zero()),
-    /*rotvel(spRotVel(0,spVector3(0,0,0))*/rotvel(spRotVel(0,0,0)) {}
+//    front_steering(0),
+//    rear_steering(0),
+//    w1(spPose::Identity()),
+//    w2(spPose::Identity()),
+//    w3(spPose::Identity()),
+//    w4(spPose::Identity()),
+    rotvel(spRotVel(0,0,0)) {}
+  ~spState(){
+    std::cout << "dest called " << std::endl;
+  }
 
   spState(const spState& state) {
     pose = state.pose;
     linvel = state.linvel;
     rotvel = state.rotvel;
     wheel_speeds = state.wheel_speeds;
+    front_steering = state.front_steering;
+    rear_steering = state.rear_steering;
+    for(int ii=0; ii<state.substate_vec.size(); ii++) {
+      InsertSubstate(state.substate_vec[ii]);
+    }
   }
 
   spState& operator=(const spState& rhs) {
@@ -94,6 +108,11 @@ public:
     linvel = rhs.linvel;
     rotvel = rhs.rotvel;
     wheel_speeds = rhs.wheel_speeds;
+    front_steering = rhs.front_steering;
+    rear_steering = rhs.rear_steering;
+    for(int ii=0; ii<rhs.substate_vec.size(); ii++) {
+      InsertSubstate(rhs.substate_vec[ii]);
+    }
     return *this;
   }
 
@@ -122,6 +141,9 @@ public:
 //    result.rotvel = rotvel*rhs.rotvel.inverse();
 //    result.rotvel.angle() = rotvel.angle()-rhs.rotvel.angle();
 //    result.rotvel.axis() = rotvel.axis()-rhs.rotvel.axis();
+//    result.front_steering = front_steering - rhs.front_steering;
+//    result.rear_steering = rear_steering - rhs.rear_steering;
+
     return result;
   }
 
@@ -174,11 +196,28 @@ public:
 //    return *vec;
 //  }
 
+  int InsertSubstate(const spState& substate){
+    substate_vec.push_back(std::make_shared<spState>(substate));
+    return substate_vec.size()-1;
+  }
+
+  int InsertSubstate(std::shared_ptr<spState> substate){
+    substate_vec.push_back(std::make_shared<spState>(*substate));
+    return substate_vec.size()-1;
+  }
+
+  int InsertSubstate(){
+    substate_vec.push_back(std::make_shared<spState>());
+    return substate_vec.size()-1;
+  }
+
   spPose pose;
   spLinVel linvel;
   spRotVel rotvel;
   spWheelSpeedVec wheel_speeds;
-
+  Eigen::Quaterniond front_steering;
+  Eigen::Quaterniond rear_steering;
+  std::vector<std::shared_ptr<spState>> substate_vec;
 private:
   spStateVec state_vec_;
 };

@@ -7,19 +7,21 @@ spLocalPlanner::spLocalPlanner(spTrajectory& initial_trajectory, const spVehicle
 spLocalPlanner::~spLocalPlanner() {
 }
 
-spState spLocalPlanner::SolveLocalPlan(int ii) {
+spState spLocalPlanner::SolveLocalPlan(int way_index) {
 //  for(int ii=0; ii<trajectory.GetNumWaypoints()-1; ii++) {
     ceres::Problem problem;
-    spState curr_state;
+//    spState curr_state;
     spState goal_state;
-    curr_state.pose = trajectory.GetWaypoint(ii).GetPose();
-    goal_state.pose = trajectory.GetWaypoint(ii+1).GetPose();
-    goal_state.linvel = trajectory.GetWaypoint(ii+1).GetLinearVelocity();
-//    goal_state.rotvel.angle() = 0;
-    ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_information,curr_state,goal_state);
+    if(way_index == 0) {
+      prev_state.pose = trajectory.GetWaypoint(way_index).GetPose();
+    }
+
+    goal_state.pose = trajectory.GetWaypoint(way_index+1).GetPose();
+    goal_state.linvel = trajectory.GetWaypoint(way_index+1).GetLinearVelocity();
+    ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_information,prev_state,goal_state);
     double parameters[7];
     for (int ii = 0; ii < 6; ++ii) {
-      parameters[ii] = trajectory.GetControls(ii).data()[ii];
+      parameters[ii] = trajectory.GetControls(way_index).data()[ii];
     }
     double sim_length = 4;
     parameters[6] =  sim_length;
@@ -57,7 +59,7 @@ spState spLocalPlanner::SolveLocalPlan(int ii) {
    //  options.gradient_check_numeric_derivative_relative_step_size = 0.05;
     options.update_state_every_iteration = true;
    //  options.minimizer_type = ceres::MinimizerType::LINE_SEARCH;
-    options.max_num_iterations = 30;
+//    options.max_num_iterations = 30;
     options.linear_solver_type = ceres::DENSE_QR;
     options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
     options.minimizer_progress_to_stdout = true;
@@ -73,19 +75,20 @@ spState spLocalPlanner::SolveLocalPlan(int ii) {
 //    std::cout << "params : " << std::endl;
     for (int ii = 0; ii < 6; ++ii) {
       inputcmd_curve.data()[ii] = parameters[ii];
-      trajectory.GetControls(ii).data()[ii] = parameters[ii];
+      trajectory.GetControls(way_index).data()[ii] = parameters[ii];
 //      std::cout << trajectory.GetControls(ii).data()[ii] << ", ";
     }
 //    std::cout << std::endl;
     sim_length = parameters[6];
     std::cout << "simlength is " << parameters[6] << std::endl;
     std::cout << "controls are \n" << inputcmd_curve << std::endl;
-    trajectory.SetControls(ii,inputcmd_curve);
-    CarSimFunctor sim(vehicle_information,curr_state);
-//    sim(0,20,0.1,trajectory.GetControls(ii),0,-1);
+    trajectory.SetControls(way_index,inputcmd_curve);
+    CarSimFunctor sim(vehicle_information,prev_state);
+//    sim(0,20,0.1,trajectory.GetControls(way_index),0,-1);
     sim(0,(int)(sim_length/0.1),0.1,inputcmd_curve,0,-1);
-    trajectory.SetTrajectoryPoints(ii,sim.GetTrajectoryPoints());
-    return sim.GetState();
+    trajectory.SetTrajectoryPoints(way_index,sim.GetTrajectoryPoints());
+    prev_state = sim.GetState();
+    return prev_state;
 //  }
 }
 

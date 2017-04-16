@@ -30,6 +30,9 @@ public:
 //  void SetAngle(double angle);
   double GetWheelSpeed();
   void SetWheelSpeed(double rps);
+//  double GetSuspensionLength();
+//  void SetSuspensionLength(double length);
+  void SetAngularVel(const spRotVel& vel);
 
 private:
   spTranslation chassis_anchor;

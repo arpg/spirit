@@ -37,7 +37,7 @@ void spirit::DummyTests() {
   spVehicleConstructionInfo car_param;
   car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
   spPose car_pose(spPose::Identity());
-  car_pose.translate(spTranslation(0,0,1.06));
+  car_pose.translate(spTranslation(0,0,0.06));
 //  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
 //  car_pose.rotate(rot1);
   car_param.pose = car_pose;
@@ -53,8 +53,8 @@ void spirit::DummyTests() {
   car_param.wheel_friction = 0.4;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.057;
-  car_param.susp_damping = 0;
-  car_param.susp_stiffness = 10;
+  car_param.susp_damping = 10;
+  car_param.susp_stiffness = 100;
   car_param.susp_preloading_spacer = 0.1;
   car_param.susp_upper_limit = 0.013;
   car_param.susp_lower_limit = -0.028;
@@ -74,32 +74,39 @@ void spirit::DummyTests() {
   gui_.AddObject(objects_.GetObject(car_handle));
   spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
   car.SetEngineTorque(10);
-  car.SetEngineMaxVel(-12);
-  car.SetSteeringServoMaxVel(10);
-  car.SetSteeringServoTorque(10);
+  car.SetEngineMaxVel(30);
+  car.SetSteeringServoMaxVel(100);
+  car.SetSteeringServoTorque(100);
   car.SetRearSteeringAngle(0);
-  car.SetFrontSteeringAngle(0);
-  int ii = 0;
-  double b =-SP_PI_QUART;
-  while (ii<10) {
-//    ii++;
-//    if(car.GetPose().translation()[0]<0) {
-//      ii = 0;
-//    }
-//    if(ii%20 == 0) {
-//      car.SetFrontSteeringAngle(b);
-//      Eigen::AngleAxisd rot2(M_PI/16,Eigen::Vector3d::UnitZ());
-//      car_pose.rotate(rot2);
-//      car.SetPose(car_pose);
-//      b*=-1;
-//    }
-//    car.SetChassisMass(0);
-    gui_.Iterate(objects_);
+  car.SetFrontSteeringAngle(SP_PI/4);
+//gui_.RemoveObject(objects_.GetObject(car_handle));
+  spObjectHandle car2_handle;
+  for(int ii=0;ii<10000;ii++) {
+    if(ii%100 == 0) {
+      if(ii != 0) {
+        gui_.RemoveObject(objects_.GetObject(car2_handle));
+        objects_.RemoveObj(car2_handle);
+      }
+      car2_handle = objects_.CreateVehicle(car_param);
+      gui_.AddObject(objects_.GetObject(car2_handle));
+      spAWSDCar& car2 = (spAWSDCar&) objects_.GetObject(car2_handle);
+      car2.SetEngineTorque(10);
+      car2.SetEngineMaxVel(30);
+      car2.SetSteeringServoMaxVel(100);
+      car2.SetSteeringServoTorque(100);
+      car2.SetRearSteeringAngle(0);
+      car2.SetFrontSteeringAngle(SP_PI/4);
+//      state.pose.translate(spTranslation(0,0,0.01));
+//      spState state = car.GetState();
+      car2.SetState(car.GetState());
+    }
     objects_.StepPhySimulation(0.01);
+    gui_.Iterate(objects_);
     spGeneralTools::Delay_ms(10);
-    std::cout << "w is " << car.GetWheel(0)->GetWheelSpeed() << "\t" << car.GetWheel(1)->GetWheelSpeed()<<"\t"<< car.GetWheel(2)->GetWheelSpeed()<<"\t"<< car.GetWheel(3)->GetWheelSpeed() << std::endl;
   }
-  std::cout << "y is " << car.GetPose().translation()[0] << std::endl;
+  while(1){
+    gui_.Iterate(objects_);
+  };
 }
 
 void spirit::SenarioCostSurf() {
@@ -234,7 +241,7 @@ void spirit::SenarioTrajectoryTest() {
   car_param.cog = spTranslation(0, 0, 0);
   car_param.chassis_friction = 0;
   car_param.wheel_rollingfriction = 0.3;
-  car_param.wheel_friction = 0.7;
+  car_param.wheel_friction = 0.8;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.057;
   car_param.susp_damping = 0;
@@ -254,9 +261,9 @@ void spirit::SenarioTrajectoryTest() {
 
   spTrajectory traj(gui_,objects_);
   // put waypoints on a elliptical path
-  double a = 3;
-  double b = 5;
-  int num_waypoints = 12;
+  double a = 4;
+  double b = 3;
+  int num_waypoints = 8;
   for(int ii=0; ii<num_waypoints; ii++) {
     // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
     double theta = ii*(2*SP_PI)/num_waypoints;
@@ -292,11 +299,11 @@ void spirit::SenarioTrajectoryTest() {
   for(int ii=0; ii<traj.GetNumWaypoints()-1; ii++) {
     gui_.Iterate(objects_);
     spState state = localplanner.SolveLocalPlan(ii);
-  }
+
 //    spObjectHandle thewayobj = objects_.CreateWaypoint(state.pose,spColor(0,1,0));
 //    ((spWaypoint&)objects_.GetObject(thewayobj)).SetLinearVelocityNorm(state.linvel.norm());
 //    gui_.AddObject(objects_.GetObject(thewayobj));
-
+  }
   while(1){
 //    traj.UpdateCurves();
     gui_.Iterate(objects_);

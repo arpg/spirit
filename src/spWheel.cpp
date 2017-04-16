@@ -172,23 +172,38 @@ void spWheel::SetWheelSpeed(double rps) {
   rigid_body_->setAngularVelocity(local_vel.rotate(global_rotation.getAxis(),global_rotation.getAngle()));
 }
 
-//const spRotVel& spWheel::GetRotVel(){
-//  btQuaternion btrotvel(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
-//  std::shared_ptr<spRotVel> rot_vel = std::make_shared<spRotVel>(btrotvel);
-//  return *rot_vel.get();
-//}
+const spRotVel& spWheel::GetRotVel(){
+  std::shared_ptr<spRotVel> angular_vel = std::make_shared<spRotVel>(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
+  return *angular_vel;
+}
 
-//const spLinVel& spWheel::GetLinVel(){
-//  std::shared_ptr<spLinVel> lin_vel = std::make_shared<spLinVel>(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2]);
-//  return *lin_vel.get();
-//}
+const spLinVel& spWheel::GetLinVel(){
+  std::shared_ptr<spLinVel> lin_vel = std::make_shared<spLinVel>(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2]);
+  return *lin_vel.get();
+}
 
 void spWheel::SetLinVel(const spLinVel& vel) {
-  SPERROREXIT("boom");
   rigid_body_->setLinearVelocity(btVector3(vel[0],vel[1],vel[2]));
+}
+
+void spWheel::SetAngularVel(const spRotVel& vel) {
+  rigid_body_->setAngularVelocity(btVector3(vel[0],vel[1],vel[2]));
 }
 
 //void spWheel::SetAngle(double angle){
 //  Eigen::AngleAxisd rot(wheel_angle-angle,Eigen::Vector3d::UnitZ());
 //  pose_.rotate(rot);
+//}
+
+//double spWheel::GetSuspensionLength(){
+////  hinge_->calculateTransforms();
+//  Eigen::Vector3d susp_len(hinge_->getRelativePivotPosition(0),hinge_->getRelativePivotPosition(1),hinge_->getRelativePivotPosition(2));
+//  std::cout << "pose is "
+//            << " , " << hinge_->getRelativePivotPosition(2)//susp_len.norm()
+//            << std::endl;
+//}
+
+
+//void spWheel::SetSuspensionLength(double length) {
+
 //}
