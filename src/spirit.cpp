@@ -74,7 +74,7 @@ void spirit::DummyTests() {
   gui_.AddObject(objects_.GetObject(car_handle));
   spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
   car.SetEngineTorque(10);
-  car.SetEngineMaxVel(30);
+  car.SetEngineMaxVel(40);
   car.SetSteeringServoMaxVel(100);
   car.SetSteeringServoTorque(100);
   car.SetRearSteeringAngle(0);
@@ -82,7 +82,7 @@ void spirit::DummyTests() {
 //gui_.RemoveObject(objects_.GetObject(car_handle));
   spObjectHandle car2_handle;
   for(int ii=0;ii<10000;ii++) {
-    if(ii%100 == 0) {
+    if(ii%300 == 0) {
       if(ii != 0) {
         gui_.RemoveObject(objects_.GetObject(car2_handle));
         objects_.RemoveObj(car2_handle);
@@ -91,14 +91,14 @@ void spirit::DummyTests() {
       gui_.AddObject(objects_.GetObject(car2_handle));
       spAWSDCar& car2 = (spAWSDCar&) objects_.GetObject(car2_handle);
       car2.SetEngineTorque(10);
-      car2.SetEngineMaxVel(30);
+      car2.SetEngineMaxVel(40);
       car2.SetSteeringServoMaxVel(100);
       car2.SetSteeringServoTorque(100);
       car2.SetRearSteeringAngle(0);
       car2.SetFrontSteeringAngle(SP_PI/4);
 //      state.pose.translate(spTranslation(0,0,0.01));
 //      spState state = car.GetState();
-      car2.SetState(car.GetState());
+      car2.SetState(*car.GetState());
     }
     objects_.StepPhySimulation(0.01);
     gui_.Iterate(objects_);
@@ -263,7 +263,7 @@ void spirit::SenarioTrajectoryTest() {
   // put waypoints on a elliptical path
   double a = 4;
   double b = 3;
-  int num_waypoints = 8;
+  int num_waypoints = 20;
   for(int ii=0; ii<num_waypoints; ii++) {
     // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
     double theta = ii*(2*SP_PI)/num_waypoints;
@@ -273,19 +273,20 @@ void spirit::SenarioTrajectoryTest() {
     // slope of the line is
     double angle = atan2(-(x*b*b),(y*a*a));
     spPose pose(spPose::Identity());
-    pose.translate(spTranslation(x,y,0.05));
+    pose.translate(spTranslation(x,y,0.06));
     Eigen::AngleAxisd rot(angle+SP_PI_HALF,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
 //    if(ii==1){
 //      Eigen::AngleAxisd rot2(SP_PI_QUART,Eigen::Vector3d::UnitY());
 //      pose.rotate(rot2);
 //    }
-    traj.AddWaypoint(pose,20,false);
+    traj.AddWaypoint(pose,20);
   }
-  std::cout << "waypoint speed is \n" << traj.GetWaypoint(0).GetLinearVelocity() << std::endl;
+  traj.IsLoop(true);
+//  std::cout << "waypoint speed is \n" << traj.GetWaypoint(0).GetLinearVelocity() << std::endl;
 
-  spLocalPlanner localplanner(traj,car_param);
-  localplanner.CalcInitialPlans();
+  spLocalPlanner localplanner(car_param);
+
 
 //  spPose pose(spPose::Identity());
 //  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
@@ -296,14 +297,16 @@ void spirit::SenarioTrajectoryTest() {
 //  std::cout << "angle is " << angleaxis.angle() << std::endl;
 //  std::cout << "axis is " << angleaxis.axis() << std::endl;
 
-  for(int ii=0; ii<traj.GetNumWaypoints()-1; ii++) {
+  for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
+    localplanner.SolveInitialPlan(traj,ii);
     gui_.Iterate(objects_);
-    spState state = localplanner.SolveLocalPlan(ii);
-
+    localplanner.SolveLocalPlan(traj,ii,true);
+    gui_.Iterate(objects_);
 //    spObjectHandle thewayobj = objects_.CreateWaypoint(state.pose,spColor(0,1,0));
 //    ((spWaypoint&)objects_.GetObject(thewayobj)).SetLinearVelocityNorm(state.linvel.norm());
 //    gui_.AddObject(objects_.GetObject(thewayobj));
   }
+
   while(1){
 //    traj.UpdateCurves();
     gui_.Iterate(objects_);
@@ -446,7 +449,7 @@ while(1){
 //  curve.GetPoints3d(line_pts);
 //  strip.SetLineStripPoints(line_pts);
 
-  traj.UpdateCurves();
+//  traj.UpdateCurves();
   gui_.Iterate(objects_);
 //  objects_.StepPhySimulation(0.001);
 }

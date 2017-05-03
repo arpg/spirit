@@ -10,12 +10,19 @@
 
 class CarSimFunctor {
  public:
-  CarSimFunctor(const spVehicleConstructionInfo& info ,const spState& initial_state) : vehicle_info_(info), initial_state_(initial_state){
+  CarSimFunctor(const spVehicleConstructionInfo& info ,const spState& initial_state,Gui* gui=nullptr/*, Objects* objects=nullptr*/) : vehicle_info_(info), initial_state_(initial_state), gui_(gui)/*, objects_(objects)*/ {
     spPose gnd_pose_ = spPose::Identity();
     gnd_pose_.translate(spTranslation(0,0,-0.5));
     gnd_handle_ = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
     car_handle_ = objects_.CreateVehicle(vehicle_info_);
-    ((spAWSDCar&)objects_.GetObject(car_handle_)).SetState(initial_state);
+    initial_state_.InsertSubstate();
+    initial_state_.InsertSubstate();
+    initial_state_.InsertSubstate();
+    initial_state_.InsertSubstate();
+    ((spAWSDCar&)objects_.GetObject(car_handle_)).SetState(initial_state_);
+    if((gui_!=nullptr)) {
+      gui_->AddObject(objects_.GetObject(car_handle_));
+    }
   }
 
   CarSimFunctor(const spVehicleConstructionInfo& info ) : vehicle_info_(info)/*, initial_state_(spState())*/ {
@@ -26,18 +33,21 @@ class CarSimFunctor {
   }
 
   ~CarSimFunctor() {
+    if((gui_!=nullptr)) {
+      gui_->RemoveObject(objects_.GetObject(car_handle_));
+    }
     objects_.RemoveObj(car_handle_);
     objects_.RemoveObj(gnd_handle_);
   }
 
-  void operator()(int thread_id,double num_sim_steps, double step_size,const spCtrlPts2ord_2dof& cntrl_vars, double epsilon, int pert_index) {
+  void operator()(int thread_id,double num_sim_steps, double step_size,const spCtrlPts2ord_2dof& cntrl_vars, double epsilon, int pert_index, std::shared_ptr<spStateSeries> traj_states = nullptr) {
     spBox& gnd = (spBox&) objects_.GetObject(gnd_handle_);
     gnd.SetFriction(1);
     spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle_);
 
     car.SetPose(initial_state_.pose);
     car.SetEngineMaxVel(10);
-    car.SetEngineTorque(100);
+    car.SetEngineTorque(1000);
     car.SetSteeringServoMaxVel(10);
     car.SetSteeringServoTorque(10);
     car.SetFrontSteeringAngle(0);
@@ -50,40 +60,45 @@ class CarSimFunctor {
     if (pert_index >= 0) {
       control_curve.PerturbControlPoint(pert_index,epsilon/**std::abs(cntrl_vars.data()[pert_index])*/);
     }
+    if(traj_states != nullptr) {
+      traj_states->push_back(car.GetState());
+    }
+//    traj_points_.push_back(car.GetPose().translation());
     for(int ii=0;ii<num_sim_steps;ii++) {
       control_curve.GetPoint(sample_control,ii/(double)num_sim_steps);
       car.SetFrontSteeringAngle(sample_control[0]);
       car.SetEngineMaxVel(sample_control[1]);
       objects_.StepPhySimulation(step_size);
-      traj_points_.push_back(car.GetPose().translation());
+      if((gui_!=nullptr)) {
+        gui_->Iterate(objects_);
+        spGeneralTools::Delay_ms(100);
+      }
+//      traj_points_.push_back(car.GetPose().translation());
+      if(traj_states != nullptr) {
+        traj_states->push_back(car.GetState());
+      }
     }
     state_ = car.GetState();
   }
 
   const spState& GetState(){
-//    std::cout  << state_ << std::endl;
-    return state_;
+    return *state_;
   }
 
-//  spCtrlPts3ord_3dof& GetEstimatedTrajectoryCurve() {
-//    // fit a curve to traj_points;
-//    SPERROREXIT("TODO");
-//    return traj_curve_;
+//  spPoints3d& GetTrajectoryPoints() {
+//    return traj_points_;
 //  }
-
-  spPoints3d& GetTrajectoryPoints() {
-    return traj_points_;
-  }
 
  private:
   const spVehicleConstructionInfo& vehicle_info_;
   spCtrlPts3ord_3dof traj_curve_;
-  spPoints3d traj_points_;
+//  spPoints3d traj_points_;
   Objects objects_;
   spObjectHandle gnd_handle_;
   spObjectHandle car_handle_;
-  spState state_;
+  std::shared_ptr<spState> state_;
   spState initial_state_;
+  Gui* gui_;
 };
 
 #endif  // THREADPOOL_H__

@@ -28,7 +28,16 @@
 // for a stable physics result use a scale of 2-10
 #define WSCALE 10
 #define WSCALE_INV 0.1
+
 #define BULLET_SOLVER_NUM_ITERATIONS 5
+
+// Enable this line for using central differencing instead of forward diff
+//#define SOLVER_USE_CENTRAL_DIFF
+
+// recommended step sizes
+// Forward diff step = 0.09
+// Central diff step = 0.05
+#define FINITE_DIFF_EPSILON 0.09
 
 #define BIT(x) (1<<(x))
 enum BulletCollissionType{
@@ -47,7 +56,6 @@ typedef Eigen::Vector4d spWheelSpeedVec;
 typedef Eigen::Vector3d spBoxSize;
 typedef Eigen::Vector3d spLinVel;
 typedef Eigen::Vector3d spVector3;
-//typedef Eigen::AngleAxisd spRotVel;
 typedef Eigen::Vector3d spRotVel;
 typedef Eigen::Vector3d spCylinderSize;
 typedef Eigen::Vector2d spMeshSize;
@@ -70,22 +78,16 @@ typedef Eigen::Matrix<double,2,3> spCtrlPts2ord_2dof;
 typedef Eigen::Matrix<double,8,4> spPlannerJacobian;
 typedef Eigen::Array<double,12,1> spStateVec;
 typedef Eigen::Array<double,8,1> spResidualVec;
+class spState;
+typedef std::vector<std::shared_ptr<spState>> spStateSeries;
 
 class spState {
 public:
   spState() : pose(spPose::Identity()),
-//    wheel_speeds(spWheelSpeedVec::Zero()),
-    linvel(spLinVel::Zero()),
-//    front_steering(0),
-//    rear_steering(0),
-//    w1(spPose::Identity()),
-//    w2(spPose::Identity()),
-//    w3(spPose::Identity()),
-//    w4(spPose::Identity()),
+    linvel(spLinVel(0,0,0)),
     rotvel(spRotVel(0,0,0)) {}
-  ~spState(){
-    std::cout << "dest called " << std::endl;
-  }
+
+  ~spState(){}
 
   spState(const spState& state) {
     pose = state.pose;
@@ -171,30 +173,6 @@ public:
 
     return vec;
   }
-//  const spStateVec vector() const{
-//    std::shared_ptr<spStateVec> vec = std::make_shared<spStateVec>();
-//    (*vec)[0] = pose.translation()[0];
-//    (*vec)[1] = pose.translation()[1];
-//    (*vec)[2] = pose.translation()[2];
-
-//    Eigen::AngleAxisd angleaxis(pose.rotation());
-//    Eigen::Vector3d rotvec(angleaxis.angle()*angleaxis.axis());
-//    (*vec)[3] = rotvec[0];
-//    (*vec)[4] = rotvec[1];
-//    (*vec)[5] = rotvec[2];
-
-//    (*vec)[6] = linvel[0];
-//    (*vec)[7] = linvel[1];
-//    (*vec)[8] = linvel[2];
-
-//    Eigen::Vector3d rotvelvec(rotvel.angle()*rotvel.axis());
-//    std::cout << "rotvel angle is " << rotvel.angle() << "rotvel axis is "<< rotvel.axis().transpose() << std::endl;
-//    (*vec)[9] = rotvelvec[0];
-//    (*vec)[10] = rotvelvec[1];
-//    (*vec)[11] = rotvelvec[2];
-
-//    return *vec;
-//  }
 
   int InsertSubstate(const spState& substate){
     substate_vec.push_back(std::make_shared<spState>(substate));

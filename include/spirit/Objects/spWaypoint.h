@@ -9,10 +9,11 @@ class spWaypoint : public spCommonObject {
   spWaypoint(const spWaypoint&wp);
   ~spWaypoint();
   void SetPose(const spPose& pose);
-  const spPose& GetPose();
+  spPose& GetPose();
+  const spPose& GetPose() const;
   void SetColor(const spColor& color);
   const spColor& GetColor();
-  const spLinVel& GetLinearVelocity();
+  const spLinVel& GetLinearVelocity() const;
 //  void SetLinearVelocityDirection(const spLinVel& linvel);
 
   void SetLinearVelocityNorm(double length);

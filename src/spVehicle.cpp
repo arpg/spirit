@@ -137,7 +137,7 @@ const spRotVel& spVehicle::GetAngularVelocity() {
   return *angular_vel;
 }
 
-const spState spVehicle::GetState() {
+std::shared_ptr<spState> spVehicle::GetState() {
   std::shared_ptr<spState> state = std::make_shared<spState>();
   // bullet uses Euler XYZ(yaw,pitch,roll) convention for rotations
   state->pose = btTransform2spPose(rigid_body_->getWorldTransform());
@@ -188,20 +188,18 @@ const spState spVehicle::GetState() {
 //  state->w2 = GetWheel(1)->GetPose();
 //  state->w3 = GetWheel(2)->GetPose();
 //  state->w4 = GetWheel(3)->GetPose();
-  std::cout << "size " << state->substate_vec.size() << std::endl;
 
-  return *state.get();
+  return state;
 }
 
 void spVehicle::SetState(const spState& state){
   // TODO: when setting the pose we need to set suspention length aswell
-  std::cout << "size2 " << state.substate_vec.size() << std::endl;
   SetPose(state.pose);
+//  std::cout << "linvel is " << state.linvel.transpose() << std::endl;
   SetLinearVelocity(state.linvel);
   SetAngularVelocity(state.rotvel);
   for(int ii=0; ii<GetNumberOfWheels(); ii++) {
-
-    GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
+//    GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
     GetWheel(ii)->SetPose(state.substate_vec[ii]->pose);
     GetWheel(ii)->SetLinVel(state.substate_vec[ii]->linvel);
     GetWheel(ii)->SetAngularVel(state.substate_vec[ii]->rotvel);

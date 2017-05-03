@@ -39,7 +39,11 @@ void spWaypoint::SetPose(const spPose& pose) {
   obj_guichanged_ = true;
 }
 
-const spPose& spWaypoint::GetPose() {
+spPose& spWaypoint::GetPose(){
+  return pose_;
+}
+
+const spPose& spWaypoint::GetPose() const{
   return pose_;
 }
 
@@ -48,7 +52,7 @@ void spWaypoint::SetColor(const spColor& color) {
   obj_guichanged_ = true;
 }
 
-const spLinVel& spWaypoint::GetLinearVelocity() {
+const spLinVel& spWaypoint::GetLinearVelocity() const{
   // pangolin's waypoint has velocity on x axis
   std::shared_ptr<spLinVel> linvel = std::make_shared<spLinVel>(pose_.rotation()*spLinVel(0,1,0));
   linvel->normalize();

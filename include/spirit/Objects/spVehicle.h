@@ -25,7 +25,7 @@ class spVehicle : public spCommonObject {
   const spPose& GetWheelOrigin(int index);
   const spBoxSize& GetChassisSize();
   const spPose& GetLocalCOG();
-  const spState GetState();
+  std::shared_ptr<spState> GetState();
   void SetState(const spState& state);
   void SetClampToSurfaceFlag();
   void SetLinearVelocity(const spLinVel& linear_vel);
