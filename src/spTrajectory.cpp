@@ -1,6 +1,6 @@
 #include <spirit/Planners/spTrajectory.h>
 
-spTrajectory::spTrajectory(Gui& gui, Objects& objects) : gui_(gui),objects_(objects) {
+spTrajectory::spTrajectory(Gui& gui, Objects& objects) : gui_(gui), objects_(objects) {
   is_loop_ = false;
 }
 
@@ -46,18 +46,23 @@ void spTrajectory::InitControlCommand(spCtrlPts2ord_2dof* cntrl_cmd){
   cntrl_cmd->col(2) = Eigen::Vector2d(0,20);
 }
 
-void spTrajectory::PlaybackTrajectoryOnGUI(int waypoint_index) {
-  // draw a car at point
-SPERROREXIT("this is not complete yet. need to store states through linestrip to be able to play back");
-//  spPose pose(spPose::Identity());
-//  spObjectHandle carchassis = objects_.CreateBox(GetWaypoint(waypoint_index).pose_,spBoxSize(0.2, 0.42,0.05),0,spColor(1,0,0));
-//  gui_.AddObject(carchassis);
-//  for (int ii = 0; ii < 100; ++ii) {
-//    spGeneralTools::Delay_us(1);
-//    gui_.Iterate(objects_);
-//  }
-//  gui_.RemoveObject(objects_.GetObject(carchassis));
-
+void spTrajectory::PlaybackTrajectoryOnGUI(const spVehicleConstructionInfo& vehicle_params, int waypoint_index, double playback_ratio, int max_num_steps) {
+  spObjectHandle car_handle = objects_.CreateVehicle(vehicle_params);
+  gui_.AddObject(objects_.GetObject(car_handle));
+  spStateSeries& stateseries = *(stateseries_vec_[waypoint_index]);
+  int num_steps = stateseries.size();
+  if(max_num_steps != -1) {
+    num_steps = max_num_steps;
+  }
+  for (int ii = 0; ii < num_steps; ++ii) {
+    ((spAWSDCar&)objects_.GetObject(car_handle)).SetState(*stateseries[ii]);
+    for(int jj=0; jj<(int)(10.0/playback_ratio);jj++) {
+      gui_.Iterate(objects_);
+      spGeneralTools::Delay_ms(7);
+    }
+  }
+  gui_.RemoveObject(objects_.GetObject(car_handle));
+  objects_.RemoveObj(car_handle);
 }
 
 //void spTrajectory::SetTrajectoryPoints(int waypoint_index, const spPoints3d& traj_pts) {

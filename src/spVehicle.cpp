@@ -193,13 +193,16 @@ std::shared_ptr<spState> spVehicle::GetState() {
 }
 
 void spVehicle::SetState(const spState& state){
+  if(state.substate_vec.size() != GetNumberOfWheels()) {
+    SPERROREXIT("state tree size mismatch.");
+  }
   // TODO: when setting the pose we need to set suspention length aswell
   SetPose(state.pose);
 //  std::cout << "linvel is " << state.linvel.transpose() << std::endl;
   SetLinearVelocity(state.linvel);
   SetAngularVelocity(state.rotvel);
   for(int ii=0; ii<GetNumberOfWheels(); ii++) {
-//    GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
+    GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
     GetWheel(ii)->SetPose(state.substate_vec[ii]->pose);
     GetWheel(ii)->SetLinVel(state.substate_vec[ii]->linvel);
     GetWheel(ii)->SetAngularVel(state.substate_vec[ii]->rotvel);

@@ -50,6 +50,64 @@ void spirit::DummyTests() {
   car_param.cog = spTranslation(0, 0, 0);
   car_param.chassis_friction = 0;
   car_param.wheel_rollingfriction = 0.1;
+  car_param.wheel_friction = 0.8;
+  car_param.wheel_width = 0.04;
+  car_param.wheel_radius = 0.057;
+  car_param.susp_damping = 10;
+  car_param.susp_stiffness = 100;
+  car_param.susp_preloading_spacer = 0.1;
+  car_param.susp_upper_limit = 0.013;
+  car_param.susp_lower_limit = -0.028;
+  car_param.wheel_mass = 0.4;
+  car_param.chassis_mass = 5;
+  car_param.steering_servo_lower_limit = -SP_PI / 4;
+  car_param.steering_servo_upper_limit = SP_PI / 4;
+
+  spPose gnd_pose_ = spPose::Identity();
+  gnd_pose_.translate(spTranslation(0,0,-0.5));
+  spObjectHandle gnd_handle = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
+  ((spBox&)objects_.GetObject(gnd_handle)).SetFriction(1);
+  ((spBox&)objects_.GetObject(gnd_handle)).SetRollingFriction(0.1);
+  gui_.AddObject(objects_.GetObject(gnd_handle));
+
+  spObjectHandle car_handle = objects_.CreateVehicle(car_param);
+  gui_.AddObject(objects_.GetObject(car_handle));
+  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
+  car.SetEngineTorque(10);
+  car.SetEngineMaxVel(0);
+  car.SetSteeringServoMaxVel(100);
+  car.SetSteeringServoTorque(100);
+  car.SetRearSteeringAngle(0);
+  car.SetFrontSteeringAngle(SP_PI/4);
+
+
+//  spGeneralTools::Delay_ms(10);
+  while(1){
+    objects_.StepPhySimulation(0.1);
+    spState state;
+    state = *car.GetState();
+//    car.SetState(state);
+    gui_.Iterate(objects_);
+  };
+}
+
+void spirit::SenarioStateInitialization() {
+  spVehicleConstructionInfo car_param;
+  car_param.vehicle_type = spObjectType::VEHICLE_AWSD;
+  spPose car_pose(spPose::Identity());
+  car_pose.translate(spTranslation(0,0,0.06));
+//  Eigen::AngleAxisd rot1(-M_PI/2,Eigen::Vector3d::UnitZ());
+//  car_pose.rotate(rot1);
+  car_param.pose = car_pose;
+
+  car_param.wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(-0.13, -0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(0.13, -0.17, -0.003));
+  car_param.wheels_anchor.push_back(spTranslation(0.13, 0.17, -0.003));
+  car_param.chassis_size = spBoxSize(0.2, 0.42, 0.05);
+  car_param.cog = spTranslation(0, 0, 0);
+  car_param.chassis_friction = 0;
+  car_param.wheel_rollingfriction = 0.1;
   car_param.wheel_friction = 0.4;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.057;
@@ -262,8 +320,8 @@ void spirit::SenarioTrajectoryTest() {
   spTrajectory traj(gui_,objects_);
   // put waypoints on a elliptical path
   double a = 4;
-  double b = 3;
-  int num_waypoints = 20;
+  double b = 2;
+  int num_waypoints = 8;
   for(int ii=0; ii<num_waypoints; ii++) {
     // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
     double theta = ii*(2*SP_PI)/num_waypoints;
@@ -273,7 +331,7 @@ void spirit::SenarioTrajectoryTest() {
     // slope of the line is
     double angle = atan2(-(x*b*b),(y*a*a));
     spPose pose(spPose::Identity());
-    pose.translate(spTranslation(x,y,0.06));
+    pose.translate(spTranslation(x,y,0.07));
     Eigen::AngleAxisd rot(angle+SP_PI_HALF,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
 //    if(ii==1){
@@ -282,10 +340,11 @@ void spirit::SenarioTrajectoryTest() {
 //    }
     traj.AddWaypoint(pose,20);
   }
+  gui_.Iterate(objects_);
   traj.IsLoop(true);
 //  std::cout << "waypoint speed is \n" << traj.GetWaypoint(0).GetLinearVelocity() << std::endl;
 
-  spLocalPlanner localplanner(car_param);
+  spLocalPlanner localplanner(car_param,&gui_);
 
 
 //  spPose pose(spPose::Identity());
@@ -297,10 +356,20 @@ void spirit::SenarioTrajectoryTest() {
 //  std::cout << "angle is " << angleaxis.angle() << std::endl;
 //  std::cout << "axis is " << angleaxis.axis() << std::endl;
 
-  for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
+  for(int ii=0; ii<5/*traj.GetNumWaypoints()*/; ii++) {
+    if(ii != 0) {
+      // set the solution from last control point from ii'th trajectory to first control point of ii+1'th trajectory
+      // this will guarantee C1 continuity
+//      traj.GetControls(ii).data()[0] = traj.GetControls(ii-1).data()[4];
+//      traj.GetControls(ii).data()[1] = traj.GetControls(ii-1).data()[5];
+    }
     localplanner.SolveInitialPlan(traj,ii);
     gui_.Iterate(objects_);
     localplanner.SolveLocalPlan(traj,ii,true);
+    if(ii==1)
+    for(int jj=0;jj<50;jj++) {
+      traj.PlaybackTrajectoryOnGUI(car_param,ii,0.4);
+    }
     gui_.Iterate(objects_);
 //    spObjectHandle thewayobj = objects_.CreateWaypoint(state.pose,spColor(0,1,0));
 //    ((spWaypoint&)objects_.GetObject(thewayobj)).SetLinearVelocityNorm(state.linvel.norm());

@@ -25,6 +25,8 @@ public:
   void CalcLocalPlannerJacobian();
   void SenarioCeresTest();
   void SenarioTrajectoryTest();
+  void SenarioStateInitialization();
+
 private:
   void InitCarPool(int num_cars);
   std::vector<Objects> pool_objects_vec_;

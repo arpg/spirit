@@ -74,6 +74,9 @@ void Gui::RemoveObject(spCommonObject &obj) {
   if(!gui_) {
     SPERROREXIT("gui_ object has not been created yet.");
   }
+  if(obj.GetGuiIndex()==-1) {
+    SPERROREXIT("object has never been added to gui");
+  }
   switch(obj.GetObjecType()) {
     case spObjectType::WAYPOINT:
     {

@@ -123,6 +123,8 @@ void spPangolinScenegraphGui::KeyActionMethodSample() {
 
 void spPangolinScenegraphGui::AddBox(spBox &box) {
   SceneGraph::GLBox glbox;
+  std::string name = "box";
+  glbox.SetObjectName(name);
   glbox.SetPose(box.GetPose().matrix());
   glbox.SetScale(box.GetDimensions());
   glbox.SetCheckerboard(0);
@@ -133,6 +135,8 @@ void spPangolinScenegraphGui::AddBox(spBox &box) {
 
 void spPangolinScenegraphGui::AddWaypoint(spWaypoint& waypoint) {
   SceneGraph::GLWayPoint* glwaypoint = new SceneGraph::GLWayPoint();
+  std::string name = "waypoint";
+  glwaypoint->SetObjectName(name);
   glwaypoint->SetPose(waypoint.GetPose().matrix());
   glwaypoint->SetCubeDim(UI_WAYPOINT_BOX_DIM);
   glwaypoint->SetColor(waypoint.GetColor()[0],waypoint.GetColor()[1],waypoint.GetColor()[2]);
@@ -146,6 +150,8 @@ void spPangolinScenegraphGui::AddVehicle(spVehicle& vehicle)
 {
   // draw vehicle with a box for chassis and four cylinders for wheels
   SceneGraph::GLBox glchassis;
+  std::string name = "chassis";
+  glchassis.SetObjectName(name);
   glchassis.SetPose(vehicle.GetPose().matrix());
   glchassis.SetScale(vehicle.GetChassisSize());
   globjects_.push_back(new SceneGraph::GLBox(glchassis));
@@ -164,6 +170,8 @@ void spPangolinScenegraphGui::AddVehicle(spVehicle& vehicle)
 
 void spPangolinScenegraphGui::RemoveVehicle(spVehicle& vehicle)
 {
+  // there is a problem with removing objects. when we remove and object we dont remove it from globjects vector since that could
+  // result in having mismatch indices between newly added spobjects
   glscenegraph_.RemoveChild(globjects_[vehicle.GetGuiIndex()]);
 //  delete(globjects_[vehicle.GetGuiIndex()]);
   globjects_[vehicle.GetGuiIndex()] = NULL;
@@ -176,6 +184,8 @@ void spPangolinScenegraphGui::RemoveVehicle(spVehicle& vehicle)
 
 void spPangolinScenegraphGui::AddLineStrip(spLineStrip& linestrip) {
   SceneGraph::GLLineStrip* gllinestrip = new SceneGraph::GLLineStrip;
+  std::string name = "linestrip";
+  gllinestrip->SetObjectName(name);
   gllinestrip->SetIgnoreDepth(true);
   gllinestrip->SetPose(linestrip.GetPose().matrix());
   gllinestrip->SetLineWidth(2);
@@ -190,12 +200,18 @@ void spPangolinScenegraphGui::AddLineStrip(spLineStrip& linestrip) {
 
 void spPangolinScenegraphGui::UpdateBoxGuiObject(spBox& spobj) {
   int gui_index = spobj.GetGuiIndex();
+  if((!(spobj.GetGuiIndex()<globjects_.size())) || (globjects_[gui_index]->ObjectName().compare("box"))){
+    SPERROREXIT("gui object doesn't match spobject.");
+  }
   globjects_[gui_index]->SetPose(spobj.GetPose().matrix());
   globjects_[gui_index]->SetScale(spobj.GetDimensions());
 }
 
 void spPangolinScenegraphGui::UpdateWaypointGuiObject(spWaypoint& spobj) {
   int gui_index = spobj.GetGuiIndex();
+  if(!(spobj.GetGuiIndex()<globjects_.size()) || (globjects_[gui_index]->ObjectName().compare("waypoint"))){
+    SPERROREXIT("gui object doesn't match spobject.");
+  }
   SceneGraph::GLWayPoint* glwaypoint = (SceneGraph::GLWayPoint*)globjects_[gui_index];
   glwaypoint->SetZAxisDown(false);
   glwaypoint->SetVelocityAxis(1);
@@ -206,6 +222,9 @@ void spPangolinScenegraphGui::UpdateWaypointGuiObject(spWaypoint& spobj) {
 
 void spPangolinScenegraphGui::UpdateVehicleGuiObject(spVehicle& vehicle) {
   int chassis_index = vehicle.GetGuiIndex();
+  if(!(vehicle.GetGuiIndex()<globjects_.size()) || (globjects_[chassis_index]->ObjectName().compare("chassis"))){
+    SPERROREXIT("gui object doesn't match spobject.");
+  }
   globjects_[chassis_index]->SetPose(vehicle.GetPose().matrix());
   globjects_[chassis_index]->SetScale(vehicle.GetChassisSize());
   for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
@@ -221,6 +240,9 @@ void spPangolinScenegraphGui::UpdateVehicleGuiObject(spVehicle& vehicle) {
 
 void spPangolinScenegraphGui::UpdateLineStripGuiObject(spLineStrip& spobj) {
   int gui_index = spobj.GetGuiIndex();
+  if(!(spobj.GetGuiIndex()<globjects_.size()) || (globjects_[gui_index]->ObjectName().compare("linestrip"))){
+    SPERROREXIT("gui object doesn't match spobject.");
+  }
   SceneGraph::GLLineStrip* gllinestrip = (SceneGraph::GLLineStrip*) globjects_[gui_index];
   gllinestrip->SetPose(spobj.GetPose().matrix());
   gllinestrip->SetColor(spobj.GetColor()[0],spobj.GetColor()[1],spobj.GetColor()[2],1);
@@ -232,7 +254,7 @@ void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
   // go through all spirit objects
   for(spObjectHandle ii=spobj.GetListBegin(); ii!=spobj.GetListEnd(); ++ii) {
     //only update objects which had gui property changes
-    if(spobj.GetObject(ii).HasChangedGui()) {
+    if(spobj.GetObject(ii).HasChangedGui() && (spobj.GetObject(ii).GetGuiIndex()!=-1)) {
       // update the gui object
       switch (spobj.GetObject(ii).GetObjecType()) {
         case spObjectType::WHEEL:
