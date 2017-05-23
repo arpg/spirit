@@ -13,7 +13,6 @@ class spirit{
 public:
   spirit(spSettings& user_settings);
   ~spirit();
-  void Create();
   bool ShouldRun();
   void IterateWorld();
   void CheckKeyboardAction();

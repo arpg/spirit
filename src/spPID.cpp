@@ -1,12 +1,10 @@
 #include <spirit/Controllers/spPID.h>
 
-spPID::spPID(unsigned int buf_len) {
-  buffer_size_ = buf_len;
+spPID::spPID() {
   gain_p_ = 0;
   gain_i_ = 0;
   gain_d_ = 0;
   integral_value = 0;
-  buf_curr_index = 0;
 }
 
 spPID::~spPID() {

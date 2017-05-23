@@ -21,13 +21,13 @@ IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 ENDIF()
 
-find_package( Pangolin 0.1 REQUIRED )
+find_package( Pangolin REQUIRED )
 find_package( Bullet REQUIRED )
 find_package( SceneGraph 0.1 REQUIRED )
 find_package( Eigen3 REQUIRED )
 find_package( Sophus REQUIRED)
 find_package( CeresSolver REQUIRED)
-find_package( Matlab	REQUIRED ENG_LIBRARY MX_LIBRARY MAT_LIBRARY)
+#find_package( Matlab	REQUIRED ENG_LIBRARY MX_LIBRARY MAT_LIBRARY)
 #find_package( tbb REQUIRED)
 
 set( _INCLUDE_DIRS
@@ -37,7 +37,7 @@ set( _INCLUDE_DIRS
 	${BULLET_INCLUDE_DIR}
 	${Sophus_INCLUDE_DIRS}
 	${CeresSolver_INCLUDE_DIRS}
-	${Matlab_INCLUDE_DIRS}
+#	${Matlab_INCLUDE_DIRS}
 #	${TBB_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	)
@@ -47,11 +47,9 @@ set( _LIBRARIES
 	${SceneGraph_LIBRARIES}
 	${BULLET_LIBRARIES}
 	${CeresSolver_LIBRARIES}
-	${Matlab_LIBRARIES}
+#	${Matlab_LIBRARIES}
 #	${TBB_LIBRARY_DIRS}
 	)
-
-include_directories( ${_INCLUDE_DIRS} )
 
 set( HDRS
 	include/spirit/spirit.h
@@ -108,18 +106,19 @@ if(BUILD_Examples)
 	add_subdirectory( examples )
 endif()
 
+include_directories( ${_INCLUDE_DIRS} )
 set( LIBRARY_NAME ${PROJECT_NAME} )
 string( TOLOWER ${LIBRARY_NAME} LIBRARY_NAME )
 
 add_library( ${LIBRARY_NAME} ${SRCS} ${HDRS} )
-target_link_libraries( ${LIBRARY_NAME} ${_LIBRARIES} )
+target_link_libraries( ${LIBRARY_NAME} ${_LIBRARIES})
 
 install_package(
   PKG_NAME ${PROJECT_NAME}
   LIB_NAME ${LIBRARY_NAME}
   VERSION ${VERSION}
 	DESCRIPTION "Vehicle Controller and GUI"
-  #INSTALL_INCLUDE_DIR true
+	INSTALL_INCLUDE_DIR true
   DESTINATION ${CMAKE_INSTALL_PREFIX}
   INCLUDE_DIRS ${_INCLUDE_DIRS}
   LINK_LIBS ${_LIBRARIES}

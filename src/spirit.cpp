@@ -3,16 +3,10 @@
 //#include <iomanip>
 #include <spirit/Planners/spTrajectory.h>
 #include <spirit/VehicleCeresCostFunc.h>
-#include <engine.h>
 #include <fstream>
 
 spirit::spirit(spSettings& user_settings) {
   user_settings_ = user_settings;
-}
-
-spirit::~spirit() {}
-
-void spirit::Create() {
   // create gui object if requested
   if (user_settings_.GetGuiType() != spGuiType::GUI_NONE) {
     gui_.Create(user_settings_.GetGuiType());
@@ -22,6 +16,8 @@ void spirit::Create() {
 //    physics_.Create(user_settings_.GetPhysicsEngineType());
   }
 }
+
+spirit::~spirit() {}
 
 bool spirit::ShouldRun() {
   if (gui_.ShouldQuit()) {
@@ -418,7 +414,7 @@ void PIDController_test() {
 //  }
 
   // test pid for rc circuit
-  spPID rc_pid(10);
+  spPID rc_pid;
   double target_v = 10;
   double current_v = 0;
   rc_pid.SetGainP(20);

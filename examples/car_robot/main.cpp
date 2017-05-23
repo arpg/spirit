@@ -1,7 +1,7 @@
 /// Sample Ccommandline Argument
 // ./ninja_gui --groundmeshfile=/Users/saghli/code/datasets/meshes/lab.ply --paramfile=/Users/saghli/code/spirit/parameter_files/gui_params.csv
 
-#include <glog/logging.h>
+//#include <glog/logging.h>
 #include <thread>
 #include <chrono>
 #include <math.h>
@@ -9,10 +9,10 @@
 #include <HAL/Gamepad.pb.h>
 #include <HAL/Gamepad/GamepadDevice.h>
 
-DEFINE_string(groundmeshfile, "", "Specify File Path");
-DEFINE_string(paramfile, "", "Specify File Path");
-DEFINE_int32(verbosity, 2,
-             "verbositylevel of node (the lower the less verbose)");
+//DEFINE_string(groundmeshfile, "", "Specify File Path");
+//DEFINE_string(paramfile, "", "Specify File Path");
+//DEFINE_int32(verbosity, 2,
+//             "verbositylevel of node (the lower the less verbose)");
 
 void GamepadCallback(hal::GamepadMsg& _msg) {
   std::cout << "-> "
@@ -64,7 +64,6 @@ int main(int argc, char** argv) {
   settings_obj.SetNumThreads(1);
 
   spirit sp_world(settings_obj);
-  sp_world.Create();
 //  sp_world.CalcLocalPlannerJacobian();
 //  sp_world.ScenarioWorldBoxFall();
 //  sp_world.ScenarioWorldCarFall();
