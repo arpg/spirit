@@ -72,9 +72,9 @@ int main(int argc, char** argv) {
 //  sp_world.ScenarioPIDController();
 //  sp_world.ScenarioGNTest();
 
-//  sp_world.SenarioTrajectoryTest();
+  sp_world.SenarioTrajectoryTest();
 //  sp_world.SenarioCostSurf();
-  sp_world.DummyTests();
+//  sp_world.DummyTests();
 
   while(sp_world.ShouldRun()) {
     sp_world.IterateWorld();

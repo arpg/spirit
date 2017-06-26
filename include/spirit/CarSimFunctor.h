@@ -11,12 +11,13 @@
 class CarSimFunctor {
  public:
   CarSimFunctor(const spVehicleConstructionInfo& info ,const spState& initial_state,Gui* gui=nullptr/*, Objects* objects=nullptr*/) : vehicle_info_(info), initial_state_(initial_state), gui_(gui)/*, objects_(objects)*/ {
+    state_ = nullptr;
     spPose gnd_pose_ = spPose::Identity();
     gnd_pose_.translate(spTranslation(0,0,-0.5));
-    gnd_handle_ = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(1,0,0));
+    gnd_handle_ = objects_.CreateBox(gnd_pose_,spBoxSize(20,20,1),0,spColor(1,0,0));
     car_handle_ = objects_.CreateVehicle(vehicle_info_);
     if(initial_state_.substate_vec.size() != info.wheels_anchor.size()) {
-      SPERROREXIT("Provided state does not match the VehicleInfo");
+      SPERROR("Provided state does not match the VehicleInfo");
     }
 //    if(initial_state_.substate_vec.size() == 0) {
 //      // wheel initialization has not been requested. create wheels with default state values (check spTypes.h)
@@ -53,12 +54,13 @@ class CarSimFunctor {
     gnd.SetFriction(1);
     spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle_);
 
-    car.SetPose(initial_state_.pose);
-    car.SetEngineMaxVel(1000);
-    car.SetEngineTorque(1000);
-    car.SetSteeringServoMaxVel(1000);
-    car.SetSteeringServoTorque(1000);
-    car.SetFrontSteeringAngle(0);
+//    car.SetPose(initial_state_.pose);
+    car.SetState(initial_state_);
+    car.SetEngineMaxVel(100);
+    car.SetEngineTorque(100);
+    car.SetSteeringServoMaxVel(100);
+    car.SetSteeringServoTorque(100);
+    car.SetRearSteeringAngle(0);
 
     spCurve control_curve(2,2);
     control_curve.SetBezierControlPoints(cntrl_vars);

@@ -272,7 +272,7 @@ void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
           UpdateBoxGuiObject((spBox&)spobj.GetObject(ii));
           break;
         }
-        case spObjectType::VEHICLE_AWD||spObjectType::VEHICLE_AWSD || spObjectType::VEHICLE_GENERAL || spObjectType::VEHICLE_RWD :
+        case spObjectType::VEHICLE_AWSD:
         {
           UpdateVehicleGuiObject((spVehicle&)spobj.GetObject(ii));
           break;
@@ -300,7 +300,7 @@ void spPangolinScenegraphGui::UpdateSpiritObjectsFromGui(Objects& spobjects) {
         {
           break;
         }
-        case spObjectType::VEHICLE_AWD||spObjectType::VEHICLE_AWSD||spObjectType::VEHICLE_GENERAL || spObjectType::VEHICLE_RWD :
+        case spObjectType::VEHICLE_AWSD :
         {
           break;
         }

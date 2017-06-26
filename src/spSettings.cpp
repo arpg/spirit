@@ -1,7 +1,7 @@
 #include <spirit/spSettings.h>
 
 spSettings::spSettings()
-  : gui_type_(GUI_NONE)
+  : gui_type_(spGuiType::GUI_NONE)
 {
   num_threads_ = 1;
 }

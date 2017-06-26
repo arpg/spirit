@@ -44,12 +44,13 @@ void spVehicle::SetPose(const spPose& pose) {
 //  statevec_.head(3) = pose.translation();
 //  spRotation quat(pose.rotation());
 //  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
+
   MoveWheelsToAnchors(pose);
-  rigid_body_->clearForces();
-  GetWheel(0)->GetRigidbody()->clearForces();
-  GetWheel(1)->GetRigidbody()->clearForces();
-  GetWheel(2)->GetRigidbody()->clearForces();
-  GetWheel(3)->GetRigidbody()->clearForces();
+//  rigid_body_->clearForces();
+//  GetWheel(0)->GetRigidbody()->clearForces();
+//  GetWheel(1)->GetRigidbody()->clearForces();
+//  GetWheel(2)->GetRigidbody()->clearForces();
+//  GetWheel(3)->GetRigidbody()->clearForces();
   obj_guichanged_ = true;
 }
 
@@ -141,12 +142,9 @@ std::shared_ptr<spState> spVehicle::GetState() {
   std::shared_ptr<spState> state = std::make_shared<spState>();
   // bullet uses Euler XYZ(yaw,pitch,roll) convention for rotations
   state->pose = btTransform2spPose(rigid_body_->getWorldTransform());
-//  state->linvel = (spLinVel)rigid_body_->getLinearVelocity();
   state->linvel = GetLinearVelocity();
-//  btQuaternion btrotvel(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
   state->rotvel = GetAngularVelocity();
   for(int ii=0; ii<GetNumberOfWheels(); ii++) {
-//    state->wheel_speeds[ii] = GetWheel(ii)->GetWheelSpeed();
     int index = state->InsertSubstate();
     state->substate_vec[ii]->pose = GetWheel(ii)->GetPose();
     state->substate_vec[ii]->linvel = GetWheel(ii)->GetLinVel();
@@ -194,20 +192,20 @@ std::shared_ptr<spState> spVehicle::GetState() {
 
 void spVehicle::SetState(const spState& state){
   if(state.substate_vec.size() != GetNumberOfWheels()) {
-    SPERROREXIT("state tree size mismatch.");
+    SPERROR("state tree size mismatch.");
   }
   // TODO: when setting the pose we need to set suspention length aswell
   SetPose(state.pose);
 //  std::cout << "linvel is " << state.linvel.transpose() << std::endl;
   SetLinearVelocity(state.linvel);
   SetAngularVelocity(state.rotvel);
-  for(int ii=0; ii<GetNumberOfWheels(); ii++) {
+//  for(int ii=0; ii<GetNumberOfWheels(); ii++) {
+  for(int ii=0; ii<state.substate_vec.size(); ii++) {
     GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
     GetWheel(ii)->SetPose(state.substate_vec[ii]->pose);
     GetWheel(ii)->SetLinVel(state.substate_vec[ii]->linvel);
     GetWheel(ii)->SetAngularVel(state.substate_vec[ii]->rotvel);
   }
-
 //  spPose T_wheel_chassis = GetWheel(0)->GetPose().inverse()*GetPose();
 //  Eigen::AngleAxisd rollAngle(T_wheel_chassis.rotation().eulerAngles(0,1,2)[0], Eigen::Vector3d::UnitX());
 //  Eigen::AngleAxisd pitchAngle(T_wheel_chassis.rotation().eulerAngles(0,1,2)[1], Eigen::Vector3d::UnitY());
@@ -221,36 +219,7 @@ void spVehicle::SetState(const spState& state){
 //  p3.rotate(q);
 //  GetWheel(0)->SetPose(p0);
 //  GetWheel(3)->SetPose(p3);
-/*
-  spPose w0(GetWheel(0)->GetPose());
-  spPose w3(GetWheel(3)->GetPose());
-  w0.rotation().Zero();
-  w0.rotate(state.front_steering);
-  w3.rotation().Zero();
-  w3.rotate(state.rear_steering);
-//  w0.linear() = state.front_steering;
-//  w3.linear() = state.rear_steering;
-  GetWheel(0)->SetPose(w0);
-  GetWheel(3)->SetPose(w3);
-*/
 
-//  GetWheel(0)->SetPose(state.w1);
-//  GetWheel(1)->SetPose(state.w2);
-//  GetWheel(2)->SetPose(state.w3);
-//  GetWheel(3)->SetPose(state.w4);
-
-//  GetWheel(0)->SetPose(state.w0->pose);
-//  GetWheel(1)->SetPose(state.w1->pose);
-//  GetWheel(2)->SetPose(state.w2->pose);
-//  GetWheel(3)->SetPose(state.w3->pose);
-//  GetWheel(0)->SetLinVel(state.w0->linvel);
-//  GetWheel(1)->SetLinVel(state.w1->linvel);
-//  GetWheel(2)->SetLinVel(state.w2->linvel);
-//  GetWheel(3)->SetLinVel(state.w3->linvel);
-//  GetWheel(0)->SetAngularVel(state.w0->rotvel);
-//  GetWheel(1)->SetAngularVel(state.w1->rotvel);
-//  GetWheel(2)->SetAngularVel(state.w2->rotvel);
-//  GetWheel(3)->SetAngularVel(state.w3->rotvel);
 }
 
 void spVehicle::SetClampToSurfaceFlag() {

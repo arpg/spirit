@@ -295,7 +295,7 @@ void spirit::SenarioTrajectoryTest() {
   car_param.cog = spTranslation(0, 0, 0);
   car_param.chassis_friction = 0;
   car_param.wheel_rollingfriction = 0.3;
-  car_param.wheel_friction = 0.8;
+  car_param.wheel_friction = 0.5;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.057;
   car_param.susp_damping = 0;
@@ -310,7 +310,7 @@ void spirit::SenarioTrajectoryTest() {
 
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
-  spObjectHandle gnd_handle = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
+  spObjectHandle gnd_handle = objects_.CreateBox(gnd_pose_,spBoxSize(20,20,1),0,spColor(0,1,0));
   gui_.AddObject(objects_.GetObject(gnd_handle));
 
   spTrajectory traj(gui_,objects_);
@@ -352,7 +352,7 @@ void spirit::SenarioTrajectoryTest() {
 //  std::cout << "angle is " << angleaxis.angle() << std::endl;
 //  std::cout << "axis is " << angleaxis.axis() << std::endl;
 
-  for(int ii=0; ii<5/*traj.GetNumWaypoints()*/; ii++) {
+  for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
     if(ii != 0) {
       // set the solution from last control point from ii'th trajectory to first control point of ii+1'th trajectory
       // this will guarantee C1 continuity
@@ -362,18 +362,23 @@ void spirit::SenarioTrajectoryTest() {
     localplanner.SolveInitialPlan(traj,ii);
     gui_.Iterate(objects_);
     localplanner.SolveLocalPlan(traj,ii,true);
-    if(ii==1)
-    for(int jj=0;jj<50;jj++) {
-      traj.PlaybackTrajectoryOnGUI(car_param,ii,0.4);
-    }
+//    if(ii==1)
+//    for(int jj=0;jj<50;jj++) {
+//      traj.PlaybackTrajectoryOnGUI(car_param,0,3);
+//      traj.PlaybackTrajectoryOnGUI(car_param,1,3);
+//    }
     gui_.Iterate(objects_);
 //    spObjectHandle thewayobj = objects_.CreateWaypoint(state.pose,spColor(0,1,0));
 //    ((spWaypoint&)objects_.GetObject(thewayobj)).SetLinearVelocityNorm(state.linvel.norm());
 //    gui_.AddObject(objects_.GetObject(thewayobj));
   }
-
+int i=0;
   while(1){
-//    traj.UpdateCurves();
+    traj.PlaybackTrajectoryOnGUI(car_param,i,1);
+    if(i<traj.GetNumWaypoints()-1)
+      i++;
+    else
+      i=0;
     gui_.Iterate(objects_);
   }
 

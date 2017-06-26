@@ -40,7 +40,7 @@ spObjectHandle spTrajectory::AddWaypoint(const spPose& pose, double velocity/*, 
 
 void spTrajectory::InitControlCommand(spCtrlPts2ord_2dof* cntrl_cmd){
   // for now set it to a zero angle steering and some reasonable acceleration
-  // TODO(sina) : later I should come up with a better initialization based on waypoint locations
+  // TODO(sina) : later I should come up with a better initialization based on relative waypoint locations
   cntrl_cmd->col(0) = Eigen::Vector2d(0,0);
   cntrl_cmd->col(1) = Eigen::Vector2d(0,10);
   cntrl_cmd->col(2) = Eigen::Vector2d(0,20);
@@ -54,7 +54,7 @@ void spTrajectory::PlaybackTrajectoryOnGUI(const spVehicleConstructionInfo& vehi
   if(max_num_steps != -1) {
     num_steps = max_num_steps;
   }
-  for (int ii = 0; ii < num_steps; ++ii) {
+  for (int ii = 0; ii < num_steps-1; ++ii) {
     ((spAWSDCar&)objects_.GetObject(car_handle)).SetState(*stateseries[ii]);
     for(int jj=0; jj<(int)(10.0/playback_ratio);jj++) {
       gui_.Iterate(objects_);

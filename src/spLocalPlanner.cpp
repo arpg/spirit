@@ -14,7 +14,8 @@ void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simula
   goal_state.pose = end_waypoint.GetPose();
   goal_state.linvel = end_waypoint.GetLinearVelocity();
   Eigen::VectorXd residual_weight(13);
-  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 1, 1, 1,0.5;
+//  residual_weight << 4, 4, 4, 3, 3, 3, 0.002, 0.002, 0.002, 0.001, 0.001, 0.001,0.0001;
+  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.5;
   ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_parameters,current_state,goal_state,residual_weight);
   double parameters[7];
   for (int ii = 0; ii < 6; ++ii) {
@@ -31,7 +32,6 @@ void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simula
 
   ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(7,fix_param_vec);
   problem.SetParameterization(parameters,subparam);
-
   problem.SetParameterLowerBound(parameters,0,-((SP_PI/4)-FINITE_DIFF_EPSILON));
   problem.SetParameterUpperBound(parameters,0,((SP_PI/4)-FINITE_DIFF_EPSILON));
   problem.SetParameterLowerBound(parameters,1,-200);
@@ -46,6 +46,7 @@ void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simula
   problem.SetParameterUpperBound(parameters,5,200);
   problem.SetParameterLowerBound(parameters,6,0.6);
   problem.SetParameterUpperBound(parameters,6,20);
+
   // Run the solver!
   ceres::Solver::Options options;
   options.update_state_every_iteration = true;
@@ -96,12 +97,13 @@ if(way_index == 0){
     current_state.pose = trajectory.GetWaypoint(way_index).GetPose();
     current_state.linvel = trajectory.GetWaypoint(way_index).GetLinearVelocity();
     // create sub states for each wheel
-    for(int ii = 0; ii<vehicle_parameters.wheels_anchor.size(); ii++) {
-      current_state.InsertSubstate();
-      current_state.substate_vec[ii]->linvel = current_state.linvel;
-    }
+//    for(int ii = 0; ii<vehicle_parameters.wheels_anchor.size(); ii++) {
+//      current_state.InsertSubstate();
+//      current_state.substate_vec[ii]->linvel = current_state.linvel;
+//    }
 }else{
     current_state = (*((*trajectory.GetTrajectoryStateSeries(way_index-1))[trajectory.GetTrajectoryStateSeries(way_index-1)->size()-1]));
+    trajectory.GetControls(way_index).col(0) = trajectory.GetControls(way_index-1).col(2);
 }
     std::shared_ptr<spStateSeries> state_series = std::make_shared<spStateSeries>();
     double travel_duration = trajectory.GetTravelDuration(way_index);
@@ -121,11 +123,17 @@ void spLocalPlanner::SolveInitialPlan(spTrajectory& trajectory, int way_index) {
     // for now use pose and linvel of the waypoint, we need a more complicated waypoint in order to add other constraints
     state.pose = trajectory.GetWaypoint(way_index).GetPose();
     state.linvel = trajectory.GetWaypoint(way_index).GetLinearVelocity();
-    // create sub states for each wheel
-    for(int ii = 0; ii<vehicle_parameters.wheels_anchor.size(); ii++) {
-      state.InsertSubstate();
-      state.substate_vec[ii]->linvel = state.linvel;
+    if(way_index > 0) {
+      std::cout << "wayindex is  " << way_index << std::endl;
+     state = (*((*trajectory.GetTrajectoryStateSeries(way_index-1))[trajectory.GetTrajectoryStateSeries(way_index-1)->size()-1]));
+     trajectory.GetControls(way_index).col(0) = trajectory.GetControls(way_index-1).col(2);
     }
+    // create sub states for each wheel
+//    for(int ii = 0; ii<vehicle_parameters.wheels_anchor.size(); ii++) {
+//      state.InsertSubstate();
+//      state.substate_vec[ii]->linvel = state.linvel;
+//    }
+
     CarSimFunctor sim(vehicle_parameters,state,gui_);
     std::shared_ptr<spStateSeries> state_series = std::make_shared<spStateSeries>();
     double travel_duration = trajectory.GetTravelDuration(way_index);

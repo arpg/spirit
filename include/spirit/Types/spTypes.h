@@ -6,7 +6,6 @@
 #include <list>
 #include <iostream>
 
-#warning "Comment the following line if using bullet in single precision mode"
 #define BT_USE_DOUBLE_PRECISION
 
 #include <bullet/btBulletDynamicsCommon.h>
@@ -203,10 +202,10 @@ private:
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 typedef Eigen::Matrix4d spMat4x4;
 
-enum spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
-enum spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
-enum spPhyEngineType{PHY_NONE,PHY_BULLET};
-enum spObjectType{BOX,VEHICLE_AWSD,VEHICLE_AWD,VEHICLE_GENERAL,VEHICLE_RWD,WHEEL,WAYPOINT,LINESTRIP};
+enum class spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
+enum class spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
+enum class spPhyEngineType{PHY_NONE,PHY_BULLET};
+enum class spObjectType{BOX,VEHICLE_AWSD,WHEEL,WAYPOINT,LINESTRIP};
 
 struct spVehicleConstructionInfo{
   spObjectType vehicle_type;
@@ -232,7 +231,7 @@ struct spVehicleConstructionInfo{
   double wheel_mass;
 
   spVehicleConstructionInfo(){
-    vehicle_type = spObjectType::VEHICLE_GENERAL;
+    vehicle_type = spObjectType::VEHICLE_AWSD;
     pose = spPose::Identity();
     color = spColor(0,1,0);
     cog = spTranslation(0,0,0);

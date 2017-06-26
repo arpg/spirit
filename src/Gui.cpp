@@ -53,7 +53,7 @@ void Gui::AddObject(spCommonObject &obj) {
       gui_->AddBox((spBox&) obj);
       break;
     }
-    case spObjectType::VEHICLE_AWD||spObjectType::VEHICLE_AWSD||spObjectType::VEHICLE_GENERAL || spObjectType::VEHICLE_RWD :
+    case spObjectType::VEHICLE_AWSD :
     {
       gui_->AddVehicle((spVehicle&) obj);
       break;
@@ -88,7 +88,7 @@ void Gui::RemoveObject(spCommonObject &obj) {
 //      gui_->AddBox((spBox&) obj);
       break;
     }
-    case spObjectType::VEHICLE_AWD||spObjectType::VEHICLE_AWSD||spObjectType::VEHICLE_GENERAL || spObjectType::VEHICLE_RWD :
+    case spObjectType::VEHICLE_AWSD :
     {
       gui_->RemoveVehicle((spVehicle&) obj);
       break;
