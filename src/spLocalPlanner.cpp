@@ -129,8 +129,9 @@ void spLocalPlanner::SolveInitialPlan(spTrajectory& trajectory, int way_index) {
     state.linvel = trajectory.GetWaypoint(way_index).GetLinearVelocity();
     if(way_index > 0) {
       std::cout << "wayindex is  " << way_index << std::endl;
-     state = (*((*trajectory.GetTrajectoryStateSeries(way_index-1))[trajectory.GetTrajectoryStateSeries(way_index-1)->size()-1]));
-     trajectory.GetControls(way_index).col(0) = trajectory.GetControls(way_index-1).col(2);
+      // TODO: find simpler struct for sub state series
+      state = (*((*trajectory.GetTrajectoryStateSeries(way_index-1))[trajectory.GetTrajectoryStateSeries(way_index-1)->size()-1]));
+      trajectory.GetControls(way_index).col(0) = trajectory.GetControls(way_index-1).col(2);
     }
     // create sub states for each wheel
 //    for(int ii = 0; ii<vehicle_parameters.wheels_anchor.size(); ii++) {

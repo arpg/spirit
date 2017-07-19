@@ -258,7 +258,6 @@ void spirit::SenarioControllerTest() {
   car.SetPose(car_init_pose);
 
   while(1){
-
     spState current_car_state(*car.GetState());
     // create a MPC controller with 0.4s horizon
     spMPC mpc(0.4);
@@ -274,9 +273,7 @@ void spirit::SenarioControllerTest() {
     objects_.StepPhySimulation(0.1);
     gui_.Iterate(objects_);
     spGeneralTools::Delay_ms(100);
-
   }
-
 }
 
 
