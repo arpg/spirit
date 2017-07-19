@@ -8,6 +8,7 @@
 #include <spirit/Objects.h>
 #include <functional>
 #include <spirit/Planners/spLocalPlanner.h>
+#include <spirit/Controllers/spMPC.h>
 
 class spirit{
 public:

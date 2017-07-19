@@ -247,18 +247,34 @@ void spirit::SenarioControllerTest() {
   spLocalPlanner localplanner(car_param,&gui_);
 
   for(int ii=0; ii<2; ii++) {
-//    localplanner.SolveInitialPlan(traj,ii);
-    gui_.Iterate(objects_);
-//    localplanner.SolveLocalPlan(traj,ii,true);
+    localplanner.SolveInitialPlan(traj,ii);
+    localplanner.SolveLocalPlan(traj,ii,true);
     gui_.Iterate(objects_);
   }
+
   // set driving car's first pose
   spPose car_init_pose(traj.GetWaypoint(0).GetPose());
   car_init_pose.translate(spTranslation(0.2,0,0));
   car.SetPose(car_init_pose);
+
   while(1){
-    objects_.StepPhySimulation(0.01);
+
+    spState current_car_state(*car.GetState());
+    // create a MPC controller with 0.4s horizon
+    spMPC mpc(0.4);
+    spCtrlPts2ord_2dof controls;
+    mpc.CalculateControls(traj,current_car_state,controls);
+    spCurve controls_curve(2,2);
+    spPointXd next_control(2);
+    controls_curve.SetBezierControlPoints(controls);
+    controls_curve.GetPoint(next_control,0.1/0.4);
+    car.SetFrontSteeringAngle(next_control[0]);
+    car.SetEngineMaxVel(next_control[1]);
+
+    objects_.StepPhySimulation(0.1);
     gui_.Iterate(objects_);
+    spGeneralTools::Delay_ms(100);
+
   }
 
 }
@@ -331,7 +347,7 @@ void spirit::ScenarioPIDController() {
   gui_.AddObject(objects_.GetObject(obj_gnd_index));
   spBox& gnd = (spBox&) objects_.GetObject(obj_gnd_index);
   gnd.SetFriction(1);
-  spPose waypoint_pose(spPose::Identity());
+//  spPose waypoint_pose(spPose::Identity());
 //  obj_waypoint_index0 = objects_.CreateWaypoint(waypoint_pose, spColor(0, 0, 1));
 //  gui_.AddObject(objects_.GetObject(obj_waypoint_index0));
 //  waypoint_pose.translate(spTranslation(1, 1, 0));
@@ -433,14 +449,14 @@ SPERROREXIT("ENDOFPROGRAM");
 //      car.SetPose(pose);
 //      car.GetWheel(3)->SetAngle(3*SP_PI/4);
 //    std::cout << "wheel is \n" << car.GetWheel(1)->GetPose().rotation() << std::endl;
-    spTimestamp phy_tick = spGeneralTools::Tick();
+//    spTimestamp phy_tick = spGeneralTools::Tick();
 //    spBox& box1 = (spBox&) objects_.GetObject(obj_gnd_index);
 //    std::cout << "z is " << box1.GetPose().translation()[2] << std::endl;
 //    objects_.StepPhySimulation(0.01);
 
     //    std::cout << "wheel pose is\n" << car.GetWheel(0)->GetPose().matrix() << std::endl;
     fl++;
-    double phy_cost = spGeneralTools::Tock_us(phy_tick);
+//    double phy_cost = spGeneralTools::Tock_us(phy_tick);
 //    std::cout << "Phy Iteration time:   " << phy_cost/1000 << "ms" << std::endl;
 
   }

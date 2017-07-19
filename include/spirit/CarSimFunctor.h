@@ -65,8 +65,8 @@ class CarSimFunctor {
     spCurve control_curve(2,2);
     control_curve.SetBezierControlPoints(cntrl_vars);
     spPointXd sample_control(2);
-    spPointXd curvature_cost(2);
-    control_curve.Get2ndDrivativeCurveArea(curvature_cost);
+//    spPointXd curvature_cost(2);
+//    control_curve.Get2ndDrivativeCurveArea(curvature_cost);
     if (pert_index >= 0) {
       control_curve.PerturbControlPoint(pert_index,epsilon/**std::abs(cntrl_vars.data()[pert_index])*/);
     }

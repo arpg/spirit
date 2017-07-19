@@ -7,14 +7,14 @@
 
 class spMPC {
  public:
-  spMPC();
+  spMPC(float horizon_duration);
   ~spMPC();
-  void GetControlOutput(const spTrajectory& ref_traj, const spState& curr_state);
-  void SetHorizon(int horizon);
+  void CalculateControls(const spTrajectory& ref_traj, const spState& curr_state, spCtrlPts2ord_2dof& controls);
+  void SetHorizon(float horizon_duration);
 
  private:
-  void FindClosestTrajPoint(int& index, const spTrajectory& ref_traj, const spState& base_state);
-  int horizon_;
+  void FindClosestTrajPoint(int& index, const spTrajectory& ref_traj, const spState& curr_state);
+  float horizon_;
 };
 
 #endif  // SPMPC_H__
