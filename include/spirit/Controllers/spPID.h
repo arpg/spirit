@@ -2,7 +2,6 @@
 #define SPPID_H__
 
 #include <spirit/Types/spTypes.h>
-#include <vector>
 #include <spirit/spGeneralTools.h>
 
 class spPID {

@@ -70,7 +70,6 @@ set( HDRS
 	include/spirit/Objects/spWheel.h
 	include/spirit/Objects/spWaypoint.h
 	include/spirit/Types/spTypes.h
-	include/spirit/Controllers/spControllerInterface.h
 	include/spirit/Objects/spLineStrip.h
 	include/spirit/CarSimFunctor.h
 	include/spirit/Types/ctpl_stl.h
@@ -78,6 +77,8 @@ set( HDRS
 	include/spirit/Planners/spTrajectory.h
 	include/spirit/VehicleCeresCostFunc.h
 	include/spirit/Planners/spLocalPlanner.h
+	include/spirit/Controllers/spMPC.h
+	include/spirit/MPCCostFunc.h
 	)
 
 set( SRCS
@@ -98,6 +99,7 @@ set( SRCS
 	src/spLineStrip.cpp
 	src/spPID.cpp
 	src/spTrajectory.cpp
+	src/spMPC.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)

@@ -18,13 +18,13 @@ public:
   void CheckKeyboardAction();
   void ScenarioWorldBoxFall();
   void DummyTests();
-  void ScenarioWorldCarFall();
   void SenarioCostSurf();
   void ScenarioPIDController();
   void CalcLocalPlannerJacobian();
   void SenarioCeresTest();
   void SenarioTrajectoryTest();
   void SenarioStateInitialization();
+  void SenarioControllerTest();
 
 private:
   void InitCarPool(int num_cars);
@@ -42,6 +42,7 @@ private:
   spObjectHandle obj_waypoint_index1;
   spObjectHandle obj_waypoint_index2;
   spObjectHandle obj_linestrip_index;
+  spVehicleConstructionInfo car_param;
 };
 
 #endif  //SPIRIT_H__

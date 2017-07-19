@@ -32,7 +32,7 @@ spObjectHandle spTrajectory::AddWaypoint(const spPose& pose, double velocity/*, 
   std::shared_ptr<spCtrlPts2ord_2dof> cntrl_cmd = std::make_shared<spCtrlPts2ord_2dof>();
 
   // InitTravelDuration
-  travel_duration_vec_.push_back(1);
+  travel_duration_vec_.push_back(-1);
   InitControlCommand(cntrl_cmd.get());
   control_command_vec_.push_back(cntrl_cmd);
   stateseries_vec_.push_back(nullptr);
@@ -47,6 +47,10 @@ void spTrajectory::InitControlCommand(spCtrlPts2ord_2dof* cntrl_cmd){
 }
 
 void spTrajectory::PlaybackTrajectoryOnGUI(const spVehicleConstructionInfo& vehicle_params, int waypoint_index, double playback_ratio, int max_num_steps) {
+  if(GetTravelDuration(waypoint_index)==-1) {
+    SPERROR("Trajectory not planned yet!");
+    return;
+  }
   spObjectHandle car_handle = objects_.CreateVehicle(vehicle_params);
   gui_.AddObject(objects_.GetObject(car_handle));
   spStateSeries& stateseries = *(stateseries_vec_[waypoint_index]);
@@ -118,7 +122,7 @@ void spTrajectory::SetTravelDuration(int waypoint_index, double travel_time) {
   travel_duration_vec_[waypoint_index] = travel_time;
 }
 
-double spTrajectory::GetTravelDuration(int waypoint_index) {
+double spTrajectory::GetTravelDuration(int waypoint_index) const {
   return travel_duration_vec_[waypoint_index];
 }
 

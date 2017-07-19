@@ -26,7 +26,7 @@ public:
   void IsLoop(bool is_loop);
   bool IsLoop();
   void SetTravelDuration(int waypoint_index, double travel_time);
-  double GetTravelDuration(int waypoint_index);
+  double GetTravelDuration(int waypoint_index) const;
   //  void UpdateCurves();
 
 private:
