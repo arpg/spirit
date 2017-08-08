@@ -53,7 +53,7 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
         sims_neg.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
       }
 #endif
-      ctpl::thread_pool pool(8);
+      ctpl::thread_pool pool(1);
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
         if(ii == parameter_block_sizes()[0]-1) {
           pool.push(std::ref(*sims[ii].get()), (int)(simulation_length/0.1)+1, 0.1, cntrl_vars, 0, -1);

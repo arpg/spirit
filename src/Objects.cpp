@@ -6,6 +6,11 @@ Objects::Objects(){
   world_params_.solver = spPhysolver::SEQUENTIAL_IMPULSE;
   this->InitEmptyDynamicsWorld();
 }
+
+Objects::Objects(const Objects& obj) {
+  SPERROREXIT("Objects cpyConstructor shouldn't be called");
+}
+
 Objects::~Objects(){
 	//delete collision shapes
 //	for (int j=0;j<collisionShapes_.size();j++)
@@ -21,44 +26,45 @@ Objects::~Objects(){
 //  for (spObjectHandle ii=objects_.begin();ii!=objects_.end();++ii) {
 //    RemoveObj(--ii);
 //  }
-  delete(dynamics_world_);
+  dynamics_world_->clearForces();
+  dynamics_world_.reset();
   switch(world_params_.solver) {
     case spPhysolver::MLCP_DANTZIG:
-      delete(solver_dantzig_);
+      solver_dantzig_.reset();
       break;
     case spPhysolver::MLCP_PROJECTEDGAUSSSEIDEL:
-      delete(solver_gseidel_);
+      solver_gseidel_.reset();
       break;
     case spPhysolver::SEQUENTIAL_IMPULSE:
       // do nothing
       break;
   }
-  delete(solver_);
-  delete(broadphase_);
-  delete(dispatcher_);
-  delete(collisionConfiguration_);
+  solver_.reset();
+  broadphase_.reset();
+  dispatcher_.reset();
+  collisionConfiguration_.reset();
 }
 
 void Objects::InitEmptyDynamicsWorld() {
 
-  collisionConfiguration_ = new btDefaultCollisionConfiguration();
-  dispatcher_ = new btCollisionDispatcher(collisionConfiguration_);
-  broadphase_ = new btAxisSweep3(world_params_.worldMin,world_params_.worldMax);
+  collisionConfiguration_ = std::make_shared<btDefaultCollisionConfiguration>();
+  dispatcher_ = std::make_shared<btCollisionDispatcher>(collisionConfiguration_.get());
+  broadphase_ = std::make_shared<btAxisSweep3>(world_params_.worldMin,world_params_.worldMax);
   switch(world_params_.solver) {
     case spPhysolver::MLCP_DANTZIG:
-      solver_dantzig_ = new btDantzigSolver();
-      solver_ = new btMLCPSolver(solver_dantzig_);
+      solver_dantzig_ = std::make_shared<btDantzigSolver>();
+      solver_ = std::make_shared<btMLCPSolver>(solver_dantzig_.get());
       break;
     case spPhysolver::MLCP_PROJECTEDGAUSSSEIDEL:
-      solver_gseidel_ = new btSolveProjectedGaussSeidel;
-      solver_ = new btMLCPSolver(solver_gseidel_);
+      solver_gseidel_ = std::make_shared<btSolveProjectedGaussSeidel>();
+      solver_ = std::make_shared<btMLCPSolver>(solver_gseidel_.get());
       break;
     case spPhysolver::SEQUENTIAL_IMPULSE:
-      solver_ = new btSequentialImpulseConstraintSolver();
+      solver_ = std::make_shared<btSequentialImpulseConstraintSolver>();
       break;
   }
 
-  dynamics_world_ = new btDiscreteDynamicsWorld(dispatcher_,broadphase_,solver_,collisionConfiguration_);
+  dynamics_world_ = std::make_shared<btDiscreteDynamicsWorld>(dispatcher_.get(),broadphase_.get(),solver_.get(),collisionConfiguration_.get());
 
   switch(world_params_.solver) {
     case spPhysolver::MLCP_DANTZIG:
@@ -124,21 +130,23 @@ void Objects::RemoveObj(spObjectHandle& obj_handle) {
   if(obj_handle != NULL_HANDLE) {
     if(GetObject(obj_handle).GetObjecType() == spObjectType::VEHICLE_AWSD) {
       spAWSDCar& car = (spAWSDCar&) GetObject(obj_handle);
-      dynamics_world_->removeRigidBody(car.GetWheel(3)->GetRigidbody());
-      dynamics_world_->removeConstraint(car.GetWheel(3)->GetRigidbody()->getConstraintRef(0));
-      dynamics_world_->removeRigidBody(car.GetWheel(2)->GetRigidbody());
-      dynamics_world_->removeConstraint(car.GetWheel(2)->GetRigidbody()->getConstraintRef(0));
-      dynamics_world_->removeRigidBody(car.GetWheel(1)->GetRigidbody());
-      dynamics_world_->removeConstraint(car.GetWheel(1)->GetRigidbody()->getConstraintRef(0));
-      dynamics_world_->removeRigidBody(car.GetWheel(0)->GetRigidbody());
-      dynamics_world_->removeConstraint(car.GetWheel(0)->GetRigidbody()->getConstraintRef(0));
-      dynamics_world_->removeRigidBody(car.GetRigidbody());
+      for(int ii=car.GetNumberOfWheels()-1; ii>=0; ii--) {
+        dynamics_world_->removeRigidBody(car.GetWheel(ii)->GetRigidbody().get());
+        dynamics_world_->removeConstraint(car.GetWheel(ii)->GetRigidbody().get()->getConstraintRef(0));
+      }
+      dynamics_world_->removeRigidBody(car.GetRigidbody().get());
       dynamics_world_->clearForces();
     } else if(GetObject(obj_handle).GetObjecType() == spObjectType::BOX) {
       spBox& box = (spBox&) GetObject(obj_handle);
-      dynamics_world_->removeRigidBody(box.GetRigidbody());
+      dynamics_world_->removeRigidBody(box.GetRigidbody().get());
       dynamics_world_->clearForces();
     } else {
+      if(GetObject(obj_handle).GetObjecType() == spObjectType::WHEEL)
+        SPERROR("obj is wheel");
+      if(GetObject(obj_handle).GetObjecType() == spObjectType::WAYPOINT)
+        SPERROR("obj is waypoint");
+      if(GetObject(obj_handle).GetObjecType() == spObjectType::LINESTRIP)
+        SPERROR("obj is linestrip");
       SPERROREXIT("Removing other objects not implemented.");
     }
     objects_.erase(obj_handle);

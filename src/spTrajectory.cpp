@@ -84,7 +84,7 @@ void spTrajectory::SetTrajectoryStateSeries(int waypoint_index, std::shared_ptr<
   ((spLineStrip&)objects_.GetObject(linestrip_handle_vec_[waypoint_index])).SetLineStripPoints(points);
 }
 
-std::shared_ptr<spStateSeries> spTrajectory::GetTrajectoryStateSeries(int waypoint_index) {
+std::shared_ptr<spStateSeries> spTrajectory::GetTrajectoryStateSeries(int waypoint_index) const {
   return stateseries_vec_[waypoint_index];
 }
 
@@ -114,7 +114,7 @@ void spTrajectory::IsLoop(bool is_loop) {
   is_loop_ = is_loop;
 }
 
-bool spTrajectory::IsLoop() {
+bool spTrajectory::IsLoop() const {
   return is_loop_;
 }
 

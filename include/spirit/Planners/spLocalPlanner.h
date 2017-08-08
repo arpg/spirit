@@ -19,25 +19,6 @@ class spLocalPlanner {
 private:
   spVehicleConstructionInfo vehicle_parameters;
   Gui* gui_;
-//  std::vector<std::shared_ptr<spCtrlPts3ord_3dof>> path_vec_;
 };
-
-// This callback will be called at every iteration of ceres solver
-//class SoverIterationCallback : public ceres::IterationCallback {
-// public:
-//  explicit SoverIterationCallback(Gui* gui, Objects* objects)
-//      : gui_(gui), objects_(objects) {}
-
-//  ~SoverIterationCallback() {}
-
-//  ceres::CallbackReturnType operator()(const ceres::IterationSummary& summary) {
-//    std::cout << "callback called" << std::endl;
-//    return ceres::SOLVER_CONTINUE;
-//  }
-
-// private:
-//  Gui* gui_;
-//  Objects* objects_;
-//};
 
 #endif  // LOCALPLANNER_H__

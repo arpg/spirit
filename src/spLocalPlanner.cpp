@@ -15,8 +15,8 @@ void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simula
   goal_state.linvel = end_waypoint.GetLinearVelocity();
   Eigen::VectorXd residual_weight(13);
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.002, 0.002, 0.002, 0.001, 0.001, 0.001,0.0001;
-//  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.5;
-  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.1;
+  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.5;
+//  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.1;
   ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_parameters,current_state,goal_state,residual_weight);
   double parameters[7];
   for (int ii = 0; ii < 6; ++ii) {
@@ -111,10 +111,11 @@ void spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory, int way_index, boo
   std::shared_ptr<spStateSeries> state_series = std::make_shared<spStateSeries>();
   double travel_duration = 1;
   SolveLocalPlan(trajectory.GetControls(way_index),travel_duration,current_state, trajectory.GetWaypoint(next_index),state_series);
-  std::cout << "controls are :\n" << trajectory.GetControls(way_index) << std::endl;
   trajectory.SetTravelDuration(way_index,(int)(travel_duration/0.1)*0.1);
-  std::cout << "travel duration is : " << trajectory.GetTravelDuration(way_index) << std::endl;
   trajectory.SetTrajectoryStateSeries(way_index,state_series);
+  std::cout << "controls are :\n" << trajectory.GetControls(way_index) << std::endl;
+//  std::cout << "travel duration is : " << trajectory.GetTravelDuration(way_index) << std::endl;
+//  std::cout << "number of states is " << trajectory.GetTrajectoryStateSeries(way_index)->size() << std::endl;
   // adjust the next waypoint accordingly if overwrite_endstate was enabled
   if(overwrite_endstate && (next_index != 0)) {
     trajectory.GetWaypoint(next_index).SetPose(state_series->back()->pose);
@@ -127,9 +128,10 @@ void spLocalPlanner::SolveInitialPlan(spTrajectory& trajectory, int way_index) {
     // for now use pose and linvel of the waypoint, we need a more complicated waypoint in order to add other constraints
     state.pose = trajectory.GetWaypoint(way_index).GetPose();
     state.linvel = trajectory.GetWaypoint(way_index).GetLinearVelocity();
+    // TODO: fix this zero index issue
     if(way_index > 0) {
       std::cout << "wayindex is  " << way_index << std::endl;
-      // TODO: find simpler struct for sub state series
+      // TODO: find simpler struct for state series
       state = (*((*trajectory.GetTrajectoryStateSeries(way_index-1))[trajectory.GetTrajectoryStateSeries(way_index-1)->size()-1]));
       trajectory.GetControls(way_index).col(0) = trajectory.GetControls(way_index-1).col(2);
     }

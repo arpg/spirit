@@ -22,6 +22,7 @@ class Objects {
 
 public:
   Objects();
+  Objects(const Objects& obj);
   ~Objects();
   spObjectHandle CreateBox(const spPose& pose, const spBoxSize& size, double mass,const spColor& color);
   spObjectHandle CreateWaypoint(const spPose& pose, const spColor& color);
@@ -46,13 +47,13 @@ btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShap
   std::list<std::shared_ptr<spCommonObject>> objects_;
   void InitEmptyDynamicsWorld();
   BulletWorldParams world_params_;
-  btDefaultCollisionConfiguration* collisionConfiguration_;
-  btCollisionDispatcher*	dispatcher_;
-  btBroadphaseInterface*	broadphase_;
-  btConstraintSolver*	solver_;
-  btDiscreteDynamicsWorld* dynamics_world_;
-  btDantzigSolver* solver_dantzig_;
-  btSolveProjectedGaussSeidel* solver_gseidel_;
+  std::shared_ptr<btDefaultCollisionConfiguration> collisionConfiguration_;
+  std::shared_ptr<btCollisionDispatcher>	dispatcher_;
+  std::shared_ptr<btBroadphaseInterface>	broadphase_;
+  std::shared_ptr<btConstraintSolver>	solver_;
+  std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world_;
+  std::shared_ptr<btDantzigSolver> solver_dantzig_;
+  std::shared_ptr<btSolveProjectedGaussSeidel> solver_gseidel_;
   // when ever we remove a object we are gonna point its handle to NULL_HANDLE
   const spObjectHandle NULL_HANDLE;
 //  btAlignedObjectArray<btCollisionShape*>	collisionShapes_;

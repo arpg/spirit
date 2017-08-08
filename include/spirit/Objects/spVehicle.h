@@ -12,26 +12,26 @@
 // in its fucntion name.
 class spVehicle : public spCommonObject {
  public:
-  spVehicle(const spVehicleConstructionInfo& vehicle_info, btDiscreteDynamicsWorld* dynamics_world_);
+  spVehicle(const spVehicleConstructionInfo& vehicle_info, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world_);
   ~spVehicle();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
   void SetColor(const spColor& color);
   const spColor& GetColor();
   int GetNumberOfWheels();
-  spWheel* GetWheel(int index);
+  std::shared_ptr<spWheel> GetWheel(int index);
   double GetChassisMass();
   void SetChassisMass(double mass);
   const spPose& GetWheelOrigin(int index);
   const spBoxSize& GetChassisSize();
   const spPose& GetLocalCOG();
-  std::shared_ptr<spState> GetState();
+  const spState& GetState();
   void SetState(const spState& state);
   void SetClampToSurfaceFlag();
-  void SetLinearVelocity(const spLinVel& linear_vel);
-  void SetAngularVelocity(const spRotVel& angular_vel);
-  const spRotVel& GetAngularVelocity();
-  const spLinVel& GetLinearVelocity();
+  void SetChassisLinearVelocity(const spLinVel& linear_vel);
+  void SetChassisAngularVelocity(const spRotVel& angular_vel);
+  const spRotVel& GetChassisAngularVelocity();
+  const spLinVel& GetChassisLinearVelocity();
 
  private:
   void MoveWheelsToAnchors(const spPose& chasis_pose);
@@ -39,12 +39,16 @@ class spVehicle : public spCommonObject {
 //  spPose pose_;        // this pose will represent geometric center of the car
   spPose cog_local_;  // center of gravity
   spColor color_;
-//  spRotVel rot_vel;
-//  spLinVel lin_vel;
+  spRotVel ch_rotvel_;
+  spLinVel ch_linvel_;
   spBoxSize chassis_size_;
+  spPose pose_;
+  spState state_;
   void SetWheelOrigin(int index, const spPose& pose);
   void SetWheelAnchor(int index, const spTranslation& tr);
-  btCompoundShape* chassis_compound;
+//  btCompoundShape* chassis_compound;
+  std::shared_ptr<btCompoundShape> chassis_compound_;
+  std::shared_ptr<btCollisionShape> chassis_shape_;
 };
 
 #endif  //  SP_VEHICLE_H__

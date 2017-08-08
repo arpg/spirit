@@ -27,7 +27,7 @@ class spCommonObject {
   bool IsGuiModifiable();
   bool NeedsClampToSurface();
   void SetClamped();
-  btRigidBody* GetRigidbody();
+  std::shared_ptr<btRigidBody> GetRigidbody();
 
  protected:
   int index_gui_;
@@ -36,11 +36,16 @@ class spCommonObject {
   spObjectType object_type_;
   bool modifiable_gui_;
   double mass_;
-  btRigidBody* rigid_body_;
+  std::shared_ptr<btRigidBody> rigid_body_;
 //  btAlignedObjectArray<btCollisionShape*>*	collisionShapes_;
-  btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
-  btTransform& spPose2btTransform(const spPose& pose);
-  spPose& btTransform2spPose(const btTransform& tr);
+  void CreateRigidBody(double mass, const btTransform& tr, std::shared_ptr<btCollisionShape> shape);
+  void CreateRigidBody(double mass, const spPose& pose, std::shared_ptr<btCollisionShape> shape);
+  void spPose2btTransform(const spPose& pose, btTransform& tr);
+  void btTransform2spPose(const btTransform& tr, spPose& pose);
+
+ private:
+  std::unique_ptr<btDefaultMotionState> motion_state_;
+
 };
 
 #endif  //  SP_COMMONOBJECT_H__

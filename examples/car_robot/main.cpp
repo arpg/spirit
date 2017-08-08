@@ -72,7 +72,9 @@ int main(int argc, char** argv) {
 //  sp_world.ScenarioPIDController();
 //  sp_world.ScenarioGNTest();
 
-  sp_world.SenarioControllerTest();
+  sp_world.multithreadtest();
+//  sp_world.SenarioControllerTest();
+//  sp_world.leaktest();
 //  sp_world.SenarioTrajectoryTest();
 //  sp_world.SenarioCostSurf();
 //  sp_world.DummyTests();

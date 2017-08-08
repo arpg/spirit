@@ -26,6 +26,9 @@ public:
   void SenarioTrajectoryTest();
   void SenarioStateInitialization();
   void SenarioControllerTest();
+  void leaktest();
+  void multithreadtest();
+  void threadfunc();
 
 private:
   void InitCarPool(int num_cars);

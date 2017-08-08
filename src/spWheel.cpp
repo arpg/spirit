@@ -1,7 +1,7 @@
 #include <spirit/Objects/spWheel.h>
 
 
-spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index, btRigidBody* chassis_body, btDiscreteDynamicsWorld* dynamics_world) {
+spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index, std::shared_ptr<btRigidBody> chassis_body, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world) {
   color_ = spColor(0,0,0);
   index_gui_ = -1;
   obj_guichanged_ = false;
@@ -17,21 +17,24 @@ spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index,
   tr.setIdentity();
   tr.setOrigin(btVector3(chassis_anchor[0],chassis_anchor[1],chassis_anchor[2]-vehicle_info.susp_preloading_spacer)*WSCALE);
 //  btCollisionShape* wheel_shape = new btCylinderShapeX(btVector3(vehicle_info.wheel_width/2,vehicle_info.wheel_radius,vehicle_info.wheel_radius)*WSCALE);
-  btCollisionShape* wheel_shape = new btCapsuleShapeX((vehicle_info.wheel_radius)*WSCALE,(vehicle_info.wheel_width/2.0)*WSCALE);
+//  btCollisionShape* wheel_shape = new btCapsuleShapeX((vehicle_info.wheel_radius)*WSCALE,(vehicle_info.wheel_width/2.0)*WSCALE);
+  wheel_shape_ = std::make_shared<btCapsuleShapeX>((vehicle_info.wheel_radius)*WSCALE,(vehicle_info.wheel_width/2.0)*WSCALE);
 //  mass_ = vehicle_info.wheel_mass;
-  btRigidBody* bodyB = CreateRigidBody(vehicle_info.wheel_mass,tr,wheel_shape);
+  CreateRigidBody(vehicle_info.wheel_mass,tr,wheel_shape_);
+  std::shared_ptr<btRigidBody> bodyB = rigid_body_;
   bodyB->setDamping(0,0);
   bodyB->setAngularVelocity(btVector3(0,0,0));
   bodyB->setLinearVelocity(btVector3(0,0,0));
   int wheel_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
-  dynamics_world->addRigidBody(bodyB,BulletCollissionType::COL_WHEEL,wheel_collides_with_);
+  dynamics_world->addRigidBody(bodyB.get(),BulletCollissionType::COL_WHEEL,wheel_collides_with_);
   bodyB->setRollingFriction(vehicle_info.wheel_rollingfriction);
   bodyB->setFriction(vehicle_info.wheel_friction);
   bodyB->setActivationState(DISABLE_DEACTIVATION);
   btVector3 parent_axis(0,0,1);
   btVector3 child_axis(1,0,0);
   btVector3 anchor = tr.getOrigin();
-  hinge_ = new btHinge2Constraint(*chassis_body,*bodyB,anchor, parent_axis, child_axis);
+//  hinge_ = new btHinge2Constraint(*chassis_body,*bodyB,anchor, parent_axis, child_axis);
+  hinge_ = std::make_shared<btHinge2Constraint>(*chassis_body.get(),*bodyB.get(),anchor, parent_axis, child_axis);
   // set suspension damping to axis 2 of constraint only (z direction)
   hinge_->setDamping(2,vehicle_info.susp_damping);
   hinge_->setStiffness(2,vehicle_info.susp_stiffness);
@@ -43,24 +46,27 @@ spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index,
   hinge_->setAngularLowerLimit(btVector3(1,0,vehicle_info.steering_servo_lower_limit));
   hinge_->setAngularUpperLimit(btVector3(-1,0,vehicle_info.steering_servo_upper_limit));
   // add the hinge constraint to the world and disable collision between bodyA/bodyB
-  dynamics_world->addConstraint(hinge_,true);
-  rigid_body_ = bodyB;
+  dynamics_world->addConstraint(hinge_.get(),true);
 }
 
 spWheel::~spWheel()
 {
-
+//  delete hinge_->getRigidBodyB().getCollisionShape();
+//  delete hinge_;
 }
 
 void spWheel::SetPose(const spPose& pose)
 {
-  rigid_body_->setWorldTransform(spPose2btTransform(pose));
+  btTransform tr;
+  spPose2btTransform(pose,tr);
+  rigid_body_->setWorldTransform(tr);
   obj_guichanged_ = true;
 }
 
 const spPose& spWheel::GetPose()
 {
-  return btTransform2spPose(rigid_body_->getWorldTransform());
+  btTransform2spPose(rigid_body_->getWorldTransform(),pose_);
+  return pose_;
 }
 
 void spWheel::SetColor(const spColor& color)
@@ -132,7 +138,7 @@ void spWheel::SetDriveMotorTorque(double torque)
   hinge_->setMaxMotorForce(drive_motor_axis,torque*WSCALE*WSCALE);
 }
 
-const Eigen::Vector3d& spWheel::GetChassisAnchor()
+const spTranslation& spWheel::GetChassisAnchor()
 {
   return chassis_anchor;
 }
@@ -173,13 +179,13 @@ void spWheel::SetWheelSpeed(double rps) {
 }
 
 const spRotVel& spWheel::GetRotVel(){
-  std::shared_ptr<spRotVel> angular_vel = std::make_shared<spRotVel>(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
-  return *angular_vel;
+  rotvel_ = spRotVel(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
+  return rotvel_;
 }
 
 const spLinVel& spWheel::GetLinVel(){
-  std::shared_ptr<spLinVel> lin_vel = std::make_shared<spLinVel>(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2]);
-  return *lin_vel.get();
+  linvel_ = spLinVel(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2]);
+  return linvel_;
 }
 
 void spWheel::SetLinVel(const spLinVel& vel) {

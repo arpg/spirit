@@ -15,7 +15,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 include(install_package)
 
 # Default flags.
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 
 IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
@@ -79,6 +79,7 @@ set( HDRS
 	include/spirit/Planners/spLocalPlanner.h
 	include/spirit/Controllers/spMPC.h
 	include/spirit/MPCCostFunc.h
+	include/spirit/MPCLossFunc.h
 	)
 
 set( SRCS

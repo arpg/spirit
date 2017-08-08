@@ -18,13 +18,13 @@ public:
   spObjectHandle AddWaypoint(const spPose& pose, double velocity=1/*, bool en_default_3ord3dof_traj=false*/);
   void PlaybackTrajectoryOnGUI(const spVehicleConstructionInfo& vehicle_params, int waypoint_index, double playback_ratio=1, int max_num_steps = -1);
   void SetTrajectoryStateSeries(int waypoint_index, std::shared_ptr<spStateSeries> state_series );
-  std::shared_ptr<spStateSeries> GetTrajectoryStateSeries(int waypoint_index);
+  std::shared_ptr<spStateSeries> GetTrajectoryStateSeries(int waypoint_index) const;
   void SetControls(int waypoint_index, const spCtrlPts2ord_2dof& control_command);
   spCtrlPts2ord_2dof& GetControls(int waypoint_index);
   spWaypoint& GetWaypoint(unsigned int index) const;
   int GetNumWaypoints() const;
   void IsLoop(bool is_loop);
-  bool IsLoop();
+  bool IsLoop() const;
   void SetTravelDuration(int waypoint_index, double travel_time);
   double GetTravelDuration(int waypoint_index) const;
   //  void UpdateCurves();

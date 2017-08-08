@@ -6,7 +6,7 @@
 
 class spAWSDCar : public spVehicle {
 public:
-  spAWSDCar(const spVehicleConstructionInfo& vehicle_info, btDiscreteDynamicsWorld* dynamics_world);
+  spAWSDCar(const spVehicleConstructionInfo& vehicle_info, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world);
   ~spAWSDCar();
   void SetFrontSteeringAngle(double angle);
   void SetRearSteeringAngle(double angle);

@@ -77,7 +77,7 @@ void spirit::DummyTests() {
   while(1){
     objects_.StepPhySimulation(0.1);
     spState state;
-    state = *car.GetState();
+    state = car.GetState();
 //    car.SetState(state);
     gui_.Iterate(objects_);
   };
@@ -202,15 +202,37 @@ int i=0;
 
 }
 
+void spirit::leaktest() {
+  // Create vehicle
+
+  while(1) {
+//    spCtrlPts2ord_2dof controls;
+//    controls.col(0) = Eigen::Vector2d(0,0);
+//    controls.col(1) = Eigen::Vector2d(0,10);
+//    controls.col(2) = Eigen::Vector2d(0,20);
+//    spState state;
+//    CarSimFunctor sims(car_param,state);
+//    sims(0,1,0.01,controls,0,-1);
+    Objects mobjects_;
+    spObjectHandle car_handle = mobjects_.CreateVehicle(car_param);
+    spAWSDCar& car = (spAWSDCar&) mobjects_.GetObject(car_handle);
+
+    spPose gnd_pose_ = spPose::Identity();
+    gnd_pose_.translate(spTranslation(0,0,-0.5));
+    spObjectHandle gnd_handle = mobjects_.CreateBox(gnd_pose_,spBoxSize(20,20,1),0,spColor(0,1,0));
+
+  }
+}
+
 void spirit::SenarioControllerTest() {
   // Create vehicle
   spObjectHandle car_handle = objects_.CreateVehicle(car_param);
   gui_.AddObject(objects_.GetObject(car_handle));
   spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
-  car.SetEngineTorque(0);
-  car.SetEngineMaxVel(100);
+  car.SetEngineTorque(1000);
+  car.SetEngineMaxVel(0);
   car.SetSteeringServoMaxVel(100);
-  car.SetSteeringServoTorque(100);
+  car.SetSteeringServoTorque(1000);
   car.SetRearSteeringAngle(0);
   car.SetFrontSteeringAngle(0);
 
@@ -227,7 +249,7 @@ void spirit::SenarioControllerTest() {
   double a = 4;
   double b = 2;
   int num_waypoints = 8;
-  for(int ii=0; ii<3; ii++) {
+  for(int ii=0; ii<3/*num_waypoints*/; ii++) {
     // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
     double theta = ii*(2*SP_PI)/num_waypoints;
     double r = (a*b)/sqrt(b*b*pow(cos(theta),2)+a*a*pow(sin(theta),2));
@@ -239,14 +261,14 @@ void spirit::SenarioControllerTest() {
     pose.translate(spTranslation(x,y,0.07));
     Eigen::AngleAxisd rot(angle+SP_PI_HALF,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
-    traj.AddWaypoint(pose,20);
+    traj.AddWaypoint(pose,50);
   }
   gui_.Iterate(objects_);
-  traj.IsLoop(true);
+  traj.IsLoop(false);
 
   spLocalPlanner localplanner(car_param,&gui_);
 
-  for(int ii=0; ii<2; ii++) {
+  for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
     localplanner.SolveInitialPlan(traj,ii);
     localplanner.SolveLocalPlan(traj,ii,true);
     gui_.Iterate(objects_);
@@ -257,25 +279,110 @@ void spirit::SenarioControllerTest() {
   car_init_pose.translate(spTranslation(0.2,0,0));
   car.SetPose(car_init_pose);
 
+//  while(1){
+//    gui_.Iterate(objects_);
+//  }
+  spCtrlPts2ord_2dof controls;
+  controls.col(0) = Eigen::Vector2d(0,0);
+  controls.col(1) = Eigen::Vector2d(0,10);
+  controls.col(2) = Eigen::Vector2d(0,20);
+
   while(1){
-    spState current_car_state(*car.GetState());
     // create a MPC controller with 0.4s horizon
-    spMPC mpc(0.4);
-    spCtrlPts2ord_2dof controls;
-    mpc.CalculateControls(traj,current_car_state,controls);
+    spMPC mpc(car_param,1);
+    mpc.CalculateControls(traj,car.GetState(),controls);
     spCurve controls_curve(2,2);
     spPointXd next_control(2);
     controls_curve.SetBezierControlPoints(controls);
-    controls_curve.GetPoint(next_control,0.1/0.4);
+    // only get the control signal for next point and apply to car
+    controls_curve.GetPoint(next_control,0.1/1);
+    std::cout << "next signals are " << next_control.transpose() << std::endl;
     car.SetFrontSteeringAngle(next_control[0]);
     car.SetEngineMaxVel(next_control[1]);
+    controls.col(0) = next_control;
 
     objects_.StepPhySimulation(0.1);
     gui_.Iterate(objects_);
-    spGeneralTools::Delay_ms(100);
+    spGeneralTools::Delay_ms(1);
   }
 }
 
+void spirit::threadfunc(){
+  Objects objects_;
+  spPose gnd_pose_ = spPose::Identity();
+  gnd_pose_.translate(spTranslation(0,0,-0.5));
+  spObjectHandle gnd_handle = objects_.CreateBox(gnd_pose_,spBoxSize(20,20,1),0,spColor(1,0,0));
+  spObjectHandle car_handle = objects_.CreateVehicle(car_param);
+  for(int ii=0;ii<20;ii++) {
+    objects_.StepPhySimulation(0.01);
+  }
+  objects_.RemoveObj(gnd_handle);
+  objects_.RemoveObj(car_handle);
+}
+
+void spirit::multithreadtest() {
+  spState initstate;
+  initstate.pose.translate(spTranslation(0,0,0.06));
+  std::vector<std::shared_ptr<CarSimFunctor>> sims;
+  std::vector<std::shared_ptr<spStateSeries>> sim_traj;
+  spCtrlPts2ord_2dof cntrl_vars;
+  double simulation_length = 0.5;
+  for (int ii = 0; ii < 4; ii++) {
+//    sims.push_back(std::make_shared<CarSimFunctor>(car_param,initstate));
+  }
+  std::cout << "all carsimfunctor objects created" << std::endl;
+  std::vector<std::shared_ptr<std::thread>> thread_vec;
+  int ii = 0;
+
+while(1) {
+  std::thread th1(&spirit::threadfunc,this);
+  std::thread th2(&spirit::threadfunc,this);
+  th1.join();
+  th2.join();
+//  std::cout << "while start " << ii++ << std::endl;
+//  CarSimFunctor sim0(car_param,initstate);
+//  CarSimFunctor sim1(car_param,initstate);
+//  sim0.run(0,20, 0.01, FINITE_DIFF_EPSILON, 0);
+//  sim1.blah(1,20, 0.01,FINITE_DIFF_EPSILON, 0);
+//  sim0.WaitForThreadJoin();
+//  sim1.WaitForThreadJoin();
+
+//  CarSimFunctor sim(car_param,initstate);
+//  sim.run(0,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, 0);
+//  sim.WaitForThreadJoin();
+
+//  sims[0]->run(0,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, 0);
+//  sims[1]->run(1,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, 0);
+//  sims[2]->run(2,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, 0);
+//  sims[3]->run(3,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, 0);
+//  sims[0]->WaitForThreadJoin();
+//  sims[1]->WaitForThreadJoin();
+//  sims[2]->WaitForThreadJoin();
+//  sims[3]->WaitForThreadJoin();
+#if 0
+  thread_vec.clear();
+  sim_traj.clear();
+  for (int ii = 0; ii < 2; ii++) {
+    std::cout << "pushing back object " << ii << std::endl;
+    sims[ii]->SetState(initstate);
+    sim_traj.push_back(std::make_shared<spStateSeries>());
+    thread_vec.push_back(std::make_shared<std::thread>(std::ref(*(sims[ii].get())),ii,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, std::ref(cntrl_vars), FINITE_DIFF_EPSILON, ii, sim_traj[ii]));
+  }
+//  std::cout << "pushing last thread" << std::endl;
+//  sims[6]->SetState(initstate);
+//  sim_traj.push_back(std::make_shared<spStateSeries>());
+//  thread_vec.push_back(std::make_shared<std::thread>(std::ref(*sims[6].get()),6,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, std::ref(cntrl_vars), FINITE_DIFF_EPSILON, -1, sim_traj[sim_traj.size()-1]));
+
+  std::cout << "done pushing all threads" << std::endl;
+  for (int ii = 0; ii <= 1; ii++) {
+      std::cout << "joining thread " << ii << std::endl;
+      thread_vec[ii]->join();
+  }
+#endif
+  std::cout << "done in thread----------------------------------------------" << std::endl;
+}
+
+}
 
 double test_plant(double vin, spTimestamp curr_time) {
   static double cap_voltage = 0;

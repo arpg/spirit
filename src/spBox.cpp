@@ -1,18 +1,19 @@
 #include <spirit/Objects/spBox.h>
 
-spBox::spBox(const spPose& pose, const spBoxSize& size, double mass, const spColor& color, btDiscreteDynamicsWorld* dynamics_world) {
+spBox::spBox(const spPose& pose, const spBoxSize& size, double mass, const spColor& color, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world) {
   color_ = color;
   mass_ = mass;
   index_gui_ = -1;
   modifiable_gui_ = false;
   obj_clamptosurface_ = false;
   object_type_ = spObjectType::BOX;
-  btCollisionShape* shape = new btBoxShape(btVector3(1.0,1.0,1.0));
+//  btCollisionShape* shape = new btBoxShape(btVector3(1.0,1.0,1.0));
+  shape_ = std::make_shared<btBoxShape>(btVector3(1.0,1.0,1.0));
   btTransform tr;
   tr.setIdentity();
-  rigid_body_ = CreateRigidBody(mass,spPose2btTransform(pose),shape);
+  CreateRigidBody(mass,pose,shape_);
   int box_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH | BulletCollissionType::COL_CHASSIS | BulletCollissionType::COL_WHEEL;
-  dynamics_world->addRigidBody(rigid_body_,BulletCollissionType::COL_BOX,box_collides_with_);
+  dynamics_world->addRigidBody(rigid_body_.get(),BulletCollissionType::COL_BOX,box_collides_with_);
   rigid_body_->setActivationState(DISABLE_DEACTIVATION);
   obj_guichanged_ = true;
   SetDimensions(size);
@@ -23,6 +24,7 @@ spBox::spBox(const spPose& pose, const spBoxSize& size, double mass, const spCol
 }
 
 spBox::~spBox() {
+//  delete rigid_body_->getCollisionShape();
 }
 
 void spBox::SetFriction(double fric_coeff) {
@@ -53,12 +55,15 @@ spBoxSize spBox::GetDimensions() {
 }
 
 void spBox::SetPose(const spPose& pose) {
-  rigid_body_->setWorldTransform(spPose2btTransform(pose));
+  btTransform tr;
+  spPose2btTransform(pose,tr);
+  rigid_body_->setWorldTransform(tr);
   obj_guichanged_ = true;
 }
 
 const spPose& spBox::GetPose(){
-  return btTransform2spPose(rigid_body_->getWorldTransform());
+  btTransform2spPose(rigid_body_->getWorldTransform(),pose_);
+  return pose_;
 }
 
 void spBox::SetColor(const spColor& color) {
@@ -69,7 +74,6 @@ void spBox::SetColor(const spColor& color) {
 const spColor& spBox::GetColor() {
   return color_;
 }
-
 
 void spBox::SetMass(double mass) {
   //rigidbody is dynamic if and only if mass is non zero, otherwise static

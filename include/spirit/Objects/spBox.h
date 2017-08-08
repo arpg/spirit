@@ -5,7 +5,7 @@
 
 class spBox : public spCommonObject {
  public:
-  spBox(const spPose& pose, const spBoxSize& size, double mass, const spColor& color, btDiscreteDynamicsWorld* dynamics_world_);
+  spBox(const spPose& pose, const spBoxSize& size, double mass, const spColor& color, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world_);
   ~spBox();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
@@ -23,6 +23,9 @@ class spBox : public spCommonObject {
 
  private:
   spColor color_;
+  // pose_ shouldn't be used directly, call GetPose() if position of object is required
+  spPose pose_;
+  std::shared_ptr<btCollisionShape> shape_;
 };
 
 #endif  //  SP_BOX_H__

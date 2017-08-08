@@ -5,7 +5,7 @@
 
 class spWheel : public spCommonObject {
 public:
-  spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index, btRigidBody* chassis_body, btDiscreteDynamicsWorld* dynamics_world);
+  spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index, std::shared_ptr<btRigidBody> chassis_body, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world);
   ~spWheel();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
@@ -41,7 +41,12 @@ private:
   const int drive_motor_axis = 3;
   const int steering_servo_axis = 5;
   spColor color_;
-  btHinge2Constraint* hinge_;
+  // Use GetPose() whenever pose of object is required
+  spPose pose_;
+  spLinVel linvel_;
+  spRotVel rotvel_;
+  std::shared_ptr<btHinge2Constraint> hinge_;
+  std::shared_ptr<btCollisionShape> wheel_shape_;
 };
 
 #endif  //  SP_WHEEL_H__

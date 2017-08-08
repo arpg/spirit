@@ -28,6 +28,7 @@
 #define WSCALE 10
 #define WSCALE_INV 0.1
 
+// A reasonable range of iterations is from 4 (low quality, good performance) to 20 (good quality, less but still reasonable performance), while the default is 10
 #define BULLET_SOLVER_NUM_ITERATIONS 5
 
 // Enable this line for using central differencing instead of forward diff
@@ -37,6 +38,9 @@
 // Forward diff step = 0.09
 // Central diff step = 0.05
 #define FINITE_DIFF_EPSILON 0.09
+
+// Trajectory discretization step size in seconds
+#define DISCRETIZATION_STEP_SIZE 0.1
 
 #define BIT(x) (1<<(x))
 enum BulletCollissionType{
