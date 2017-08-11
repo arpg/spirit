@@ -12,12 +12,6 @@ Objects::Objects(const Objects& obj) {
 }
 
 Objects::~Objects(){
-	//delete collision shapes
-//	for (int j=0;j<collisionShapes_.size();j++)
-//	{
-//		btCollisionShape* shape = collisionShapes_[j];
-//		delete shape;
-//	}
   spObjectHandle ii = objects_.begin();
   while(ii != objects_.end()){
     RemoveObj(ii);

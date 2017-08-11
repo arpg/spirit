@@ -64,19 +64,13 @@ int main(int argc, char** argv) {
   settings_obj.SetNumThreads(1);
 
   spirit sp_world(settings_obj);
-//  sp_world.CalcLocalPlannerJacobian();
-//  sp_world.ScenarioWorldBoxFall();
-//  sp_world.ScenarioWorldCarFall();
 //  sp_world.ScenarioPlannerTest();
 //  sp_world.SenarioCeresTest();
 //  sp_world.ScenarioPIDController();
 //  sp_world.ScenarioGNTest();
 
-  sp_world.multithreadtest();
-//  sp_world.SenarioControllerTest();
-//  sp_world.leaktest();
-//  sp_world.SenarioTrajectoryTest();
-//  sp_world.SenarioCostSurf();
+//  sp_world.multithreadtest();
+  sp_world.SenarioControllerTest();
 //  sp_world.DummyTests();
 
   while(sp_world.ShouldRun()) {

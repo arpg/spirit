@@ -11,8 +11,12 @@ spLocalPlanner::~spLocalPlanner() {
 void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simulation_duration, const spState& current_state, const spWaypoint& end_waypoint) {
   ceres::Problem problem;
   spState goal_state;
-  goal_state.pose = end_waypoint.GetPose();
-  goal_state.linvel = end_waypoint.GetLinearVelocity();
+  spPose a;
+  spPose b;
+  const spPose& c(b);
+  a = c;
+  goal_state.pose = spPose(end_waypoint.GetPose());
+  goal_state.linvel = spLinVel(end_waypoint.GetLinearVelocity());
   Eigen::VectorXd residual_weight(13);
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.002, 0.002, 0.002, 0.001, 0.001, 0.001,0.0001;
   residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.5;
@@ -124,28 +128,30 @@ void spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory, int way_index, boo
 }
 
 void spLocalPlanner::SolveInitialPlan(spTrajectory& trajectory, int way_index) {
-    spState state;
-    // for now use pose and linvel of the waypoint, we need a more complicated waypoint in order to add other constraints
-    state.pose = trajectory.GetWaypoint(way_index).GetPose();
-    state.linvel = trajectory.GetWaypoint(way_index).GetLinearVelocity();
-    // TODO: fix this zero index issue
-    if(way_index > 0) {
-      std::cout << "wayindex is  " << way_index << std::endl;
-      // TODO: find simpler struct for state series
-      state = (*((*trajectory.GetTrajectoryStateSeries(way_index-1))[trajectory.GetTrajectoryStateSeries(way_index-1)->size()-1]));
-      trajectory.GetControls(way_index).col(0) = trajectory.GetControls(way_index-1).col(2);
-    }
-    // create sub states for each wheel
+  if(trajectory.GetTravelDuration(way_index) == -1) {
+    SPERROREXIT("Travel duration between waypoints hasn't been initialized for waypoint " + std::to_string(way_index));
+  }
+  spState state;
+  // for now use pose and linvel of the waypoint, we need a more complicated waypoint in order to add other constraints
+  state.pose = trajectory.GetWaypoint(way_index).GetPose();
+  state.linvel = trajectory.GetWaypoint(way_index).GetLinearVelocity();
+  // TODO: fix this zero index issue
+  if(way_index > 0) {
+    // TODO: find simpler struct for state series
+    state = (*((*trajectory.GetTrajectoryStateSeries(way_index-1))[trajectory.GetTrajectoryStateSeries(way_index-1)->size()-1]));
+    trajectory.GetControls(way_index).col(0) = trajectory.GetControls(way_index-1).col(2);
+  }
+  // create sub states for each wheel
 //    for(int ii = 0; ii<vehicle_parameters.wheels_anchor.size(); ii++) {
 //      state.InsertSubstate();
 //      state.substate_vec[ii]->linvel = state.linvel;
 //    }
+  CarSimFunctor sim(vehicle_parameters,state,gui_);
+  std::shared_ptr<spStateSeries> state_series = std::make_shared<spStateSeries>();
+  double travel_duration = trajectory.GetTravelDuration(way_index);
+  sim(0,(int)(travel_duration/0.1),0.1,trajectory.GetControls(way_index),0,-1,state_series);
 
-    CarSimFunctor sim(vehicle_parameters,state,gui_);
-    std::shared_ptr<spStateSeries> state_series = std::make_shared<spStateSeries>();
-    double travel_duration = trajectory.GetTravelDuration(way_index);
-    sim(0,(int)(travel_duration/0.1),0.1,trajectory.GetControls(way_index),0,-1,state_series);
-    trajectory.SetTrajectoryStateSeries(way_index,state_series);
+  trajectory.SetTrajectoryStateSeries(way_index,state_series);
 }
 
 

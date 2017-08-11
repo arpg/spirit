@@ -36,14 +36,10 @@ public:
   spObjectHandle GetListBegin();
   spObjectHandle GetListEnd();
 
-int boxtest();
-
 private:
-
-spPose& btTransform2spPose(const btTransform& tr, double btworld_scale_inv);
-btTransform& spPose2btTransform(const spPose& pose, double btworld_scale);
-btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
-
+  spPose& btTransform2spPose(const btTransform& tr, double btworld_scale_inv);
+  btTransform& spPose2btTransform(const spPose& pose, double btworld_scale);
+  btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
   std::list<std::shared_ptr<spCommonObject>> objects_;
   void InitEmptyDynamicsWorld();
   BulletWorldParams world_params_;

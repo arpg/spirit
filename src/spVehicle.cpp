@@ -152,7 +152,9 @@ const spRotVel& spVehicle::GetChassisAngularVelocity() {
 const spState& spVehicle::GetState() {
 //  std::shared_ptr<spState> state = std::make_shared<spState>();
   // bullet uses Euler XYZ(yaw,pitch,roll) convention for rotations
-  btTransform2spPose(rigid_body_->getWorldTransform(),state_.pose);
+//  btTransform2spPose(rigid_body_->getWorldTransform(),state_.pose);
+//  state_.pose = state_.pose*GetLocalCOG().inverse();
+  state_.pose = GetPose();
   state_.linvel = GetChassisLinearVelocity();
   state_.rotvel = GetChassisAngularVelocity();
   for(int ii=0; ii<GetNumberOfWheels(); ii++) {

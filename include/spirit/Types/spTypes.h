@@ -86,9 +86,9 @@ typedef std::vector<std::shared_ptr<spState>> spStateSeries;
 
 class spState {
 public:
-  spState() : pose(spPose::Identity()),
-    linvel(spLinVel(0,0,0)),
-    rotvel(spRotVel(0,0,0)) {}
+  spState() {
+    this->clear();
+  }
 
   ~spState(){}
 
@@ -105,7 +105,6 @@ public:
   }
 
   spState& operator=(const spState& rhs) {
-    // check for self-assignment
     if(&rhs == this)
         return *this;
     // reuse storage when possible
@@ -115,6 +114,7 @@ public:
     wheel_speeds = rhs.wheel_speeds;
     front_steering = rhs.front_steering;
     rear_steering = rhs.rear_steering;
+    substate_vec.clear();
     for(int ii=0; ii<rhs.substate_vec.size(); ii++) {
       InsertSubstate(rhs.substate_vec[ii]);
     }
@@ -133,23 +133,22 @@ public:
   }
 
   // TODO : check for efficiency
-  const spState operator-(const spState &rhs) const {
-    spState result;
-    result.pose.translate(pose.translation()-rhs.pose.translation());
-    result.pose.rotate(pose.rotation()*rhs.pose.rotation().inverse());
-    result.linvel = linvel-rhs.linvel;
+  spState operator-(const spState &rhs) const {
+    spState state;
+    state.pose.translate(pose.translation()-rhs.pose.translation());
+    state.pose.rotate(pose.rotation()*rhs.pose.rotation().inverse());
+    state.linvel = linvel-rhs.linvel;
 //    Eigen::Quaterniond rhs_rotvel(rhs.rotvel);
 //    Eigen::Quaterniond this_rotvel(rotvel);
 //    Eigen::Quaterniond diff_rotvel(this_rotvel*rhs_rotvel.inverse());
 //    result.rotvel = Eigen::AngleAxisd(diff_rotvel);
-    result.rotvel = rotvel-rhs.rotvel;
+    state.rotvel = rotvel-rhs.rotvel;
 //    result.rotvel = rotvel*rhs.rotvel.inverse();
 //    result.rotvel.angle() = rotvel.angle()-rhs.rotvel.angle();
 //    result.rotvel.axis() = rotvel.axis()-rhs.rotvel.axis();
 //    result.front_steering = front_steering - rhs.front_steering;
 //    result.rear_steering = rear_steering - rhs.rear_steering;
-
-    return result;
+    return state;
   }
 
   const spStateVec vector() const{
@@ -192,6 +191,16 @@ public:
     return substate_vec.size()-1;
   }
 
+  void clear() {
+    pose = spPose::Identity();
+    linvel = spLinVel::Zero();
+    rotvel = spRotVel::Zero();
+    wheel_speeds = spWheelSpeedVec::Zero();
+    front_steering = Eigen::Quaterniond::Identity();
+    rear_steering = Eigen::Quaterniond::Identity();
+    substate_vec.clear();
+  }
+
   spPose pose;
   spLinVel linvel;
   spRotVel rotvel;
@@ -200,7 +209,7 @@ public:
   Eigen::Quaterniond rear_steering;
   std::vector<std::shared_ptr<spState>> substate_vec;
 private:
-  spStateVec state_vec_;
+//  spStateVec state_vec_;
 };
 
 typedef std::chrono::high_resolution_clock::time_point spTimestamp;

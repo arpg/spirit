@@ -57,23 +57,17 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
         sims_neg.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
       }
 #endif
-
-#if 1
-      std::vector<std::shared_ptr<std::thread>> thread_vec;
-//int ii = 0;
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
         sim_traj.push_back(std::make_shared<spStateSeries>());
-        thread_vec.push_back(std::make_shared<std::thread>(std::ref(*(sims[ii].get())),ii,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, std::ref(cntrl_vars), FINITE_DIFF_EPSILON, ii, sim_traj[ii]));
+        sims[ii]->RunInThread(ii,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, ii, sim_traj[ii]);
       }
 
       sim_traj.push_back(std::make_shared<spStateSeries>());
-      thread_vec.push_back(std::make_shared<std::thread>(std::ref(*sims[parameter_block_sizes()[0]].get()),parameter_block_sizes()[0],(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, std::ref(cntrl_vars), FINITE_DIFF_EPSILON, -1,sim_traj[sim_traj.size()-1]));
-
+      sims[parameter_block_sizes()[0]]->RunInThread(parameter_block_sizes()[0],(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, -1, sim_traj[sim_traj.size()-1]);
       for (int ii = 0; ii <= parameter_block_sizes()[0]; ii++) {
-          thread_vec[ii]->join();
+          sims[ii]->WaitForThreadJoin();
       }
-
-#elif 1
+#if 0
       std::shared_ptr<CarSimFunctor> sim = std::make_shared<CarSimFunctor>(vehicle_info_,current_state_);
       std::vector<std::shared_ptr<std::thread>> thp;
       thp.push_back(std::make_shared<std::thread>(std::ref(*sims[0].get()),0,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, 0));
@@ -81,14 +75,16 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
         thp[0]->join();
       }
       std::cout << "done here " << std::endl;
-#elif 0
+#endif
+#if 0
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
         sim_traj.push_back(std::make_shared<spStateSeries>());
         sims[ii]->operator()(0,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, ii, sim_traj[ii]);
       }
       sim_traj.push_back(std::make_shared<spStateSeries>());
       sims[parameter_block_sizes()[0]]->operator()(0,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, 0, -1, sim_traj[sim_traj.size()-1]);
-#else
+#endif
+#if 0
 
       // create thread pool with #n threads
       ctpl::thread_pool pool(2);
@@ -110,6 +106,8 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
       pool.stop(true);
 
 #endif
+
+
 
 #ifdef SOLVER_USE_CENTRAL_DIFF
       for (int ii = 0; ii<parameter_block_sizes()[0]; ii++) {
@@ -155,8 +153,8 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
   }
 
  private:
-  const spVehicleConstructionInfo vehicle_info_;
-  const spState current_state_;
+  const spVehicleConstructionInfo& vehicle_info_;
+  const spState& current_state_;
   const spStateSeries& ref_states_;
   Eigen::MatrixXd residual_weight_;
   int num_residual_blocks_;

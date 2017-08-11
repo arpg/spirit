@@ -30,7 +30,6 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
   virtual bool Evaluate(double const* const* parameters, double* residuals,
                         double** jacobians) const {
     // setup a weight vector/matrix
-
     spCtrlPts2ord_2dof cntrl_vars;
     for (int ii = 0; ii < 6; ii++) {
       cntrl_vars.data()[ii] = parameters[0][ii];
@@ -46,7 +45,7 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
       for (int ii = 0; ii < parameter_block_sizes()[0] + 1; ii++) {
         sims.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
       }
-
+#if 0
 #ifdef SOLVER_USE_CENTRAL_DIFF
       std::vector<std::shared_ptr<CarSimFunctor>> sims_neg;
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
@@ -69,6 +68,19 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
       }
       pool.push(std::ref(*sims[parameter_block_sizes()[0]].get()), (int)(simulation_length/0.1), 0.1, cntrl_vars, 0, -1);
       pool.stop(true);
+#endif
+
+      for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
+        if(ii == parameter_block_sizes()[0]-1) {
+          sims[ii]->RunInThread(ii,(int)(simulation_length/DISCRETIZATION_STEP_SIZE)+1, DISCRETIZATION_STEP_SIZE, cntrl_vars, 0, -1);
+        } else {
+          sims[ii]->RunInThread(ii,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, ii);
+        }
+      }
+      sims[parameter_block_sizes()[0]]->RunInThread(parameter_block_sizes()[0],(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, 0, -1);
+      for (int ii = 0; ii <= parameter_block_sizes()[0]; ii++) {
+          sims[ii]->WaitForThreadJoin();
+      }
 
 #ifdef SOLVER_USE_CENTRAL_DIFF
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {

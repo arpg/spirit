@@ -13,7 +13,7 @@ void spMPC::CalculateControls(const spTrajectory& ref_traj, const spState& curr_
   int closest_index;
   int closest_subindex;
   FindClosestTrajPoint(closest_index,closest_subindex,ref_traj,curr_state);
-
+  std::cout << "closest traj is " << closest_index << " sub is " << closest_subindex << std::endl;
   // crop trajectory from closest traj point up to horizon
   spStateSeries ref_states;
   int index = closest_index;
@@ -50,6 +50,7 @@ void spMPC::SetHorizon(float horizon_duration) {
 
 
 // Brutefoce search for closest state of reference trajectory to current state
+// This could be replaced with a faster search algorithm later
 void spMPC::FindClosestTrajPoint(int& closest_waypoint_index, int& closest_subindex, const spTrajectory& ref_traj, const spState& curr_state) {
   double smallest_norm;
   spState state_diff;
@@ -77,38 +78,37 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1;
 //  residual_weight << 1,1,1,0.5,0.5,0.5,0.1,0.1,0.1,0,0,0;
   residual_weight << 1,1,1,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001;
-  Eigen::VectorXd traj_point_weight(5);
+  Eigen::VectorXd traj_point_weight(10);
   traj_point_weight << 0.5, 0.7, 1, 1, 1, 1, 1, 1, 1, 1;
   traj_point_weight = 10*traj_point_weight;
   ceres::CostFunction* cost_function = new MPCCostFunc(car_params_,current_state,ref_states,residual_weight,traj_point_weight);
-//  ceres::CostFunction* loss_function = new MPCLossFunc(SP_PI_QUART,-SP_PI_QUART,200,-200);
+  ceres::CostFunction* loss_function = new MPCLossFunc(SP_PI_QUART,-SP_PI_QUART,200,-200);
 
   double parameters[6];
   for (int ii = 0; ii < 6; ++ii) {
     parameters[ii] = controls.data()[ii];
   }
   problem.AddResidualBlock(cost_function, NULL, parameters);
-//  problem.AddResidualBlock(loss_function,NULL,parameters);
+  problem.AddResidualBlock(loss_function,NULL,parameters);
 
   std::vector<int> fix_param_vec;
   // fix the first two parameters
   fix_param_vec.push_back(0);
   fix_param_vec.push_back(1);
-
-  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(6,fix_param_vec);
-  problem.SetParameterization(parameters,subparam);
-  problem.SetParameterLowerBound(parameters,0,-((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterUpperBound(parameters,0,((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterLowerBound(parameters,1,-200);
-  problem.SetParameterUpperBound(parameters,1,200);
-  problem.SetParameterLowerBound(parameters,2,-((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterUpperBound(parameters,2,((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterLowerBound(parameters,3,-200);
-  problem.SetParameterUpperBound(parameters,3,200);
-  problem.SetParameterLowerBound(parameters,4,-((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterUpperBound(parameters,4,((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterLowerBound(parameters,5,-200);
-  problem.SetParameterUpperBound(parameters,5,200);
+//  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(6,fix_param_vec);
+//  problem.SetParameterization(parameters,subparam);
+//  problem.SetParameterLowerBound(parameters,0,-((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterUpperBound(parameters,0,((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterLowerBound(parameters,1,-200);
+//  problem.SetParameterUpperBound(parameters,1,200);
+//  problem.SetParameterLowerBound(parameters,2,-((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterUpperBound(parameters,2,((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterLowerBound(parameters,3,-200);
+//  problem.SetParameterUpperBound(parameters,3,200);
+//  problem.SetParameterLowerBound(parameters,4,-((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterUpperBound(parameters,4,((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterLowerBound(parameters,5,-200);
+//  problem.SetParameterUpperBound(parameters,5,200);
 
   // Run the solver!
   ceres::Solver::Options options;
@@ -122,7 +122,7 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
   options.min_relative_decrease = 1e-4;
   options.linear_solver_type = ceres::DENSE_QR;
   options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
-  options.minimizer_progress_to_stdout = false;
+  options.minimizer_progress_to_stdout = true;
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
   for (int ii = 0; ii < 6; ++ii) {

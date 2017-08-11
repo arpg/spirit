@@ -28,6 +28,7 @@ class spCommonObject {
   bool NeedsClampToSurface();
   void SetClamped();
   std::shared_ptr<btRigidBody> GetRigidbody();
+  int GetRigidbodyCount();
 
  protected:
   int index_gui_;
@@ -44,7 +45,7 @@ class spCommonObject {
   void btTransform2spPose(const btTransform& tr, spPose& pose);
 
  private:
-  std::unique_ptr<btDefaultMotionState> motion_state_;
+  std::shared_ptr<btDefaultMotionState> motion_state_;
 
 };
 

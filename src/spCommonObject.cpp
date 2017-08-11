@@ -34,6 +34,10 @@ bool spCommonObject::IsDynamic() {
     return false;
 }
 
+int spCommonObject::GetRigidbodyCount() {
+  return motion_state_.use_count();
+}
+
 bool spCommonObject::IsGuiModifiable() {
   return modifiable_gui_;
 }
@@ -61,7 +65,7 @@ void spCommonObject::CreateRigidBody(double mass, const btTransform& tr, std::sh
 	if (isDynamic)
 		shape->calculateLocalInertia(mass,localInertia);
 	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-	motion_state_ = std::make_unique<btDefaultMotionState>(tr);
+	motion_state_ = std::make_shared<btDefaultMotionState>(tr);
 	btRigidBody::btRigidBodyConstructionInfo cInfo(mass,motion_state_.get(),shape.get(),localInertia);
 //	std::shared_ptr<btRigidBody> body = std::make_shared<btRigidBody>(cInfo);
 	rigid_body_ = std::make_shared<btRigidBody>(cInfo);
@@ -78,8 +82,8 @@ void spCommonObject::spPose2btTransform(const spPose& pose, btTransform& tr) {
 }
 
 void spCommonObject::btTransform2spPose(const btTransform& tr, spPose& pose) {
-  btVector3 origin = tr.getOrigin();
-  pose.translate(spTranslation(origin[0],origin[1],origin[2])*WSCALE_INV);
+  pose = spPose::Identity();
+  pose.translate(spTranslation(tr.getOrigin()[0],tr.getOrigin()[1],tr.getOrigin()[2])*WSCALE_INV);
   btQuaternion btrot = tr.getRotation();
   spRotation spangle(btrot.w(),btrot.x(),btrot.y(),btrot.z());
   pose.rotate(spangle);
