@@ -71,6 +71,7 @@ int main(int argc, char** argv) {
 
 //  sp_world.multithreadtest();
   sp_world.SenarioControllerTest();
+//  sp_world.zibil();
 //  sp_world.DummyTests();
 
   while(sp_world.ShouldRun()) {

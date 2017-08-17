@@ -32,6 +32,11 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
       weightvec.block<12,1>(ii*12,0) << traj_point_weight[ii]*state_weight;
     }
     residual_weight_ = weightvec.asDiagonal();
+
+//    for (int ii = 0; ii < parameter_block_sizes()[0] + 1; ii++) {
+//      sims.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
+//    }
+
   }
 
   ~MPCCostFunc() {}
@@ -44,13 +49,17 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
     }
     double simulation_length = DISCRETIZATION_STEP_SIZE*ref_states_.size();
     if ((jacobians != NULL) && (residuals != NULL)) {
+//      std::cout << "jac called"  << std::endl;
+//      std::cout << "parameters are \n" << cntrl_vars << std::endl;
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> jac(jacobians[0],num_residual_blocks_*12,6);
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*12,1);
       std::vector<std::shared_ptr<CarSimFunctor>> sims;
       for (int ii = 0; ii < parameter_block_sizes()[0] + 1; ii++) {
         sims.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
       }
-
+//      for (int ii = 0; ii < sims.size() ; ii++) {
+//        sims[ii]->SetState(current_state_);
+//      }
 #ifdef SOLVER_USE_CENTRAL_DIFF
       std::vector<std::shared_ptr<CarSimFunctor>> sims_neg;
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
@@ -134,11 +143,11 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
       // apply weighting matrix
       jac = residual_weight_ * jac;
       res = residual_weight_ * res;
-
 //      std::cout << " jac ->  \n" << jac << std::endl;
 //      std::cout << "res   -> \n" << res << std::endl;
-
+//      std::cout << "cost is " << res.norm() << std::endl;
     } else if (residuals != NULL) {
+//      std::cout << "res called " << std::endl;
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*12,1);
       std::shared_ptr<spStateSeries> curr_states = std::make_shared<spStateSeries>();
       CarSimFunctor sims(vehicle_info_,current_state_);
@@ -148,6 +157,8 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
         res.block<12,1>(jj*12,0) = (*(ref_states_[jj]) - *((*curr_states)[jj+1])).vector();
       }
       res = residual_weight_ * res;
+//      std::cout << "res   -> \n" << res << std::endl;
+//      std::cout << "cost is " << res.norm() << std::endl;
     }
     return true;
   }
@@ -157,6 +168,7 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
   const spState& current_state_;
   const spStateSeries& ref_states_;
   Eigen::MatrixXd residual_weight_;
+//  std::vector<std::shared_ptr<CarSimFunctor>> sims;
   int num_residual_blocks_;
 };
 

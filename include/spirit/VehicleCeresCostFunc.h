@@ -97,7 +97,7 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
         // find central difference of residual with respect to parameters
         if(ii == parameter_block_sizes()[0]-1) {
           // we have -j since we are calculating (z-h(x)) and then derivative of h(x) would be -J(x)
-          jac.col(ii) << -((sims[ii]->GetState() - sims[parameter_block_sizes()[0]]->GetState()).vector()) / (0.1),1;
+          jac.col(ii) << -((sims[ii]->GetState() - sims[parameter_block_sizes()[0]]->GetState()).vector()) / (DISCRETIZATION_STEP_SIZE),1;
         } else {
           jac.col(ii) << -((sims[ii]->GetState() - sims[parameter_block_sizes()[0]]->GetState()).vector()) / (FINITE_DIFF_EPSILON),0;
         }
@@ -122,7 +122,7 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
     } else if (residuals != NULL) {
       Eigen::Map<Eigen::Matrix<double,13,1>> res(residuals);
       CarSimFunctor sims(vehicle_info_,current_state_);
-      sims(0, (int)(simulation_length/0.1), 0.1, cntrl_vars, 0, -1);
+      sims(0, (int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, 0, -1);
 
       res << (target_state_ - sims.GetState()).vector(),simulation_length;
       res = residual_weight_ * res;

@@ -10,7 +10,7 @@ class spMPC {
  public:
   spMPC(const spVehicleConstructionInfo& car_params, float horizon_duration);
   ~spMPC();
-  void CalculateControls(const spTrajectory& ref_traj, const spState& curr_state, spCtrlPts2ord_2dof& controls);
+  int CalculateControls(const spTrajectory& ref_traj, const spState& curr_state, spCtrlPts2ord_2dof& controls);
   void SetHorizon(float horizon_duration);
 
  private:

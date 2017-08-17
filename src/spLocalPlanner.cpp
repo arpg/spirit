@@ -22,35 +22,37 @@ void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simula
   residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.5;
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.1;
   ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_parameters,current_state,goal_state,residual_weight);
+  ceres::CostFunction* loss_function = new LocalPlannerLossFunc(SP_PI_QUART,-SP_PI_QUART,200,-200,20,0.5);
+
   double parameters[7];
   for (int ii = 0; ii < 6; ++ii) {
     parameters[ii] = controls.data()[ii];
   }
   parameters[6] = simulation_duration;
   problem.AddResidualBlock(cost_function, new ceres::CauchyLoss(0.5), parameters);
-  //    problem.AddResidualBlock(cost_function, NULL, parameters);
+  problem.AddResidualBlock(loss_function,NULL,parameters);
 
   std::vector<int> fix_param_vec;
   // fix the first two parameters
   fix_param_vec.push_back(0);
   fix_param_vec.push_back(1);
 
-  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(7,fix_param_vec);
-  problem.SetParameterization(parameters,subparam);
-  problem.SetParameterLowerBound(parameters,0,-((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterUpperBound(parameters,0,((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterLowerBound(parameters,1,-200);
-  problem.SetParameterUpperBound(parameters,1,200);
-  problem.SetParameterLowerBound(parameters,2,-((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterUpperBound(parameters,2,((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterLowerBound(parameters,3,-200);
-  problem.SetParameterUpperBound(parameters,3,200);
-  problem.SetParameterLowerBound(parameters,4,-((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterUpperBound(parameters,4,((SP_PI/4)-FINITE_DIFF_EPSILON));
-  problem.SetParameterLowerBound(parameters,5,-200);
-  problem.SetParameterUpperBound(parameters,5,200);
-  problem.SetParameterLowerBound(parameters,6,0.6);
-  problem.SetParameterUpperBound(parameters,6,20);
+//  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(7,fix_param_vec);
+//  problem.SetParameterization(parameters,subparam);
+//  problem.SetParameterLowerBound(parameters,0,-((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterUpperBound(parameters,0,((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterLowerBound(parameters,1,-200);
+//  problem.SetParameterUpperBound(parameters,1,200);
+//  problem.SetParameterLowerBound(parameters,2,-((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterUpperBound(parameters,2,((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterLowerBound(parameters,3,-200);
+//  problem.SetParameterUpperBound(parameters,3,200);
+//  problem.SetParameterLowerBound(parameters,4,-((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterUpperBound(parameters,4,((SP_PI/4)-FINITE_DIFF_EPSILON));
+//  problem.SetParameterLowerBound(parameters,5,-200);
+//  problem.SetParameterUpperBound(parameters,5,200);
+//  problem.SetParameterLowerBound(parameters,6,0.6);
+//  problem.SetParameterUpperBound(parameters,6,20);
 
   // Run the solver!
   ceres::Solver::Options options;
@@ -61,6 +63,8 @@ void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simula
   //  options.gradient_check_numeric_derivative_relative_step_size = 0.05;
   //  options.minimizer_type = ceres::MinimizerType::LINE_SEARCH;
 //    options.max_num_iterations = 30;
+  options.initial_trust_region_radius = 0.7;
+  options.max_trust_region_radius = 0.7;
   options.linear_solver_type = ceres::DENSE_QR;
   options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
   options.minimizer_progress_to_stdout = false;
@@ -75,9 +79,9 @@ void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simula
 void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simulation_duration, const spState& current_state, const spWaypoint& end_waypoint, std::shared_ptr<spStateSeries> traj_states) {
   SolveLocalPlan(controls,simulation_duration,current_state,end_waypoint);
   // TODO: we should be able to get traj_states from solution of last optimization step but for now we resimulate.
-//  CarSimFunctor sim(vehicle_parameters,current_state,gui_);
-  CarSimFunctor sim(vehicle_parameters,current_state,nullptr);
-  sim(0,(int)(simulation_duration/0.1),0.1,controls,0,-1,traj_states);
+  CarSimFunctor sim(vehicle_parameters,current_state,gui_);
+//  CarSimFunctor sim(vehicle_parameters,current_state,nullptr);
+  sim(0,(int)(simulation_duration/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,controls,0,-1,traj_states);
 }
 
 void spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory) {
@@ -117,7 +121,7 @@ void spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory, int way_index, boo
   SolveLocalPlan(trajectory.GetControls(way_index),travel_duration,current_state, trajectory.GetWaypoint(next_index),state_series);
   trajectory.SetTravelDuration(way_index,(int)(travel_duration/0.1)*0.1);
   trajectory.SetTrajectoryStateSeries(way_index,state_series);
-  std::cout << "controls are :\n" << trajectory.GetControls(way_index) << std::endl;
+//  std::cout << "controls are :\n" << trajectory.GetControls(way_index) << std::endl;
 //  std::cout << "travel duration is : " << trajectory.GetTravelDuration(way_index) << std::endl;
 //  std::cout << "number of states is " << trajectory.GetTrajectoryStateSeries(way_index)->size() << std::endl;
   // adjust the next waypoint accordingly if overwrite_endstate was enabled
@@ -149,7 +153,7 @@ void spLocalPlanner::SolveInitialPlan(spTrajectory& trajectory, int way_index) {
   CarSimFunctor sim(vehicle_parameters,state,gui_);
   std::shared_ptr<spStateSeries> state_series = std::make_shared<spStateSeries>();
   double travel_duration = trajectory.GetTravelDuration(way_index);
-  sim(0,(int)(travel_duration/0.1),0.1,trajectory.GetControls(way_index),0,-1,state_series);
+  sim(0,(int)(travel_duration/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,trajectory.GetControls(way_index),0,-1,state_series);
 
   trajectory.SetTrajectoryStateSeries(way_index,state_series);
 }

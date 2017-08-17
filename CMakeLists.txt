@@ -80,6 +80,7 @@ set( HDRS
 	include/spirit/Controllers/spMPC.h
 	include/spirit/MPCCostFunc.h
 	include/spirit/MPCLossFunc.h
+	include/spirit/LocalPlannerLossFunc.h
 	)
 
 set( SRCS

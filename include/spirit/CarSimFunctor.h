@@ -78,10 +78,13 @@ class CarSimFunctor {
                   const spCtrlPts2ord_2dof& cntrl_vars, double epsilon,
                   int pert_index,
                   std::shared_ptr<spStateSeries> traj_states = nullptr) {
+//                  const spState& init_state = initial_state_ ) {
     spBox& gnd = (spBox&)objects_->GetObject(gnd_handle_);
     gnd.SetFriction(1);
     spAWSDCar& car = (spAWSDCar&)objects_->GetObject(car_handle_);
-//    car.SetState(initial_state_);
+//    if(init_state != nullptr) {
+//      car.SetState(init_state);
+//    }
     car.SetEngineMaxVel(100);
     car.SetEngineTorque(100);
     car.SetSteeringServoMaxVel(100);

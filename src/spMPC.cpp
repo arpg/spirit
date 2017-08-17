@@ -8,18 +8,18 @@ spMPC::~spMPC() {
 
 }
 
-void spMPC::CalculateControls(const spTrajectory& ref_traj, const spState& curr_state, spCtrlPts2ord_2dof& controls) {
+int spMPC::CalculateControls(const spTrajectory& ref_traj, const spState& curr_state, spCtrlPts2ord_2dof& controls) {
   // find the closest trajectory point to current state
   int closest_index;
   int closest_subindex;
   FindClosestTrajPoint(closest_index,closest_subindex,ref_traj,curr_state);
-  std::cout << "closest traj is " << closest_index << " sub is " << closest_subindex << std::endl;
   // crop trajectory from closest traj point up to horizon
   spStateSeries ref_states;
   int index = closest_index;
   // skip to next subindex so horizon starts from next subindex
   int subindex = closest_subindex+1;
   for(int ii=0; ii<horizon_; ii++) {
+    // skip the last subindex since its same as subindex0 of next index
     if(subindex < (*ref_traj.GetTrajectoryStateSeries(index)).size()-1) {
       ref_states.push_back((*ref_traj.GetTrajectoryStateSeries(index))[subindex]);
     } else {
@@ -29,7 +29,7 @@ void spMPC::CalculateControls(const spTrajectory& ref_traj, const spState& curr_
           index = 0;
         } else {
           SPERROR("Reached end of the trajectory, no further controls can be calculated.");
-          return;
+          return 0;
         }
       } else {
         index++;
@@ -42,10 +42,11 @@ void spMPC::CalculateControls(const spTrajectory& ref_traj, const spState& curr_
 
   // construct and minimize the MPC cost function, then return controls found
   MinimizeMPCError(ref_states,curr_state,controls);
+  return 1;
 }
 
 void spMPC::SetHorizon(float horizon_duration) {
-  horizon_ = horizon_duration;
+  horizon_ = (int)(horizon_duration/DISCRETIZATION_STEP_SIZE);
 }
 
 
@@ -54,10 +55,11 @@ void spMPC::SetHorizon(float horizon_duration) {
 void spMPC::FindClosestTrajPoint(int& closest_waypoint_index, int& closest_subindex, const spTrajectory& ref_traj, const spState& curr_state) {
   double smallest_norm;
   spState state_diff;
-  for(int ii=0; ii<ref_traj.GetNumWaypoints()-1; ii++) {
+  for(int ii=0; ii<ref_traj.GetNumWaypoints(); ii++) {
     if(ref_traj.GetTravelDuration(ii) == -1) {
       SPERROREXIT("LocalPlanner solution doesn't exist");
     }
+    // skip the last subindex since its same as subindex0 of next index
     for(int jj=0; jj<ref_traj.GetTrajectoryStateSeries(ii)->size()-1; jj++) {
       // calculate the distance of current state to every trajectory state
       state_diff = curr_state - *((*ref_traj.GetTrajectoryStateSeries(ii))[jj]);
@@ -72,14 +74,19 @@ void spMPC::FindClosestTrajPoint(int& closest_waypoint_index, int& closest_subin
   }
 }
 
+#include <ceres/gradient_checker.h>
+
 void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& current_state, spCtrlPts2ord_2dof& controls) {
   ceres::Problem problem;
   Eigen::VectorXd residual_weight(12);
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1;
 //  residual_weight << 1,1,1,0.5,0.5,0.5,0.1,0.1,0.1,0,0,0;
-  residual_weight << 1,1,1,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001;
-  Eigen::VectorXd traj_point_weight(10);
-  traj_point_weight << 0.5, 0.7, 1, 1, 1, 1, 1, 1, 1, 1;
+  residual_weight << 1,1,1,0.1,0.1,0.1,0.001,0.001,0.001,0.001,0.001,0.001;
+  Eigen::VectorXd traj_point_weight(horizon_);
+  traj_point_weight.setOnes(horizon_);
+//  traj_point_weight[0] = 0.5;
+//  traj_point_weight[1] = 0.8;
+  // put more weight on trajecotry point errors rather than residula weights
   traj_point_weight = 10*traj_point_weight;
   ceres::CostFunction* cost_function = new MPCCostFunc(car_params_,current_state,ref_states,residual_weight,traj_point_weight);
   ceres::CostFunction* loss_function = new MPCLossFunc(SP_PI_QUART,-SP_PI_QUART,200,-200);
@@ -110,21 +117,28 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
 //  problem.SetParameterLowerBound(parameters,5,-200);
 //  problem.SetParameterUpperBound(parameters,5,200);
 
+
+
   // Run the solver!
   ceres::Solver::Options options;
-  options.update_state_every_iteration = true;
+//  options.update_state_every_iteration = true;
 //  SoverIterationCallback iteration_callback(nullptr,nullptr);
 //  options.callbacks.push_back(&iteration_callback);
-  //  options.check_gradients = true;
-  //  options.gradient_check_numeric_derivative_relative_step_size = 0.05;
-  //  options.minimizer_type = ceres::MinimizerType::LINE_SEARCH;
+//    options.check_gradients = true;
+//    options.gradient_check_numeric_derivative_relative_step_size = 0.01;
 //  options.max_num_iterations = 10;
-  options.min_relative_decrease = 1e-4;
+//  options.min_relative_decrease = 1e-2;
+//  options.max_solver_time_in_seconds = 0.1;
+  options.initial_trust_region_radius = 0.7;
+  options.max_trust_region_radius = 0.7;
+//  options.min_trust_region_radius = 1e-32;
+  options.parameter_tolerance = 1e-2;
   options.linear_solver_type = ceres::DENSE_QR;
   options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
-  options.minimizer_progress_to_stdout = true;
+  options.minimizer_progress_to_stdout = false;
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
+//  std::cout << summary.FullReport() << std::endl;
   for (int ii = 0; ii < 6; ++ii) {
     controls.data()[ii] = parameters[ii];
   }

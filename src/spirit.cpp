@@ -1,6 +1,5 @@
 #include <spirit/spirit.h>
 #include <spirit/CarSimFunctor.h>
-//#include <iomanip>
 #include <spirit/Planners/spTrajectory.h>
 #include <spirit/VehicleCeresCostFunc.h>
 #include <fstream>
@@ -202,15 +201,53 @@ int i=0;
 
 }
 
+void spirit::zibil() {
+  car_param.wheel_friction = 0.9;
+  car_param.chassis_mass = 180;
+  spObjectHandle car1_handle = objects_.CreateVehicle(car_param);
+  gui_.AddObject(objects_.GetObject(car1_handle));
+  spAWSDCar& car1 = (spAWSDCar&) objects_.GetObject(car1_handle);
+  car1.SetEngineTorque(0.01);
+  car1.SetEngineMaxVel(200);
+  car1.SetSteeringServoMaxVel(100);
+  car1.SetSteeringServoTorque(10);
+  car1.SetRearSteeringAngle(0);
+  car1.SetFrontSteeringAngle(0);
+
+  car_param.pose.translate(spTranslation(0.2,0,0));
+  spObjectHandle car2_handle = objects_.CreateVehicle(car_param);
+  gui_.AddObject(objects_.GetObject(car2_handle));
+  spAWSDCar& car2 = (spAWSDCar&) objects_.GetObject(car2_handle);
+  car2.SetEngineTorque(0.1);
+  car2.SetEngineMaxVel(200);
+  car2.SetSteeringServoMaxVel(100);
+  car2.SetSteeringServoTorque(10);
+  car2.SetRearSteeringAngle(0);
+  car2.SetFrontSteeringAngle(0);
+
+  spPose gnd_pose_ = spPose::Identity();
+  gnd_pose_.translate(spTranslation(0,0,-0.5));
+  spObjectHandle gnd_handle = objects_.CreateBox(gnd_pose_,spBoxSize(200,200,1),0,spColor(0,1,0));
+  gui_.AddObject(objects_.GetObject(gnd_handle));
+  ((spBox&)objects_.GetObject(gnd_handle)).SetFriction(1);
+  ((spBox&)objects_.GetObject(gnd_handle)).SetRollingFriction(0.1);
+
+  while(1){
+    objects_.StepPhySimulation(0.01);
+    gui_.Iterate(objects_);
+  }
+}
+
+
 void spirit::SenarioControllerTest() {
   // Create vehicle
   spObjectHandle car_handle = objects_.CreateVehicle(car_param);
   gui_.AddObject(objects_.GetObject(car_handle));
   spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
-  car.SetEngineTorque(1000);
-  car.SetEngineMaxVel(0);
+  car.SetEngineTorque(100);
+  car.SetEngineMaxVel(100);
   car.SetSteeringServoMaxVel(100);
-  car.SetSteeringServoTorque(1000);
+  car.SetSteeringServoTorque(100);
   car.SetRearSteeringAngle(0);
   car.SetFrontSteeringAngle(0);
 
@@ -224,10 +261,10 @@ void spirit::SenarioControllerTest() {
 
   spTrajectory traj(gui_,objects_);
   // put waypoints on a elliptical path
-  double a = 4;
-  double b = 2;
+  double a = 2;
+  double b = 4;
   int num_waypoints = 8;
-  for(int ii=0; ii<3/*num_waypoints*/; ii++) {
+  for(int ii=0; ii<num_waypoints; ii++) {
     // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
     double theta = ii*(2*SP_PI)/num_waypoints;
     double r = (a*b)/sqrt(b*b*pow(cos(theta),2)+a*a*pow(sin(theta),2));
@@ -239,15 +276,15 @@ void spirit::SenarioControllerTest() {
     pose.translate(spTranslation(x,y,0.07));
     Eigen::AngleAxisd rot(angle+SP_PI_HALF,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
-    traj.AddWaypoint(pose,50);
+    traj.AddWaypoint(pose,30);
   }
   gui_.Iterate(objects_);
-  traj.IsLoop(false);
+  traj.IsLoop(true);
 
   spLocalPlanner localplanner(car_param,&gui_);
 
   for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
-    traj.SetTravelDuration(ii,0.5);
+    traj.SetTravelDuration(ii,1.5);
     localplanner.SolveInitialPlan(traj,ii);
     localplanner.SolveLocalPlan(traj,ii,true);
     gui_.Iterate(objects_);
@@ -266,22 +303,32 @@ void spirit::SenarioControllerTest() {
   controls.col(1) = Eigen::Vector2d(0,10);
   controls.col(2) = Eigen::Vector2d(0,20);
 
-  while(1){
-    // create a MPC controller with 0.4s horizon
-    spMPC mpc(car_param,1);
-    mpc.CalculateControls(traj,car.GetState(),controls);
-    spCurve controls_curve(2,2);
-    spPointXd next_control(2);
-    controls_curve.SetBezierControlPoints(controls);
-    // only get the control signal for next point and apply to car
-    controls_curve.GetPoint(next_control,0.1/1);
-    std::cout << "next signals are " << next_control.transpose() << std::endl;
-    car.SetFrontSteeringAngle(next_control[0]);
-    car.SetEngineMaxVel(next_control[1]);
-    controls.col(0) = next_control;
+  // create a MPC controller with horizon
+  float horizon = 0.5;
+  spMPC mpc(car_param,horizon);
 
-    objects_.StepPhySimulation(0.1);
-    gui_.Iterate(objects_);
+  while(1){
+//    controls.col(1) = Eigen::Vector2d(0,0);
+//    controls.col(2) = Eigen::Vector2d(0,0);
+    spTimestamp t0 = spGeneralTools::Tick();
+    if(mpc.CalculateControls(traj,car.GetState(),controls)) {
+      spCurve controls_curve(2,2);
+      spPointXd next_control(2);
+      controls_curve.SetBezierControlPoints(controls);
+      // only get the control signal for next point and apply to car
+      controls_curve.GetPoint(next_control,DISCRETIZATION_STEP_SIZE/horizon);
+      std::cout << "next signals are " << std::fixed << std::setprecision(3) << next_control.transpose() << std::endl;
+      car.SetFrontSteeringAngle(next_control[0]);
+      car.SetEngineMaxVel(next_control[1]);
+      controls.col(0) = next_control;
+      double calc_time = spGeneralTools::Tock_ms(t0);
+      std::cout << "calc time was " << calc_time << std::endl;
+
+      objects_.StepPhySimulation(DISCRETIZATION_STEP_SIZE);
+      gui_.Iterate(objects_);
+    } else {
+      SPERROREXIT("No Controls could be calculated! ");
+    }
   }
 }
 
