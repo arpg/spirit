@@ -74,8 +74,6 @@ void spMPC::FindClosestTrajPoint(int& closest_waypoint_index, int& closest_subin
   }
 }
 
-#include <ceres/gradient_checker.h>
-
 void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& current_state, spCtrlPts2ord_2dof& controls) {
   ceres::Problem problem;
   Eigen::VectorXd residual_weight(12);
@@ -89,7 +87,17 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
   // put more weight on trajecotry point errors rather than residula weights
   traj_point_weight = 10*traj_point_weight;
   ceres::CostFunction* cost_function = new MPCCostFunc(car_params_,current_state,ref_states,residual_weight,traj_point_weight);
-  ceres::CostFunction* loss_function = new MPCLossFunc(SP_PI_QUART,-SP_PI_QUART,200,-200);
+  Eigen::VectorXd min_limits(6);
+  Eigen::VectorXd max_limits(6);
+  for(int ii=0; ii<6; ii+=2) {
+    min_limits[ii] = -SP_PI_QUART;
+    max_limits[ii] = SP_PI_QUART;
+  }
+  for(int ii=1; ii<6; ii+=2) {
+    min_limits[ii] = -200;
+    max_limits[ii] = 200;
+  }
+  ceres::CostFunction* loss_function = new ParamLimitLossFunc<6>(min_limits,max_limits,100);
 
   double parameters[6];
   for (int ii = 0; ii < 6; ++ii) {

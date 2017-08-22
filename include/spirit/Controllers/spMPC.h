@@ -4,7 +4,7 @@
 #include <spirit/spGeneralTools.h>
 #include <spirit/spirit.h>
 #include <spirit/MPCCostFunc.h>
-#include <spirit/MPCLossFunc.h>
+#include <spirit/ParamLimitLossFunc.h>
 
 class spMPC {
  public:

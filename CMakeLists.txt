@@ -79,8 +79,7 @@ set( HDRS
 	include/spirit/Planners/spLocalPlanner.h
 	include/spirit/Controllers/spMPC.h
 	include/spirit/MPCCostFunc.h
-	include/spirit/MPCLossFunc.h
-	include/spirit/LocalPlannerLossFunc.h
+	include/spirit/ParamLimitLossFunc.h
 	)
 
 set( SRCS

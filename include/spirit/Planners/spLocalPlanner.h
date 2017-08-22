@@ -4,7 +4,7 @@
 #include <spirit/Planners/spTrajectory.h>
 #include <spirit/CarSimFunctor.h>
 #include <spirit/VehicleCeresCostFunc.h>
-#include <spirit/LocalPlannerLossFunc.h>
+#include <spirit/ParamLimitLossFunc.h>
 
 class spLocalPlanner {
  public:
