@@ -45,6 +45,16 @@ spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index,
   // unlimitted in tire axis, fixed in one direction and limitted in steering direction(set upper/lower to 0/0 if its not supposed to be steering)
   hinge_->setAngularLowerLimit(btVector3(1,0,vehicle_info.steering_servo_lower_limit));
   hinge_->setAngularUpperLimit(btVector3(-1,0,vehicle_info.steering_servo_upper_limit));
+  // set motor torque
+  if(vehicle_info.engine_torque < MIN_ENGINE_TORQUE) {
+    hinge_->setMaxMotorForce(drive_motor_axis,MIN_ENGINE_TORQUE*WSCALE*WSCALE);
+  } else {
+    hinge_->setMaxMotorForce(drive_motor_axis,vehicle_info.engine_torque*WSCALE*WSCALE);
+  }
+  // set steering servo torque and max velocity
+  hinge_->setMaxMotorForce(steering_servo_axis,vehicle_info.steering_servo_torque*WSCALE*WSCALE);
+  hinge_->setTargetVelocity(steering_servo_axis,vehicle_info.steering_servo_max_velocity);
+
   // add the hinge constraint to the world and disable collision between bodyA/bodyB
   dynamics_world->addConstraint(hinge_.get(),true);
 }
@@ -96,14 +106,12 @@ void spWheel::SetSteeringServoLowerLimit(double limit)
 
 void spWheel::SetSteeringServoUpperLimit(double limit)
 {
-//  steering_servo_upper_limit_ = limit;
   hinge_->setAngularUpperLimit(btVector3(-1,0,limit));
 
 }
 
 void spWheel::SetSteeringServoMaxVelocity(double velocity)
 {
-//  steering_servo_max_velocity_ = velocity;
   hinge_->setTargetVelocity(steering_servo_axis,velocity);
 
 }
@@ -133,10 +141,10 @@ void spWheel::SetDriveMotorTargetVelocity(double velocity)
   hinge_->setTargetVelocity(drive_motor_axis,velocity);
 }
 
-void spWheel::SetDriveMotorTorque(double torque)
-{
-  hinge_->setMaxMotorForce(drive_motor_axis,torque*WSCALE*WSCALE);
-}
+//void spWheel::SetDriveMotorTorque(double torque)
+//{
+//  hinge_->setMaxMotorForce(drive_motor_axis,torque*WSCALE*WSCALE);
+//}
 
 const spTranslation& spWheel::GetChassisAnchor()
 {

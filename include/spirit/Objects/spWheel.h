@@ -18,7 +18,7 @@ public:
   void SetSteeringServoMaxVelocity(double velocity);
   void SetSteeringServoTorque(double torque);
   void SetDriveMotorTargetVelocity(double velocity);
-  void SetDriveMotorTorque(double torque);
+//  void SetDriveMotorTorque(double torque);
   const spTranslation& GetChassisAnchor();
   double GetSteeringServoCurrentAngle();
   void SetSteeringServoTargetAngle(double angle);

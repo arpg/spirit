@@ -37,8 +37,11 @@ spirit::spirit(spSettings& user_settings) {
   car_param.susp_lower_limit = -0.028;
   car_param.wheel_mass = 0.1;
   car_param.chassis_mass = 5;
+  car_param.engine_torque = 100;
   car_param.steering_servo_lower_limit = -SP_PI / 4;
   car_param.steering_servo_upper_limit = SP_PI / 4;
+  car_param.steering_servo_max_velocity = 100;
+  car_param.steering_servo_torque = 100;
 }
 
 spirit::~spirit() {}
@@ -61,13 +64,12 @@ void spirit::DummyTests() {
   ((spBox&)objects_.GetObject(gnd_handle)).SetRollingFriction(0.1);
   gui_.AddObject(objects_.GetObject(gnd_handle));
 
+  car_param.steering_servo_max_velocity = 100;
+  car_param.steering_servo_torque = 100;
   spObjectHandle car_handle = objects_.CreateVehicle(car_param);
   gui_.AddObject(objects_.GetObject(car_handle));
   spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
-  car.SetEngineTorque(10);
   car.SetEngineMaxVel(10);
-  car.SetSteeringServoMaxVel(100);
-  car.SetSteeringServoTorque(100);
   car.SetRearSteeringAngle(0);
   car.SetFrontSteeringAngle(SP_PI/4);
 
@@ -204,24 +206,24 @@ int i=0;
 void spirit::zibil() {
   car_param.wheel_friction = 0.9;
   car_param.chassis_mass = 180;
+  car_param.engine_torque = 0.01;
+  car_param.steering_servo_max_velocity = 100;
+  car_param.steering_servo_torque = 10;
   spObjectHandle car1_handle = objects_.CreateVehicle(car_param);
   gui_.AddObject(objects_.GetObject(car1_handle));
   spAWSDCar& car1 = (spAWSDCar&) objects_.GetObject(car1_handle);
-  car1.SetEngineTorque(0.01);
   car1.SetEngineMaxVel(200);
-  car1.SetSteeringServoMaxVel(100);
-  car1.SetSteeringServoTorque(10);
   car1.SetRearSteeringAngle(0);
   car1.SetFrontSteeringAngle(0);
 
   car_param.pose.translate(spTranslation(0.2,0,0));
+  car_param.engine_torque = 0.001;
+  car_param.steering_servo_max_velocity = 100;
+  car_param.steering_servo_torque = 10;
   spObjectHandle car2_handle = objects_.CreateVehicle(car_param);
   gui_.AddObject(objects_.GetObject(car2_handle));
   spAWSDCar& car2 = (spAWSDCar&) objects_.GetObject(car2_handle);
-  car2.SetEngineTorque(0.1);
   car2.SetEngineMaxVel(200);
-  car2.SetSteeringServoMaxVel(100);
-  car2.SetSteeringServoTorque(10);
   car2.SetRearSteeringAngle(0);
   car2.SetFrontSteeringAngle(0);
 
@@ -244,13 +246,6 @@ void spirit::SenarioControllerTest() {
   spObjectHandle car_handle = objects_.CreateVehicle(car_param);
   gui_.AddObject(objects_.GetObject(car_handle));
   spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
-  car.SetEngineTorque(100);
-  car.SetEngineMaxVel(100);
-  car.SetSteeringServoMaxVel(100);
-  car.SetSteeringServoTorque(100);
-  car.SetRearSteeringAngle(0);
-  car.SetFrontSteeringAngle(0);
-
 
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
@@ -446,7 +441,6 @@ void spirit::ScenarioPIDController() {
   gui_.AddObject(objects_.GetObject(obj_car_index));
   spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
   car.SetEngineMaxVel(10);
-  car.SetEngineTorque(10);
   // create and add a ground as a box to objects_ vector
   spPose ground(spPose::Identity());
   ground.translate(spTranslation(0, 0, -0.5));

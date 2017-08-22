@@ -85,11 +85,6 @@ class CarSimFunctor {
 //    if(init_state != nullptr) {
 //      car.SetState(init_state);
 //    }
-    car.SetEngineMaxVel(100);
-    car.SetEngineTorque(100);
-    car.SetSteeringServoMaxVel(100);
-    car.SetSteeringServoTorque(100);
-    car.SetRearSteeringAngle(0);
     spCurve control_curve(2, 2);
     control_curve.SetBezierControlPoints(cntrl_vars);
     spPointXd sample_control(2);

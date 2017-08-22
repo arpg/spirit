@@ -9,12 +9,9 @@ spAWSDCar::spAWSDCar(const spVehicleConstructionInfo& vehicle_info, std::shared_
   for(int ii=0;ii<4;ii++)
   {
     GetWheel(ii)->EnableSteeringServo(true);
-    GetWheel(ii)->SetSteeringServoMaxVelocity(0);
-    GetWheel(ii)->SetSteeringServoTorque(10);
     GetWheel(ii)->SetSteeringServoTargetAngle(0);
     GetWheel(ii)->EnableDriveMotor(true);
     GetWheel(ii)->SetDriveMotorTargetVelocity(0);
-    GetWheel(ii)->SetDriveMotorTorque(10);
   }
 }
 
@@ -37,28 +34,15 @@ void spAWSDCar::SetEngineMaxVel(double vel) {
   }
 }
 
-void spAWSDCar::SetEngineTorque(double torque) {
-  // bullet doesn't like zero torque
-  if(torque == 0) {
-    torque = 1e-10;
-  }
-  for(int ii=0;ii<4;ii++) {
-    GetWheel(ii)->SetDriveMotorTorque(torque);
-  }
-}
+//void spAWSDCar::SetSteeringServoMaxVel(double vel){
+//  for(int ii=0;ii<4;ii++) {
+//    GetWheel(ii)->SetSteeringServoMaxVelocity(vel);
+//  }
+//}
 
-void spAWSDCar::SetSteeringServoMaxVel(double vel){
-  for(int ii=0;ii<4;ii++) {
-    GetWheel(ii)->SetSteeringServoMaxVelocity(vel);
-  }
-}
+//void spAWSDCar::SetSteeringServoTorque(double torque){
+//  for(int ii=0;ii<4;ii++) {
+//    GetWheel(ii)->SetSteeringServoTorque(torque);
+//  }
+//}
 
-void spAWSDCar::SetSteeringServoTorque(double torque){
-  for(int ii=0;ii<4;ii++) {
-    GetWheel(ii)->SetSteeringServoTorque(torque);
-  }
-}
-
-void spAWSDCar::ApplyTransmissionDifferentialCoupling() {
-
-}

@@ -42,6 +42,9 @@
 // Trajectory discretization step size in seconds
 #define DISCRETIZATION_STEP_SIZE 0.1
 
+// Minimum Engine torque, bullet doesn't like zero torques, if you need a passive wheel just disable the motor.
+#define MIN_ENGINE_TORQUE 1e-10
+
 #define BIT(x) (1<<(x))
 enum BulletCollissionType{
   COL_NOTHING = 0,      // Collide with nothing
@@ -241,7 +244,10 @@ struct spVehicleConstructionInfo{
   double susp_upper_limit;
   double steering_servo_lower_limit;
   double steering_servo_upper_limit;
+  double steering_servo_torque;
+  double steering_servo_max_velocity;
   double wheel_mass;
+  double engine_torque;
 
   spVehicleConstructionInfo(){
     vehicle_type = spObjectType::VEHICLE_AWSD;
@@ -262,7 +268,10 @@ struct spVehicleConstructionInfo{
     susp_upper_limit = 0;
     steering_servo_lower_limit = 0;
     steering_servo_upper_limit = 0;
+    steering_servo_torque = 0;
+    steering_servo_max_velocity = 0;
     wheel_mass = 0;
+    engine_torque = 0;
   }
   spVehicleConstructionInfo(const spVehicleConstructionInfo& v)
     : vehicle_type(v.vehicle_type),
@@ -283,7 +292,10 @@ struct spVehicleConstructionInfo{
       susp_upper_limit(v.susp_upper_limit),
       steering_servo_lower_limit(v.steering_servo_lower_limit),
       steering_servo_upper_limit(v.steering_servo_upper_limit),
-      wheel_mass(v.wheel_mass) {
+      steering_servo_torque(v.steering_servo_torque),
+      steering_servo_max_velocity(v.steering_servo_max_velocity),
+      wheel_mass(v.wheel_mass),
+      engine_torque(v.engine_torque) {
     for(int ii=0;ii<v.wheels_anchor.size();ii++) {
       wheels_anchor.push_back(v.wheels_anchor[ii]);
     }
