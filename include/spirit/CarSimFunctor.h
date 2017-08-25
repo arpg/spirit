@@ -63,10 +63,11 @@ class CarSimFunctor {
   void RunInThread(int thread_id, double num_sim_steps, double step_size,
                    const spCtrlPts2ord_2dof& cntrl_vars, double epsilon,
                    int pert_index,
-                   std::shared_ptr<spStateSeries> traj_states = nullptr) {
+                   std::shared_ptr<spStateSeries> traj_states = nullptr,
+                   std::shared_ptr<spState> init_state = nullptr) {
     thread_ = std::make_unique<std::thread>(
         &CarSimFunctor::operator(), this, thread_id, num_sim_steps, step_size,
-        cntrl_vars, epsilon, pert_index, traj_states);
+        cntrl_vars, epsilon, pert_index, traj_states,init_state);
   }
 
   void WaitForThreadJoin() {
@@ -77,14 +78,14 @@ class CarSimFunctor {
   void operator()(int thread_id, double num_sim_steps, double step_size,
                   const spCtrlPts2ord_2dof& cntrl_vars, double epsilon,
                   int pert_index,
-                  std::shared_ptr<spStateSeries> traj_states = nullptr) {
-//                  const spState& init_state = initial_state_ ) {
+                  std::shared_ptr<spStateSeries> traj_states = nullptr,
+                  std::shared_ptr<spState> init_state = nullptr ) {
     spBox& gnd = (spBox&)objects_->GetObject(gnd_handle_);
     gnd.SetFriction(1);
     spAWSDCar& car = (spAWSDCar&)objects_->GetObject(car_handle_);
-//    if(init_state != nullptr) {
-//      car.SetState(init_state);
-//    }
+    if(init_state != nullptr) {
+      car.SetState(*init_state);
+    }
     spCurve control_curve(2, 2);
     control_curve.SetBezierControlPoints(cntrl_vars);
     spPointXd sample_control(2);
@@ -116,10 +117,10 @@ class CarSimFunctor {
     return ((spAWSDCar&)objects_->GetObject(car_handle_)).GetState();
   }
 
-  void SetState(const spState& state) {
-    spAWSDCar& car = (spAWSDCar&)objects_->GetObject(car_handle_);
-    car.SetState(state);
-  }
+//  void SetState(const spState& state) {
+//    spAWSDCar& car = (spAWSDCar&)objects_->GetObject(car_handle_);
+//    car.SetState(state);
+//  }
 
  public:
   const spVehicleConstructionInfo& vehicle_info_;

@@ -147,6 +147,27 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
 //  std::cout << summary.FullReport() << std::endl;
+
+  // calculate final Covariance
+  /*
+  ceres::Covariance::Options cov_options;
+  cov_options.num_threads = 1;
+  ceres::Covariance covariance(cov_options);
+  std::vector<const double*> covariance_blocks;
+  covariance_blocks.push_back(parameters);
+  CHECK(covariance.Compute(covariance_blocks, &problem));
+  double covariance_xx[6 * 6];
+  covariance.GetCovarianceBlock(parameters, parameters, covariance_xx);
+  std::cout << "covariance is "  << std::endl;
+  for(int ii=0;ii<6;ii++) {
+    for(int jj=0;jj<6;jj++) {
+      std::cout << "\t" << covariance_xx[ii*6+jj] ;
+    }
+    std::cout  << std::endl;
+  }
+  std::cout << std::endl;
+  */
+
   for (int ii = 0; ii < 6; ++ii) {
     controls.data()[ii] = parameters[ii];
   }

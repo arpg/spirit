@@ -67,20 +67,18 @@ void spCommonObject::CreateRigidBody(double mass, const btTransform& tr, std::sh
 	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
 	motion_state_ = std::make_shared<btDefaultMotionState>(tr);
 	btRigidBody::btRigidBodyConstructionInfo cInfo(mass,motion_state_.get(),shape.get(),localInertia);
-//	std::shared_ptr<btRigidBody> body = std::make_shared<btRigidBody>(cInfo);
 	rigid_body_ = std::make_shared<btRigidBody>(cInfo);
 //	body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
-//	return body;
 }
 
+// this function has some error when converting from type to another (about 1e-14). its related to bit accuracy of floating point and operations in Eigen Transform.
 void spCommonObject::spPose2btTransform(const spPose& pose, btTransform& tr) {
-//  std::shared_ptr<btTransform> tr = std::make_shared<btTransform>();
   tr.setOrigin(btVector3(pose.translation()[0],pose.translation()[1],pose.translation()[2])*WSCALE);
   spRotation q(pose.rotation());
   tr.setRotation(btQuaternion(q.x(),q.y(),q.z(),q.w()));
-//  return tr;
 }
 
+// this function has some error when converting from type to another (about 1e-14). its related to bit accuracy of floating point and operations in Eigen Transform.
 void spCommonObject::btTransform2spPose(const btTransform& tr, spPose& pose) {
   pose = spPose::Identity();
   pose.translate(spTranslation(tr.getOrigin()[0],tr.getOrigin()[1],tr.getOrigin()[2])*WSCALE_INV);

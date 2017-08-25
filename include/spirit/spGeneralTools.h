@@ -5,7 +5,6 @@
 #include <sys/stat.h>
 #include <chrono>
 #include <thread>
-#include <spirit/Types/spTypes.h>
 #include <pangolin/pangolin.h>
 #include <iostream>
 #include <stdio.h>
@@ -13,6 +12,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 
 class spGeneralTools {
  public:

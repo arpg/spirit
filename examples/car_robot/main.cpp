@@ -61,7 +61,6 @@ int main(int argc, char** argv) {
   spSettings settings_obj;
   settings_obj.SetGuiType(spGuiType::GUI_PANGOSCENEGRAPH);
   settings_obj.SetPhysicsEngineType(spPhyEngineType::PHY_BULLET);
-  settings_obj.SetNumThreads(1);
 
   spirit sp_world(settings_obj);
 //  sp_world.ScenarioPlannerTest();
@@ -71,6 +70,7 @@ int main(int argc, char** argv) {
 
 //  sp_world.multithreadtest();
   sp_world.SenarioControllerTest();
+//  sp_world.SenarioCalibrationTest();
 //  sp_world.zibil();
 //  sp_world.DummyTests();
 

@@ -9,9 +9,11 @@
 #include <functional>
 #include <spirit/Planners/spLocalPlanner.h>
 #include <spirit/Controllers/spMPC.h>
+#include <spirit/Calibration/CandidateWindow.h>
+#include <spirit/Calibration/PriorityQueue.h>
 #include <iomanip>
 
-class spirit{
+class spirit {
 public:
   spirit(spSettings& user_settings);
   ~spirit();
@@ -29,14 +31,16 @@ public:
   void SenarioControllerTest();
   void multithreadtest();
   void zibil();
+  void SenarioCalibrationTest();
+  Objects objects_;
+  Gui gui_;
+  spVehicleConstructionInfo car_param;
 
 private:
   void InitCarPool(int num_cars);
   std::vector<Objects> pool_objects_vec_;
   std::vector<std::thread> pool_threads_vec_;
-  Gui gui_;
   spSettings user_settings_;
-  Objects objects_;
   spObjectHandle obj_gnd_index;
   spObjectHandle obj_box_index;
   spObjectHandle obj_car_index;
@@ -46,7 +50,6 @@ private:
   spObjectHandle obj_waypoint_index1;
   spObjectHandle obj_waypoint_index2;
   spObjectHandle obj_linestrip_index;
-  spVehicleConstructionInfo car_param;
 };
 
 #endif  //SPIRIT_H__

@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <spirit/spGeneralTools.h>
 
 #define BT_USE_DOUBLE_PRECISION
 
@@ -105,6 +106,7 @@ public:
     for(int ii=0; ii<state.substate_vec.size(); ii++) {
       InsertSubstate(state.substate_vec[ii]);
     }
+    time_stamp = state.time_stamp;
   }
 
   spState& operator=(const spState& rhs) {
@@ -149,8 +151,8 @@ public:
 //    result.rotvel = rotvel*rhs.rotvel.inverse();
 //    result.rotvel.angle() = rotvel.angle()-rhs.rotvel.angle();
 //    result.rotvel.axis() = rotvel.axis()-rhs.rotvel.axis();
-//    result.front_steering = front_steering - rhs.front_steering;
-//    result.rear_steering = rear_steering - rhs.rear_steering;
+    state.front_steering = front_steering - rhs.front_steering;
+    state.rear_steering = rear_steering - rhs.rear_steering;
     return state;
   }
 
@@ -199,8 +201,9 @@ public:
     linvel = spLinVel::Zero();
     rotvel = spRotVel::Zero();
     wheel_speeds = spWheelSpeedVec::Zero();
-    front_steering = Eigen::Quaterniond::Identity();
-    rear_steering = Eigen::Quaterniond::Identity();
+    front_steering = 0;
+    rear_steering = 0;
+    time_stamp = spGeneralTools::Tick();
     substate_vec.clear();
   }
 
@@ -208,14 +211,15 @@ public:
   spLinVel linvel;
   spRotVel rotvel;
   spWheelSpeedVec wheel_speeds;
-  Eigen::Quaterniond front_steering;
-  Eigen::Quaterniond rear_steering;
+  spTimestamp time_stamp;
+  double front_steering;
+  double rear_steering;
+  std::pair<double,double> controls;
   std::vector<std::shared_ptr<spState>> substate_vec;
 private:
 //  spStateVec state_vec_;
 };
 
-typedef std::chrono::high_resolution_clock::time_point spTimestamp;
 typedef Eigen::Matrix4d spMat4x4;
 
 enum class spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};

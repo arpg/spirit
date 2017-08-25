@@ -25,8 +25,6 @@ public:
   spPhyEngineType GetPhysicsEngineType();
   void SetGuiParamFilePath(std::string& file_path);
   std::string GetGuiParamFilePath();
-  void SetNumThreads(unsigned int num_threads);
-  int GetNumThreads();
 
 private:
   spGuiType gui_type_;

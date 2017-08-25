@@ -132,11 +132,11 @@ std::shared_ptr<spWheel> spVehicle::GetWheel(int index)
 }
 
 void spVehicle::SetChassisLinearVelocity(const spLinVel& linear_vel) {
-  rigid_body_->setLinearVelocity(btVector3(linear_vel[0],linear_vel[1],linear_vel[2]));
+  rigid_body_->setLinearVelocity(btVector3(linear_vel[0],linear_vel[1],linear_vel[2])*WSCALE);
 }
 
 const spLinVel& spVehicle::GetChassisLinearVelocity() {
-  ch_linvel_ = spLinVel(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2]);
+  ch_linvel_ = spLinVel(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2])*WSCALE_INV;
   return ch_linvel_;
 }
 
@@ -157,6 +157,7 @@ const spState& spVehicle::GetState() {
   state_.pose = GetPose();
   state_.linvel = GetChassisLinearVelocity();
   state_.rotvel = GetChassisAngularVelocity();
+  state_.front_steering = 0.5*(GetWheel(0)->GetSteeringServoCurrentAngle()+GetWheel(3)->GetSteeringServoCurrentAngle());
   for(int ii=0; ii<GetNumberOfWheels(); ii++) {
     state_.substate_vec[ii]->pose = GetWheel(ii)->GetPose();
     state_.substate_vec[ii]->linvel = GetWheel(ii)->GetLinVel();
@@ -213,7 +214,7 @@ void spVehicle::SetState(const spState& state){
   SetChassisAngularVelocity(state.rotvel);
 //  for(int ii=0; ii<GetNumberOfWheels(); ii++) {
   for(int ii=0; ii<state.substate_vec.size(); ii++) {
-    GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
+//    GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
     GetWheel(ii)->SetPose(state.substate_vec[ii]->pose);
     GetWheel(ii)->SetLinVel(state.substate_vec[ii]->linvel);
     GetWheel(ii)->SetAngularVel(state.substate_vec[ii]->rotvel);

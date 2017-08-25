@@ -33,7 +33,7 @@ double spGeneralTools::TickTock_ms(spTimestamp tick_time,spTimestamp tock_time) 
 }
 
 void spGeneralTools::PlotXY(std::vector<double>& x_axis, std::string xlabel, std::string ylabel) {
-  pangolin::CreateWindowAndBind("Main",640,480);
+  pangolin::CreateWindowAndBind("PlotXY Window",640,480);
 
   // Data logger object
   pangolin::DataLog log;

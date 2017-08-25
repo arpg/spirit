@@ -55,8 +55,6 @@ set( HDRS
 	include/spirit/spirit.h
 	include/spirit/Gui/spCommonGui.h
 	include/spirit/Gui/spPangolinScenegraphGui.h
-#	include/spirit/Physics/spPhysicsWorld.h
-#	include/spirit/Physics/spBulletWorld.h
 	include/spirit/Objects.h
 	include/spirit/Gui.h
 	include/spirit/spGeneralTools.h
@@ -80,6 +78,8 @@ set( HDRS
 	include/spirit/Controllers/spMPC.h
 	include/spirit/MPCCostFunc.h
 	include/spirit/ParamLimitLossFunc.h
+	include/spirit/Calibration/PriorityQueue.h
+	include/spirit/Calibration/CandidateWindow.h
 	)
 
 set( SRCS

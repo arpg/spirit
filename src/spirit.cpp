@@ -29,7 +29,7 @@ spirit::spirit(spSettings& user_settings) {
   car_param.wheel_rollingfriction = 0.3;
   car_param.wheel_friction = 0.5;
   car_param.wheel_width = 0.04;
-  car_param.wheel_radius = 0.057;
+  car_param.wheel_radius = 0.05;//0.057;
   car_param.susp_damping = 0;
   car_param.susp_stiffness = 10;
   car_param.susp_preloading_spacer = 0.1;
@@ -205,41 +205,52 @@ int i=0;
 
 void spirit::zibil() {
   car_param.wheel_friction = 0.9;
-  car_param.chassis_mass = 180;
-  car_param.engine_torque = 0.01;
+//  car_param.chassis_mass = 180;
   car_param.steering_servo_max_velocity = 100;
   car_param.steering_servo_torque = 10;
+  car_param.engine_torque = 0.01;
   spObjectHandle car1_handle = objects_.CreateVehicle(car_param);
   gui_.AddObject(objects_.GetObject(car1_handle));
   spAWSDCar& car1 = (spAWSDCar&) objects_.GetObject(car1_handle);
-  car1.SetEngineMaxVel(200);
+  car1.SetEngineMaxVel(0);
   car1.SetRearSteeringAngle(0);
   car1.SetFrontSteeringAngle(0);
 
-  car_param.pose.translate(spTranslation(0.2,0,0));
-  car_param.engine_torque = 0.001;
-  car_param.steering_servo_max_velocity = 100;
-  car_param.steering_servo_torque = 10;
-  spObjectHandle car2_handle = objects_.CreateVehicle(car_param);
-  gui_.AddObject(objects_.GetObject(car2_handle));
-  spAWSDCar& car2 = (spAWSDCar&) objects_.GetObject(car2_handle);
-  car2.SetEngineMaxVel(200);
-  car2.SetRearSteeringAngle(0);
-  car2.SetFrontSteeringAngle(0);
+//  car_param.pose.translate(spTranslation(0.2,0,0));
+//  car_param.engine_torque = 0.01;
+//  spObjectHandle car2_handle = objects_.CreateVehicle(car_param);
+//  gui_.AddObject(objects_.GetObject(car2_handle));
+//  spAWSDCar& car2 = (spAWSDCar&) objects_.GetObject(car2_handle);
+//  car2.SetEngineMaxVel(40);
+//  car2.SetRearSteeringAngle(0);
+//  car2.SetFrontSteeringAngle(SP_PI_QUART);
 
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
-  spObjectHandle gnd_handle = objects_.CreateBox(gnd_pose_,spBoxSize(200,200,1),0,spColor(0,1,0));
+  spObjectHandle gnd_handle = objects_.CreateBox(gnd_pose_,spBoxSize(10,10,1),0,spColor(0,1,0));
   gui_.AddObject(objects_.GetObject(gnd_handle));
   ((spBox&)objects_.GetObject(gnd_handle)).SetFriction(1);
   ((spBox&)objects_.GetObject(gnd_handle)).SetRollingFriction(0.1);
+  objects_.StepPhySimulation(0.5);
+  car1.SetEngineMaxVel(10);
+  objects_.StepPhySimulation(2);
 
+int cnt = 0;
   while(1){
-    objects_.StepPhySimulation(0.01);
+    if(cnt == 300) {
+//      car1.SetState(car2.GetState());
+      cnt = 0;
+    } else {
+      cnt++;
+    }
+//    objects_.StepPhySimulation(0.01);
     gui_.Iterate(objects_);
   }
 }
 
+void spirit::SenarioCalibrationTest() {
+
+}
 
 void spirit::SenarioControllerTest() {
   // Create vehicle
@@ -271,7 +282,7 @@ void spirit::SenarioControllerTest() {
     pose.translate(spTranslation(x,y,0.07));
     Eigen::AngleAxisd rot(angle+SP_PI_HALF,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
-    traj.AddWaypoint(pose,30);
+    traj.AddWaypoint(pose,4);
   }
   gui_.Iterate(objects_);
   traj.IsLoop(true);
@@ -303,8 +314,6 @@ void spirit::SenarioControllerTest() {
   spMPC mpc(car_param,horizon);
 
   while(1){
-//    controls.col(1) = Eigen::Vector2d(0,0);
-//    controls.col(2) = Eigen::Vector2d(0,0);
     spTimestamp t0 = spGeneralTools::Tick();
     if(mpc.CalculateControls(traj,car.GetState(),controls)) {
       spCurve controls_curve(2,2);
@@ -326,6 +335,7 @@ void spirit::SenarioControllerTest() {
     }
   }
 }
+
 
 
 void spirit::multithreadtest() {

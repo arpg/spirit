@@ -11,10 +11,6 @@ spLocalPlanner::~spLocalPlanner() {
 void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simulation_duration, const spState& current_state, const spWaypoint& end_waypoint) {
   ceres::Problem problem;
   spState goal_state;
-  spPose a;
-  spPose b;
-  const spPose& c(b);
-  a = c;
   goal_state.pose = spPose(end_waypoint.GetPose());
   goal_state.linvel = spLinVel(end_waypoint.GetLinearVelocity());
   Eigen::VectorXd residual_weight(13);

@@ -160,6 +160,8 @@ void spPangolinScenegraphGui::AddVehicle(spVehicle& vehicle)
 
   for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
     SceneGraph::GLCylinder glwheel;
+    spColor c(vehicle.GetWheel(ii)->GetColor()*255);
+    glwheel.SetColor(SceneGraph::GLColor(c[0],c[1],c[2],255));
     glwheel.Init(vehicle.GetWheel(ii)->GetRadius(),vehicle.GetWheel(ii)->GetRadius(),vehicle.GetWheel(ii)->GetWidth(),20,1);
     glwheel.SetPose(vehicle.GetWheel(ii)->GetPose().matrix());
     globjects_.push_back(new SceneGraph::GLCylinder(glwheel));
@@ -235,6 +237,10 @@ void spPangolinScenegraphGui::UpdateVehicleGuiObject(spVehicle& vehicle) {
     glwheelpose.rotate(ang);
     glwheelpose.translate(spTranslation(0,0,-vehicle.GetWheel(ii)->GetWidth()/2));
     globjects_[wheel_index]->SetPose(glwheelpose.matrix());
+    // change wheel color based on its drifting value
+    double diff = std::abs(vehicle.GetWheel(ii)->GetLinVel().norm()-(vehicle.GetWheel(ii)->GetWheelSpeed()*0.159155*2*3.14*vehicle.GetWheel(ii)->GetRadius()));
+    spColor c(vehicle.GetWheel(ii)->GetColor()*255);
+    ((SceneGraph::GLCylinder*)globjects_[wheel_index])->SetColor(SceneGraph::GLColor(diff*100,c[1],c[2],255));
   }
 }
 

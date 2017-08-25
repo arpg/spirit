@@ -2,7 +2,7 @@
 
 
 spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index, std::shared_ptr<btRigidBody> chassis_body, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world) {
-  color_ = spColor(0,0,0);
+  color_ = spColor(1,1,1);
   index_gui_ = -1;
   obj_guichanged_ = false;
   modifiable_gui_ = false;
@@ -192,12 +192,12 @@ const spRotVel& spWheel::GetRotVel(){
 }
 
 const spLinVel& spWheel::GetLinVel(){
-  linvel_ = spLinVel(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2]);
+  linvel_ = spLinVel(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2])*WSCALE_INV;
   return linvel_;
 }
 
 void spWheel::SetLinVel(const spLinVel& vel) {
-  rigid_body_->setLinearVelocity(btVector3(vel[0],vel[1],vel[2]));
+  rigid_body_->setLinearVelocity(btVector3(vel[0],vel[1],vel[2])*WSCALE);
 }
 
 void spWheel::SetAngularVel(const spRotVel& vel) {
