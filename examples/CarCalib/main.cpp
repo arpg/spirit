@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
 #ifdef SIM_CALIB
   // create a simulated car
-  spworld.car_param.wheel_friction = 0.4;
+  spworld.car_param.wheel_friction = 0.3;
   spworld.car_param.wheel_rollingfriction = 0.1;
   spworld.car_param.engine_torque = 0.0001;
   spworld.car_param.chassis_mass = 5;
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
   // create a flat ground
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
-  spObjectHandle gnd_handle = spworld.objects_.CreateBox(gnd_pose_,spBoxSize(20,20,1),0,spColor(0,1,0));
+  spObjectHandle gnd_handle = spworld.objects_.CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
   spworld.gui_.AddObject(spworld.objects_.GetObject(gnd_handle));
   // set ground friction
   ((spBox&)spworld.objects_.GetObject(gnd_handle)).SetFriction(1);
@@ -60,15 +60,15 @@ int main(int argc, char** argv) {
 
 #endif
 
-  unsigned int window_size = 100;
+  unsigned int window_size = 400;
   unsigned int queue_size = 5;
   double batch_min_entropy = 10;
   // create a candidate_window and a priority queue
   PriorityQueue priority_queue(queue_size);
   // create a new candidate window
   std::shared_ptr<CandidateWindow> candidate_window = std::make_shared<CandidateWindow>(window_size);
-  steering_signal = 0.3;
-  throttle_signal = 60;
+//  steering_signal = 0.3;
+//  throttle_signal = 60;
   while(spworld.ShouldRun()) {
     // Get Car's Pose
     spPose vicon_pose;
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
     car.SetEngineMaxVel(throttle_signal);
     // step forward the simulated car
     spworld.objects_.StepPhySimulation(0.1);
-    std::cout << "WHEELS ARE " << car.GetState().wheel_speeds.transpose() << std::endl;
+    spGeneralTools::Delay_ms(100);
     spworld.gui_.Iterate(spworld.objects_);
 #endif
   }

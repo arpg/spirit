@@ -36,7 +36,7 @@ class CandidateWindow {
 //    residual_weight << 1,1,1,1,1,1,1E-9,1E-9,1E-9,1E-9,1E-9;
 //    residual_weight << 0,0,0,0,0,0,1,1,1,1,0;
 //    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
-    residual_weight << 1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1;
+    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
     ceres::CostFunction* cost_function = new CalibCostFunc(init_params,state_series_,residual_weight,gui);
 
 //    Eigen::VectorXd min_limits(6);
@@ -53,7 +53,7 @@ class CandidateWindow {
 
     double parameters[2];
     parameters[0] = 0.20;
-    parameters[1] = 0.1;
+    parameters[1] = 0.5;
     problem.AddResidualBlock(cost_function, NULL, parameters);
 //    problem.AddResidualBlock(loss_function,NULL,parameters);
 
@@ -64,7 +64,7 @@ class CandidateWindow {
     // Run the solver!
     ceres::Solver::Options options;
     options.initial_trust_region_radius = 0.8;
-    options.max_trust_region_radius = 1;
+    options.max_trust_region_radius = 10;
 //    options.min_trust_region_radius = 1e-3;
   //  options.parameter_tolerance = 1e-3;
     options.linear_solver_type = ceres::DENSE_QR;
@@ -100,11 +100,14 @@ class CandidateWindow {
   }
   // check if this state could be added to candidate window
   bool CheckPossibleCandidate(const spState& state) {
-//    if(state_series_.size()) {
+    if(state_series_.size()) {
 //      if(spGeneralTools::TickTock_ms(state_series_[state_series_.size()-1]->time_stamp,state.time_stamp)<10){
 //        return false;
 //      }
-//    }
+//      if((state_series_.back()->pose.translation()-state.pose.translation()).norm() < 0.2) {
+//        return false;
+//      }
+    }
     return true;
   }
 

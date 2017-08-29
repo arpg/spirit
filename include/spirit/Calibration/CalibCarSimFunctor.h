@@ -25,7 +25,7 @@ class CalibCarSimFunctor {
     car_handle_ = objects_->CreateVehicle(vehicle_params_);
     spPose gnd_pose_ = spPose::Identity();
     gnd_pose_.translate(spTranslation(0, 0, -0.5));
-    gnd_handle_ = objects_->CreateBox(gnd_pose_, spBoxSize(20, 20, 1), 0,
+    gnd_handle_ = objects_->CreateBox(gnd_pose_, spBoxSize(50, 50, 1), 0,
                                       spColor(1, 0, 0));
     spBox& gnd = (spBox&)objects_->GetObject(gnd_handle_);
     gnd.SetFriction(1);

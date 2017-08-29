@@ -30,24 +30,13 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
   ~CalibCostFunc() {}
   virtual bool Evaluate(double const* const* parameters, double* residuals,
                         double** jacobians)  const {
-    std::vector<std::shared_ptr<spStateSeries>> sim_traj;
-    // set parameters
-//    ((spTranslation)vehicle_info_.wheels_anchor[0])[1] = parameters[0][0]/2;
-//    ((spTranslation)vehicle_info_.wheels_anchor[1])[1] = -parameters[0][0]/2;
-//    ((spTranslation)vehicle_info_.wheels_anchor[2])[1] = -parameters[0][0]/2;
-//    ((spTranslation)vehicle_info_.wheels_anchor[3])[1] = parameters[0][0]/2;
-//    vehicle_info_.wheel_friction = parameters[0][1];
 
     if ((jacobians != NULL) && (residuals != NULL)) {
-//      std::cout << "jac called"  << std::endl;
-//      std::cout << "parameters are \n" << cntrl_vars << std::endl;
+      std::vector<std::shared_ptr<spStateSeries>> sim_traj;
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> jac(jacobians[0],num_residual_blocks_*17,2);
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*17,1);
       double epsilon = 0.1;
       std::vector<std::shared_ptr<CalibCarSimFunctor>> sims;
-//      for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
-//        sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0]+0.01,parameters[0][1]));
-//      }
       std::cout << std::fixed << std::setprecision(12) << "params are " << parameters[0][0] << "\t\t" << parameters[0][1] << std::endl;
 
       sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0]+epsilon,parameters[0][1]));
@@ -60,6 +49,7 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
         sims[ii]->operator()(ref_states_, sim_traj[ii]);
       }
 
+      // Enable folowing loop if using threaded simulation
 //      for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
 //          sims[ii]->WaitForThreadJoin();
 //      }
@@ -83,7 +73,6 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
 //      std::cout << " res -> \n" << res << std::endl;
 //      std::cout << "cost is " << res.norm() << std::endl;
     } else if (residuals != NULL) {
-//      std::cout << "res called " << std::endl;
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*17,1);
       std::shared_ptr<spStateSeries> curr_states = std::make_shared<spStateSeries>();
       CalibCarSimFunctor sims(vehicle_info_,parameters[0][0],parameters[0][1]);
