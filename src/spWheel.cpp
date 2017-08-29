@@ -16,9 +16,8 @@ spWheel::spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index,
   btTransform tr;
   tr.setIdentity();
   tr.setOrigin(btVector3(chassis_anchor[0],chassis_anchor[1],chassis_anchor[2]-vehicle_info.susp_preloading_spacer)*WSCALE);
-//  btCollisionShape* wheel_shape = new btCylinderShapeX(btVector3(vehicle_info.wheel_width/2,vehicle_info.wheel_radius,vehicle_info.wheel_radius)*WSCALE);
-//  btCollisionShape* wheel_shape = new btCapsuleShapeX((vehicle_info.wheel_radius)*WSCALE,(vehicle_info.wheel_width/2.0)*WSCALE);
   wheel_shape_ = std::make_shared<btCapsuleShapeX>((vehicle_info.wheel_radius)*WSCALE,(vehicle_info.wheel_width/2.0)*WSCALE);
+//  wheel_shape_ = std::make_shared<btCylinderShapeX>(btVector3(vehicle_info.wheel_width/2,vehicle_info.wheel_radius,vehicle_info.wheel_radius)*WSCALE);
 //  mass_ = vehicle_info.wheel_mass;
   CreateRigidBody(vehicle_info.wheel_mass,tr,wheel_shape_);
   std::shared_ptr<btRigidBody> bodyB = rigid_body_;

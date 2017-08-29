@@ -12,6 +12,11 @@
 #include <spirit/Calibration/CandidateWindow.h>
 #include <spirit/Calibration/PriorityQueue.h>
 #include <iomanip>
+#include <spirit/CarSimFunctor.h>
+#include <spirit/Planners/spTrajectory.h>
+#include <spirit/Planners/VehicleCeresCostFunc.h>
+#include <fstream>
+
 
 class spirit {
 public:

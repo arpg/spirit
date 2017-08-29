@@ -1,8 +1,4 @@
 #include <spirit/spirit.h>
-#include <spirit/CarSimFunctor.h>
-#include <spirit/Planners/spTrajectory.h>
-#include <spirit/VehicleCeresCostFunc.h>
-#include <fstream>
 
 spirit::spirit(spSettings& user_settings) {
   user_settings_ = user_settings;
@@ -204,11 +200,12 @@ int i=0;
 }
 
 void spirit::zibil() {
-  car_param.wheel_friction = 0.9;
+  car_param.wheel_friction = 0.0;
 //  car_param.chassis_mass = 180;
   car_param.steering_servo_max_velocity = 100;
   car_param.steering_servo_torque = 10;
   car_param.engine_torque = 0.01;
+//    car_param.pose.translate(spTranslation(0,0,1));
   spObjectHandle car1_handle = objects_.CreateVehicle(car_param);
   gui_.AddObject(objects_.GetObject(car1_handle));
   spAWSDCar& car1 = (spAWSDCar&) objects_.GetObject(car1_handle);
@@ -231,9 +228,12 @@ void spirit::zibil() {
   gui_.AddObject(objects_.GetObject(gnd_handle));
   ((spBox&)objects_.GetObject(gnd_handle)).SetFriction(1);
   ((spBox&)objects_.GetObject(gnd_handle)).SetRollingFriction(0.1);
-  objects_.StepPhySimulation(0.5);
-  car1.SetEngineMaxVel(10);
-  objects_.StepPhySimulation(2);
+//  objects_.StepPhySimulation(0.01);
+  spState st(car1.GetState());
+  st.linvel = spLinVel(0,10,0);
+  car1.SetState(st);
+  car1.SetEngineMaxVel(0);
+  objects_.StepPhySimulation(0.1);
 
 int cnt = 0;
   while(1){
@@ -282,7 +282,7 @@ void spirit::SenarioControllerTest() {
     pose.translate(spTranslation(x,y,0.07));
     Eigen::AngleAxisd rot(angle+SP_PI_HALF,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
-    traj.AddWaypoint(pose,4);
+    traj.AddWaypoint(pose,7);
   }
   gui_.Iterate(objects_);
   traj.IsLoop(true);

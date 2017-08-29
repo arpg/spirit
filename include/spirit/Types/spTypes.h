@@ -16,6 +16,7 @@
 
 // bullet definitions
 #define USE_MOTIONSTATE 1
+#define SP_EULER 2.718281
 #define SP_PI 3.14159265359
 #define SP_PI_HALF 1.57079632679
 #define SP_PI_QUART 0.78539816339
@@ -84,6 +85,7 @@ typedef Eigen::Matrix<double,2,3> spCtrlPts2ord_2dof;
 //typedef Eigen::Matrix<double,6,6> spPlannerJacobian;
 typedef Eigen::Matrix<double,8,4> spPlannerJacobian;
 typedef Eigen::Array<double,12,1> spStateVec;
+typedef Eigen::Array<double,17,1> spStateCalibVec;
 typedef Eigen::Array<double,8,1> spResidualVec;
 class spState;
 typedef std::vector<std::shared_ptr<spState>> spStateSeries;
@@ -107,6 +109,7 @@ public:
       InsertSubstate(state.substate_vec[ii]);
     }
     time_stamp = state.time_stamp;
+    current_controls = state.current_controls;
   }
 
   spState& operator=(const spState& rhs) {
@@ -123,6 +126,8 @@ public:
     for(int ii=0; ii<rhs.substate_vec.size(); ii++) {
       InsertSubstate(rhs.substate_vec[ii]);
     }
+    time_stamp = rhs.time_stamp;
+    current_controls = rhs.current_controls;
     return *this;
   }
 
@@ -153,6 +158,7 @@ public:
 //    result.rotvel.axis() = rotvel.axis()-rhs.rotvel.axis();
     state.front_steering = front_steering - rhs.front_steering;
     state.rear_steering = rear_steering - rhs.rear_steering;
+    state.wheel_speeds = wheel_speeds - rhs.wheel_speeds;
     return state;
   }
 
@@ -181,6 +187,38 @@ public:
     return vec;
   }
 
+  const spStateCalibVec calibvector() const{
+    spStateCalibVec vec;
+    vec[0] = pose.translation()[0];
+    vec[1] = pose.translation()[1];
+    vec[2] = pose.translation()[2];
+
+    Eigen::AngleAxisd angleaxis(pose.rotation());
+    Eigen::Vector3d rotvec(angleaxis.angle()*angleaxis.axis());
+    vec[3] = rotvec[0];
+    vec[4] = rotvec[1];
+    vec[5] = rotvec[2];
+
+    vec[6] = wheel_speeds[0];
+    vec[7] = wheel_speeds[1];
+    vec[8] = wheel_speeds[2];
+    vec[9] = wheel_speeds[3];
+
+    vec[10] = front_steering;
+
+    vec[11] = linvel[0];
+    vec[12] = linvel[1];
+    vec[13] = linvel[2];
+
+//    Eigen::Vector3d rotvelvec(rotvel.angle()*rotvel.axis());
+    Eigen::Vector3d rotvelvec(rotvel);
+    vec[14] = rotvelvec[0];
+    vec[15] = rotvelvec[1];
+    vec[16] = rotvelvec[2];
+
+    return vec;
+  }
+
   int InsertSubstate(const spState& substate){
     substate_vec.push_back(std::make_shared<spState>(substate));
     return substate_vec.size()-1;
@@ -204,6 +242,7 @@ public:
     front_steering = 0;
     rear_steering = 0;
     time_stamp = spGeneralTools::Tick();
+    current_controls = std::make_pair(0,0);
     substate_vec.clear();
   }
 
@@ -214,7 +253,7 @@ public:
   spTimestamp time_stamp;
   double front_steering;
   double rear_steering;
-  std::pair<double,double> controls;
+  std::pair<double,double> current_controls;
   std::vector<std::shared_ptr<spState>> substate_vec;
 private:
 //  spStateVec state_vec_;
@@ -304,6 +343,19 @@ struct spVehicleConstructionInfo{
       wheels_anchor.push_back(v.wheels_anchor[ii]);
     }
   }
+
+//  void SetWheelAnchorsFromSizes(double wheel_base, double track_size, double hight){
+//    if(vehicle_type != spObjectType::VEHICLE_AWSD) {
+//      SPERROREXIT("This function can't be called for other vehicle types.");
+//    }
+//    if(wheels_anchor.size() != 4){
+//      SPERROREXIT("VEHICLE_AWSD should have four wheels for this function to be used.");
+//    }
+//    wheels_anchor[0] = spTranslation(-track_size/2,wheel_base/2,hight);
+//    wheels_anchor[1] = spTranslation(-track_size/2,-wheel_base/2,hight);
+//    wheels_anchor[2] = spTranslation(track_size/2,-wheel_base/2,hight);
+//    wheels_anchor[3] = spTranslation(track_size/2,wheel_base/2,hight);
+//  }
 };
 
 class spCurve {

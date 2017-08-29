@@ -73,13 +73,15 @@ set( HDRS
 	include/spirit/Types/ctpl_stl.h
 	include/spirit/Controllers/spPID.h
 	include/spirit/Planners/spTrajectory.h
-	include/spirit/VehicleCeresCostFunc.h
+	include/spirit//Planners/VehicleCeresCostFunc.h
 	include/spirit/Planners/spLocalPlanner.h
 	include/spirit/Controllers/spMPC.h
-	include/spirit/MPCCostFunc.h
+	include/spirit/Controllers/MPCCostFunc.h
+	include/spirit/Calibration/CalibCostFunc.h
 	include/spirit/ParamLimitLossFunc.h
 	include/spirit/Calibration/PriorityQueue.h
 	include/spirit/Calibration/CandidateWindow.h
+	include/spirit/Calibration/CalibCarSimFunctor.h
 	)
 
 set( SRCS

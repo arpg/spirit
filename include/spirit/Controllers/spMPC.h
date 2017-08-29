@@ -3,7 +3,7 @@
 #include <spirit/Types/spTypes.h>
 #include <spirit/spGeneralTools.h>
 #include <spirit/spirit.h>
-#include <spirit/MPCCostFunc.h>
+#include <spirit/Controllers/MPCCostFunc.h>
 #include <spirit/ParamLimitLossFunc.h>
 
 class spMPC {

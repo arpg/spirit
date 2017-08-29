@@ -15,7 +15,7 @@ void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simula
   goal_state.linvel = spLinVel(end_waypoint.GetLinearVelocity());
   Eigen::VectorXd residual_weight(13);
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.002, 0.002, 0.002, 0.001, 0.001, 0.001,0.0001;
-  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.5;
+  residual_weight << 4, 4, 4, 9, 9, 9, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.1;
   ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_parameters,current_state,goal_state,residual_weight);
   Eigen::VectorXd min_limits(7);

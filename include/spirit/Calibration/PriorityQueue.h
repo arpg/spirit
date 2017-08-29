@@ -8,6 +8,7 @@ public:
   PriorityQueue(unsigned int queue_size):queue_size_(queue_size) {
     queue_max_entropy_ = 0;
     queue_max_entropy_index_ = 0;
+    entropy_alpha_ = 0.95;
   }
 
   ~PriorityQueue(){}
@@ -21,7 +22,7 @@ public:
     // update highest entropy value and index in queue
     FindHighestEntropy();
     // if queue is full then check the entropies
-    if(candidate->GetEntropy() >= queue_max_entropy_){
+    if(candidate->GetEntropy() >= entropy_alpha_*queue_max_entropy_){
       return -1;
     }
     // if entropy was lower than max entropy then replace it with highest entropy
@@ -49,6 +50,7 @@ private:
   }
 
   unsigned int queue_size_;
+  double entropy_alpha_;
   std::vector<std::shared_ptr<CandidateWindow>> queue_;
   double queue_max_entropy_;
   int queue_max_entropy_index_;

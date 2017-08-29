@@ -1,5 +1,5 @@
-#ifndef THREADPOOL_H__
-#define THREADPOOL_H__
+#ifndef CARSIMFUNCTOR_H__
+#define CARSIMFUNCTOR_H__
 #include <spirit/Types/ctpl_stl.h>
 #include <sophus/se3.hpp>
 #include <iostream>
@@ -133,4 +133,4 @@ class CarSimFunctor {
   std::unique_ptr<std::thread> thread_;
 };
 
-#endif  // THREADPOOL_H__
+#endif  // CARSIMFUNCTOR_H__
