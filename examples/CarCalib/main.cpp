@@ -18,7 +18,7 @@ double steering_signal = 0;
 double throttle_signal = 0;
 void GamepadCallback(hal::GamepadMsg& _msg) {
   steering_signal = _msg.axes().data(0)*SP_PI_QUART;
-  throttle_signal = -_msg.axes().data(3)*150;
+  throttle_signal = -_msg.axes().data(3)*60;
 //  std::cout << "steeromg command is " << steering_signal << std::endl;
 //  std::cout << "throttle command is " << throttle_signal << std::endl;
 }
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
 #ifdef SIM_CALIB
   // create a simulated car
-  spworld.car_param.wheel_friction = 0.5;
+  spworld.car_param.wheel_friction = 0.7;
   spworld.car_param.wheel_rollingfriction = 0.1;
   spworld.car_param.engine_torque = 0.0001;
   spworld.car_param.chassis_mass = 5;
@@ -60,8 +60,15 @@ int main(int argc, char** argv) {
 
 #endif
 
-  unsigned int window_size = 10;
-  unsigned int queue_size = 5;
+  spworld.car_param.wheel_friction = 0.2;
+  double wheel_base = 0.40;
+  spworld.car_param.wheels_anchor[0][1] = wheel_base/2;
+  spworld.car_param.wheels_anchor[1][1] = -wheel_base/2;
+  spworld.car_param.wheels_anchor[2][1] = -wheel_base/2;
+  spworld.car_param.wheels_anchor[3][1] = wheel_base/2;
+
+  unsigned int window_size = 15;
+  unsigned int queue_size = 10;
   double batch_min_entropy = 10;
   // create a candidate_window and a priority queue
   PriorityQueue priority_queue(queue_size);
@@ -109,21 +116,21 @@ int main(int argc, char** argv) {
     current_state.current_controls.second = throttle_signal;
 
     if(candidate_window.PushBackState(current_state) == window_size) {
-      // check if canditate window has good enough information
-      candidate_window.OptimizeParametersInWindow(spworld.car_param,nullptr/*&spworld.gui_*/);
-      candidate_window.CalculateEntropy();
-      std::cout << "entropy is " << candidate_window.GetEntropy() << std::endl;
-      // if candidate window has lower entropy than max entropy of queue then replace with highest one.
-      // if there are at least two candidate windows then optimize parameters over whole queue
-      if(priority_queue.PushBackCandidateWindow(candidate_window) > 1) {
-//        priority_queue.OptimizeParametersInQueue();
-        // update new parameters to test car here
+      if(candidate_window.OptimizeParametersInWindow(spworld.car_param,&spworld.gui_)) {
+        candidate_window.CalculateEntropy();
+        //      std::cout << "entropy is " << candidate_window.GetEntropy() << std::endl;
+        // if candidate window has lower entropy than max entropy of queue then replace with highest one.
+        // if there are at least two candidate windows then optimize parameters over whole queue
+        if(priority_queue.PushBackCandidateWindow(candidate_window) > 1) {
+          priority_queue.OptimizeParametersInQueue(spworld.car_param);
+          // update new parameters to test car here
+        }
       }
     }
     // apply the controls and wait for next state update
 #ifdef SIM_CALIB
-    car.SetFrontSteeringAngle(steering_signal);
-    car.SetEngineMaxVel(throttle_signal);
+    car.SetFrontSteeringAngle(current_state.current_controls.first);
+    car.SetEngineMaxVel(current_state.current_controls.second);
     // step forward the simulated car
     spworld.objects_.StepPhySimulation(0.1);
     spGeneralTools::Delay_ms(10);

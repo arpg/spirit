@@ -8,8 +8,7 @@
 class CandidateWindow {
  public:
   CandidateWindow(unsigned int window_size) : window_size_(window_size) {
-    parameter_vec_[0] = 0.20;
-    parameter_vec_[1] = 0.2;
+    max_cost_ = 200;
   }
 
   CandidateWindow(const CandidateWindow& obj) {
@@ -17,7 +16,6 @@ class CandidateWindow {
     window_size_ = obj.window_size_;
     entropy_ = obj.entropy_;
     covariance_ = obj.covariance_;
-    parameter_vec_ = obj.parameter_vec_;
     cov_is_singular_ = obj.cov_is_singular_;
   }
 
@@ -39,7 +37,11 @@ class CandidateWindow {
     entropy_ = 0.5*std::log((2*SP_PI*SP_EULER*covariance_).determinant());
   }
 
-  bool OptimizeParametersInWindow(const spVehicleConstructionInfo& init_params, Gui* gui){
+  bool OptimizeParametersInWindow(const spVehicleConstructionInfo& current_params, Gui* gui){
+    Eigen::Vector2d parameter_vec_;
+    parameter_vec_[0] = (current_params.wheels_anchor[0]-current_params.wheels_anchor[1])[1];
+    parameter_vec_[1] = current_params.wheel_friction;
+
     ceres::Problem problem;
     Eigen::VectorXd residual_weight(17);
 //    residual_weight.setOnes(11);
@@ -49,7 +51,7 @@ class CandidateWindow {
 //    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
     residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
     Eigen::MatrixXd jacobian;
-    ceres::CostFunction* cost_function = new CalibCostFunc(init_params,state_series_,residual_weight,jacobian,gui);
+    ceres::CostFunction* cost_function = new CalibCostFunc(current_params,state_series_,residual_weight,jacobian,gui);
 
     Eigen::VectorXd min_limits(2);
     Eigen::VectorXd max_limits(2);
@@ -82,14 +84,21 @@ class CandidateWindow {
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
 //    std::cout << summary.FullReport() << std::endl;
+//    std::cout << "final cost is " << summary.final_cost << std::endl;
 
+    if(summary.final_cost > max_cost_) {
+//      std::cout << "max cost reached !" << std::endl;
+      return false;
+    }
     Eigen::Matrix2d jtj = jacobian.transpose()*jacobian;
     if(jtj.determinant() == 0) {
       cov_is_singular_ = true;
+      return false;
     } else {
       cov_is_singular_ = false;
       covariance_ = (jacobian.transpose()*jacobian).inverse();
     }
+
     // calculate final Covariance
 //    ceres::Covariance::Options cov_options;
 //    cov_options.num_threads = 1;
@@ -104,6 +113,9 @@ class CandidateWindow {
 //    covariance.GetCovarianceBlock(parameters, parameters, covariance_.data());
 //    std::cout << "cov \n" << covariance_ << std::endl;
 //    std::cout << "parameters are \t" << parameter_vec_[0] << "\t,\t" << parameter_vec_[1] << std::endl;
+
+//    CalibCarSimFunctor sim(current_params,parameter_vec_[0],parameter_vec_[1],gui);
+//    sim(state_series_);
     return true;
   }
   double GetEntropy() const {
@@ -135,8 +147,8 @@ class CandidateWindow {
   unsigned int window_size_;
   double entropy_;
   Eigen::Matrix2d covariance_;
-  Eigen::Vector2d parameter_vec_;
   bool cov_is_singular_;
+  double max_cost_;
 };
 
 #endif //CANDIDATEWINDOW_H__

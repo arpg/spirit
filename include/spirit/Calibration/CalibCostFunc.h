@@ -12,7 +12,7 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
                 const spStateSeries& ref_states,
                 const Eigen::VectorXd& state_weight,
                 Eigen::MatrixXd& ex_jacobian,
-                Gui* gui)
+                Gui* gui = nullptr)
       : vehicle_info_(info), ref_states_(ref_states),ex_jacobian_(ex_jacobian), gui_(gui){
     // don't include the very first state in residual since error is gonna be zero for that term always
     num_residual_blocks_ = ref_states_.size()-1;
@@ -42,7 +42,7 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
 
       sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0]+epsilon,parameters[0][1]));
       sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0],parameters[0][1]+epsilon));
-      sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0],parameters[0][1],gui_));
+      sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0],parameters[0][1]/*,gui_*/));
 
       for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
         sim_traj.push_back(std::make_shared<spStateSeries>());
@@ -60,23 +60,11 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
         for(int jj = 0; jj<num_residual_blocks_; jj++) {
           // we have -j since we are calculating (z-h(x)) and then derivative of h(x) would be -J(x)
           jac.block<17,1>(jj*17,ii) = -(((*(*sim_traj[ii])[jj]) - (*(*sim_traj[parameter_block_sizes()[0]])[jj])).calibvector())/epsilon;
-//          // test realtive pose error
-//          if(jj == 0) {
-//            jac.block<17,1>(jj*17,ii) = -((((*(*sim_traj[ii])[jj])-(*(ref_states_[jj]))) - ((*(*sim_traj[parameter_block_sizes()[0]])[jj])-(*(ref_states_[jj])))).calibvector())/epsilon;
-//          } else {
-//            jac.block<17,1>(jj*17,ii) = -((((*(*sim_traj[ii])[jj])-(*(*sim_traj[ii])[jj-1])) - ((*(*sim_traj[parameter_block_sizes()[0]])[jj])-(*(*sim_traj[parameter_block_sizes()[0]])[jj-1]))).calibvector())/epsilon;
-//          }
         }
       }
       // Calculate residual
       for(int jj = 0; jj<num_residual_blocks_; jj++) {
         res.block<17,1>(jj*17,0) = (*(ref_states_[jj+1]) - (*(*sim_traj[parameter_block_sizes()[0]])[jj])).calibvector();
-//        // test relative pose error
-//        if(jj == 0) {
-//          res.block<17,1>(jj*17,0) = ((*(ref_states_[jj+1])-(*(ref_states_[jj]))) - ((*(*sim_traj[parameter_block_sizes()[0]])[jj])-(*(ref_states_[0])))).calibvector();
-//        } else {
-//          res.block<17,1>(jj*17,0) = ((*(ref_states_[jj+1])-(*(ref_states_[jj]))) - ((*(*sim_traj[parameter_block_sizes()[0]])[jj])-(*(*sim_traj[parameter_block_sizes()[0]])[jj-1]))).calibvector();
-//        }
       }
 
       // apply weighting matrix

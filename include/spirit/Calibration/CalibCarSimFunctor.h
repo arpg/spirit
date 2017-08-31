@@ -64,7 +64,7 @@ class CalibCarSimFunctor {
     thread_.reset();
   }
 
-  void operator()(const spStateSeries& ref_states ,std::shared_ptr<spStateSeries> traj_states) {
+  void operator()(const spStateSeries& ref_states ,std::shared_ptr<spStateSeries> traj_states = nullptr) {
     spAWSDCar& car = (spAWSDCar&)objects_->GetObject(car_handle_);
     car.SetState(*(ref_states[0]));
     for (int ii = 0; ii < ref_states.size()-1; ii++) {
@@ -77,7 +77,9 @@ class CalibCarSimFunctor {
         gui_->Iterate(*objects_);
 //        spGeneralTools::Delay_ms(travel_time_ms);
       }
-      traj_states->push_back(std::make_shared<spState>(car.GetState()));
+      if(traj_states!= nullptr) {
+        traj_states->push_back(std::make_shared<spState>(car.GetState()));
+      }
     }
   }
 

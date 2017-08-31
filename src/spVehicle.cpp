@@ -219,7 +219,7 @@ void spVehicle::SetState(const spState& state){
     GetWheel(ii)->SetPose(state.substate_vec[ii]->pose);
     GetWheel(ii)->SetLinVel(state.substate_vec[ii]->linvel);
     GetWheel(ii)->SetAngularVel(state.substate_vec[ii]->rotvel);
-    GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
+//    GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
   }
 //  spPose T_wheel_chassis = GetWheel(0)->GetPose().inverse()*GetPose();
 //  Eigen::AngleAxisd rollAngle(T_wheel_chassis.rotation().eulerAngles(0,1,2)[0], Eigen::Vector3d::UnitX());
