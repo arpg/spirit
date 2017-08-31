@@ -9,10 +9,11 @@
 class CalibCostFunc : public ceres::DynamicCostFunction {
  public:
   CalibCostFunc(const spVehicleConstructionInfo& info,
-              const spStateSeries& ref_states,
-              const Eigen::VectorXd& state_weight,
+                const spStateSeries& ref_states,
+                const Eigen::VectorXd& state_weight,
+                Eigen::MatrixXd& ex_jacobian,
                 Gui* gui)
-      : vehicle_info_(info), ref_states_(ref_states) , gui_(gui){
+      : vehicle_info_(info), ref_states_(ref_states),ex_jacobian_(ex_jacobian), gui_(gui){
     // don't include the very first state in residual since error is gonna be zero for that term always
     num_residual_blocks_ = ref_states_.size()-1;
 
@@ -37,7 +38,7 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*17,1);
       double epsilon = 0.1;
       std::vector<std::shared_ptr<CalibCarSimFunctor>> sims;
-      std::cout << std::fixed << std::setprecision(12) << "params are " << parameters[0][0] << "\t\t" << parameters[0][1] << std::endl;
+//      std::cout << std::fixed << std::setprecision(12) << "params are " << parameters[0][0] << "\t\t" << parameters[0][1] << std::endl;
 
       sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0]+epsilon,parameters[0][1]));
       sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0],parameters[0][1]+epsilon));
@@ -45,30 +46,44 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
 
       for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
         sim_traj.push_back(std::make_shared<spStateSeries>());
-//        sims[ii]->RunInThread(ref_states_, sim_traj[ii]);
-        sims[ii]->operator()(ref_states_, sim_traj[ii]);
+        sims[ii]->RunInThread(ref_states_, sim_traj[ii]);
+//        sims[ii]->operator()(ref_states_, sim_traj[ii]);
       }
 
       // Enable folowing loop if using threaded simulation
-//      for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
-//          sims[ii]->WaitForThreadJoin();
-//      }
+      for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
+          sims[ii]->WaitForThreadJoin();
+      }
 
       // find Forward difference of residual with respect to parameters
       for (int ii = 0; ii<parameter_block_sizes()[0]; ii++) {
         for(int jj = 0; jj<num_residual_blocks_; jj++) {
           // we have -j since we are calculating (z-h(x)) and then derivative of h(x) would be -J(x)
           jac.block<17,1>(jj*17,ii) = -(((*(*sim_traj[ii])[jj]) - (*(*sim_traj[parameter_block_sizes()[0]])[jj])).calibvector())/epsilon;
+//          // test realtive pose error
+//          if(jj == 0) {
+//            jac.block<17,1>(jj*17,ii) = -((((*(*sim_traj[ii])[jj])-(*(ref_states_[jj]))) - ((*(*sim_traj[parameter_block_sizes()[0]])[jj])-(*(ref_states_[jj])))).calibvector())/epsilon;
+//          } else {
+//            jac.block<17,1>(jj*17,ii) = -((((*(*sim_traj[ii])[jj])-(*(*sim_traj[ii])[jj-1])) - ((*(*sim_traj[parameter_block_sizes()[0]])[jj])-(*(*sim_traj[parameter_block_sizes()[0]])[jj-1]))).calibvector())/epsilon;
+//          }
         }
       }
       // Calculate residual
       for(int jj = 0; jj<num_residual_blocks_; jj++) {
         res.block<17,1>(jj*17,0) = (*(ref_states_[jj+1]) - (*(*sim_traj[parameter_block_sizes()[0]])[jj])).calibvector();
+//        // test relative pose error
+//        if(jj == 0) {
+//          res.block<17,1>(jj*17,0) = ((*(ref_states_[jj+1])-(*(ref_states_[jj]))) - ((*(*sim_traj[parameter_block_sizes()[0]])[jj])-(*(ref_states_[0])))).calibvector();
+//        } else {
+//          res.block<17,1>(jj*17,0) = ((*(ref_states_[jj+1])-(*(ref_states_[jj]))) - ((*(*sim_traj[parameter_block_sizes()[0]])[jj])-(*(*sim_traj[parameter_block_sizes()[0]])[jj-1]))).calibvector();
+//        }
       }
 
       // apply weighting matrix
       jac = residual_weight_ * jac;
       res = residual_weight_ * res;
+      // fill in jacobian
+      ex_jacobian_ = jac;
 //      std::cout << " jac ->  \n" << jac << std::endl;
 //      std::cout << " res -> \n" << res << std::endl;
 //      std::cout << "cost is " << res.norm() << std::endl;
@@ -80,6 +95,12 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
       // Calculate residual
       for(int jj = 0; jj<num_residual_blocks_; jj++) {
         res.block<17,1>(jj*17,0) = (*(ref_states_[jj+1]) - *((*curr_states)[jj])).calibvector();
+//        // test relative pose error
+//        if(jj == 0) {
+//          res.block<17,1>(jj*17,0) = ((*(ref_states_[jj+1])-(*(ref_states_[jj]))) - ((*((*curr_states)[jj]))-(*(ref_states_[0])))).calibvector();
+//        } else {
+//          res.block<17,1>(jj*17,0) = ((*(ref_states_[jj+1])-(*(ref_states_[jj]))) - ((*((*curr_states)[jj]))-(*((*curr_states)[jj-1])))).calibvector();
+//        }
       }
       res = residual_weight_ * res;
 //      std::cout << "res   -> \n" << res << std::endl;
@@ -94,6 +115,7 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
   const spStateSeries& ref_states_;
   Eigen::MatrixXd residual_weight_;
   int num_residual_blocks_;
+  Eigen::MatrixXd& ex_jacobian_;
 };
 
 #endif  // CALIBCOSTFUNC_H__

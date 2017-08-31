@@ -46,7 +46,7 @@ void spPangolinScenegraphGui::InitGui() {
       pangolin::ProjectionMatrix(WINDOW_WIDTH, WINDOW_HEIGHT, 420, 420,
                                  WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.1,
                                  1000),
-      pangolin::ModelViewLookAt(6, 6, 6, 0, 0, 0, pangolin::AxisZ));
+      pangolin::ModelViewLookAt(20, 20, 20, 0, 0, 0, pangolin::AxisZ));
 
   handler_scenegraph_ = new SceneGraph::HandlerSceneGraph(
       glscenegraph_, glrenderstate_, pangolin::AxisZ, 0.01f);

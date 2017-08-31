@@ -66,7 +66,7 @@ class CalibCarSimFunctor {
 
   void operator()(const spStateSeries& ref_states ,std::shared_ptr<spStateSeries> traj_states) {
     spAWSDCar& car = (spAWSDCar&)objects_->GetObject(car_handle_);
-//    car.SetState(*(ref_states[0]));
+    car.SetState(*(ref_states[0]));
     for (int ii = 0; ii < ref_states.size()-1; ii++) {
       car.SetFrontSteeringAngle(ref_states[ii]->current_controls.first);
       car.SetEngineMaxVel(ref_states[ii]->current_controls.second);

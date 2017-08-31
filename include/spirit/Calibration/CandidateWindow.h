@@ -8,6 +8,17 @@
 class CandidateWindow {
  public:
   CandidateWindow(unsigned int window_size) : window_size_(window_size) {
+    parameter_vec_[0] = 0.20;
+    parameter_vec_[1] = 0.2;
+  }
+
+  CandidateWindow(const CandidateWindow& obj) {
+    state_series_ = obj.state_series_;
+    window_size_ = obj.window_size_;
+    entropy_ = obj.entropy_;
+    covariance_ = obj.covariance_;
+    parameter_vec_ = obj.parameter_vec_;
+    cov_is_singular_ = obj.cov_is_singular_;
   }
 
   ~CandidateWindow(){}
@@ -25,10 +36,10 @@ class CandidateWindow {
   }
 
   void CalculateEntropy(){
-    entroy_ = 0.5*std::log((2*SP_PI*SP_EULER*covariance_).determinant());
+    entropy_ = 0.5*std::log((2*SP_PI*SP_EULER*covariance_).determinant());
   }
 
-  void OptimizeParametersInWindow(const spVehicleConstructionInfo& init_params, Gui* gui){
+  bool OptimizeParametersInWindow(const spVehicleConstructionInfo& init_params, Gui* gui){
     ceres::Problem problem;
     Eigen::VectorXd residual_weight(17);
 //    residual_weight.setOnes(11);
@@ -37,25 +48,22 @@ class CandidateWindow {
 //    residual_weight << 0,0,0,0,0,0,1,1,1,1,0;
 //    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
     residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
-    ceres::CostFunction* cost_function = new CalibCostFunc(init_params,state_series_,residual_weight,gui);
+    Eigen::MatrixXd jacobian;
+    ceres::CostFunction* cost_function = new CalibCostFunc(init_params,state_series_,residual_weight,jacobian,gui);
 
-//    Eigen::VectorXd min_limits(6);
-//    Eigen::VectorXd max_limits(6);
-//    for(int ii=0; ii<6; ii+=2) {
-//      min_limits[ii] = -SP_PI_QUART;
-//      max_limits[ii] = SP_PI_QUART;
-//    }
-//    for(int ii=1; ii<6; ii+=2) {
-//      min_limits[ii] = -200;
-//      max_limits[ii] = 200;
-//    }
-//    ceres::CostFunction* loss_function = new ParamLimitLossFunc<6>(min_limits,max_limits,100);
+    Eigen::VectorXd min_limits(2);
+    Eigen::VectorXd max_limits(2);
+    min_limits[0] = 0.2;
+    max_limits[0] = 0.4;
+    min_limits[1] = 0.1;
+    max_limits[1] = 1;
 
-    double parameters[2];
-    parameters[0] = 0.20;
-    parameters[1] = 0.5;
-    problem.AddResidualBlock(cost_function, NULL, parameters);
-//    problem.AddResidualBlock(loss_function,NULL,parameters);
+    ceres::CostFunction* loss_function = new ParamLimitLossFunc<2>(min_limits,max_limits,100);
+
+//    parameter_vec_[0] = 0.30;
+//    parameter_vec_[1] = 0.6;
+    problem.AddResidualBlock(cost_function, NULL, parameter_vec_.data());
+    problem.AddResidualBlock(loss_function,NULL,parameter_vec_.data());
 
 //    std::vector<int> fix_param_vec;
 //    fix_param_vec.push_back(0);
@@ -63,42 +71,50 @@ class CandidateWindow {
 
     // Run the solver!
     ceres::Solver::Options options;
-    options.initial_trust_region_radius = 0.8;
-    options.max_trust_region_radius = 10;
+    options.initial_trust_region_radius = 5;
+    options.max_trust_region_radius = 5;
 //    options.min_trust_region_radius = 1e-3;
-  //  options.parameter_tolerance = 1e-3;
+    options.parameter_tolerance = 1e-3;
     options.linear_solver_type = ceres::DENSE_QR;
     options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
-    options.minimizer_progress_to_stdout = true;
+    options.minimizer_progress_to_stdout = false;
+    options.num_linear_solver_threads = 1;
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
-    std::cout << summary.FullReport() << std::endl;
+//    std::cout << summary.FullReport() << std::endl;
 
+    Eigen::Matrix2d jtj = jacobian.transpose()*jacobian;
+    if(jtj.determinant() == 0) {
+      cov_is_singular_ = true;
+    } else {
+      cov_is_singular_ = false;
+      covariance_ = (jacobian.transpose()*jacobian).inverse();
+    }
     // calculate final Covariance
 //    ceres::Covariance::Options cov_options;
 //    cov_options.num_threads = 1;
 //    ceres::Covariance covariance(cov_options);
 //    std::vector<const double*> covariance_blocks;
 //    covariance_blocks.push_back(parameters);
-//    CHECK(covariance.Compute(covariance_blocks, &problem));
-//    double covariance_xx[6 * 6];
-//    covariance.GetCovarianceBlock(parameters, parameters, covariance_xx);
-//    std::cout << "covariance is "  << std::endl;
-//    for(int ii=0;ii<6;ii++) {
-//      for(int jj=0;jj<6;jj++) {
-//        std::cout << "\t" << covariance_xx[ii*6+jj] ;
-//      }
-//      std::cout  << std::endl;
+//    // check if covarinace is non-singular
+//    if(!covariance.Compute(covariance_blocks, &problem)) {
+//      SPERROREXIT("covariance is singular ");
+//      return false;
 //    }
-//    std::cout << std::endl;
+//    covariance.GetCovarianceBlock(parameters, parameters, covariance_.data());
+//    std::cout << "cov \n" << covariance_ << std::endl;
+//    std::cout << "parameters are \t" << parameter_vec_[0] << "\t,\t" << parameter_vec_[1] << std::endl;
+    return true;
+  }
+  double GetEntropy() const {
+    if(cov_is_singular_) {
+      return 1000;
+    } else {
+      return entropy_;
+    }
+  }
 
-    std::cout << "parameters are \t" << parameters[0] << "\t,\t" << parameters[1] << std::endl;
-    SPERROREXIT("done here");
-  }
-  double GetEntropy(){
-    return entroy_;
-  }
-  // check if this state could be added to candidate window
+  // check if this state should be added to candidate window
   bool CheckPossibleCandidate(const spState& state) {
     if(state_series_.size()) {
 //      if(spGeneralTools::TickTock_ms(state_series_[state_series_.size()-1]->time_stamp,state.time_stamp)<10){
@@ -111,13 +127,16 @@ class CandidateWindow {
     return true;
   }
 
+ public:
+  spStateSeries state_series_;
 
  private:
 
   unsigned int window_size_;
-  double entroy_;
-  Eigen::Matrix3d covariance_;
-  spStateSeries state_series_;
+  double entropy_;
+  Eigen::Matrix2d covariance_;
+  Eigen::Vector2d parameter_vec_;
+  bool cov_is_singular_;
 };
 
 #endif //CANDIDATEWINDOW_H__
