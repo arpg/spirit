@@ -1,5 +1,5 @@
-find_package( Spirit QUIET )
-if( Spirit_FOUND )
+find_package( spirit QUIET )
+if( spirit_FOUND )
       add_subdirectory( car_robot )
       add_subdirectory( CarCalib )
 endif()
