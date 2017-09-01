@@ -12,50 +12,15 @@ hal::CarCommandMsg commandMSG;
 spPose posys_;
 
 void Posys_Handler(hal::PoseMsg& PoseData) {
-  std::cout << "Posys Id: " << PoseData.id() << ". Data: ";
-  for (int ii = 0; ii < PoseData.pose().data_size(); ++ii) {
-    std::cout << PoseData.pose().data(ii) << " ";
-  }
-  std::cout << std::endl;
   posys_ = spPose::Identity();
   posys_.translate(spTranslation(PoseData.pose().data(0),PoseData.pose().data(1),PoseData.pose().data(2)));
-  spRotation rot(PoseData.pose().data(3),PoseData.pose().data(4),PoseData.pose().data(5),PoseData.pose().data(6));
+  spRotation rot(PoseData.pose().data(6),PoseData.pose().data(3),PoseData.pose().data(4),PoseData.pose().data(5));
   posys_.rotate(rot);
 }
 
 void GamepadCallback(hal::GamepadMsg& _msg) {
-//  std::cout << "-> "
-//            << _msg.axes().data(0) << ", "
-//            << _msg.axes().data(1) << ", "
-//            << _msg.axes().data(2) << ", "
-//            << _msg.axes().data(3) << ", "
-//            << _msg.axes().data(4) << ", "
-//            << _msg.axes().data(5) << ", "
-//            << _msg.axes().data(6) << ", "
-//            << _msg.axes().data(7) << ", "
-//            << _msg.axes().data(8) << ", "
-//            << _msg.axes().data(9) << ", "
-//            << _msg.axes().data(10) << ", "
-//            << _msg.axes().data(11) << ", "
-//            << _msg.axes().data(12) << ", "
-//            << _msg.axes().data(13) << ", "
-//            << _msg.axes().data(14) << " -  "
-//            << _msg.buttons().data(0) << ","
-//            << _msg.buttons().data(1) << ","
-//            << _msg.buttons().data(2) << ","
-//            << _msg.buttons().data(3) << ","
-//            << _msg.buttons().data(4) << ","
-//            << _msg.buttons().data(5) << ","
-//            << _msg.buttons().data(6) << ","
-//            << _msg.buttons().data(7) << ","
-//            << _msg.buttons().data(8) << ","
-//            << _msg.buttons().data(9) << ","
-//            << _msg.buttons().data(10) << ","
-//            << _msg.buttons().data(11) << ","
-//            << std::endl;
-  // update transmit command with gamepad data
   commandMSG.set_steering_angle(_msg.axes().data(0));
-  commandMSG.set_throttle_percent(_msg.axes().data(0)*20);
+  commandMSG.set_throttle_percent(_msg.axes().data(5)*20);
 }
 
 void CarSensorCallback(hal::CarStateMsg msg) {
@@ -80,7 +45,7 @@ int main(int argc, char** argv) {
   gamepad.RegisterGamepadDataCallback(&GamepadCallback);
 
   // Connect to NinjaV3Car
-//  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/cu.usbserial-00002014A]//");
+//  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
 
 //  ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
 
@@ -88,9 +53,8 @@ int main(int argc, char** argv) {
   commandMSG.set_steering_angle(0);
   commandMSG.set_throttle_percent(0);
   //////////////////////////////
-  hal::Posys posys_("vicon:://192.168.20.100:[Ninja1]");
-//  posys_.RegisterPosysDataCallback(std::bind(&Posys_Handler,this, _1));
-  posys_.RegisterPosysDataCallback(&Posys_Handler);
+  hal::Posys vicon("vicon://192.168.20.100:[Ninja1]");
+  vicon.RegisterPosysDataCallback(&Posys_Handler);
   /////////////////////////////
   spSettings settings_obj;
   settings_obj.SetGuiType(spGuiType::GUI_PANGOSCENEGRAPH);
@@ -115,15 +79,3 @@ int main(int argc, char** argv) {
   }
   return 0;
 }
-
-
-//volatile sig_atomic_t flag = 0;
-//void my_function(int sig){ // can be called asynchronously
-//  flag = 1; // set flag
-//  std::cout << "ctrl-c called" << std::endl;
-//}
-//  signal(SIGINT, my_function);
-//    if(flag) {
-//      std::cout << "now breaking" << std::endl;
-//      break;
-//    }
