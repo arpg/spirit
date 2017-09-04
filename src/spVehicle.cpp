@@ -179,9 +179,11 @@ void spVehicle::SetState(const spState& state){
     MoveWheelsToAnchors(state.pose);
     for(int ii=0; ii<GetNumberOfWheels(); ii++) {
       GetWheel(ii)->SetLinVel(state.linvel);
-      GetWheel(ii)->SetAngularVel(state.rotvel);
+//      GetWheel(ii)->SetAngularVel(state.rotvel);
       GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
     }
+    GetWheel(0)->InitializeSteeringServoAngle(state.front_steering);
+    GetWheel(3)->InitializeSteeringServoAngle(state.front_steering);
   } else {
     for(int ii=0; ii<state.substate_vec.size(); ii++) {
       GetWheel(ii)->SetPose(state.substate_vec[ii]->pose);

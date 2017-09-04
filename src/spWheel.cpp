@@ -203,10 +203,14 @@ void spWheel::SetAngularVel(const spRotVel& vel) {
   rigid_body_->setAngularVelocity(btVector3(vel[0],vel[1],vel[2]));
 }
 
-//void spWheel::SetAngle(double angle){
-//  Eigen::AngleAxisd rot(wheel_angle-angle,Eigen::Vector3d::UnitZ());
-//  pose_.rotate(rot);
-//}
+void spWheel::InitializeSteeringServoAngle(double angle){
+  double curr_angle = GetSteeringServoCurrentAngle();
+  Eigen::AngleAxisd rot(curr_angle-angle,Eigen::Vector3d::UnitZ());
+  spPose ps(GetPose());
+  ps.rotate(rot);
+  SetPose(ps);
+  SetSteeringServoTargetAngle(angle);
+}
 
 //double spWheel::GetSuspensionLength(){
 ////  hinge_->calculateTransforms();

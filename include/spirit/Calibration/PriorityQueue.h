@@ -53,7 +53,7 @@ public:
 
     // update highest entropy value and index in queue
     FindHighestEntropy();
-    std::cout << "size is " << queue_.size() << std::endl;
+//    std::cout << "size is " << queue_.size() << std::endl;
 
     // notify the optimization thread that there is a new data
     {
@@ -106,13 +106,13 @@ private:
 //    residual_weight << 1,1,1,1,1,1,1e-5,1e-5,1e-5,1e-5,1e-5,1e-3,1e-3,1e-3,1e-3,1e-3,1e-3;
 //    residual_weight << 1,1,1,1,1,1,1e-1,1e-1,1e-1,1e-1,1e-5,1e-1,1e-1,1e-1,1e-3,1e-3,1e-3;
 //    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
-    residual_weight << 1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0;
+    residual_weight << 1,1,1,0.8,0.8,0.8,0,0,0,0,0,0,0,0,0,0,0;
     current_param_mutex_.lock();
     parameter_vec[0] = (current_params_.wheels_anchor[0]-current_params_.wheels_anchor[1])[1];
     parameter_vec[1] = current_params_.wheel_friction;
     for(int ii=0; ii<queue_opt_.size(); ii++) {
       ceres::CostFunction* cost_function = new CalibCostFunc(current_params_,queue_opt_[ii]->state_series_opt_,residual_weight,jacobian);
-      problem.AddResidualBlock(cost_function, /*new ceres::CauchyLoss(0.1)*/NULL, parameter_vec.data());
+      problem.AddResidualBlock(cost_function, new ceres::CauchyLoss(0.1), parameter_vec.data());
     }
     Eigen::VectorXd min_limits(2);
     Eigen::VectorXd max_limits(2);

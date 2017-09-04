@@ -128,7 +128,7 @@ private:
 //    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
 //    residual_weight << 1,1,1,1,1,1,1e-5,1e-5,1e-5,1e-5,1e-5,1e-3,1e-3,1e-3,1e-3,1e-3,1e-3;
 //    residual_weight << 1,1,1,1,1,1,1e-1,1e-1,1e-1,1e-1,1e-5,1e-1,1e-1,1e-1,1e-3,1e-3,1e-3;
-    residual_weight << 1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0;
+    residual_weight << 1,1,1,0.8,0.8,0.8,0,0,0,0,0,0,0,0,0,0,0;
     Eigen::MatrixXd jacobian;
     ceres::CostFunction* cost_function = new CalibCostFunc(current_params_opt_,state_series_opt_,residual_weight,jacobian,gui_);
 
@@ -159,8 +159,8 @@ private:
 //    std::cout << "final cost is " << summary.final_cost << std::endl;
 
     if(summary.final_cost > max_cost_) {
-      std::cout << "max cost reached !" << std::endl;
-      return false;
+//      std::cout << "max cost reached !" << std::endl;
+//      return false;
     }
     Eigen::Matrix2d jtj = jacobian.transpose()*jacobian;
     if(jtj.determinant() == 0) {
@@ -188,7 +188,10 @@ private:
 //    CalibCarSimFunctor sim(current_params,parameter_vec_[0],parameter_vec_[1],gui);
 //    sim(state_series_);
     CalculateEntropy();
-//    std::cout << "parameters are \t" << parameter_vec_[0] << "\t,\t" << parameter_vec_[1] << "\t,\t" << GetEntropy() << "\t,\t" << summary.final_cost << std::endl;
+
+//    Eigen::EigenSolver<Eigen::Matrix2d> eigensolver(covariance_)
+    //    std::cout << "parameters are \t" << parameter_vec_[0] << "\t,\t" << parameter_vec_[1] << "\t,\t" << GetEntropy() << "\t,\t" << summary.final_cost << std::endl;
+    std::cout << "parameters are \t" << covariance_(0,0) << "\t,\t" << covariance_(1,1) << "\t,\t" << GetEntropy() << "\t,\t" << summary.final_cost << std::endl;
     return true;
   }
   bool GetDataLoadedFlag() {

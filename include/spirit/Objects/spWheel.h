@@ -27,12 +27,13 @@ public:
   const spRotVel& GetRotVel();
   const spLinVel& GetLinVel();
   void SetLinVel(const spLinVel& vel);
-//  void SetAngle(double angle);
+  void SetAngle(double angle);
   double GetWheelSpeed();
   void SetWheelSpeed(double rps);
 //  double GetSuspensionLength();
 //  void SetSuspensionLength(double length);
   void SetAngularVel(const spRotVel& vel);
+  void InitializeSteeringServoAngle(double angle);
 
 private:
   spTranslation chassis_anchor;
