@@ -55,6 +55,9 @@ class CalibCarSimFunctor {
   }
 
   void RunInThread(const spStateSeries& ref_states ,std::shared_ptr<spStateSeries> traj_states) {
+    if(gui_ != nullptr) {
+      SPERROREXIT("Can not use gui in multithreaded mode.");
+    }
     thread_ = std::make_unique<std::thread>(
         &CalibCarSimFunctor::operator(), this, ref_states, traj_states);
   }

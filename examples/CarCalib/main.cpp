@@ -18,7 +18,7 @@ double steering_signal = 0;
 double throttle_signal = 0;
 void GamepadCallback(hal::GamepadMsg& _msg) {
   steering_signal = _msg.axes().data(0)*SP_PI_QUART;
-  throttle_signal = -_msg.axes().data(3)*60;
+  throttle_signal = -_msg.axes().data(3)*80;
 //  std::cout << "steeromg command is " << steering_signal << std::endl;
 //  std::cout << "throttle command is " << throttle_signal << std::endl;
 }
@@ -67,14 +67,22 @@ int main(int argc, char** argv) {
   spworld.car_param.wheels_anchor[2][1] = -wheel_base/2;
   spworld.car_param.wheels_anchor[3][1] = wheel_base/2;
 
-  unsigned int window_size = 15;
-  unsigned int queue_size = 10;
+  unsigned int window_size = 30;
+  unsigned int queue_size = 40;
   double batch_min_entropy = 10;
   // create a candidate_window and a priority queue
-  PriorityQueue priority_queue(queue_size);
+  PriorityQueue priority_queue(queue_size,spworld.car_param);
   // create a new candidate window
-  CandidateWindow candidate_window(window_size);
+  CandidateWindow candidate_window(window_size,1,spworld.car_param/*,&spworld.gui_*/);
+  candidate_window.prqueue_func_ptr_ = std::bind(&PriorityQueue::PushBackCandidateWindow,&priority_queue,std::placeholders::_1);
   int iter_cnt = 0;
+  spPose vicon_pose;
+  spPose vicon_prev_pose;
+  spTimestamp timestamp;
+  spTimestamp prev_timestamp;
+  spLinVel linvel;
+  spRotVel rotvel;
+bool flag0 = true;
   while(spworld.ShouldRun()) {
 //    if(iter_cnt<20) {
 //      steering_signal = 0;
@@ -95,11 +103,23 @@ int main(int argc, char** argv) {
 //    }
     iter_cnt++;
     // Get Car's Pose
-    spPose vicon_pose;
-    spTimestamp timestamp;
 #ifdef SIM_CALIB
+    vicon_prev_pose = vicon_pose;
+    prev_timestamp = timestamp;
+
     vicon_pose = car.GetPose();
     timestamp = spGeneralTools::Tick();
+
+    spPose diff = vicon_prev_pose.inverse()*vicon_pose;
+    linvel = (vicon_pose.translation()-vicon_prev_pose.translation())/0.1;
+    Eigen::AngleAxisd angleaxis(diff.rotation());
+    Eigen::Vector3d rotvec(angleaxis.angle()*angleaxis.axis());
+    rotvel = rotvec/0.1/*(spGeneralTools::TickTock_us(prev_timestamp,timestamp)/1e6)*/;
+    if(flag0) {
+      linvel = spLinVel::Zero();
+      rotvel = spRotVel::Zero();
+      flag0 = false;
+    }
 #endif
     // Ger Car's wheel speeds
     spWheelSpeedVec wheel_speeds;
@@ -107,17 +127,28 @@ int main(int argc, char** argv) {
       wheel_speeds[ii] = car.GetWheel(ii)->GetWheelSpeed();
     }
     // create car state from pose and wheel odometry
-    spState current_state(car.GetState());
-//    current_state.pose = vicon_pose;
+    spState current_state/*(car.GetState())*/;
+//    current_state.substate_vec.clear();
+    current_state.pose = vicon_pose;
 //    current_state.wheel_speeds = wheel_speeds;
 //    current_state.front_steering = 0.5*(car.GetWheel(0)->GetSteeringServoCurrentAngle()+car.GetWheel(3)->GetSteeringServoCurrentAngle());
+    current_state.linvel = /*car.GetState().*/linvel;
+    current_state.rotvel = /*car.GetState().*/rotvel;
     current_state.time_stamp = spGeneralTools::Tick();
     current_state.current_controls.first = steering_signal;
     current_state.current_controls.second = throttle_signal;
+    candidate_window.PushBackState(current_state);
 
+    spVehicleConstructionInfo params;
+    if(priority_queue.GetParameters(params)) {
+      candidate_window.SetParams(params);
+    }
+//    std::cout << "**********************" << std::endl;
+//    std::cout << "cars is\t" << car.GetState().rotvel.transpose() << std::endl;
+//    std::cout << "mine is\t" << rotvel.transpose() << std::endl;
+/*
     if(candidate_window.PushBackState(current_state) == window_size) {
       if(candidate_window.OptimizeParametersInWindow(spworld.car_param,&spworld.gui_)) {
-        candidate_window.CalculateEntropy();
         //      std::cout << "entropy is " << candidate_window.GetEntropy() << std::endl;
         // if candidate window has lower entropy than max entropy of queue then replace with highest one.
         // if there are at least two candidate windows then optimize parameters over whole queue
@@ -127,14 +158,19 @@ int main(int argc, char** argv) {
         }
       }
     }
+    */
     // apply the controls and wait for next state update
 #ifdef SIM_CALIB
     car.SetFrontSteeringAngle(current_state.current_controls.first);
     car.SetEngineMaxVel(current_state.current_controls.second);
     // step forward the simulated car
+    spTimestamp t0 = spGeneralTools::Tick();
     spworld.objects_.StepPhySimulation(0.1);
-    spGeneralTools::Delay_ms(10);
+    double tt = spGeneralTools::Tock_ms(t0);
+
+//    spGeneralTools::Delay_ms(100-tt);
     spworld.gui_.Iterate(spworld.objects_);
+
 #endif
   }
   std::cout << "Done ... !" << std::endl;

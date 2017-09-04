@@ -19,7 +19,9 @@ class spGeneralTools {
   static bool CheckFileExists(const std::string& file_name);
   static spTimestamp Tick();
   static double Tock_ms(spTimestamp tick_time);
+  static double TickTock_s(spTimestamp tick_time,spTimestamp tock_time);
   static double TickTock_ms(spTimestamp tick_time,spTimestamp tock_time);
+  static double TickTock_us(spTimestamp tick_time,spTimestamp tock_time);
   static double Tock_us(spTimestamp tick_time);
   static void Delay_ms(unsigned int delay_time);
   static void Delay_us(unsigned int delay_time);

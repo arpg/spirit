@@ -165,76 +165,30 @@ const spState& spVehicle::GetState() {
     state_.wheel_speeds[ii] = GetWheel(ii)->GetWheelSpeed();
   }
 
-//  state->w1 = std::make_shared<spState>();
-//  state->w2 = std::make_shared<spState>();
-//  state->w3 = std::make_shared<spState>();
-//  state->w0->pose = GetWheel(0)->GetPose();
-//  state->w0->linvel = GetWheel(0)->GetLinVel();
-//  state->w0->rotvel = GetWheel(0)->GetRotVel();
-//  state->w1->pose = GetWheel(1)->GetPose();
-//  state->w1->linvel = GetWheel(1)->GetLinVel();
-//  state->w1->rotvel = GetWheel(1)->GetRotVel();
-//  state->w2->pose = GetWheel(2)->GetPose();
-//  state->w2->linvel = GetWheel(2)->GetLinVel();
-//  state->w2->rotvel = GetWheel(2)->GetRotVel();
-//  state->w3->pose = GetWheel(3)->GetPose();
-//  state->w3->linvel = GetWheel(3)->GetLinVel();
-//  state->w3->rotvel = GetWheel(3)->GetRotVel();
-
-
-//  spPose T_wheel_chassis = GetWheel(0)->GetPose().inverse()*GetPose();
-//  double steering = T_wheel_chassis.rotation().eulerAngles(0,1,2)[2];
-//  if((steering<0)&&(tan(steering)>0)){
-//    steering += SP_PI;
-//  } else if((steering>0)&&(tan(steering)<0)){
-//    steering -= SP_PI;
-//  }
-//  state->front_steering = steering;
-
-//  spPose T_wheel_chassis = GetWheel(0)->GetPose().inverse()*GetPose();
-//  state->front_steering = T_wheel_chassis.rotation();
-//  spPose T_wheel_chassis2 = GetWheel(3)->GetPose().inverse()*GetPose();
-//  state->rear_steering = T_wheel_chassis2.rotation();
-
-//  state->w1 = GetWheel(0)->GetPose();
-//  state->w2 = GetWheel(1)->GetPose();
-//  state->w3 = GetWheel(2)->GetPose();
-//  state->w4 = GetWheel(3)->GetPose();
-
   return state_;
 }
 
 void spVehicle::SetState(const spState& state){
   if(state.substate_vec.size() != GetNumberOfWheels()) {
-    SPERROR("state tree size mismatch.");
+//    SPERROR("state tree size mismatch.");
   }
-  // TODO: when setting the pose we need to set suspention length aswell
   SetPose(state.pose);
-//  std::cout << "linvel is " << state.linvel.transpose() << std::endl;
   SetChassisLinearVelocity(state.linvel);
   SetChassisAngularVelocity(state.rotvel);
-//  for(int ii=0; ii<GetNumberOfWheels(); ii++) {
-  for(int ii=0; ii<state.substate_vec.size(); ii++) {
-//    GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
-    GetWheel(ii)->SetPose(state.substate_vec[ii]->pose);
-    GetWheel(ii)->SetLinVel(state.substate_vec[ii]->linvel);
-    GetWheel(ii)->SetAngularVel(state.substate_vec[ii]->rotvel);
-//    GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
+  if(state.substate_vec.size()<GetNumberOfWheels()) {
+    MoveWheelsToAnchors(state.pose);
+    for(int ii=0; ii<GetNumberOfWheels(); ii++) {
+      GetWheel(ii)->SetLinVel(state.linvel);
+      GetWheel(ii)->SetAngularVel(state.rotvel);
+      GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
+    }
+  } else {
+    for(int ii=0; ii<state.substate_vec.size(); ii++) {
+      GetWheel(ii)->SetPose(state.substate_vec[ii]->pose);
+      GetWheel(ii)->SetLinVel(state.substate_vec[ii]->linvel);
+      GetWheel(ii)->SetAngularVel(state.substate_vec[ii]->rotvel);
+    }
   }
-//  spPose T_wheel_chassis = GetWheel(0)->GetPose().inverse()*GetPose();
-//  Eigen::AngleAxisd rollAngle(T_wheel_chassis.rotation().eulerAngles(0,1,2)[0], Eigen::Vector3d::UnitX());
-//  Eigen::AngleAxisd pitchAngle(T_wheel_chassis.rotation().eulerAngles(0,1,2)[1], Eigen::Vector3d::UnitY());
-//  Eigen::AngleAxisd yawAngle(state.front_steering, Eigen::Vector3d::UnitZ());
-//  Eigen::Quaterniond q = rollAngle * pitchAngle * yawAngle ;
-//  spPose p0(GetWheel(0)->GetPose());
-//  spPose p3(GetWheel(3)->GetPose());
-//  p0.rotation().Zero();
-//  p0.rotate(q);
-//  p3.rotation().Zero();
-//  p3.rotate(q);
-//  GetWheel(0)->SetPose(p0);
-//  GetWheel(3)->SetPose(p3);
-
 }
 
 void spVehicle::SetClampToSurfaceFlag() {

@@ -32,6 +32,14 @@ double spGeneralTools::TickTock_ms(spTimestamp tick_time,spTimestamp tock_time) 
   return std::chrono::duration_cast<std::chrono::milliseconds>( tock_time - tick_time ).count();
 }
 
+double spGeneralTools::TickTock_us(spTimestamp tick_time,spTimestamp tock_time) {
+  return std::chrono::duration_cast<std::chrono::microseconds>( tock_time - tick_time ).count();
+}
+
+double spGeneralTools::TickTock_s(spTimestamp tick_time,spTimestamp tock_time) {
+  return std::chrono::duration_cast<std::chrono::seconds>( tock_time - tick_time ).count();
+}
+
 void spGeneralTools::PlotXY(std::vector<double>& x_axis, std::string xlabel, std::string ylabel) {
   pangolin::CreateWindowAndBind("PlotXY Window",640,480);
 

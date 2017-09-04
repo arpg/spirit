@@ -42,18 +42,18 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
 
       sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0]+epsilon,parameters[0][1]));
       sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0],parameters[0][1]+epsilon));
-      sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0],parameters[0][1]/*,gui_*/));
+      sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0],parameters[0][1],gui_));
 
       for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
         sim_traj.push_back(std::make_shared<spStateSeries>());
-        sims[ii]->RunInThread(ref_states_, sim_traj[ii]);
-//        sims[ii]->operator()(ref_states_, sim_traj[ii]);
+//        sims[ii]->RunInThread(ref_states_, sim_traj[ii]);
+        sims[ii]->operator()(ref_states_, sim_traj[ii]);
       }
 
       // Enable folowing loop if using threaded simulation
-      for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
-          sims[ii]->WaitForThreadJoin();
-      }
+//      for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
+//          sims[ii]->WaitForThreadJoin();
+//      }
 
       // find Forward difference of residual with respect to parameters
       for (int ii = 0; ii<parameter_block_sizes()[0]; ii++) {
