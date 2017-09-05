@@ -46,15 +46,19 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
 
       for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
         sim_traj.push_back(std::make_shared<spStateSeries>());
-//        sims[ii]->RunInThread(ref_states_, sim_traj[ii]);
-        sims[ii]->operator()(ref_states_, sim_traj[ii]);
+        if(gui_ == nullptr) {
+          sims[ii]->RunInThread(ref_states_, sim_traj[ii]);
+        } else {
+          sims[ii]->operator()(ref_states_, sim_traj[ii]);
+        }
       }
 
       // Enable folowing loop if using threaded simulation
-//      for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
-//          sims[ii]->WaitForThreadJoin();
-//      }
-
+      if(gui_ == nullptr) {
+        for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
+          sims[ii]->WaitForThreadJoin();
+        }
+      }
       // find Forward difference of residual with respect to parameters
       for (int ii = 0; ii<parameter_block_sizes()[0]; ii++) {
         for(int jj = 0; jj<num_residual_blocks_; jj++) {

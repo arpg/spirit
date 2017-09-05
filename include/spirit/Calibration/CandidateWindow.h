@@ -63,6 +63,17 @@ class CandidateWindow {
     }
   }
 
+  Eigen::Vector2d GetEntropyVec() {
+    Eigen::Vector2d vec;
+    Eigen::EigenSolver<Eigen::Matrix2d> eigensolver(covariance_);
+    std::complex<double> eigenvalue0;
+    std::complex<double> eigenvalue1;
+    eigenvalue0 = eigensolver.eigenvalues().col(0)[0];
+    eigenvalue1 = eigensolver.eigenvalues().col(0)[1];
+    vec << eigenvalue0.real(),eigenvalue1.real();
+    return vec;
+  }
+
   // check if this state should be added to candidate window
   bool CheckPossibleCandidate(const spState& state) {
     if(state_series_.size()) {
@@ -84,17 +95,19 @@ class CandidateWindow {
         data_load_cv_.wait(lock,std::bind(&CandidateWindow::GetDataLoadedFlag,this));
         data_loaded_flg_ = false;
       }
-      // take a copy of state_series_ for optimization. this is to avoid modification from other threads while optimizing
-      // since we are just reading the state_series_ object this should be thred safe
-      state_series_opt_.clear();
-      state_series_opt_ = state_series_;
-      params_mutex_.lock();
-      current_params_opt_ = current_params_;
-      params_mutex_.unlock();
-      // optimize candidate window with new states
-      if(OptimizationThread()) {
-        std::shared_ptr<CandidateWindow> ptr = std::make_shared<CandidateWindow>(*this);
-        prqueue_func_ptr_(ptr);
+      if(state_series_.size() == window_size_){
+        // take a copy of state_series_ for optimization. this is to avoid modification from other threads while optimizing
+        // since we are just reading the state_series_ object this should be thred safe
+        state_series_opt_.clear();
+        state_series_opt_ = state_series_;
+        params_mutex_.lock();
+        current_params_opt_ = current_params_;
+        params_mutex_.unlock();
+        // optimize candidate window with new states
+        if(OptimizationThread()) {
+          std::shared_ptr<CandidateWindow> ptr = std::make_shared<CandidateWindow>(*this);
+          prqueue_func_ptr_(ptr);
+        }
       }
       if(gui_ != nullptr){
         thread_should_run_ = false;
@@ -114,7 +127,7 @@ class CandidateWindow {
 
 private:
   void CalculateEntropy(){
-    entropy_ = 0.5*std::log((2*SP_PI*SP_EULER*covariance_).determinant());
+    entropy_ = /*0.5*std::log*/((2*SP_PI*SP_EULER*covariance_).determinant());
   }
 
   bool OptimizationThread() {
@@ -189,9 +202,14 @@ private:
 //    sim(state_series_);
     CalculateEntropy();
 
-//    Eigen::EigenSolver<Eigen::Matrix2d> eigensolver(covariance_)
-    //    std::cout << "parameters are \t" << parameter_vec_[0] << "\t,\t" << parameter_vec_[1] << "\t,\t" << GetEntropy() << "\t,\t" << summary.final_cost << std::endl;
-    std::cout << "parameters are \t" << covariance_(0,0) << "\t,\t" << covariance_(1,1) << "\t,\t" << GetEntropy() << "\t,\t" << summary.final_cost << std::endl;
+    Eigen::EigenSolver<Eigen::Matrix2d> eigensolver(covariance_);
+    std::complex<double> eigenvalue0;
+    std::complex<double> eigenvalue1;
+    eigenvalue0 = eigensolver.eigenvalues().col(0)[0];
+    eigenvalue1 = eigensolver.eigenvalues().col(0)[1];
+//    std::cout << "eigen values are\t" << eigenvalue0.real()  << "\t,\t" << eigenvalue1.real() << "\t,\t" << summary.final_cost << std::endl;
+//        std::cout << "parameters are \t" << parameter_vec_[0] << "\t,\t" << parameter_vec_[1] << "\t,\t" << GetEntropy() << "\t,\t" << summary.final_cost << std::endl;
+//    std::cout << "parameters are \t" << covariance_(0,0) << "\t,\t" << covariance_(1,1) << "\t,\t" << GetEntropy() << "\t,\t" << summary.final_cost << std::endl;
     return true;
   }
   bool GetDataLoadedFlag() {

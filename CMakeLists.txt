@@ -82,6 +82,7 @@ set( HDRS
 	include/spirit/Calibration/PriorityQueue.h
 	include/spirit/Calibration/CandidateWindow.h
 	include/spirit/Calibration/CalibCarSimFunctor.h
+	include/spirit/Calibration/EntropyTable.h
 	)
 
 set( SRCS

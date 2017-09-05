@@ -11,6 +11,7 @@
 #include <spirit/Controllers/spMPC.h>
 #include <spirit/Calibration/CandidateWindow.h>
 #include <spirit/Calibration/PriorityQueue.h>
+#include <spirit/Calibration/EntropyTable.h>
 #include <iomanip>
 #include <spirit/CarSimFunctor.h>
 #include <spirit/Planners/spTrajectory.h>

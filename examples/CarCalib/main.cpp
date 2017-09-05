@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
 #ifdef SIM_CALIB
   // create a simulated car
-  spworld.car_param.wheel_friction = 0.3;
+  spworld.car_param.wheel_friction = 0.4;
   spworld.car_param.wheel_rollingfriction = 0.1;
   spworld.car_param.engine_torque = 0.0001;
   spworld.car_param.chassis_mass = 5;
@@ -61,21 +61,29 @@ int main(int argc, char** argv) {
 
 #endif
 
-  spworld.car_param.wheel_friction = 0.5;
+
+  ///////////////////////////
+  /// testing new stuff
+
+  ////////////////////////////
+
+  spworld.car_param.wheel_friction = 0.2;
   double wheel_base = 0.40;
   spworld.car_param.wheels_anchor[0][1] = wheel_base/2;
   spworld.car_param.wheels_anchor[1][1] = -wheel_base/2;
   spworld.car_param.wheels_anchor[2][1] = -wheel_base/2;
   spworld.car_param.wheels_anchor[3][1] = wheel_base/2;
 
-  unsigned int window_size = 10;
+  unsigned int window_size = 20;
   unsigned int queue_size = 10;
   double batch_min_entropy = 10;
   // create a candidate_window and a priority queue
   PriorityQueue priority_queue(queue_size,spworld.car_param);
   // create a new candidate window
   CandidateWindow candidate_window(window_size,1,spworld.car_param/*,&spworld.gui_*/);
-  candidate_window.prqueue_func_ptr_ = std::bind(&PriorityQueue::PushBackCandidateWindow,&priority_queue,std::placeholders::_1);
+  EntropyTable entropytable(spworld.car_param,2,10);
+//  candidate_window.prqueue_func_ptr_ = std::bind(&PriorityQueue::PushBackCandidateWindow,&priority_queue,std::placeholders::_1);
+  candidate_window.prqueue_func_ptr_ = std::bind(&EntropyTable::PushBackCandidateWindow,&entropytable,std::placeholders::_1);
   int iter_cnt = 0;
   spPose vicon_pose;
   spPose vicon_prev_pose;
@@ -128,8 +136,8 @@ bool flag0 = true;
       wheel_speeds[ii] = car.GetWheel(ii)->GetWheelSpeed();
     }
     // create car state from pose and wheel odometry
-    spState current_state(car.GetState());
-    current_state.substate_vec.clear();
+    spState current_state/*(car.GetState())*/;
+//    current_state.substate_vec.clear();
     current_state.pose = vicon_pose;
     current_state.wheel_speeds = wheel_speeds;
     current_state.front_steering = 0.5*(car.GetWheel(0)->GetSteeringServoCurrentAngle()+car.GetWheel(3)->GetSteeringServoCurrentAngle());
@@ -141,10 +149,17 @@ bool flag0 = true;
     candidate_window.PushBackState(current_state);
 //    std::cout << "angle is " << car.GetWheel(0)->GetSteeringServoCurrentAngle() << std::endl;
 
+//    spVehicleConstructionInfo params;
+//    if(priority_queue.GetParameters(params)) {
+//      candidate_window.SetParams(params);
+//    }
     spVehicleConstructionInfo params;
-    if(priority_queue.GetParameters(params)) {
+    if(entropytable.GetParameters(params)) {
       candidate_window.SetParams(params);
     }
+
+
+
 //    std::cout << "**********************" << std::endl;
 //    std::cout << "cars is\t" << car.GetState().rotvel.transpose() << std::endl;
 //    std::cout << "mine is\t" << rotvel.transpose() << std::endl;
@@ -170,7 +185,7 @@ bool flag0 = true;
     spworld.objects_.StepPhySimulation(0.1);
     double tt = spGeneralTools::Tock_ms(t0);
 
-//    spGeneralTools::Delay_ms(100);
+    spGeneralTools::Delay_ms(100-tt);
     spworld.gui_.Iterate(spworld.objects_);
 
 #endif

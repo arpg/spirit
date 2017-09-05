@@ -73,8 +73,8 @@ class CalibCarSimFunctor {
     for (int ii = 0; ii < ref_states.size()-1; ii++) {
       car.SetFrontSteeringAngle(ref_states[ii]->current_controls.first);
       car.SetEngineMaxVel(ref_states[ii]->current_controls.second);
-//      double travel_time_ms = spGeneralTools::TickTock_ms(ref_states[ii]->time_stamp,ref_states[ii+1]->time_stamp);
-      double travel_time_ms = 100;
+      double travel_time_ms = spGeneralTools::TickTock_ms(ref_states[ii]->time_stamp,ref_states[ii+1]->time_stamp);
+//      double travel_time_ms = 100;
       objects_->StepPhySimulation(travel_time_ms*0.001);
       if ((gui_ != nullptr)) {
         gui_->Iterate(*objects_);
