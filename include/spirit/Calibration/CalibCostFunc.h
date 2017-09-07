@@ -8,12 +8,12 @@
 
 class CalibCostFunc : public ceres::DynamicCostFunction {
  public:
-  CalibCostFunc(const spVehicleConstructionInfo& info,
+  CalibCostFunc(std::shared_ptr<spVehicleConstructionInfo> info,
                 const spStateSeries& ref_states,
                 const Eigen::VectorXd& state_weight,
                 Eigen::MatrixXd& ex_jacobian,
                 Gui* gui = nullptr)
-      : vehicle_info_(info), ref_states_(ref_states),ex_jacobian_(ex_jacobian), gui_(gui){
+      : vehicle_info_(info->MakeCopy()), ref_states_(ref_states),ex_jacobian_(ex_jacobian), gui_(gui){
     // don't include the very first state in residual since error is gonna be zero for that term always
     num_residual_blocks_ = ref_states_.size()-1;
 
@@ -25,7 +25,6 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
       weightvec.block<17,1>(ii*17,0) << state_weight;
     }
     residual_weight_ = weightvec.asDiagonal();
-
   }
 
   ~CalibCostFunc() {}
@@ -40,9 +39,10 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
       std::vector<std::shared_ptr<CalibCarSimFunctor>> sims;
 //      std::cout << std::fixed << std::setprecision(12) << "params are " << parameters[0][0] << "\t\t" << parameters[0][1] << std::endl;
 
-      sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0]+epsilon,parameters[0][1]));
-      sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0],parameters[0][1]+epsilon));
-      sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,parameters[0][0],parameters[0][1],gui_));
+      for(int ii=0; ii<parameter_block_sizes()[0]; ii++) {
+        sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,ii,epsilon,gui_));
+      }
+      sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,0,0,gui_));
 
       for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
         sim_traj.push_back(std::make_shared<spStateSeries>());
@@ -53,7 +53,6 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
         }
       }
 
-      // Enable folowing loop if using threaded simulation
       if(gui_ == nullptr) {
         for (int ii = 0; ii < parameter_block_sizes()[0]+1; ii++) {
           sims[ii]->WaitForThreadJoin();
@@ -103,7 +102,7 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
 
  private:
   Gui* gui_;
-  const spVehicleConstructionInfo& vehicle_info_;
+  std::shared_ptr<spVehicleConstructionInfo> vehicle_info_;
   const spStateSeries& ref_states_;
   Eigen::MatrixXd residual_weight_;
   int num_residual_blocks_;

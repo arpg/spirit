@@ -7,7 +7,7 @@ typedef Eigen::Vector2d Vec;
 
 class EntropyTable {
  public:
-  EntropyTable(const spVehicleConstructionInfo& car_params, int num_params, int candidates_per_param): current_params_(car_params), num_params_(num_params),candidates_per_param_(candidates_per_param) {
+  EntropyTable(std::shared_ptr<spVehicleConstructionInfo> car_params, int num_params, int candidates_per_param): current_params_(car_params->MakeCopy()), num_params_(num_params),candidates_per_param_(candidates_per_param) {
     alpha_ = 0.95;
     thread_should_run_ = true;
     data_loaded_flg_ = false;
@@ -78,7 +78,7 @@ class EntropyTable {
     score_count_ += candidate_score_vec;
     PruneTable();
     FindHighestEntropy();
-//    CoutTable();
+    CoutTable();
 
     // notify the optimization thread that there is a new data
     {
@@ -91,9 +91,9 @@ class EntropyTable {
     return 0;
   }
 
-  bool GetParameters(spVehicleConstructionInfo& car_params) {
+  bool GetParameters(std::shared_ptr<spVehicleConstructionInfo>& car_params) {
     if(current_param_mutex_.try_lock()) {
-      car_params = current_params_;
+      car_params = current_params_->MakeCopy();
       current_param_mutex_.unlock();
       return true;
     }
@@ -120,26 +120,19 @@ private:
       for(int ii=0; ii<table_.size(); ii++) {
         queue_opt_.push_back(table_[ii].first);
       }
-      std::cout << "opt" << std::endl;
       // optimize queue with new candidate windows
       OptimizationThread();
-//      thread_should_run_ = false;
     }
   }
 
   double OptimizationThread() {
-    Eigen::Vector2d parameter_vec;
     ceres::Problem problem;
     Eigen::MatrixXd jacobian;
     Eigen::VectorXd residual_weight(17);
-//    residual_weight << 1,1,1,1,1,1,1e-5,1e-5,1e-5,1e-5,1,1,1,1,1,1,1;
-//    residual_weight << 1,1,1,1,1,1,1e-5,1e-5,1e-5,1e-5,1e-5,1e-3,1e-3,1e-3,1e-3,1e-3,1e-3;
-//    residual_weight << 1,1,1,1,1,1,1e-1,1e-1,1e-1,1e-1,1e-5,1e-1,1e-1,1e-1,1e-3,1e-3,1e-3;
 //    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
     residual_weight << 1,1,1,0.8,0.8,0.8,0,0,0,0,0,0,0,0,0,0,0;
     current_param_mutex_.lock();
-    parameter_vec[0] = (current_params_.wheels_anchor[0]-current_params_.wheels_anchor[1])[1];
-    parameter_vec[1] = current_params_.wheel_friction;
+    Eigen::VectorXd parameter_vec(current_params_->GetParameterVector());
     for(int ii=0; ii<queue_opt_.size(); ii++) {
       ceres::CostFunction* cost_function = new CalibCostFunc(current_params_,queue_opt_[ii]->state_series_opt_,residual_weight,jacobian);
       problem.AddResidualBlock(cost_function, new ceres::CauchyLoss(0.1), parameter_vec.data());
@@ -187,11 +180,7 @@ private:
 //    std::cout << "cov \n" << covariance_ << std::endl;
     std::cout << parameter_vec[0] << "," << parameter_vec[1]  << "," << covariance_(0,0) << "," << covariance_(1,1) << ";" << std::endl;
 
-    current_params_.wheels_anchor[0][1] = parameter_vec[0]/2;
-    current_params_.wheels_anchor[1][1] = -parameter_vec[0]/2;
-    current_params_.wheels_anchor[2][1] = -parameter_vec[0]/2;
-    current_params_.wheels_anchor[3][1] = parameter_vec[0]/2;
-    current_params_.wheel_friction = parameter_vec[1];
+    current_params_->SetParameterVector(parameter_vec);
     current_param_mutex_.unlock();
   }
 
@@ -248,7 +237,7 @@ private:
 
 
 
-  spVehicleConstructionInfo current_params_;
+  std::shared_ptr<spVehicleConstructionInfo> current_params_;
   std::mutex current_param_mutex_;
   std::vector<std::pair<std::shared_ptr<CandidateWindow>,Vec>> table_;
   std::vector<std::shared_ptr<CandidateWindow>> queue_opt_;

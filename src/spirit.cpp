@@ -1,6 +1,6 @@
 #include <spirit/spirit.h>
 
-spirit::spirit(spSettings& user_settings) {
+spirit::spirit(const spSettings& user_settings) {
   user_settings_ = user_settings;
   // create gui object if requested
   if (user_settings_.GetGuiType() != spGuiType::GUI_NONE) {

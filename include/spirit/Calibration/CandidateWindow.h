@@ -10,10 +10,9 @@
 
 class CandidateWindow {
  public:
-  CandidateWindow(int window_size, double max_cost, const spVehicleConstructionInfo& params, Gui* gui = nullptr) : window_size_(window_size), max_cost_(max_cost), current_params_(params), gui_(gui) {
+  CandidateWindow(int window_size, double max_cost, std::shared_ptr<spVehicleConstructionInfo> params, Gui* gui = nullptr) : window_size_(window_size), max_cost_(max_cost), current_params_(params), gui_(gui) {
     thread_should_run_ = false;
     data_loaded_flg_ = false;
-    current_params_opt_ = current_params_;
     if(gui_ == nullptr) {
       thread_handle_ = std::make_unique<std::thread>(&CandidateWindow::OptimizeParametersInWindow,this);
       thread_should_run_ = true;
@@ -101,12 +100,14 @@ class CandidateWindow {
         state_series_opt_.clear();
         state_series_opt_ = state_series_;
         params_mutex_.lock();
-        current_params_opt_ = current_params_;
+        current_params_opt_ = current_params_->MakeCopy();
         params_mutex_.unlock();
         // optimize candidate window with new states
         if(OptimizationThread()) {
           std::shared_ptr<CandidateWindow> ptr = std::make_shared<CandidateWindow>(*this);
-          prqueue_func_ptr_(ptr);
+          if(prqueue_func_ptr_) {
+            prqueue_func_ptr_(ptr);
+          }
         }
       }
       if(gui_ != nullptr){
@@ -119,21 +120,19 @@ class CandidateWindow {
 
   }
 
-  void SetParams(const spVehicleConstructionInfo& params) {
+  void SetParams(std::shared_ptr<spVehicleConstructionInfo> params) {
     params_mutex_.lock();
-    current_params_ = params;
+    current_params_ = params->MakeCopy();
     params_mutex_.unlock();
   }
 
 private:
   void CalculateEntropy(){
-    entropy_ = /*0.5*std::log*/((2*SP_PI*SP_EULER*covariance_).determinant());
+    entropy_ = 0.5*std::log((2*SP_PI*SP_EULER*covariance_).determinant());
   }
 
   bool OptimizationThread() {
-    Eigen::Vector2d parameter_vec_;
-    parameter_vec_[0] = (current_params_opt_.wheels_anchor[0]-current_params_opt_.wheels_anchor[1])[1];
-    parameter_vec_[1] = current_params_opt_.wheel_friction;
+    Eigen::VectorXd parameter_vec_(current_params_opt_->GetParameterVector());
 
     ceres::Problem problem;
     Eigen::VectorXd residual_weight(17);
@@ -201,7 +200,7 @@ private:
 //    CalibCarSimFunctor sim(current_params,parameter_vec_[0],parameter_vec_[1],gui);
 //    sim(state_series_);
     CalculateEntropy();
-
+    std::cout << "fist one is done " << std::endl;
     Eigen::EigenSolver<Eigen::Matrix2d> eigensolver(covariance_);
     std::complex<double> eigenvalue0;
     std::complex<double> eigenvalue1;
@@ -229,8 +228,8 @@ private:
   double max_cost_;
   std::shared_ptr<std::thread> thread_handle_;
   std::atomic<bool> thread_should_run_;
-  spVehicleConstructionInfo current_params_;
-  spVehicleConstructionInfo current_params_opt_;
+  std::shared_ptr<spVehicleConstructionInfo> current_params_;
+  std::shared_ptr<spVehicleConstructionInfo> current_params_opt_;
   std::mutex params_mutex_;
 
   // synchronization variables

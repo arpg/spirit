@@ -10,19 +10,18 @@
 
 class CalibCarSimFunctor {
  public:
-  CalibCarSimFunctor(
-      const spVehicleConstructionInfo& vehicle_params,double wheel_base,double friction, Gui* gui = nullptr)
-      : vehicle_params_(vehicle_params), gui_(gui) {
-    // check if perturbation is required on some spVehicleConstructionInfo parameters
-    // perturb wheel_base
-    vehicle_params_.wheels_anchor[0][1] = wheel_base/2;
-    vehicle_params_.wheels_anchor[1][1] = -wheel_base/2;
-    vehicle_params_.wheels_anchor[2][1] = -wheel_base/2;
-    vehicle_params_.wheels_anchor[3][1] = wheel_base/2;
-    vehicle_params_.wheel_friction = friction;
+  CalibCarSimFunctor(std::shared_ptr<spVehicleConstructionInfo> vehicle_params,
+                     int perturbation_index = 0, double epsilon = 0,Gui* gui = nullptr)
+    : vehicle_params_(vehicle_params->MakeCopy()),gui_(gui) {
+
+    Eigen::VectorXd param_vec(vehicle_params_->GetParameterVector());
+    param_vec[perturbation_index] += epsilon;
+    vehicle_params_->SetParameterVector(param_vec);
     thread_ = nullptr;
     objects_ = std::make_shared<Objects>();
-    car_handle_ = objects_->CreateVehicle(vehicle_params_);
+    car_handle_ = objects_->CreateVehicle(*vehicle_params_);
+    param_vec[perturbation_index] -= epsilon;
+    vehicle_params_->SetParameterVector(param_vec);
     spPose gnd_pose_ = spPose::Identity();
     gnd_pose_.translate(spTranslation(0, 0, -0.5));
     gnd_handle_ = objects_->CreateBox(gnd_pose_, spBoxSize(50, 50, 1), 0,
@@ -50,7 +49,7 @@ class CalibCarSimFunctor {
     }
   }
 
-  CalibCarSimFunctor(const CalibCarSimFunctor& obj) : vehicle_params_(obj.vehicle_params_) {
+  CalibCarSimFunctor(const CalibCarSimFunctor& obj) {
     SPERROREXIT("cpy constructor called. AVOID calling cpyConstructors");
   }
 
@@ -87,7 +86,7 @@ class CalibCarSimFunctor {
   }
 
  public:
-  spVehicleConstructionInfo vehicle_params_;
+  std::shared_ptr<spVehicleConstructionInfo> vehicle_params_;
   spCtrlPts3ord_3dof traj_curve_;
   std::shared_ptr<Objects> objects_;
   spObjectHandle gnd_handle_;

@@ -6,6 +6,7 @@
 #include <list>
 #include <iostream>
 #include <spirit/spGeneralTools.h>
+#include <mutex>
 
 #define BT_USE_DOUBLE_PRECISION
 
@@ -266,7 +267,8 @@ enum class spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum class spPhyEngineType{PHY_NONE,PHY_BULLET};
 enum class spObjectType{BOX,VEHICLE_AWSD,WHEEL,WAYPOINT,LINESTRIP};
 
-struct spVehicleConstructionInfo{
+class spVehicleConstructionInfo{
+public:
   spObjectType vehicle_type;
   spPose pose;
   spTranslation cog; // Center Of Gravity in chassis frame
@@ -344,23 +346,19 @@ struct spVehicleConstructionInfo{
     }
   }
 
-//  void SetWheelAnchorsFromSizes(double wheel_base, double track_size, double hight){
-//    if(vehicle_type != spObjectType::VEHICLE_AWSD) {
-//      SPERROREXIT("This function can't be called for other vehicle types.");
-//    }
-//    if(wheels_anchor.size() != 4){
-//      SPERROREXIT("VEHICLE_AWSD should have four wheels for this function to be used.");
-//    }
-//    wheels_anchor[0] = spTranslation(-track_size/2,wheel_base/2,hight);
-//    wheels_anchor[1] = spTranslation(-track_size/2,-wheel_base/2,hight);
-//    wheels_anchor[2] = spTranslation(track_size/2,-wheel_base/2,hight);
-//    wheels_anchor[3] = spTranslation(track_size/2,wheel_base/2,hight);
-//  }
+  virtual Eigen::VectorXd GetParameterVector() const {
+    SPERROREXIT("This function should be re-defined in a derived class!");
+  }
+  virtual void SetParameterVector(Eigen::VectorXd param_vec){
+    SPERROREXIT("This function should be re-defined in a derived class!");
+  }
+  virtual std::shared_ptr<spVehicleConstructionInfo> MakeCopy() {
+    SPERROREXIT("This function should be re-defined in a derived class!");
+  }
 };
 
 class spCurve {
  public:
-
   spCurve(int curve_order, int curve_dof): curve_dof_(curve_dof), curve_order_(curve_order) {
     perturbation_value_ = 0;
     perturbation_dim_ = 0;

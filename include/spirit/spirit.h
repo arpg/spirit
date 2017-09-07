@@ -21,7 +21,7 @@
 
 class spirit {
 public:
-  spirit(spSettings& user_settings);
+  spirit(const spSettings& user_settings);
   ~spirit();
   bool ShouldRun();
   void IterateWorld();

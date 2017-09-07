@@ -7,7 +7,7 @@
 
 class PriorityQueue {
 public:
-  PriorityQueue(int queue_size, const spVehicleConstructionInfo& car_params):queue_size_(queue_size), current_params_(car_params) {
+  PriorityQueue(int queue_size, std::shared_ptr<spVehicleConstructionInfo> car_params):queue_size_(queue_size), current_params_(car_params->MakeCopy()) {
     queue_max_entropy_index_ = 0;
     entropy_alpha_ = 0.05129;
     data_loaded_flg_ = false;
@@ -87,9 +87,9 @@ public:
     return queue_max_entropy_;
   }
 
-  bool GetParameters(spVehicleConstructionInfo& car_params) {
+  bool GetParameters(std::shared_ptr<spVehicleConstructionInfo> car_params) {
     if(current_param_mutex_.try_lock()) {
-      car_params = current_params_;
+      car_params = current_params_->MakeCopy();
       current_param_mutex_.unlock();
       return true;
     }
@@ -98,18 +98,12 @@ public:
 
 private:
   double OptimizationThread() {
-    Eigen::Vector2d parameter_vec;
     ceres::Problem problem;
     Eigen::MatrixXd jacobian;
     Eigen::VectorXd residual_weight(17);
-//    residual_weight << 1,1,1,1,1,1,1e-5,1e-5,1e-5,1e-5,1,1,1,1,1,1,1;
-//    residual_weight << 1,1,1,1,1,1,1e-5,1e-5,1e-5,1e-5,1e-5,1e-3,1e-3,1e-3,1e-3,1e-3,1e-3;
-//    residual_weight << 1,1,1,1,1,1,1e-1,1e-1,1e-1,1e-1,1e-5,1e-1,1e-1,1e-1,1e-3,1e-3,1e-3;
-//    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
     residual_weight << 1,1,1,0.8,0.8,0.8,0,0,0,0,0,0,0,0,0,0,0;
     current_param_mutex_.lock();
-    parameter_vec[0] = (current_params_.wheels_anchor[0]-current_params_.wheels_anchor[1])[1];
-    parameter_vec[1] = current_params_.wheel_friction;
+    Eigen::VectorXd parameter_vec(current_params_->GetParameterVector());
     for(int ii=0; ii<queue_opt_.size(); ii++) {
       ceres::CostFunction* cost_function = new CalibCostFunc(current_params_,queue_opt_[ii]->state_series_opt_,residual_weight,jacobian);
       problem.AddResidualBlock(cost_function, new ceres::CauchyLoss(0.1), parameter_vec.data());
@@ -157,11 +151,7 @@ private:
 //    std::cout << "cov \n" << covariance_ << std::endl;
     std::cout << parameter_vec[0] << "," << parameter_vec[1]  << "," << covariance_(1,1) << "," << covariance_(1,1) << ";" << std::endl;
 
-    current_params_.wheels_anchor[0][1] = parameter_vec[0]/2;
-    current_params_.wheels_anchor[1][1] = -parameter_vec[0]/2;
-    current_params_.wheels_anchor[2][1] = -parameter_vec[0]/2;
-    current_params_.wheels_anchor[3][1] = parameter_vec[0]/2;
-    current_params_.wheel_friction = parameter_vec[1];
+    current_params_->SetParameterVector(parameter_vec);
     current_param_mutex_.unlock();
     std::cout << "entropies are " ;
     for(int ii=0; ii<queue_.size(); ii++) {
@@ -200,7 +190,7 @@ private:
 
   unsigned int queue_size_;
   double entropy_alpha_;
-  spVehicleConstructionInfo current_params_;
+  std::shared_ptr<spVehicleConstructionInfo> current_params_;
   std::mutex current_param_mutex_;
   std::vector<std::shared_ptr<CandidateWindow>> queue_;
   std::vector<std::shared_ptr<CandidateWindow>> queue_opt_;
