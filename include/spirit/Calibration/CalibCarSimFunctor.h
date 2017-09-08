@@ -12,16 +12,18 @@ class CalibCarSimFunctor {
  public:
   CalibCarSimFunctor(std::shared_ptr<spVehicleConstructionInfo> vehicle_params,
                      int perturbation_index = 0, double epsilon = 0,Gui* gui = nullptr)
-    : vehicle_params_(vehicle_params->MakeCopy()),gui_(gui) {
+    : gui_(gui) {
 
-    Eigen::VectorXd param_vec(vehicle_params_->GetParameterVector());
-    param_vec[perturbation_index] += epsilon;
-    vehicle_params_->SetParameterVector(param_vec);
     thread_ = nullptr;
     objects_ = std::make_shared<Objects>();
-    car_handle_ = objects_->CreateVehicle(*vehicle_params_);
+    // perturb parameters
+    Eigen::VectorXd param_vec(vehicle_params->GetParameterVector());
+    param_vec[perturbation_index] += epsilon;
+    vehicle_params->SetParameterVector(param_vec);
+    car_handle_ = objects_->CreateVehicle(*vehicle_params);
     param_vec[perturbation_index] -= epsilon;
-    vehicle_params_->SetParameterVector(param_vec);
+    vehicle_params->SetParameterVector(param_vec);
+
     spPose gnd_pose_ = spPose::Identity();
     gnd_pose_.translate(spTranslation(0, 0, -0.5));
     gnd_handle_ = objects_->CreateBox(gnd_pose_, spBoxSize(50, 50, 1), 0,
@@ -72,8 +74,8 @@ class CalibCarSimFunctor {
     for (int ii = 0; ii < ref_states.size()-1; ii++) {
       car.SetFrontSteeringAngle(ref_states[ii]->current_controls.first);
       car.SetEngineMaxVel(ref_states[ii]->current_controls.second);
-      double travel_time_ms = spGeneralTools::TickTock_ms(ref_states[ii]->time_stamp,ref_states[ii+1]->time_stamp);
-//      double travel_time_ms = 100;
+//      double travel_time_ms = spGeneralTools::TickTock_ms(ref_states[ii]->time_stamp,ref_states[ii+1]->time_stamp);
+      double travel_time_ms = 100;
       objects_->StepPhySimulation(travel_time_ms*0.001);
       if ((gui_ != nullptr)) {
         gui_->Iterate(*objects_);
@@ -86,7 +88,6 @@ class CalibCarSimFunctor {
   }
 
  public:
-  std::shared_ptr<spVehicleConstructionInfo> vehicle_params_;
   spCtrlPts3ord_3dof traj_curve_;
   std::shared_ptr<Objects> objects_;
   spObjectHandle gnd_handle_;

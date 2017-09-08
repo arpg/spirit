@@ -3,7 +3,7 @@
 
 #include <spirit/Calibration/CandidateWindow.h>
 #include <condition_variable>
-typedef Eigen::Vector2d Vec;
+typedef Eigen::Vector3d Vec;
 
 class EntropyTable {
  public:
@@ -17,10 +17,8 @@ class EntropyTable {
   int PushBackCandidateWindow(std::shared_ptr<CandidateWindow> candidate) {
     // accept very firt candidate
     if(table_.size() == 0) {
-      Vec ones;
-      ones << 1,1;
-      table_.push_back(std::make_pair(candidate,ones));
-      score_count_ = ones;
+      table_.push_back(std::make_pair(candidate,Vec::Ones()));
+      score_count_ = Vec::Ones();
       FindHighestEntropy();
       return 0;
     }
@@ -78,7 +76,7 @@ class EntropyTable {
     score_count_ += candidate_score_vec;
     PruneTable();
     FindHighestEntropy();
-    CoutTable();
+//    CoutTable();
 
     // notify the optimization thread that there is a new data
     {
@@ -127,34 +125,25 @@ private:
 
   double OptimizationThread() {
     ceres::Problem problem;
-    Eigen::MatrixXd jacobian;
+    std::vector<Eigen::MatrixXd> jacobians;
+    jacobians.resize(queue_opt_.size());
     Eigen::VectorXd residual_weight(17);
 //    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
-    residual_weight << 1,1,1,0.8,0.8,0.8,0,0,0,0,0,0,0,0,0,0,0;
+    residual_weight << 1,1,1,1,1,1,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0;
     current_param_mutex_.lock();
     Eigen::VectorXd parameter_vec(current_params_->GetParameterVector());
     for(int ii=0; ii<queue_opt_.size(); ii++) {
-      ceres::CostFunction* cost_function = new CalibCostFunc(current_params_,queue_opt_[ii]->state_series_opt_,residual_weight,jacobian);
+      ceres::CostFunction* cost_function = new CalibCostFunc(current_params_,queue_opt_[ii]->state_series_opt_,residual_weight,jacobians[ii]);
       problem.AddResidualBlock(cost_function, new ceres::CauchyLoss(0.1), parameter_vec.data());
     }
-    Eigen::VectorXd min_limits(2);
-    Eigen::VectorXd max_limits(2);
-    min_limits[0] = 0.1;
-    max_limits[0] = 0.5;
-    min_limits[1] = 0.1;
-    max_limits[1] = 1;
-    ceres::CostFunction* loss_function = new ParamLimitLossFunc<2>(min_limits,max_limits,100);
+    ceres::CostFunction* loss_function = new ParamLimitLossFunc<3>(current_params_->calib_min_limit_vec,current_params_->calib_max_limit_vec,100);
     problem.AddResidualBlock(loss_function,NULL,parameter_vec.data());
-
-//    std::vector<int> fix_param_vec;
-//    fix_param_vec.push_back(0);
-//    fix_param_vec.push_back(1);
 
     // Run the solver!
     ceres::Solver::Options options;
-    options.initial_trust_region_radius = 5;
-    options.max_trust_region_radius = 5;
-//    options.min_trust_region_radius = 1e-3;
+    options.initial_trust_region_radius = 0.05;
+    options.max_trust_region_radius = 0.05;
+    options.min_trust_region_radius = 1e-3;
     options.parameter_tolerance = 1e-4;
     options.linear_solver_type = ceres::DENSE_QR;
     options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
@@ -165,7 +154,8 @@ private:
 //    std::cout << summary.FullReport() << std::endl;
 
     // calculate final Covariance
-    Eigen::Matrix2d covariance_;
+    Eigen::Matrix3d covariance_;
+
     ceres::Covariance::Options cov_options;
     cov_options.num_threads = 1;
     ceres::Covariance covariance(cov_options);
@@ -177,8 +167,9 @@ private:
       return false;
     }
     covariance.GetCovarianceBlock(parameter_vec.data(), parameter_vec.data(), covariance_.data());
+
 //    std::cout << "cov \n" << covariance_ << std::endl;
-    std::cout << parameter_vec[0] << "," << parameter_vec[1]  << "," << covariance_(0,0) << "," << covariance_(1,1) << ";" << std::endl;
+    std::cout << parameter_vec[0] << "," << parameter_vec[1]<< "," << parameter_vec[2]  << "," << covariance_(0,0) << "," << covariance_(1,1)<< "," << covariance_(2,2) << ";" << std::endl;
 
     current_params_->SetParameterVector(parameter_vec);
     current_param_mutex_.unlock();

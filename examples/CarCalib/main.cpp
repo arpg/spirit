@@ -47,15 +47,15 @@ int main(int argc, char** argv) {
       vehicle_type = spObjectType::VEHICLE_AWSD;
       pose = spPose::Identity();
       pose.translate(spTranslation(0,0,0.07));
-      wheels_anchor.push_back(spTranslation(-0.13, 0.17, -0.003));
-      wheels_anchor.push_back(spTranslation(-0.13, -0.17, -0.003));
-      wheels_anchor.push_back(spTranslation(0.13, -0.17, -0.003));
-      wheels_anchor.push_back(spTranslation(0.13, 0.17, -0.003));
+      wheels_anchor.push_back(spTranslation(-0.15, 0.17, -0.003));
+      wheels_anchor.push_back(spTranslation(-0.15, -0.17, -0.003));
+      wheels_anchor.push_back(spTranslation(0.15, -0.17, -0.003));
+      wheels_anchor.push_back(spTranslation(0.15, 0.17, -0.003));
       chassis_size = spBoxSize(0.2, 0.42, 0.05);
       cog = spTranslation(0, 0, 0);
       chassis_friction = 0;
       wheel_rollingfriction = 0.1;
-      wheel_friction = 0.4;
+      wheel_friction = 0.5;
       wheel_width = 0.04;
       wheel_radius = 0.05;//0.057;
       susp_damping = 0;
@@ -68,8 +68,18 @@ int main(int argc, char** argv) {
       engine_torque = 0.0001;
       steering_servo_lower_limit = -SP_PI / 4;
       steering_servo_upper_limit = SP_PI / 4;
-      steering_servo_max_velocity = 100;
+      steering_servo_max_velocity = 2;
       steering_servo_torque = 100;
+      Eigen::VectorXd min_limits(3);
+      min_limits[0] = 0.1;
+      min_limits[1] = 0.1;
+      min_limits[2] = 0.1;
+      calib_min_limit_vec = min_limits;
+      Eigen::VectorXd max_limits(3);
+      max_limits[0] = 0.4;
+      max_limits[1] = 1;
+      max_limits[2] = 0.2;
+      calib_max_limit_vec = max_limits;
     }
     MyVehicleConstInfo(const spVehicleConstructionInfo& obj) : spVehicleConstructionInfo(obj) {}
     MyVehicleConstInfo(const MyVehicleConstInfo& obj) : spVehicleConstructionInfo(obj) {}
@@ -79,9 +89,10 @@ int main(int argc, char** argv) {
     }
 
     Eigen::VectorXd GetParameterVector() const {
-      Eigen::VectorXd vec(2);
+      Eigen::VectorXd vec(3);
       vec[0] = (wheels_anchor[0]-wheels_anchor[1])[1];
       vec[1] = wheel_friction;
+      vec[2] = (wheels_anchor[2]-wheels_anchor[1])[0];
       return vec;
     }
     void SetParameterVector(Eigen::VectorXd vec) {
@@ -90,18 +101,16 @@ int main(int argc, char** argv) {
       wheels_anchor[2][1] = -vec[0]/2;
       wheels_anchor[3][1] = vec[0]/2;
       wheel_friction = vec[1];
+      wheels_anchor[0][0] = -vec[2]/2;
+      wheels_anchor[1][0] = -vec[2]/2;
+      wheels_anchor[2][0] = vec[2]/2;
+      wheels_anchor[3][0] = vec[2]/2;
     }
   };
 
   std::shared_ptr<spVehicleConstructionInfo> car_params = std::make_shared<MyVehicleConstInfo>();
 
 #ifdef SIM_CALIB
-  // create a simulated car
-  spworld.car_param.wheel_friction = 0.4;
-  spworld.car_param.wheel_rollingfriction = 0.1;
-  spworld.car_param.engine_torque = 0.0001;
-  spworld.car_param.chassis_mass = 5;
-//  spworld.car_param.steering_servo_max_velocity = 1;
   spObjectHandle car_handle = spworld.objects_.CreateVehicle(*car_params);
   spworld.gui_.AddObject(spworld.objects_.GetObject(car_handle));
   spAWSDCar& car = (spAWSDCar&) spworld.objects_.GetObject(car_handle);
@@ -116,24 +125,28 @@ int main(int argc, char** argv) {
 
 #endif
 
-  unsigned int window_size = 20;
+  unsigned int window_size = 40;
   unsigned int queue_size = 10;
   double batch_min_entropy = 10;
   // create a candidate_window and a priority queue
 //  PriorityQueue priority_queue(queue_size,*car_params);
   // create a new candidate window
-  CandidateWindow candidate_window(window_size,1,car_params,&spworld.gui_);
-  car_params->wheel_friction = 0.2;
-  double wheel_base = 0.40;
+  car_params->wheel_friction = 0.4;
+  double wheel_base = 0.41;
   car_params->wheels_anchor[0][1] = wheel_base/2;
   car_params->wheels_anchor[1][1] = -wheel_base/2;
   car_params->wheels_anchor[2][1] = -wheel_base/2;
   car_params->wheels_anchor[3][1] = wheel_base/2;
+  double wheel_trach_len = 0.20;
+  car_params->wheels_anchor[0][0] = -wheel_trach_len/2;
+  car_params->wheels_anchor[1][0] = -wheel_trach_len/2;
+  car_params->wheels_anchor[2][0] = wheel_trach_len/2;
+  car_params->wheels_anchor[3][0] = wheel_trach_len/2;
 
-//  EntropyTable entropytable(car_params,2,10);
+  CandidateWindow candidate_window(window_size,1,car_params/*,&spworld.gui_*/);
+  EntropyTable entropytable(car_params,3,10);
 //  candidate_window.prqueue_func_ptr_ = std::bind(&PriorityQueue::PushBackCandidateWindow,&priority_queue,std::placeholders::_1);
-//  candidate_window.prqueue_func_ptr_ = std::bind(&EntropyTable::PushBackCandidateWindow,&entropytable,std::placeholders::_1);
-  int iter_cnt = 0;
+  candidate_window.prqueue_func_ptr_ = std::bind(&EntropyTable::PushBackCandidateWindow,&entropytable,std::placeholders::_1);
   spPose vicon_pose;
   spPose vicon_prev_pose;
   spTimestamp timestamp;
@@ -142,24 +155,7 @@ int main(int argc, char** argv) {
   spRotVel rotvel;
 bool flag0 = true;
   while(spworld.ShouldRun()) {
-//    if(iter_cnt<20) {
-//      steering_signal = 0;
-//      throttle_signal = 100;
-//    } else if(iter_cnt<window_size/2) {
-//      steering_signal = 0.7;
-//      throttle_signal = 100;
-//    } else {
-//      steering_signal = 0.7;
-//      throttle_signal = 150;
-//    }
-//    if(iter_cnt%20<12) {
-//      steering_signal = -0.7;
-//      throttle_signal = 100;
-//    } else {
-//      steering_signal = 0;
-//      throttle_signal = 50;
-//    }
-    iter_cnt++;
+
     // Get Car's Pose
 #ifdef SIM_CALIB
     vicon_prev_pose = vicon_pose;

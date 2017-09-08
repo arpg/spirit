@@ -18,7 +18,7 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
     num_residual_blocks_ = ref_states_.size()-1;
 
     set_num_residuals(num_residual_blocks_*17);
-    AddParameterBlock(2);
+    AddParameterBlock(3);
 
     Eigen::VectorXd weightvec(num_residual_blocks_*17);
     for(int ii=0; ii<num_residual_blocks_; ii++) {
@@ -33,14 +33,18 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
 
     if ((jacobians != NULL) && (residuals != NULL)) {
       std::vector<std::shared_ptr<spStateSeries>> sim_traj;
-      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> jac(jacobians[0],num_residual_blocks_*17,2);
+      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> jac(jacobians[0],num_residual_blocks_*17,parameter_block_sizes()[0]);
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*17,1);
       double epsilon = 0.1;
       std::vector<std::shared_ptr<CalibCarSimFunctor>> sims;
 //      std::cout << std::fixed << std::setprecision(12) << "params are " << parameters[0][0] << "\t\t" << parameters[0][1] << std::endl;
-
+      Eigen::VectorXd update_vec(parameter_block_sizes()[0]);
       for(int ii=0; ii<parameter_block_sizes()[0]; ii++) {
-        sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,ii,epsilon,gui_));
+        update_vec[ii] = parameters[0][ii];
+      }
+      vehicle_info_->SetParameterVector(update_vec);
+      for(int ii=0; ii<parameter_block_sizes()[0]; ii++) {
+        sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,ii,epsilon,nullptr));
       }
       sims.push_back(std::make_shared<CalibCarSimFunctor>(vehicle_info_,0,0,gui_));
 
@@ -81,17 +85,16 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
     } else if (residuals != NULL) {
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*17,1);
       std::shared_ptr<spStateSeries> curr_states = std::make_shared<spStateSeries>();
-      CalibCarSimFunctor sims(vehicle_info_,parameters[0][0],parameters[0][1]);
+      Eigen::VectorXd update_vec(parameter_block_sizes()[0]);
+      for(int ii=0; ii<parameter_block_sizes()[0]; ii++) {
+        update_vec[ii] = parameters[0][ii];
+      }
+      vehicle_info_->SetParameterVector(update_vec);
+      CalibCarSimFunctor sims(vehicle_info_,0,0);
       sims(ref_states_, curr_states);
       // Calculate residual
       for(int jj = 0; jj<num_residual_blocks_; jj++) {
         res.block<17,1>(jj*17,0) = (*(ref_states_[jj+1]) - *((*curr_states)[jj])).calibvector();
-//        // test relative pose error
-//        if(jj == 0) {
-//          res.block<17,1>(jj*17,0) = ((*(ref_states_[jj+1])-(*(ref_states_[jj]))) - ((*((*curr_states)[jj]))-(*(ref_states_[0])))).calibvector();
-//        } else {
-//          res.block<17,1>(jj*17,0) = ((*(ref_states_[jj+1])-(*(ref_states_[jj]))) - ((*((*curr_states)[jj]))-(*((*curr_states)[jj-1])))).calibvector();
-//        }
       }
       res = residual_weight_ * res;
 //      std::cout << "res   -> \n" << res << std::endl;

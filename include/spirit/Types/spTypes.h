@@ -269,6 +269,8 @@ enum class spObjectType{BOX,VEHICLE_AWSD,WHEEL,WAYPOINT,LINESTRIP};
 
 class spVehicleConstructionInfo{
 public:
+  Eigen::VectorXd calib_min_limit_vec;
+  Eigen::VectorXd calib_max_limit_vec;
   spObjectType vehicle_type;
   spPose pose;
   spTranslation cog; // Center Of Gravity in chassis frame
@@ -319,7 +321,9 @@ public:
     engine_torque = 0;
   }
   spVehicleConstructionInfo(const spVehicleConstructionInfo& v)
-    : vehicle_type(v.vehicle_type),
+    : calib_min_limit_vec(v.calib_min_limit_vec),
+      calib_max_limit_vec(v.calib_max_limit_vec),
+      vehicle_type(v.vehicle_type),
       pose(v.pose),
       cog(v.cog),
       chassis_mass(v.chassis_mass),
@@ -355,6 +359,7 @@ public:
   virtual std::shared_ptr<spVehicleConstructionInfo> MakeCopy() {
     SPERROREXIT("This function should be re-defined in a derived class!");
   }
+
 };
 
 class spCurve {

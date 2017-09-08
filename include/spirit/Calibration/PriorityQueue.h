@@ -108,13 +108,7 @@ private:
       ceres::CostFunction* cost_function = new CalibCostFunc(current_params_,queue_opt_[ii]->state_series_opt_,residual_weight,jacobian);
       problem.AddResidualBlock(cost_function, new ceres::CauchyLoss(0.1), parameter_vec.data());
     }
-    Eigen::VectorXd min_limits(2);
-    Eigen::VectorXd max_limits(2);
-    min_limits[0] = 0.1;
-    max_limits[0] = 0.5;
-    min_limits[1] = 0.1;
-    max_limits[1] = 1;
-    ceres::CostFunction* loss_function = new ParamLimitLossFunc<2>(min_limits,max_limits,100);
+    ceres::CostFunction* loss_function = new ParamLimitLossFunc<2>(current_params_->calib_min_limit_vec,current_params_->calib_max_limit_vec,100);
     problem.AddResidualBlock(loss_function,NULL,parameter_vec.data());
 
 //    std::vector<int> fix_param_vec;
