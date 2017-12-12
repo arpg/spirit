@@ -120,7 +120,7 @@ private:
       for(int ii=0; ii<table_.size(); ii++) {
         queue_opt_.push_back(table_[ii].first);
       }
-      std::cout << "opt" << std::endl;
+      //std::cout << "opt" << std::endl;
       // optimize queue with new candidate windows
       OptimizationThread();
 //      thread_should_run_ = false;
