@@ -52,6 +52,67 @@ bool spirit::ShouldRun() {
 
 void spirit::CheckKeyboardAction() { gui_.CheckKeyboardAction(); }
 
+void spirit::NonlinControl() {
+  // Create vehicle
+  spObjectHandle car_handle = objects_.CreateVehicle(car_param);
+  gui_.AddObject(objects_.GetObject(car_handle));
+  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
+  spPose pose = spPose::Identity();
+  pose.translation() = spTranslation(-6,0,0.06);
+  car.SetPose(pose);
+  spPose gnd_pose_ = spPose::Identity();
+  gnd_pose_.translate(spTranslation(0,0,-0.5));
+  spObjectHandle gnd_handle = objects_.CreateBox(gnd_pose_,spBoxSize(20,20,1),0,spColor(0,1,0));
+  gui_.AddObject(objects_.GetObject(gnd_handle));
+  ((spBox&)objects_.GetObject(gnd_handle)).SetFriction(1);
+  ((spBox&)objects_.GetObject(gnd_handle)).SetRollingFriction(0.1);
+  car.SetChassisLinearVelocity(spLinVel(0,3,0));
+  while(1) {
+    // Measure current states
+    double k_v = 10;
+    double k_d = 50;
+    double k_p = 50;
+    double v_d = 2;
+    double r_d = 3;
+    double r = 2;
+    double x = car.GetPose().translation()[0];
+    double y = car.GetPose().translation()[1];
+    double etha = SP_PI-atan2(y,x);
+    Eigen::Matrix3d rotmat = car.GetPose().rotation();
+    double cai = -atan2(rotmat(1,0),rotmat(0,0));
+    double v = car.GetChassisLinearVelocity().norm();
+    double v_perp = v*sin(cai-etha);
+    double v_tan = v*cos(cai-etha);
+    double a_perp;
+    double a_tan;
+//    std::cout << "etha -> " << etha << "\t\tcai-> " << cai << std::endl;
+
+    // Calculate controls
+    a_perp = (v_tan*v_tan)/r - k_d*v_perp-k_p*(r_d-r);
+    a_tan = -k_v*(v_tan-v_d);
+
+
+    double u1 = a_tan*cos(etha-cai) - a_perp*sin(etha-cai);
+    double u2 = a_tan*sin(etha-cai)/(v*v) + a_perp*cos(etha-cai)/(v*v);
+
+    if(u2 < -SP_PI_QUART) u2 = -SP_PI_QUART;
+    if(u2 > SP_PI_QUART) u2 = SP_PI_QUART;
+//    if(u1 < -0.01) u1 = -0.01;
+//    if(u1 > 0.01) u1 = 0.01;
+    if(u1 < -30) u1 = -30;
+    if(u1 > 30) u1 = 30;
+    std::cout << "u1 -> " << u1 << "\t\tu2 -> " << u2 << std::endl;
+    car.SetFrontSteeringAngle(u2);
+    car.SetEngineMaxVel(u1);
+//    car.SetEngineTorque(u1);
+//    car.SetFrontSteeringAngle(SP_PI_QUART/2);
+//    car.SetEngineMaxVel(3);
+
+    objects_.StepPhySimulation(0.1);
+    gui_.Iterate(objects_);
+  }
+}
+
 void spirit::DummyTests() {
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
@@ -62,21 +123,25 @@ void spirit::DummyTests() {
 
   car_param.steering_servo_max_velocity = 100;
   car_param.steering_servo_torque = 100;
-  spObjectHandle car_handle = objects_.CreateVehicle(car_param);
-  gui_.AddObject(objects_.GetObject(car_handle));
-  spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
-  car.SetEngineMaxVel(10);
-  car.SetRearSteeringAngle(0);
-  car.SetFrontSteeringAngle(SP_PI/4);
-
+  for(int ii=0; ii<1000; ii++) {
+    spObjectHandle car_handle = objects_.CreateVehicle(car_param);
+    gui_.AddObject(objects_.GetObject(car_handle));
+    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(car_handle);
+    car.SetEngineMaxVel(10);
+    car.SetRearSteeringAngle(0);
+    car.SetFrontSteeringAngle(SP_PI/4);
+  }
 
 //  spGeneralTools::Delay_ms(10);
   while(1){
+    spTimestamp tt =  spGeneralTools::Tick();
     objects_.StepPhySimulation(0.1);
+    double time =  spGeneralTools::Tock_us(tt);
+    std::cout << "time is " << time  << std::endl;
     spState state;
-    state = car.GetState();
-    car.SetState(state);
-    gui_.Iterate(objects_);
+//    state = car.GetState();
+//    car.SetState(state);
+//    gui_.Iterate(objects_);
   };
 }
 
@@ -282,7 +347,7 @@ void spirit::SenarioControllerTest() {
     pose.translate(spTranslation(x,y,0.07));
     Eigen::AngleAxisd rot(angle+SP_PI_HALF,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
-    traj.AddWaypoint(pose,7);
+    traj.AddWaypoint(pose,4);
   }
   gui_.Iterate(objects_);
   traj.IsLoop(true);
@@ -290,7 +355,7 @@ void spirit::SenarioControllerTest() {
   spLocalPlanner localplanner(car_param,&gui_);
 
   for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
-    traj.SetTravelDuration(ii,1.5);
+    traj.SetTravelDuration(ii,1);
     localplanner.SolveInitialPlan(traj,ii);
     localplanner.SolveLocalPlan(traj,ii,true);
     gui_.Iterate(objects_);

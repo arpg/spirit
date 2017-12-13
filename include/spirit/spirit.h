@@ -38,6 +38,7 @@ public:
   void multithreadtest();
   void zibil();
   void SenarioCalibrationTest();
+  void NonlinControl();
   Objects objects_;
   Gui gui_;
   spVehicleConstructionInfo car_param;

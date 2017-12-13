@@ -13,6 +13,7 @@ class CandidateWindow {
   CandidateWindow(int window_size, double max_cost, std::shared_ptr<spVehicleConstructionInfo> params, Gui* gui = nullptr) : window_size_(window_size), max_cost_(max_cost), current_params_(params), gui_(gui) {
     thread_should_run_ = false;
     data_loaded_flg_ = false;
+    final_cost_ = 1000;
     if(gui_ == nullptr) {
       thread_handle_ = std::make_unique<std::thread>(&CandidateWindow::OptimizeParametersInWindow,this);
       thread_should_run_ = true;
@@ -27,6 +28,7 @@ class CandidateWindow {
     cov_is_singular_ = obj.cov_is_singular_;
     max_cost_ = obj.max_cost_;
     state_series_opt_ = obj.state_series_opt_;
+    final_cost_ = obj.final_cost_;
   }
 
   ~CandidateWindow(){}
@@ -62,16 +64,16 @@ class CandidateWindow {
     }
   }
 
-  Eigen::Vector3d GetEntropyVec() {
-    Eigen::Vector3d vec;
-    Eigen::EigenSolver<Eigen::Matrix3d> eigensolver(covariance_);
+  Eigen::Vector2d GetEntropyVec() {
+    Eigen::Vector2d vec;
+    Eigen::EigenSolver<Eigen::Matrix2d> eigensolver(covariance_);
     std::complex<double> eigenvalue0;
     std::complex<double> eigenvalue1;
-    std::complex<double> eigenvalue2;
+//    std::complex<double> eigenvalue2;
     eigenvalue0 = eigensolver.eigenvalues().col(0)[0];
     eigenvalue1 = eigensolver.eigenvalues().col(0)[1];
-    eigenvalue2 = eigensolver.eigenvalues().col(0)[2];
-    vec << eigenvalue0.real(),eigenvalue1.real(),eigenvalue2.real();
+//    eigenvalue2 = eigensolver.eigenvalues().col(0)[2];
+    vec << eigenvalue0.real(),eigenvalue1.real();//,eigenvalue2.real();
     return vec;
   }
 
@@ -124,6 +126,10 @@ class CandidateWindow {
     params_mutex_.unlock();
   }
 
+  double GetFinalCost() {
+    return final_cost_;
+  }
+
 private:
   void CalculateEntropy(){
     entropy_ = 0.5*std::log((2*SP_PI*SP_EULER*covariance_).determinant());
@@ -140,11 +146,11 @@ private:
     Eigen::MatrixXd jacobian;
     params_mutex_.lock();
     Eigen::VectorXd parameter_vec_(current_params_->GetParameterVector());
-    std::cout << "params " << parameter_vec_.transpose() << std::endl;
+//    std::cout << "params " << parameter_vec_.transpose() << std::endl;
     ceres::CostFunction* cost_function = new CalibCostFunc(current_params_,state_series_opt_,residual_weight,jacobian,gui_);
     params_mutex_.unlock();
 
-    ceres::CostFunction* loss_function = new ParamLimitLossFunc<3>(current_params_->calib_min_limit_vec,current_params_->calib_max_limit_vec,100);
+    ceres::CostFunction* loss_function = new ParamLimitLossFunc<2>(current_params_->calib_min_limit_vec,current_params_->calib_max_limit_vec,100);
 
     problem.AddResidualBlock(cost_function, NULL, parameter_vec_.data());
     problem.AddResidualBlock(loss_function,NULL,parameter_vec_.data());
@@ -157,8 +163,8 @@ private:
     options.parameter_tolerance = 1e-3;
     options.linear_solver_type = ceres::DENSE_QR;
     options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
-    options.minimizer_progress_to_stdout = true;
-    options.num_linear_solver_threads = 1;
+    options.minimizer_progress_to_stdout = false;
+//    options.num_linear_solver_threads = 1;
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
 //    std::cout << summary.FullReport() << std::endl;
@@ -168,13 +174,13 @@ private:
 //      std::cout << "max cost reached !" << std::endl;
 //      return false;
 //    }
-    Eigen::Matrix3d jtj = jacobian.transpose()*jacobian;
+    Eigen::Matrix2d jtj = jacobian.transpose()*jacobian;
     if(jtj.determinant() == 0) {
       cov_is_singular_ = true;
       return false;
     } else {
       cov_is_singular_ = false;
-      covariance_ = (jacobian.transpose()*jacobian).inverse();
+      covariance_ = jtj.inverse();
     }
 
     // calculate final Covariance
@@ -194,14 +200,15 @@ private:
 //    CalibCarSimFunctor sim(current_params,parameter_vec_[0],parameter_vec_[1],gui);
 //    sim(state_series_);
     CalculateEntropy();
-
+    final_cost_ = summary.final_cost;
+//    std::cout << "final cost is " << summary.final_cost << std::endl;
 //    Eigen::EigenSolver<Eigen::Matrix3d> eigensolver(covariance_);
 //    std::complex<double> eigenvalue0;
 //    std::complex<double> eigenvalue1;
 //    eigenvalue0 = eigensolver.eigenvalues().col(0)[0];
 //    eigenvalue1 = eigensolver.eigenvalues().col(0)[1];
 //    std::cout << "eigen values are\t" << eigenvalue0.real()  << "\t,\t" << eigenvalue1.real() << "\t,\t" << summary.final_cost << std::endl;
-//    std::cout << "parameters are \t" << covariance_(0,0) << "\t,\t" << covariance_(1,1) << "\t,\t" << GetEntropy() << "\t,\t" << summary.final_cost << std::endl;
+//    std::cout << "parameters are \t" << parameter_vec_[0] << "\t,\t" << parameter_vec_[1] << std::endl;
     return true;
   }
   bool GetDataLoadedFlag() {
@@ -212,11 +219,12 @@ public:
   spStateSeries state_series_;
   spStateSeries state_series_opt_;
   std::function<int(std::shared_ptr<CandidateWindow>)> prqueue_func_ptr_;
+  double final_cost_;
 
 private:
   unsigned int window_size_;
   double entropy_;
-  Eigen::Matrix3d covariance_;
+  Eigen::Matrix2d covariance_;
   bool cov_is_singular_;
   double max_cost_;
   std::shared_ptr<std::thread> thread_handle_;

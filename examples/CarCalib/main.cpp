@@ -70,15 +70,17 @@ int main(int argc, char** argv) {
       steering_servo_upper_limit = SP_PI / 4;
       steering_servo_max_velocity = 2;
       steering_servo_torque = 100;
-      Eigen::VectorXd min_limits(3);
+//      Eigen::VectorXd min_limits(3);
+      Eigen::VectorXd min_limits(2);
       min_limits[0] = 0.1;
       min_limits[1] = 0.1;
-      min_limits[2] = 0.1;
+//      min_limits[2] = 0.1;
       calib_min_limit_vec = min_limits;
-      Eigen::VectorXd max_limits(3);
+//      Eigen::VectorXd max_limits(3);
+      Eigen::VectorXd max_limits(2);
       max_limits[0] = 0.4;
       max_limits[1] = 1;
-      max_limits[2] = 0.2;
+//      max_limits[2] = 0.2;
       calib_max_limit_vec = max_limits;
     }
     MyVehicleConstInfo(const spVehicleConstructionInfo& obj) : spVehicleConstructionInfo(obj) {}
@@ -89,10 +91,11 @@ int main(int argc, char** argv) {
     }
 
     Eigen::VectorXd GetParameterVector() const {
-      Eigen::VectorXd vec(3);
+//      Eigen::VectorXd vec(3);
+      Eigen::VectorXd vec(2);
       vec[0] = (wheels_anchor[0]-wheels_anchor[1])[1];
       vec[1] = wheel_friction;
-      vec[2] = (wheels_anchor[2]-wheels_anchor[1])[0];
+//      vec[2] = (wheels_anchor[2]-wheels_anchor[1])[0];
       return vec;
     }
     void SetParameterVector(Eigen::VectorXd vec) {
@@ -101,10 +104,10 @@ int main(int argc, char** argv) {
       wheels_anchor[2][1] = -vec[0]/2;
       wheels_anchor[3][1] = vec[0]/2;
       wheel_friction = vec[1];
-      wheels_anchor[0][0] = -vec[2]/2;
-      wheels_anchor[1][0] = -vec[2]/2;
-      wheels_anchor[2][0] = vec[2]/2;
-      wheels_anchor[3][0] = vec[2]/2;
+//      wheels_anchor[0][0] = -vec[2]/2;
+//      wheels_anchor[1][0] = -vec[2]/2;
+//      wheels_anchor[2][0] = vec[2]/2;
+//      wheels_anchor[3][0] = vec[2]/2;
     }
   };
 
@@ -125,7 +128,7 @@ int main(int argc, char** argv) {
 
 #endif
 
-  unsigned int window_size = 40;
+  unsigned int window_size = 15;
   unsigned int queue_size = 10;
   double batch_min_entropy = 10;
   // create a candidate_window and a priority queue
@@ -137,14 +140,14 @@ int main(int argc, char** argv) {
   car_params->wheels_anchor[1][1] = -wheel_base/2;
   car_params->wheels_anchor[2][1] = -wheel_base/2;
   car_params->wheels_anchor[3][1] = wheel_base/2;
-  double wheel_trach_len = 0.20;
-  car_params->wheels_anchor[0][0] = -wheel_trach_len/2;
-  car_params->wheels_anchor[1][0] = -wheel_trach_len/2;
-  car_params->wheels_anchor[2][0] = wheel_trach_len/2;
-  car_params->wheels_anchor[3][0] = wheel_trach_len/2;
+//  double wheel_trach_len = 0.20;
+//  car_params->wheels_anchor[0][0] = -wheel_trach_len/2;
+//  car_params->wheels_anchor[1][0] = -wheel_trach_len/2;
+//  car_params->wheels_anchor[2][0] = wheel_trach_len/2;
+//  car_params->wheels_anchor[3][0] = wheel_trach_len/2;
 
   CandidateWindow candidate_window(window_size,1,car_params/*,&spworld.gui_*/);
-  EntropyTable entropytable(car_params,3,10);
+  EntropyTable entropytable(car_params,2,5);
 //  candidate_window.prqueue_func_ptr_ = std::bind(&PriorityQueue::PushBackCandidateWindow,&priority_queue,std::placeholders::_1);
   candidate_window.prqueue_func_ptr_ = std::bind(&EntropyTable::PushBackCandidateWindow,&entropytable,std::placeholders::_1);
   spPose vicon_pose;
@@ -199,9 +202,9 @@ bool flag0 = true;
 //      candidate_window.SetParams(params);
 //    }
     std::shared_ptr<spVehicleConstructionInfo> params;
-//    if(entropytable.GetParameters(params)) {
-//      candidate_window.SetParams(params);
-//    }
+    if(entropytable.GetParameters(params)) {
+      candidate_window.SetParams(params);
+    }
 
 //    std::cout << "**********************" << std::endl;
 //    std::cout << "cars is\t" << car.GetState().rotvel.transpose() << std::endl;

@@ -3,7 +3,7 @@
 
 #include <spirit/Calibration/CandidateWindow.h>
 #include <condition_variable>
-typedef Eigen::Vector3d Vec;
+typedef Eigen::Vector2d Vec;
 
 class EntropyTable {
  public:
@@ -20,6 +20,11 @@ class EntropyTable {
       table_.push_back(std::make_pair(candidate,Vec::Ones()));
       score_count_ = Vec::Ones();
       FindHighestEntropy();
+      {
+        std::lock_guard<std::mutex> lock(data_load_mutex_);
+        data_loaded_flg_ = true;
+        data_load_cv_.notify_one();
+      }
       return 0;
     }
 
@@ -131,36 +136,37 @@ private:
 //    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
     residual_weight << 1,1,1,1,1,1,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0;
     current_param_mutex_.lock();
+//    CoutTable();
     Eigen::VectorXd parameter_vec(current_params_->GetParameterVector());
     for(int ii=0; ii<queue_opt_.size(); ii++) {
       ceres::CostFunction* cost_function = new CalibCostFunc(current_params_,queue_opt_[ii]->state_series_opt_,residual_weight,jacobians[ii]);
-      problem.AddResidualBlock(cost_function, new ceres::CauchyLoss(0.1), parameter_vec.data());
+      problem.AddResidualBlock(cost_function, /*new ceres::CauchyLoss(0.1)*/NULL, parameter_vec.data());
     }
-    ceres::CostFunction* loss_function = new ParamLimitLossFunc<3>(current_params_->calib_min_limit_vec,current_params_->calib_max_limit_vec,100);
+    ceres::CostFunction* loss_function = new ParamLimitLossFunc<2>(current_params_->calib_min_limit_vec,current_params_->calib_max_limit_vec,100);
     problem.AddResidualBlock(loss_function,NULL,parameter_vec.data());
 
     // Run the solver!
     ceres::Solver::Options options;
-    options.initial_trust_region_radius = 0.05;
-    options.max_trust_region_radius = 0.05;
+    options.initial_trust_region_radius = 1;
+    options.max_trust_region_radius = 1;
     options.min_trust_region_radius = 1e-3;
-    options.parameter_tolerance = 1e-4;
+    options.parameter_tolerance = 1e-3;
     options.linear_solver_type = ceres::DENSE_QR;
     options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
     options.minimizer_progress_to_stdout = false;
-    options.num_linear_solver_threads = 1;
+//    options.num_linear_solver_threads = 1;
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
 //    std::cout << summary.FullReport() << std::endl;
 
     // calculate final Covariance
-    Eigen::Matrix3d covariance_;
+    Eigen::Matrix2d covariance_;
 
     ceres::Covariance::Options cov_options;
     cov_options.num_threads = 1;
     ceres::Covariance covariance(cov_options);
-    std::vector<const double*> covariance_blocks;
-    covariance_blocks.push_back(parameter_vec.data());
+    std::vector<std::pair<const double*,const double*>> covariance_blocks;
+    covariance_blocks.push_back(std::make_pair(parameter_vec.data(),parameter_vec.data()));
     // check if covarinace is non-singular
     if(!covariance.Compute(covariance_blocks, &problem)) {
       SPERROREXIT("covariance is singular ");
@@ -169,7 +175,29 @@ private:
     covariance.GetCovarianceBlock(parameter_vec.data(), parameter_vec.data(), covariance_.data());
 
 //    std::cout << "cov \n" << covariance_ << std::endl;
-    std::cout << parameter_vec[0] << "," << parameter_vec[1]<< "," << parameter_vec[2]  << "," << covariance_(0,0) << "," << covariance_(1,1)<< "," << covariance_(2,2) << ";" << std::endl;
+//    std::cout << parameter_vec[0] << "," << parameter_vec[1]<< "," /*<< parameter_vec[2]  << "," */<< covariance_(0,0) << "," << covariance_(1,1)<< /*"," << covariance_(2,2) <<*/ ";" << std::endl;
+/*
+    if(queue_opt_.size() == 1) {
+      Eigen::Matrix2d cov_;
+      Eigen::Matrix2d jtj = jacobians[0].transpose()*jacobians[0];
+      cov_ = jtj.inverse();
+      Eigen::EigenSolver<Eigen::Matrix2d> eigensolver(cov_);
+      std::complex<double> eigenvalue0;
+      std::complex<double> eigenvalue1;
+      eigenvalue0 = eigensolver.eigenvalues().col(0)[0];
+      eigenvalue1 = eigensolver.eigenvalues().col(0)[1];
+      std::cout << "cov is \n" << cov_ << std::endl;
+      std::cout << "eigen values are\t" << eigenvalue0.real()  << "\t,\t" << eigenvalue1.real() << std::endl;
+    }
+*/
+    Eigen::EigenSolver<Eigen::Matrix2d> eigensolver(covariance_);
+    std::complex<double> eigenvalue0;
+    std::complex<double> eigenvalue1;
+    eigenvalue0 = eigensolver.eigenvalues().col(0)[0];
+    eigenvalue1 = eigensolver.eigenvalues().col(0)[1];
+//    std::cout << "cov is \n" << cov_ << std::endl;
+//    std::cout << "eigen values are\t" << eigenvalue0.real()  << "\t,\t" << eigenvalue1.real() << std::endl;
+std::cout << parameter_vec[0] << "," << parameter_vec[1]<< "," /*<< parameter_vec[2]  << "," */<< eigenvalue0.real()<< "," << eigenvalue1.real() << "," << covariance_.determinant() << ";" << std::endl;
 
     current_params_->SetParameterVector(parameter_vec);
     current_param_mutex_.unlock();
@@ -180,6 +208,7 @@ private:
     for(int ii=0; ii<table_.size(); ii++) {
       std::cout << table_[ii].first->GetEntropyVec().transpose() << "\t|\t";
       std::cout << table_[ii].first->GetEntropy() << "\t|\t";
+      std::cout << (double)table_[ii].first->GetFinalCost() << "\t|\t";
       std::cout << table_[ii].second.transpose() << std::endl;
     }
     std::cout << "score count is " << score_count_.transpose() << std::endl;

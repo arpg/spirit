@@ -1,6 +1,5 @@
 #ifndef VEHICLECERESCOSTFUNC_H__
 #define VEHICLECERESCOSTFUNC_H__
-#include <spirit/Types/ctpl_stl.h>
 #include <sophus/se3.hpp>
 #include <iostream>
 #include <spirit/Types/spTypes.h>

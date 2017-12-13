@@ -140,10 +140,10 @@ void spWheel::SetDriveMotorTargetVelocity(double velocity)
   hinge_->setTargetVelocity(drive_motor_axis,velocity);
 }
 
-//void spWheel::SetDriveMotorTorque(double torque)
-//{
-//  hinge_->setMaxMotorForce(drive_motor_axis,torque*WSCALE*WSCALE);
-//}
+void spWheel::SetDriveMotorTorque(double torque)
+{
+  hinge_->setMaxMotorForce(drive_motor_axis,torque*WSCALE*WSCALE);
+}
 
 const spTranslation& spWheel::GetChassisAnchor()
 {

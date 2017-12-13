@@ -34,6 +34,12 @@ void spAWSDCar::SetEngineMaxVel(double vel) {
   }
 }
 
+void spAWSDCar::SetEngineTorque(double torque) {
+  for(int ii=0;ii<4;ii++) {
+    GetWheel(ii)->SetDriveMotorTorque(torque);
+  }
+}
+
 //void spAWSDCar::SetSteeringServoMaxVel(double vel){
 //  for(int ii=0;ii<4;ii++) {
 //    GetWheel(ii)->SetSteeringServoMaxVelocity(vel);

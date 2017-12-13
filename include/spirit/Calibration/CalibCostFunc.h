@@ -18,7 +18,7 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
     num_residual_blocks_ = ref_states_.size()-1;
 
     set_num_residuals(num_residual_blocks_*17);
-    AddParameterBlock(3);
+    AddParameterBlock(2);
 
     Eigen::VectorXd weightvec(num_residual_blocks_*17);
     for(int ii=0; ii<num_residual_blocks_; ii++) {
