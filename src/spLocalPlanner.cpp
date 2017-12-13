@@ -8,14 +8,14 @@ spLocalPlanner::spLocalPlanner(const spVehicleConstructionInfo& vehicle_info, Gu
 spLocalPlanner::~spLocalPlanner() {
 }
 
-void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simulation_duration, const spState& current_state, const spWaypoint& end_waypoint) {
+double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simulation_duration, const spState& current_state, const spWaypoint& end_waypoint) {
   ceres::Problem problem;
   spState goal_state;
   goal_state.pose = spPose(end_waypoint.GetPose());
   goal_state.linvel = spLinVel(end_waypoint.GetLinearVelocity());
   Eigen::VectorXd residual_weight(13);
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.002, 0.002, 0.002, 0.001, 0.001, 0.001,0.0001;
-  residual_weight << 4, 4, 4, 9, 9, 9, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
+  residual_weight << 10, 10, 10, 0.1, 0.1, 0.1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.1;
   ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_parameters,current_state,goal_state,residual_weight);
   Eigen::VectorXd min_limits(7);
@@ -86,14 +86,16 @@ void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simula
     controls.data()[ii] = parameters[ii];
   }
   simulation_duration = parameters[6];
+  return summary.final_cost;
 }
 
-void spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simulation_duration, const spState& current_state, const spWaypoint& end_waypoint, std::shared_ptr<spStateSeries> traj_states) {
-  SolveLocalPlan(controls,simulation_duration,current_state,end_waypoint);
+double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simulation_duration, const spState& current_state, const spWaypoint& end_waypoint, std::shared_ptr<spStateSeries> traj_states) {
+  double final_cost = SolveLocalPlan(controls,simulation_duration,current_state,end_waypoint);
   // TODO: we should be able to get traj_states from solution of last optimization step but for now we resimulate.
   CarSimFunctor sim(vehicle_parameters,current_state,gui_);
 //  CarSimFunctor sim(vehicle_parameters,current_state,nullptr);
   sim(0,(int)(simulation_duration/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,controls,0,-1,traj_states);
+  return final_cost;
 }
 
 void spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory) {
@@ -102,13 +104,13 @@ void spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory) {
   }
 }
 
-void spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory, int way_index, bool overwrite_endstate) {
+double spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory, int way_index, bool overwrite_endstate) {
   int next_index;
   if(way_index == trajectory.GetNumWaypoints()-1) {
     if(trajectory.IsLoop()) {
       next_index = 0;
     } else {
-      return;
+      return -1;
     }
   } else {
     next_index = way_index + 1;
@@ -130,7 +132,7 @@ void spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory, int way_index, boo
   }
   std::shared_ptr<spStateSeries> state_series = std::make_shared<spStateSeries>();
   double travel_duration = 1;
-  SolveLocalPlan(trajectory.GetControls(way_index),travel_duration,current_state, trajectory.GetWaypoint(next_index),state_series);
+  double final_cost = SolveLocalPlan(trajectory.GetControls(way_index),travel_duration,current_state, trajectory.GetWaypoint(next_index),state_series);
   trajectory.SetTravelDuration(way_index,(int)(travel_duration/0.1)*0.1);
   trajectory.SetTrajectoryStateSeries(way_index,state_series);
 //  std::cout << "controls are :\n" << trajectory.GetControls(way_index) << std::endl;
@@ -141,6 +143,8 @@ void spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory, int way_index, boo
     trajectory.GetWaypoint(next_index).SetPose(state_series->back()->pose);
     trajectory.GetWaypoint(next_index).SetLinearVelocityNorm(state_series->back()->linvel.norm());
   }
+
+  return final_cost;
 }
 
 void spLocalPlanner::SolveInitialPlan(spTrajectory& trajectory, int way_index) {

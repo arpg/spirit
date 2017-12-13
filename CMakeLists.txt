@@ -25,7 +25,6 @@ find_package( Pangolin REQUIRED )
 find_package( Bullet REQUIRED )
 find_package( SceneGraph 0.1 REQUIRED )
 find_package( Eigen3 REQUIRED )
-find_package( Sophus REQUIRED)
 find_package( CeresSolver REQUIRED)
 #find_package( Matlab	REQUIRED ENG_LIBRARY MX_LIBRARY MAT_LIBRARY)
 #find_package( tbb REQUIRED)
@@ -35,7 +34,6 @@ set( _INCLUDE_DIRS
 	${Pangolin_INCLUDE_DIRS}
 	${SceneGraph_INCLUDE_DIRS}
 	${BULLET_INCLUDE_DIR}
-	${Sophus_INCLUDE_DIRS}
 	${CeresSolver_INCLUDE_DIRS}
 #	${Matlab_INCLUDE_DIRS}
 #	${TBB_INCLUDE_DIRS}

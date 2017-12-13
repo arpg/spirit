@@ -22,8 +22,8 @@ spirit::spirit(const spSettings& user_settings) {
   car_param.chassis_size = spBoxSize(0.2, 0.42, 0.05);
   car_param.cog = spTranslation(0, 0, 0);
   car_param.chassis_friction = 0;
-  car_param.wheel_rollingfriction = 0.3;
-  car_param.wheel_friction = 0.5;
+  car_param.wheel_rollingfriction = 0.1;
+  car_param.wheel_friction = 0.8;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.05;//0.057;
   car_param.susp_damping = 0;
