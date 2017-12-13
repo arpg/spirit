@@ -3,6 +3,7 @@ if( spirit_FOUND )
       add_subdirectory( car_robot )
       add_subdirectory( CarCalib )
       add_subdirectory( mpc_car )
+      add_subdirectory( sim_car )
 endif()
 add_subdirectory( gamepad_drive )
 

@@ -10,7 +10,7 @@ include_directories(${HAL_INCLUDE_DIRS})
 #include_directories(${Pangolin_INCLUDE_DIRS})
 
 # Find Scenegraph
-#find_package(SceneGraph 0.1 REQUIRED)
+#find_package(SceneGraph 0. 1 REQUIRED)
 #include_directories(${SceneGraph_INCLUDE_DIRS})
 
 # Find GLOG
@@ -21,7 +21,7 @@ include_directories(${HAL_INCLUDE_DIRS})
 #find_package(gflags REQUIRED)
 
 # Find SPIRIT
-find_package(spirit REQUIRED)
+find_package( REQUIRED)
 include_directories(${spirit_INCLUDE_DIRS})
 
 add_executable( ${ProjectId} main.cpp)

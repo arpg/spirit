@@ -70,7 +70,6 @@ set( HDRS
 	include/spirit/Types/spTypes.h
 	include/spirit/Objects/spLineStrip.h
 	include/spirit/CarSimFunctor.h
-	include/spirit/Types/ctpl_stl.h
 	include/spirit/Controllers/spPID.h
 	include/spirit/Planners/spTrajectory.h
 	include/spirit//Planners/VehicleCeresCostFunc.h

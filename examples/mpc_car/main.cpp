@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 
   while(1) {
 //    ninja_car.UpdateCarCommand(commandMSG);
-    car.SetPose(posys_);
+//    car.SetPose(posys_);
     spworld.gui_.Iterate(spworld.objects_);
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
