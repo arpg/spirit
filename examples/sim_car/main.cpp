@@ -54,6 +54,8 @@ int main(int argc, char** argv) {
     // set some constant values for engine velocity and front steering angle
     car.SetEngineMaxVel(20);
     car.SetFrontSteeringAngle(SP_PI_QUART);
+    Eigen::Matrix3d rotmat = car.GetPose().rotation();
+    std::cout << "yaw -> " << std::atan2(rotmat(1,0),rotmat(0,0)) << std::endl;
 
     // step physics simulation for 0.01 seconds
     spworld.objects_.StepPhySimulation(0.01);
