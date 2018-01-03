@@ -52,8 +52,8 @@ int main(int argc, char** argv) {
   commandMSG.set_steering_angle(0);
   commandMSG.set_throttle_percent(0);
   //////////////////////////////
-//  hal::Posys vicon("vicon://192.168.50.22:[RigidBody01]");
-//  vicon.RegisterPosysDataCallback(&Posys_Handler);
+  hal::Posys vicon("vicon://tracker:[dummy]");
+  vicon.RegisterPosysDataCallback(&Posys_Handler);
   /////////////////////////////
   spSettings settings_obj;
   settings_obj.SetGuiType(spGuiType::GUI_PANGOSCENEGRAPH);
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
 
   while(1) {
 //    ninja_car.UpdateCarCommand(commandMSG);
-//    car.SetPose(posys_);
+    car.SetPose(posys_);
     spworld.gui_.Iterate(spworld.objects_);
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }

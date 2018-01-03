@@ -33,4 +33,5 @@ target_link_libraries(${ProjectId}
 #                      ${GLog_LIBRARIES}
 #                      spirit
 #                      gflags
+dl
                       )

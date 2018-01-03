@@ -21,9 +21,9 @@ include_directories(${HAL_INCLUDE_DIRS})
 #find_package(gflags REQUIRED)
 
 # Find SPIRIT
-find_package( REQUIRED)
+find_package( spirit REQUIRED)
 include_directories(${spirit_INCLUDE_DIRS})
-
+message("libs -> ${HAL_LIBRARIES}")
 add_executable( ${ProjectId} main.cpp)
 target_link_libraries(${ProjectId}
                       ${HAL_LIBRARIES}
@@ -33,4 +33,7 @@ target_link_libraries(${ProjectId}
 #                      ${GLog_LIBRARIES}
 #                      spirit
 #                      gflags
+glog
+#pthread
+dl
                       )

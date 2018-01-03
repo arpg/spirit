@@ -12,4 +12,6 @@
   target_link_libraries(${ProjectId}
                         ${HAL_LIBRARIES}
                         ${spirit_LIBRARIES}
+glog
+dl
                         )

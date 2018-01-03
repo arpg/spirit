@@ -14,6 +14,8 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 include(install_package)
 
+option( BUILD_SHARED_LIBS "Build shared libraries." ON )
+
 # Default flags.
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
 
@@ -39,6 +41,8 @@ set( _INCLUDE_DIRS
 #	${TBB_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	)
+
+message("Ceres Libs: ${CeresSolver_LIBRARIES}")
 
 set( _LIBRARIES
 	${Pangolin_LIBRARIES}

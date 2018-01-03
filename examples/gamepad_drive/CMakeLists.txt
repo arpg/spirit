@@ -22,4 +22,6 @@
                         ${spirit_LIBRARIES}
   #                      ${Pangolin_LIBRARIES}
   #                      ${SceneGraph_LIBRARIES}
+glog
+dl
                         )
