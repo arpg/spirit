@@ -32,11 +32,11 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
                         double** jacobians)  const {
 
     if ((jacobians != NULL) && (residuals != NULL)) {
-      std::vector<std::shared_ptr<spStateSeries>> sim_traj;
-      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> jac(jacobians[0],num_residual_blocks_*17,parameter_block_sizes()[0]);
-      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*17,1);
+      std::vector<std::shared_ptr<spStateSeries> > sim_traj;
+      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> > jac(jacobians[0],num_residual_blocks_*17,parameter_block_sizes()[0]);
+      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > res(residuals,num_residual_blocks_*17,1);
       double epsilon = 0.1;
-      std::vector<std::shared_ptr<CalibCarSimFunctor>> sims;
+      std::vector<std::shared_ptr<CalibCarSimFunctor> > sims;
 //      std::cout << std::fixed << std::setprecision(12) << "params are " << parameters[0][0] << "\t\t" << parameters[0][1] << std::endl;
       Eigen::VectorXd update_vec(parameter_block_sizes()[0]);
       for(int ii=0; ii<parameter_block_sizes()[0]; ii++) {
@@ -83,7 +83,7 @@ class CalibCostFunc : public ceres::DynamicCostFunction {
 //      std::cout << " res -> \n" << res << std::endl;
 //      std::cout << "cost is " << res.norm() << std::endl;
     } else if (residuals != NULL) {
-      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*17,1);
+      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > res(residuals,num_residual_blocks_*17,1);
       std::shared_ptr<spStateSeries> curr_states = std::make_shared<spStateSeries>();
       Eigen::VectorXd update_vec(parameter_block_sizes()[0]);
       for(int ii=0; ii<parameter_block_sizes()[0]; ii++) {

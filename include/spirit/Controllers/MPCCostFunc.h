@@ -40,7 +40,7 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
   ~MPCCostFunc() {}
   virtual bool Evaluate(double const* const* parameters, double* residuals,
                         double** jacobians) const {
-    std::vector<std::shared_ptr<spStateSeries>> sim_traj;
+    std::vector<std::shared_ptr<spStateSeries> > sim_traj;
     spCtrlPts2ord_2dof cntrl_vars;
     for (int ii = 0; ii < 6; ii++) {
       cntrl_vars.data()[ii] = parameters[0][ii];
@@ -49,9 +49,9 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
     if ((jacobians != NULL) && (residuals != NULL)) {
 //      std::cout << "jac called"  << std::endl;
 //      std::cout << "parameters are \n" << cntrl_vars << std::endl;
-      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> jac(jacobians[0],num_residual_blocks_*12,6);
-      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*12,1);
-      std::vector<std::shared_ptr<CarSimFunctor>> sims;
+      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> > jac(jacobians[0],num_residual_blocks_*12,6);
+      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > res(residuals,num_residual_blocks_*12,1);
+      std::vector<std::shared_ptr<CarSimFunctor> > sims;
       for (int ii = 0; ii < parameter_block_sizes()[0] + 1; ii++) {
         sims.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
       }
@@ -59,7 +59,7 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
 //        sims[ii]->SetState(current_state_);
 //      }
 #ifdef SOLVER_USE_CENTRAL_DIFF
-      std::vector<std::shared_ptr<CarSimFunctor>> sims_neg;
+      std::vector<std::shared_ptr<CarSimFunctor> > sims_neg;
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
         sims_neg.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
       }
@@ -146,7 +146,7 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
 //      std::cout << "cost is " << res.norm() << std::endl;
     } else if (residuals != NULL) {
 //      std::cout << "res called " << std::endl;
-      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*12,1);
+      Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> > res(residuals,num_residual_blocks_*12,1);
       std::shared_ptr<spStateSeries> curr_states = std::make_shared<spStateSeries>();
       CarSimFunctor sims(vehicle_info_,current_state_);
       sims(0, (int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, 0, -1, curr_states);

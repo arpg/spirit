@@ -186,8 +186,8 @@ private:
   double entropy_alpha_;
   std::shared_ptr<spVehicleConstructionInfo> current_params_;
   std::mutex current_param_mutex_;
-  std::vector<std::shared_ptr<CandidateWindow>> queue_;
-  std::vector<std::shared_ptr<CandidateWindow>> queue_opt_;
+  std::vector<std::shared_ptr<CandidateWindow> > queue_;
+  std::vector<std::shared_ptr<CandidateWindow> > queue_opt_;
   double queue_max_entropy_;
   int queue_max_entropy_index_;
   std::shared_ptr<std::thread> thread_handle_;

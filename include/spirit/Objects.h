@@ -9,7 +9,7 @@
 #include <spirit/Objects/spLineStrip.h>
 
 
-typedef std::list<std::shared_ptr<spCommonObject>>::iterator spObjectHandle;
+typedef std::list<std::shared_ptr<spCommonObject> >::iterator spObjectHandle;
 
 class Objects {
 
@@ -40,7 +40,7 @@ private:
   spPose& btTransform2spPose(const btTransform& tr, double btworld_scale_inv);
   btTransform& spPose2btTransform(const spPose& pose, double btworld_scale);
   btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
-  std::list<std::shared_ptr<spCommonObject>> objects_;
+  std::list<std::shared_ptr<spCommonObject> > objects_;
   void InitEmptyDynamicsWorld();
   BulletWorldParams world_params_;
   std::shared_ptr<btDefaultCollisionConfiguration> collisionConfiguration_;

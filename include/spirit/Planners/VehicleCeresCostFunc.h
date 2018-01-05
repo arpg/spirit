@@ -36,10 +36,10 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
 //    std::cout << "sim time -> " << simulation_length << std::endl;
 //    std::cout << cntrl_vars << std::endl;
     if ((jacobians != NULL) && (residuals != NULL)) {
-      Eigen::Map<Eigen::Matrix<double, 13, 7, Eigen::RowMajor>> jac(jacobians[0]);
-      Eigen::Map<Eigen::Matrix<double,13,1>> res(residuals);
+      Eigen::Map<Eigen::Matrix<double, 13, 7, Eigen::RowMajor> > jac(jacobians[0]);
+      Eigen::Map<Eigen::Matrix<double,13,1> > res(residuals);
       //      std::cout << "doing residual and jac" << std::endl;
-      std::vector<std::shared_ptr<CarSimFunctor>> sims;
+      std::vector<std::shared_ptr<CarSimFunctor> > sims;
       for (int ii = 0; ii < parameter_block_sizes()[0] + 1; ii++) {
         sims.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
       }
@@ -118,7 +118,7 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
 //      std::cout << " jac ->  \n" << jac << std::endl;
 //      std::cout << "res   -> " << res.transpose() << std::endl;
     } else if (residuals != NULL) {
-      Eigen::Map<Eigen::Matrix<double,13,1>> res(residuals);
+      Eigen::Map<Eigen::Matrix<double,13,1> > res(residuals);
       CarSimFunctor sims(vehicle_info_,current_state_);
       sims(0, (int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, 0, -1);
 

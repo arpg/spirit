@@ -23,8 +23,8 @@ class ParamLimitLossFunc : public ceres::SizedCostFunction<tsize,tsize> {
   virtual bool Evaluate(double const* const* parameters, double* residuals,
                         double** jacobians) const {
     if ((jacobians != NULL) && (residuals != NULL)) {
-      Eigen::Map<Eigen::Matrix<double,tsize,tsize,Eigen::RowMajor>> jac(jacobians[0]);
-      Eigen::Map<Eigen::Matrix<double,tsize,1>> res(residuals);
+      Eigen::Map<Eigen::Matrix<double,tsize,tsize,Eigen::RowMajor> > jac(jacobians[0]);
+      Eigen::Map<Eigen::Matrix<double,tsize,1> > res(residuals);
       // Jacobian calculation
       Eigen::VectorXd jac_vec(tsize);
       for (int ii = 0; ii < tsize; ii++) {
@@ -49,7 +49,7 @@ class ParamLimitLossFunc : public ceres::SizedCostFunction<tsize,tsize> {
       }
 
     } else if (residuals != NULL) {
-      Eigen::Map<Eigen::Matrix<double,tsize,1>> res(residuals);
+      Eigen::Map<Eigen::Matrix<double,tsize,1> > res(residuals);
       for (int ii = 0; ii < tsize; ii++) {
         if(parameters[0][ii]<min_limits_[ii]) {
           res[ii] = -slope_*(parameters[0][ii]-min_limits_[ii]);

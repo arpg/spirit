@@ -39,12 +39,12 @@ private:
 //  std::vector<std::vector<spState*>*> trajectorystrip_state_vec_;
   std::vector<spWaypoint*> waypoint_vec_;
   std::vector<spVehicleConstructionInfo*> vehicle_info_vec_;
-  std::vector<std::shared_ptr<spCtrlPts2ord_2dof>> control_command_vec_;
+  std::vector<std::shared_ptr<spCtrlPts2ord_2dof> > control_command_vec_;
 //  std::vector<std::shared_ptr<spCurve>> curve_vec_;
 //  std::vector<bool> has_def_traj_vec_;
   std::vector<double> travel_duration_vec_;
 //  const int num_pts_per_curve = 50;
-  std::vector<std::shared_ptr<spStateSeries>> stateseries_vec_;
+  std::vector<std::shared_ptr<spStateSeries> > stateseries_vec_;
 
   void InitControlCommand(spCtrlPts2ord_2dof* cntrl_cmd);
 

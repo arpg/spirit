@@ -35,7 +35,7 @@ class spVehicle : public spCommonObject {
 
  private:
   void MoveWheelsToAnchors(const spPose& chasis_pose);
-  std::vector<std::shared_ptr<spWheel>> wheel_;
+  std::vector<std::shared_ptr<spWheel> > wheel_;
 //  spPose pose_;        // this pose will represent geometric center of the car
   spPose cog_local_;  // center of gravity
   spColor color_;

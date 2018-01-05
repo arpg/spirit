@@ -72,8 +72,8 @@ typedef Eigen::Vector3d spColor;
 typedef Eigen::Vector3d spPoint3d;
 typedef Eigen::VectorXd spPointXd;
 typedef Eigen::Array<double,6,1> spVelocity;
-typedef std::vector<spPoint3d,Eigen::aligned_allocator<spPoint3d>> spPoints3d;
-typedef std::vector<spPointXd,Eigen::aligned_allocator<spPointXd>> spPointsXd;
+typedef std::vector<spPoint3d,Eigen::aligned_allocator<spPoint3d> > spPoints3d;
+typedef std::vector<spPointXd,Eigen::aligned_allocator<spPointXd> > spPointsXd;
 typedef Eigen::Matrix3d spInertiaTensor;
 typedef Eigen::Vector3d spCubeInertiaTensor;
 // ctrlpts for bezier curve mean [P0,P1,P2,P3]
@@ -89,7 +89,7 @@ typedef Eigen::Array<double,12,1> spStateVec;
 typedef Eigen::Array<double,17,1> spStateCalibVec;
 typedef Eigen::Array<double,8,1> spResidualVec;
 class spState;
-typedef std::vector<std::shared_ptr<spState>> spStateSeries;
+typedef std::vector<std::shared_ptr<spState> > spStateSeries;
 
 class spState {
 public:
@@ -255,7 +255,7 @@ public:
   double front_steering;
   double rear_steering;
   std::pair<double,double> current_controls;
-  std::vector<std::shared_ptr<spState>> substate_vec;
+  std::vector<std::shared_ptr<spState> > substate_vec;
 private:
 //  spStateVec state_vec_;
 };

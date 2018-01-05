@@ -165,7 +165,7 @@ private:
     ceres::Covariance::Options cov_options;
     cov_options.num_threads = 1;
     ceres::Covariance covariance(cov_options);
-    std::vector<std::pair<const double*,const double*>> covariance_blocks;
+    std::vector<std::pair<const double*,const double*> > covariance_blocks;
     covariance_blocks.push_back(std::make_pair(parameter_vec.data(),parameter_vec.data()));
     // check if covarinace is non-singular
     if(!covariance.Compute(covariance_blocks, &problem)) {
@@ -259,8 +259,8 @@ std::cout << parameter_vec[0] << "," << parameter_vec[1]<< "," /*<< parameter_ve
 
   std::shared_ptr<spVehicleConstructionInfo> current_params_;
   std::mutex current_param_mutex_;
-  std::vector<std::pair<std::shared_ptr<CandidateWindow>,Vec>> table_;
-  std::vector<std::shared_ptr<CandidateWindow>> queue_opt_;
+  std::vector<std::pair<std::shared_ptr<CandidateWindow>,Vec> > table_;
+  std::vector<std::shared_ptr<CandidateWindow> > queue_opt_;
   Vec score_count_;
   Vec max_entropy_;
   Vec max_entropy_index_;
