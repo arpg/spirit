@@ -353,7 +353,9 @@ void spirit::SenarioControllerTest() {
   traj.IsLoop(true);
 
   spLocalPlanner localplanner(car_param,&gui_);
-
+  spBVPWeightVec weight_vec;
+  weight_vec << 10, 10, 10, 0.1, 0.1, 1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
+  localplanner.SetCostWeight(weight_vec);
   for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
     traj.SetTravelDuration(ii,1);
     localplanner.SolveInitialPlan(traj,ii);

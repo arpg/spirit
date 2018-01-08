@@ -69,11 +69,11 @@ int main(int argc, char** argv) {
 //  sp_world.ScenarioGNTest();
 
 //  sp_world.multithreadtest();
-//  sp_world.SenarioControllerTest();
+  sp_world.SenarioControllerTest();
 //  sp_world.SenarioCalibrationTest();
 //  sp_world.zibil();
 //  sp_world.DummyTests();
-  sp_world.NonlinControl();
+//  sp_world.NonlinControl();
 
   while(sp_world.ShouldRun()) {
     sp_world.IterateWorld();
