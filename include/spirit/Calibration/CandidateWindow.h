@@ -64,16 +64,23 @@ class CandidateWindow {
     }
   }
 
-  Eigen::Vector2d GetEntropyVec() {
-    Eigen::Vector2d vec;
-    Eigen::EigenSolver<Eigen::Matrix2d> eigensolver(covariance_);
-    std::complex<double> eigenvalue0;
-    std::complex<double> eigenvalue1;
+  Eigen::Vector3d GetEntropyVec() {
+    Eigen::Vector3d vec;
+//    Eigen::EigenSolver<Eigen::Matrix2d> eigensolver(covariance_);
+//    std::complex<double> eigenvalue0;
+//    std::complex<double> eigenvalue1;
 //    std::complex<double> eigenvalue2;
-    eigenvalue0 = eigensolver.eigenvalues().col(0)[0];
-    eigenvalue1 = eigensolver.eigenvalues().col(0)[1];
+//    eigenvalue0 = eigensolver.eigenvalues().col(0)[0];
+//    eigenvalue1 = eigensolver.eigenvalues().col(0)[1];
 //    eigenvalue2 = eigensolver.eigenvalues().col(0)[2];
-    vec << eigenvalue0.real(),eigenvalue1.real();//,eigenvalue2.real();
+//    vec << eigenvalue0.real(),eigenvalue1.real();//,eigenvalue2.real();
+
+    // entropy of normal distribution = ln(sigma*sqrt(2*pi*e)) = ln(sigma*4.13273)
+//    vec << std::log(covariance_(0,0)*4.13273), std::log(covariance_(1,1)*4.13273), std::log(covariance_(0,1)*4.13273);
+    vec[0] = std::log(covariance_(0,0)*4.13273);
+    vec[1] = std::log(covariance_(1,1)*4.13273);
+    vec[2] = std::log(std::abs(covariance_(0,1))*4.13273);
+
     return vec;
   }
 
@@ -142,7 +149,8 @@ private:
 //    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
 //    residual_weight << 1,1,1,1,1,1,1e-5,1e-5,1e-5,1e-5,1e-5,1e-3,1e-3,1e-3,1e-3,1e-3,1e-3;
 //    residual_weight << 1,1,1,1,1,1,1e-1,1e-1,1e-1,1e-1,1e-5,1e-1,1e-1,1e-1,1e-3,1e-3,1e-3;
-    residual_weight << 1,1,1,1,1,1,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0;
+//    residual_weight << 1,1,1,1,1,1,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0;
+    residual_weight << 1,1,1,0,0,1,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0;
     Eigen::MatrixXd jacobian;
     params_mutex_.lock();
     Eigen::VectorXd parameter_vec_(current_params_->GetParameterVector());
@@ -177,6 +185,7 @@ private:
     Eigen::Matrix2d jtj = jacobian.transpose()*jacobian;
     if(jtj.determinant() == 0) {
       cov_is_singular_ = true;
+      std::cout << "CandidateWindow Cov is Singular! returning." << std::endl;
       return false;
     } else {
       cov_is_singular_ = false;
@@ -209,6 +218,9 @@ private:
 //    eigenvalue1 = eigensolver.eigenvalues().col(0)[1];
 //    std::cout << "eigen values are\t" << eigenvalue0.real()  << "\t,\t" << eigenvalue1.real() << "\t,\t" << summary.final_cost << std::endl;
 //    std::cout << "parameters are \t" << parameter_vec_[0] << "\t,\t" << parameter_vec_[1] << std::endl;
+
+//    std::cout << parameter_vec_[0] << "," << parameter_vec_[1]<< "," /*<< parameter_vec[2]  << "," */<< covariance_(0,0) << "," << covariance_(1,1)<< "," << covariance_(0,1)<< /*"," << covariance_(2,2) <<*/ ";" << std::endl;
+//    std::cout << " vec is " << GetEntropyVec().transpose() << std::endl;
     return true;
   }
   bool GetDataLoadedFlag() {

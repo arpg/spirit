@@ -128,14 +128,14 @@ int main(int argc, char** argv) {
 
 #endif
 
-  unsigned int window_size = 15;
+  unsigned int window_size = 20;
   unsigned int queue_size = 10;
   double batch_min_entropy = 10;
   // create a candidate_window and a priority queue
 //  PriorityQueue priority_queue(queue_size,*car_params);
   // create a new candidate window
-  car_params->wheel_friction = 0.4;
-  double wheel_base = 0.41;
+  car_params->wheel_friction = 0.3;
+  double wheel_base = 0.27;
   car_params->wheels_anchor[0][1] = wheel_base/2;
   car_params->wheels_anchor[1][1] = -wheel_base/2;
   car_params->wheels_anchor[2][1] = -wheel_base/2;
@@ -184,17 +184,20 @@ bool flag0 = true;
       wheel_speeds[ii] = car.GetWheel(ii)->GetWheelSpeed();
     }
     // create car state from pose and wheel odometry
-    spState current_state/*(car.GetState())*/;
+    spState current_state(car.GetState());
 //    current_state.substate_vec.clear();
-    current_state.pose = vicon_pose;
-    current_state.wheel_speeds = wheel_speeds;
-    current_state.front_steering = 0.5*(car.GetWheel(0)->GetSteeringServoCurrentAngle()+car.GetWheel(3)->GetSteeringServoCurrentAngle());
-    current_state.linvel = car.GetState().linvel;
-    current_state.rotvel = car.GetState().rotvel;
+
+//    current_state.pose = vicon_pose;
+//    current_state.wheel_speeds = wheel_speeds;
+//    current_state.front_steering = 0.5*(car.GetWheel(0)->GetSteeringServoCurrentAngle()+car.GetWheel(3)->GetSteeringServoCurrentAngle());
+//    current_state.linvel = car.GetState().linvel;
+//    current_state.rotvel = car.GetState().rotvel;
     current_state.time_stamp = spGeneralTools::Tick();
     current_state.current_controls.first = steering_signal;
     current_state.current_controls.second = throttle_signal;
+
     candidate_window.PushBackState(current_state);
+
 //    std::cout << "angle is " << car.GetWheel(0)->GetSteeringServoCurrentAngle() << std::endl;
 
 //    spVehicleConstructionInfo params;
