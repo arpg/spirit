@@ -69,6 +69,7 @@ typedef Eigen::Vector3d spVector3;
 typedef Eigen::Vector3d spRotVel;
 typedef Eigen::Vector3d spCylinderSize;
 typedef Eigen::Vector2d spMeshSize;
+typedef Eigen::Vector2d spInputInstance2D;
 typedef Eigen::Vector3d spColor;
 typedef Eigen::Vector3d spPoint3d;
 typedef Eigen::VectorXd spPointXd;

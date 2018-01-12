@@ -16,6 +16,7 @@
 #include <spirit/CarSimFunctor.h>
 #include <spirit/Planners/spTrajectory.h>
 #include <spirit/Planners/VehicleCeresCostFunc.h>
+#include <spirit/Planners/spCirclePlanner.h>
 #include <fstream>
 
 
@@ -39,6 +40,7 @@ public:
   void zibil();
   void SenarioCalibrationTest();
   void NonlinControl();
+  void ScenarioSteadyStateCircle();
   Objects objects_;
   Gui gui_;
   spVehicleConstructionInfo car_param;

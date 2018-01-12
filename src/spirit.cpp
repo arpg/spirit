@@ -196,6 +196,17 @@ void spirit::SenarioCostSurf() {
   myfile.close();
 }
 
+void spirit::ScenarioSteadyStateCircle(){
+  spTrajectory traj(gui_,objects_);
+  spInputInstance2D init_input;
+  init_input << 0, 10;
+  spCirclePlanner planner(car_param,1.5,init_input,1,10,&gui_);
+  planner.SolveInitialPlan(traj);
+  while(1){
+    gui_.Iterate(objects_);
+  }
+}
+
 void spirit::SenarioTrajectoryTest() {
 
   spPose gnd_pose_ = spPose::Identity();
