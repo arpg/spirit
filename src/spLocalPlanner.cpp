@@ -17,7 +17,7 @@ double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simu
   ceres::Problem problem;
   spState goal_state;
   goal_state.pose = spPose(end_waypoint.GetPose());
-  goal_state.linvel = spLinVel(end_waypoint.GetLinearVelocity());
+  goal_state.linvel = spLinVel(end_waypoint.GetLinearVelocityInWorld());
   Eigen::VectorXd residual_weight(13);
 //  residual_weight << 10, 10, 10, 0.1, 0.1, 0.1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
   ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_parameters,current_state,goal_state,weight_vec_);
@@ -123,7 +123,7 @@ double spLocalPlanner::SolveLocalPlan(spTrajectory& trajectory, int way_index, b
   if(way_index == 0){
     // for now use pose and linvel of the waypoint, we need a more complicated waypoint in order to add other constraints
     current_state.pose = trajectory.GetWaypoint(way_index).GetPose();
-    current_state.linvel = trajectory.GetWaypoint(way_index).GetLinearVelocity();
+    current_state.linvel = trajectory.GetWaypoint(way_index).GetLinearVelocityInWorld();
     // create sub states for each wheel
     //    for(int ii = 0; ii<vehicle_parameters.wheels_anchor.size(); ii++) {
     //      current_state.InsertSubstate();
@@ -157,7 +157,7 @@ void spLocalPlanner::SolveInitialPlan(spTrajectory& trajectory, int way_index) {
   spState state;
   // for now use pose and linvel of the waypoint, we need a more complicated waypoint in order to add other constraints
   state.pose = trajectory.GetWaypoint(way_index).GetPose();
-  state.linvel = trajectory.GetWaypoint(way_index).GetLinearVelocity();
+  state.linvel = trajectory.GetWaypoint(way_index).GetLinearVelocityInWorld();
   // TODO: fix this zero index issue
   if(way_index > 0) {
     // TODO: find simpler struct for state series

@@ -4,6 +4,8 @@ spWaypoint::spWaypoint(const spPose& pose, const spColor& color) {
   mass_ = 0;
   color_ = color;
   pose_ = pose;
+  linveldir_ = spLinVel(0,1,0);
+  rotvel_ = spRotVel(0,0,0);
   linvelnorm_ = 1;
   index_gui_ = -1;
   obj_guichanged_ = false;
@@ -24,6 +26,11 @@ spWaypoint::spWaypoint(const spWaypoint& wp) {
 
 spWaypoint::~spWaypoint() {}
 
+void spWaypoint::SetLinearVelocityDirection(const spLinVel& linvel_dir) {
+  linveldir_ = linvel_dir;
+  linveldir_.normalize();
+}
+
 void spWaypoint::SetLinearVelocityNorm(double velocity) {
   linvelnorm_ = velocity;
   obj_guichanged_ = true;
@@ -32,7 +39,6 @@ void spWaypoint::SetLinearVelocityNorm(double velocity) {
 double spWaypoint::GetLinearVelocityNorm() {
   return linvelnorm_;
 }
-
 
 void spWaypoint::SetPose(const spPose& pose) {
   pose_ = pose;
@@ -52,15 +58,22 @@ void spWaypoint::SetColor(const spColor& color) {
   obj_guichanged_ = true;
 }
 
-const spLinVel spWaypoint::GetLinearVelocity() const {
+const spLinVel spWaypoint::GetLinearVelocityInWorld() const {
   spLinVel linvel;
-  // pangolin's waypoint has velocity on x axis
-  linvel = spLinVel(pose_.rotation()*spLinVel(0,1,0));
-  linvel.normalize();
+  linvel = spLinVel(pose_.rotation()*linveldir_);
+//  linvel.normalize();
   linvel *= linvelnorm_;
   return linvel;
 }
 
 const spColor& spWaypoint::GetColor() {
   return color_;
+}
+
+void spWaypoint::SetRotVel(const spRotVel& rotvel) {
+  rotvel_ = rotvel;
+}
+
+const spRotVel& spWaypoint::GetRotVel() {
+  return rotvel_;
 }
