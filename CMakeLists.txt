@@ -84,6 +84,7 @@ set( HDRS
 	include/spirit/Calibration/CandidateWindow.h
 	include/spirit/Calibration/CalibCarSimFunctor.h
 	include/spirit/Calibration/EntropyTable.h
+	include/spirit/Planners/spCirclePlanner.h
 	)
 
 set( SRCS
@@ -105,6 +106,7 @@ set( SRCS
 	src/spPID.cpp
 	src/spTrajectory.cpp
 	src/spMPC.cpp
+	src/spCirclePlanner.cpp
 	)
 
 option(BUILD_Examples "Build Examples" ON)
