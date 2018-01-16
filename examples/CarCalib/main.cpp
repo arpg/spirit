@@ -19,7 +19,7 @@ double steering_signal = 0;
 double throttle_signal = 0;
 void GamepadCallback(hal::GamepadMsg& _msg) {
   steering_signal = _msg.axes().data(0)*SP_PI_QUART;
-  throttle_signal = -_msg.axes().data(3)*80;
+  throttle_signal = -_msg.axes().data(3)*220;
 //  std::cout << "steeromg command is " << steering_signal << std::endl;
 //  std::cout << "throttle command is " << throttle_signal << std::endl;
 }
@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
       cog = spTranslation(0, 0, 0);
       chassis_friction = 0;
       wheel_rollingfriction = 0.1;
-      wheel_friction = 0.5;
+      wheel_friction = 0.3;
       wheel_width = 0.04;
       wheel_radius = 0.05;//0.057;
       susp_damping = 0;

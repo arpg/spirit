@@ -23,7 +23,7 @@ spirit::spirit(const spSettings& user_settings) {
   car_param.cog = spTranslation(0, 0, 0);
   car_param.chassis_friction = 0;
   car_param.wheel_rollingfriction = 0.1;
-  car_param.wheel_friction = 0.4;
+  car_param.wheel_friction = 0.5;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.05;//0.057;
   car_param.susp_damping = 0;
@@ -332,8 +332,8 @@ void spirit::SenarioControllerTest() {
 
   spTrajectory traj(gui_,objects_);
   // put waypoints on a elliptical path
-  double a = 1.5;
-  double b = 1.5;
+  double a = 1;
+  double b = 1;
   int num_waypoints = 8;
   for(int ii=0; ii<num_waypoints; ii++) {
     // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
@@ -345,12 +345,12 @@ void spirit::SenarioControllerTest() {
     double angle = atan2(-(x*b*b),(y*a*a));
     spPose pose(spPose::Identity());
     pose.translate(spTranslation(x,y,0.07));
-    Eigen::AngleAxisd rot(angle+SP_PI_HALF+0.5,Eigen::Vector3d::UnitZ());
+    Eigen::AngleAxisd rot(angle+SP_PI_HALF+0.8,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
     traj.AddWaypoint(pose,3);
-    spRotVel rotvel(0,0,2);
+    spRotVel rotvel(0,0,4);
     traj.GetWaypoint(ii).SetRotVel(rotvel);
-    traj.GetWaypoint(ii).SetLinearVelocityDirection(spLinVel(0.3,1,0));
+    traj.GetWaypoint(ii).SetLinearVelocityDirection(spLinVel(0.4,1,0));
   }
   gui_.Iterate(objects_);
   traj.IsLoop(true);
@@ -360,7 +360,7 @@ void spirit::SenarioControllerTest() {
   weight_vec << 10, 10, 10, 0.1, 0.1, 1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
   localplanner.SetCostWeight(weight_vec);
   for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
-    traj.SetTravelDuration(ii,0.6);
+    traj.SetTravelDuration(ii,0.3);
     localplanner.SolveInitialPlan(traj,ii);
 //    localplanner.SolveLocalPlan(traj,ii);
     gui_.Iterate(objects_);
