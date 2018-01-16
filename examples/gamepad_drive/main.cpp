@@ -8,22 +8,26 @@
 
 
 hal::CarCommandMsg commandMSG;
+double steering_angle;
 spPose posys_;
 
 void Posys_Handler(hal::PoseMsg& PoseData) {
   posys_ = spPose::Identity();
   posys_.translate(spTranslation(PoseData.pose().data(0),PoseData.pose().data(1),PoseData.pose().data(2)));
   spRotation rot(PoseData.pose().data(6),PoseData.pose().data(3),PoseData.pose().data(4),PoseData.pose().data(5));
+  Eigen::AngleAxisd tracker_rot(-SP_PI_HALF,Eigen::Vector3d::UnitZ());
   posys_.rotate(rot);
+  posys_.rotate(tracker_rot);
 }
 
 void GamepadCallback(hal::GamepadMsg& _msg) {
-  commandMSG.set_steering_angle(_msg.axes().data(0));
-  commandMSG.set_throttle_percent(_msg.axes().data(5)*20);
+  commandMSG.set_steering_angle(-_msg.axes().data(0));
+  commandMSG.set_throttle_percent(_msg.axes().data(4)*30);
+  //std::cout << "Gamepad steering -> " << _msg.axes().data(0) << std::endl;
 }
 
 void CarSensorCallback(hal::CarStateMsg msg) {
-//    std::cout << "-> "
+    std::cout << "-> "
 //              << msg.swing_angle_fl() << ", "
 //              << msg.swing_angle_fr() << ", "
 //              << msg.swing_angle_rl() << ", "
@@ -33,8 +37,9 @@ void CarSensorCallback(hal::CarStateMsg msg) {
 //              << msg.wheel_speed_fl() << ", "
 //              << msg.wheel_speed_rl() << ", "
 //              << msg.wheel_speed_rr() << ", "
-//              << msg.steer_angle() << ", "
-//              << std::endl;
+              << msg.steer_angle() << ", "
+              << std::endl;
+    steering_angle = -msg.steer_angle();
 }
 
 
@@ -44,15 +49,15 @@ int main(int argc, char** argv) {
   gamepad.RegisterGamepadDataCallback(&GamepadCallback);
 
   // Connect to NinjaV3Car
-//  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
+  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
 
-//  ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
+  ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
 
   // initialize command packet
   commandMSG.set_steering_angle(0);
   commandMSG.set_throttle_percent(0);
   //////////////////////////////
-  hal::Posys vicon("vicon://tracker:[dummy]");
+  hal::Posys vicon("vicon://tracker:[ninja]");
   vicon.RegisterPosysDataCallback(&Posys_Handler);
   /////////////////////////////
   spSettings settings_obj;
@@ -70,8 +75,10 @@ int main(int argc, char** argv) {
   spworld.gui_.AddObject(spworld.objects_.GetObject(gnd_handle));
 
   while(1) {
-//    ninja_car.UpdateCarCommand(commandMSG);
+    ninja_car.UpdateCarCommand(commandMSG);
     car.SetPose(posys_);
+    car.SetFrontSteeringAngle(steering_angle);
+    spworld.objects_.StepPhySimulation(0.01);
     spworld.gui_.Iterate(spworld.objects_);
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
