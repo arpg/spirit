@@ -3,11 +3,11 @@
 
 #include <spirit/Calibration/CandidateWindow.h>
 #include <condition_variable>
-typedef Eigen::Vector2d Vec;
+typedef Eigen::Vector3d Vec;
 
 class EntropyTable {
  public:
-  EntropyTable(std::shared_ptr<spVehicleConstructionInfo> car_params, int num_params, int candidates_per_param): current_params_(car_params->MakeCopy()), num_params_(num_params),candidates_per_param_(candidates_per_param) {
+  EntropyTable(std::shared_ptr<spVehicleConstructionInfo> car_params, int num_params, int candidates_per_param): current_params_(car_params->MakeCopy()), num_params_(/*num_params*/3),candidates_per_param_(candidates_per_param) {
     alpha_ = 0.95;
     thread_should_run_ = true;
     data_loaded_flg_ = false;
@@ -134,7 +134,8 @@ private:
     jacobians.resize(queue_opt_.size());
     Eigen::VectorXd residual_weight(17);
 //    residual_weight << 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1;
-    residual_weight << 1,1,1,1,1,1,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0;
+//    residual_weight << 1,1,1,1,1,1,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0;
+    residual_weight << 1,1,1,0,0,1,0.0,0.0,0.0,0.0,0,0,0,0,0,0,0;
     current_param_mutex_.lock();
 //    CoutTable();
     Eigen::VectorXd parameter_vec(current_params_->GetParameterVector());
@@ -175,7 +176,8 @@ private:
     covariance.GetCovarianceBlock(parameter_vec.data(), parameter_vec.data(), covariance_.data());
 
 //    std::cout << "cov \n" << covariance_ << std::endl;
-//    std::cout << parameter_vec[0] << "," << parameter_vec[1]<< "," /*<< parameter_vec[2]  << "," */<< covariance_(0,0) << "," << covariance_(1,1)<< /*"," << covariance_(2,2) <<*/ ";" << std::endl;
+    std::cout << parameter_vec[0] << "," << parameter_vec[1]<< "," /*<< parameter_vec[2]  << "," */<< covariance_(0,0) << "," << covariance_(1,1)<< "," << covariance_(0,1)<< /*"," << covariance_(2,2) <<*/ ";" << std::endl;
+
 /*
     if(queue_opt_.size() == 1) {
       Eigen::Matrix2d cov_;
@@ -197,7 +199,7 @@ private:
     eigenvalue1 = eigensolver.eigenvalues().col(0)[1];
 //    std::cout << "cov is \n" << cov_ << std::endl;
 //    std::cout << "eigen values are\t" << eigenvalue0.real()  << "\t,\t" << eigenvalue1.real() << std::endl;
-std::cout << parameter_vec[0] << "," << parameter_vec[1]<< "," /*<< parameter_vec[2]  << "," */<< eigenvalue0.real()<< "," << eigenvalue1.real() << "," << covariance_.determinant() << ";" << std::endl;
+//std::cout << parameter_vec[0] << "," << parameter_vec[1]<< "," /*<< parameter_vec[2]  << "," */<< eigenvalue0.real()<< "," << eigenvalue1.real() << "," << covariance_.determinant() << ";" << std::endl;
 
     current_params_->SetParameterVector(parameter_vec);
     current_param_mutex_.unlock();

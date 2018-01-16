@@ -61,6 +61,7 @@ enum BulletCollissionType{
 typedef Eigen::Transform<double,3,Eigen::Affine> spPose;
 typedef Eigen::Quaterniond spRotation;
 typedef Eigen::Vector3d spTranslation;
+typedef Eigen::Array<double,13,1> spBVPWeightVec;
 typedef Eigen::Vector4d spWheelSpeedVec;
 typedef Eigen::Vector3d spBoxSize;
 typedef Eigen::Vector3d spLinVel;

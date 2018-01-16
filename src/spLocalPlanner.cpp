@@ -2,10 +2,15 @@
 
 spLocalPlanner::spLocalPlanner(const spVehicleConstructionInfo& vehicle_info, Gui* gui):
   vehicle_parameters(vehicle_info) {
+  weight_vec_ << 10, 10, 10, 0.1, 0.1, 0.1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
   gui_ = gui;
 }
 
 spLocalPlanner::~spLocalPlanner() {
+}
+
+void spLocalPlanner::SetCostWeight(const spBVPWeightVec& vec) {
+  weight_vec_ = vec;
 }
 
 double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simulation_duration, const spState& current_state, const spWaypoint& end_waypoint) {
@@ -14,10 +19,8 @@ double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simu
   goal_state.pose = spPose(end_waypoint.GetPose());
   goal_state.linvel = spLinVel(end_waypoint.GetLinearVelocity());
   Eigen::VectorXd residual_weight(13);
-//  residual_weight << 4, 4, 4, 3, 3, 3, 0.002, 0.002, 0.002, 0.001, 0.001, 0.001,0.0001;
-  residual_weight << 10, 10, 10, 0.1, 0.1, 0.1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
-//  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1,0.1;
-  ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_parameters,current_state,goal_state,residual_weight);
+//  residual_weight << 10, 10, 10, 0.1, 0.1, 0.1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
+  ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_parameters,current_state,goal_state,weight_vec_);
   Eigen::VectorXd min_limits(7);
   Eigen::VectorXd max_limits(7);
   // set steering limits
