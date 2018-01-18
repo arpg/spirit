@@ -269,6 +269,12 @@ enum class spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
 enum class spPhyEngineType{PHY_NONE,PHY_BULLET};
 enum class spObjectType{BOX,VEHICLE_AWSD,WHEEL,WAYPOINT,LINESTRIP};
 
+//*********************************************************
+
+
+
+
+//*********************************************************
 class spVehicleConstructionInfo{
 public:
   Eigen::VectorXd calib_min_limit_vec;

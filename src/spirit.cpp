@@ -23,7 +23,7 @@ spirit::spirit(const spSettings& user_settings) {
   car_param.cog = spTranslation(0, 0, 0);
   car_param.chassis_friction = 0;
   car_param.wheel_rollingfriction = 0.1;
-  car_param.wheel_friction = 0.8;
+  car_param.wheel_friction = 0.5;
   car_param.wheel_width = 0.04;
   car_param.wheel_radius = 0.05;//0.057;
   car_param.susp_damping = 0;
@@ -241,7 +241,7 @@ void spirit::SenarioTrajectoryTest() {
   traj.IsLoop(true);
 //  std::cout << "waypoint speed is \n" << traj.GetWaypoint(0).GetLinearVelocity() << std::endl;
 
-  spLocalPlanner localplanner(car_param,&gui_);
+  spLocalPlanner localplanner(car_param,false,&gui_);
 
   for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
     if(ii != 0) {
@@ -252,7 +252,7 @@ void spirit::SenarioTrajectoryTest() {
     }
     localplanner.SolveInitialPlan(traj,ii);
     gui_.Iterate(objects_);
-    localplanner.SolveLocalPlan(traj,ii,true);
+    localplanner.SolveLocalPlan(traj,ii);
 //    if(ii==1)
 //    for(int jj=0;jj<50;jj++) {
 //      traj.PlaybackTrajectoryOnGUI(car_param,0,3);
@@ -343,8 +343,8 @@ void spirit::SenarioControllerTest() {
 
   spTrajectory traj(gui_,objects_);
   // put waypoints on a elliptical path
-  double a = 2;
-  double b = 4;
+  double a = 1;
+  double b = 1;
   int num_waypoints = 8;
   for(int ii=0; ii<num_waypoints; ii++) {
     // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
@@ -356,21 +356,24 @@ void spirit::SenarioControllerTest() {
     double angle = atan2(-(x*b*b),(y*a*a));
     spPose pose(spPose::Identity());
     pose.translate(spTranslation(x,y,0.07));
-    Eigen::AngleAxisd rot(angle+SP_PI_HALF,Eigen::Vector3d::UnitZ());
+    Eigen::AngleAxisd rot(angle+SP_PI_HALF+0.8,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
-    traj.AddWaypoint(pose,4);
+    traj.AddWaypoint(pose,3);
+    spRotVel rotvel(0,0,4);
+    traj.GetWaypoint(ii).SetRotVel(rotvel);
+    traj.GetWaypoint(ii).SetLinearVelocityDirection(spLinVel(0.4,1,0));
   }
   gui_.Iterate(objects_);
   traj.IsLoop(true);
 
-  spLocalPlanner localplanner(car_param,&gui_);
+  spLocalPlanner localplanner(car_param,false,&gui_);
   spBVPWeightVec weight_vec;
   weight_vec << 10, 10, 10, 0.1, 0.1, 1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
   localplanner.SetCostWeight(weight_vec);
   for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
-    traj.SetTravelDuration(ii,1);
+    traj.SetTravelDuration(ii,0.3);
     localplanner.SolveInitialPlan(traj,ii);
-    localplanner.SolveLocalPlan(traj,ii,true);
+//    localplanner.SolveLocalPlan(traj,ii);
     gui_.Iterate(objects_);
   }
 

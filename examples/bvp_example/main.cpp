@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 
   traj.IsLoop(false);
 
-  spLocalPlanner localplanner(spworld.car_param,&spworld.gui_);
+  spLocalPlanner localplanner(spworld.car_param,false,&spworld.gui_);
 
   spworld.gui_.Iterate(spworld.objects_);
 
@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
 
   traj.SetTravelDuration(0,1);
   localplanner.SolveInitialPlan(traj,0);
-  double final_cost = localplanner.SolveLocalPlan(traj,0,false);
+  double final_cost = localplanner.SolveLocalPlan(traj,0);
 //  double sim_duration = 1;
 //  double final_cost = localplanner.SolveLocalPlan((spCtrlPts2ord_2dof&)controls_curve.GetBezierControlPoints(),sim_duration,traj.Getz
   std::cout << "final cost: " << final_cost << std::endl;
