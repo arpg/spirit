@@ -99,23 +99,27 @@ int main(int argc, char** argv) {
     double angle = atan2(-(x*b*b),(y*a*a));
     spPose pose(spPose::Identity());
     pose.translate(spTranslation(x,y,0.07));
-    Eigen::AngleAxisd rot(angle+SP_PI_HALF,Eigen::Vector3d::UnitZ());
+    Eigen::AngleAxisd rot(angle+SP_PI_HALF+0.8,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
-    traj.AddWaypoint(pose,4);
+    traj.AddWaypoint(pose,3);
+    spRotVel rotvel(0,0,4);
+    traj.GetWaypoint(ii).SetRotVel(rotvel);
+    traj.GetWaypoint(ii).SetLinearVelocityDirection(spLinVel(0.4,1,0));
   }
   spworld.gui_.Iterate(spworld.objects_);
   traj.IsLoop(true);
 
-  spLocalPlanner localplanner(spworld.car_param,&spworld.gui_);
+  spLocalPlanner localplanner(spworld.car_param,false,&spworld.gui_);
   spBVPWeightVec weight_vec;
   weight_vec << 10, 10, 10, 0.1, 0.1, 1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
   localplanner.SetCostWeight(weight_vec);
   for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
-    traj.SetTravelDuration(ii,1);
+    traj.SetTravelDuration(ii,0.3);
     localplanner.SolveInitialPlan(traj,ii);
-    localplanner.SolveLocalPlan(traj,ii,true);
+//    localplanner.SolveLocalPlan(traj,ii);
     spworld.gui_.Iterate(spworld.objects_);
   }
+
 
   // set driving car's first pose
 //  spPose car_init_pose(traj.GetWaypoint(0).GetPose());
