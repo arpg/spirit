@@ -12,14 +12,28 @@
 #include <HAL/Car/CarDevice.h>
 #include <memory>
 #include <spirit/Types/spTypes.h>
+#include <HAL/Posys/PosysDevice.h>
 
 #define SIM_CALIB
 
 double steering_signal = 0;
 double throttle_signal = 0;
+
+hal::CarCommandMsg commandMSG;
+spPose posys_;
+
+void Posys_Handler(hal::PoseMsg& PoseData) {
+  posys_ = spPose::Identity();
+  posys_.translate(spTranslation(PoseData.pose().data(0),PoseData.pose().data(1),0.06/*PoseData.pose().data(2)*/));
+  spRotation rot(PoseData.pose().data(6),PoseData.pose().data(3),PoseData.pose().data(4),PoseData.pose().data(5));
+  Eigen::AngleAxisd tracker_rot(-SP_PI_HALF,Eigen::Vector3d::UnitZ());
+  posys_.rotate(rot);
+  posys_.rotate(tracker_rot);
+}
+
 void GamepadCallback(hal::GamepadMsg& _msg) {
-  steering_signal = _msg.axes().data(0)*SP_PI_QUART;
-  throttle_signal = -_msg.axes().data(3)*220;
+  steering_signal = -_msg.axes().data(0)*SP_PI_QUART;
+  throttle_signal = _msg.axes().data(4)*30;
 //  std::cout << "steeromg command is " << steering_signal << std::endl;
 //  std::cout << "throttle command is " << throttle_signal << std::endl;
 }
@@ -34,6 +48,11 @@ int main(int argc, char** argv) {
 
   hal::Gamepad gamepad("gamepad:/");
   gamepad.RegisterGamepadDataCallback(&GamepadCallback);
+
+  hal::Posys vicon("vicon://tracker:[ninja]");
+  vicon.RegisterPosysDataCallback(&Posys_Handler);
+
+  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
 
   spSettings settings_obj;
   settings_obj.SetGuiType(spGuiType::GUI_PANGOSCENEGRAPH);
@@ -115,8 +134,13 @@ int main(int argc, char** argv) {
 
 #ifdef SIM_CALIB
   spObjectHandle car_handle = spworld.objects_.CreateVehicle(*car_params);
+
   spworld.gui_.AddObject(spworld.objects_.GetObject(car_handle));
   spAWSDCar& car = (spAWSDCar&) spworld.objects_.GetObject(car_handle);
+  //second car
+  spObjectHandle car2_handle = spworld.objects_.CreateVehicle(spworld.car_param);
+  spworld.gui_.AddObject(spworld.objects_.GetObject(car2_handle));
+  spAWSDCar& car2 = (spAWSDCar&) spworld.objects_.GetObject(car2_handle);
   // create a flat ground
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
@@ -128,9 +152,14 @@ int main(int argc, char** argv) {
 
 #endif
 
-  unsigned int window_size = 20;
-  unsigned int queue_size = 10;
-  double batch_min_entropy = 10;
+
+  ///////////////////////////
+  /// testing new stuff
+
+  ////////////////////////////
+
+  unsigned int window_size = 5;
+
   // create a candidate_window and a priority queue
 //  PriorityQueue priority_queue(queue_size,*car_params);
   // create a new candidate window
@@ -150,6 +179,7 @@ int main(int argc, char** argv) {
   EntropyTable entropytable(car_params,2,5);
 //  candidate_window.prqueue_func_ptr_ = std::bind(&PriorityQueue::PushBackCandidateWindow,&priority_queue,std::placeholders::_1);
   candidate_window.prqueue_func_ptr_ = std::bind(&EntropyTable::PushBackCandidateWindow,&entropytable,std::placeholders::_1);
+  int cnt = 0;
   spPose vicon_pose;
   spPose vicon_prev_pose;
   spTimestamp timestamp;
@@ -164,14 +194,15 @@ bool flag0 = true;
     vicon_prev_pose = vicon_pose;
     prev_timestamp = timestamp;
 
-    vicon_pose = car.GetPose();
+//    vicon_pose = car.GetPose();
+    vicon_pose = posys_;
     timestamp = spGeneralTools::Tick();
 
     spPose diff = vicon_prev_pose.inverse()*vicon_pose;
     linvel = (vicon_pose.translation()-vicon_prev_pose.translation())/0.1;
     Eigen::AngleAxisd angleaxis(diff.rotation());
     Eigen::Vector3d rotvec(angleaxis.angle()*angleaxis.axis());
-    rotvel = rotvec/0.1/*(spGeneralTools::TickTock_us(prev_timestamp,timestamp)/1e6)*/;
+    rotvel = rotvec/(spGeneralTools::TickTock_us(prev_timestamp,timestamp)/1e6);
     if(flag0) {
       linvel = spLinVel::Zero();
       rotvel = spRotVel::Zero();
@@ -187,14 +218,15 @@ bool flag0 = true;
     spState current_state(car.GetState());
 //    current_state.substate_vec.clear();
 
-//    current_state.pose = vicon_pose;
-//    current_state.wheel_speeds = wheel_speeds;
-//    current_state.front_steering = 0.5*(car.GetWheel(0)->GetSteeringServoCurrentAngle()+car.GetWheel(3)->GetSteeringServoCurrentAngle());
-//    current_state.linvel = car.GetState().linvel;
-//    current_state.rotvel = car.GetState().rotvel;
-    current_state.time_stamp = spGeneralTools::Tick();
-    current_state.current_controls.first = steering_signal;
-    current_state.current_controls.second = throttle_signal;
+    current_state.pose = vicon_pose;
+    //current_state.wheel_speeds = wheel_speeds;
+    //current_state.front_steering = 0.5*(car.GetWheel(0)->GetSteeringServoCurrentAngle()+car.GetWheel(3)->GetSteeringServoCurrentAngle());
+    current_state.front_steering = steering_signal;
+    current_state.linvel = linvel;// car.GetState().linvel;
+    current_state.rotvel = rotvel;//car.GetState().rotvel;
+    current_state.time_stamp = timestamp;//spGeneralTools::Tick();
+    current_state.current_controls.first = 0.8*steering_signal;
+    current_state.current_controls.second = 1.6*throttle_signal;
 
     candidate_window.PushBackState(current_state);
 
@@ -212,29 +244,34 @@ bool flag0 = true;
 //    std::cout << "**********************" << std::endl;
 //    std::cout << "cars is\t" << car.GetState().rotvel.transpose() << std::endl;
 //    std::cout << "mine is\t" << rotvel.transpose() << std::endl;
-/*
-    if(candidate_window.PushBackState(current_state) == window_size) {
-      if(candidate_window.OptimizeParametersInWindow(spworld.car_param,&spworld.gui_)) {
-        //      std::cout << "entropy is " << candidate_window.GetEntropy() << std::endl;
-        // if candidate window has lower entropy than max entropy of queue then replace with highest one.
-        // if there are at least two candidate windows then optimize parameters over whole queue
-        if(priority_queue.PushBackCandidateWindow(candidate_window) > 1) {
-          priority_queue.OptimizeParametersInQueue(spworld.car_param);
-          // update new parameters to test car here
-        }
-      }
-    }
-    */
-    // apply the controls and wait for next state update
+    commandMSG.set_steering_angle(steering_signal);
+    commandMSG.set_throttle_percent(throttle_signal);
+    ninja_car.UpdateCarCommand(commandMSG);
+
 #ifdef SIM_CALIB
-    car.SetFrontSteeringAngle(current_state.current_controls.first);
-    car.SetEngineMaxVel(current_state.current_controls.second);
+   car.SetPose(vicon_pose);
+   car.SetFrontSteeringAngle(steering_signal);
+
+   if(cnt == 40) {
+       cnt=0;
+       car2.SetState(current_state);
+   }else {
+       cnt++;
+    }
+   car2.SetFrontSteeringAngle(current_state.current_controls.first);
+   car2.SetEngineMaxVel(current_state.current_controls.second);
+   //double tdif=spGeneralTools::TickTock_ms(prev_timestamp,timestamp)/1e3;
+   //std::cout << "val " << tdif << std::endl;
+    //spworld.objects_.StepPhySimulation(0.1);
+    // car.SetFrontSteeringAngle(current_state.current_controls.first);
+    //car.SetEngineMaxVel(current_state.current_controls.second);
     // step forward the simulated car
     spTimestamp t0 = spGeneralTools::Tick();
     spworld.objects_.StepPhySimulation(0.1);
     double tt = spGeneralTools::Tock_ms(t0);
 
     spGeneralTools::Delay_ms(100-tt);
+    //spGeneralTools::Delay_ms(100);
     spworld.gui_.Iterate(spworld.objects_);
 
 #endif
