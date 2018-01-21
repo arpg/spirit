@@ -22,7 +22,7 @@ void Posys_Handler(hal::PoseMsg& PoseData) {
 
 void GamepadCallback(hal::GamepadMsg& _msg) {
   commandMSG.set_steering_angle(-_msg.axes().data(0));
-  commandMSG.set_throttle_percent(_msg.axes().data(4)*30);
+  commandMSG.set_throttle_percent(_msg.axes().data(4)*40);
   //std::cout << "Gamepad steering -> " << _msg.axes().data(0) << std::endl;
 }
 

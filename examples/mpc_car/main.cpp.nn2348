@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
 
   spLocalPlanner localplanner(spworld.car_param,false,&spworld.gui_);
   spBVPWeightVec weight_vec;
-  weight_vec << 10, 10, 0.1, 0.1, 0.1, 0.2, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,100;
+  weight_vec << 10, 10, 0.1, 0.1, 0.1, 1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.05;
   localplanner.SetCostWeight(weight_vec);
   for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
     traj.SetTravelDuration(ii,0.4);
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
 
 
   // create a MPC controller with horizon
-  float horizon = 0.4;
+  float horizon = 0.5;
   spMPC mpc(spworld.car_param,horizon);
 
   spCtrlPts2ord_2dof controls;
@@ -145,7 +145,7 @@ int main(int argc, char** argv) {
       spPointXd next_control(2);
       controls_curve.SetBezierControlPoints(controls);
       // only get the control signal for next point and apply to car
-      controls_curve.GetPoint(next_control,2*DISCRETIZATION_STEP_SIZE/horizon);
+      controls_curve.GetPoint(next_control,1*DISCRETIZATION_STEP_SIZE/horizon);
       std::cout << "next signals are " << std::fixed << std::setprecision(3) << next_control.transpose() << std::endl;
       car.SetFrontSteeringAngle(next_control[0]);
       car.SetEngineMaxVel(next_control[1]);

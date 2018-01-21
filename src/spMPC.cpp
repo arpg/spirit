@@ -80,7 +80,7 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1;
 //  residual_weight << 1,1,1,0.5,0.5,0.5,0.1,0.1,0.1,0,0,0;
 //  residual_weight << 1,1,1,0.4,0.4,0.4,0.001,0.001,0.001,0.001,0.001,0.001;
-  residual_weight << 1,1,1,0,0,0,0,0,0,0,0,0.3;
+  residual_weight << 1,1,0,0,0,0,0,0,0,0,0,0.0;
   Eigen::VectorXd traj_point_weight(horizon_);
   traj_point_weight.setOnes(horizon_);
 //  traj_point_weight[0] = 0.5;
