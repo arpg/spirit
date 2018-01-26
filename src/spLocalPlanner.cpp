@@ -32,8 +32,8 @@ double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simu
   }
   // set engine limits
   for(int ii=1; ii<6; ii+=2) {
-    min_limits[ii] = -20;
-    max_limits[ii] = 20;
+    min_limits[ii] = -30;
+    max_limits[ii] = 30;
   }
   // set time of travel limits
   min_limits[6] = 0.2;
