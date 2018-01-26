@@ -52,10 +52,10 @@ void CarSensorCallback(hal::CarStateMsg msg) {
 int main(int argc, char** argv) {
   // connect to a gamepad
   hal::Gamepad gamepad("gamepad:/");
-  gamepad.RegisterGamepadDataCallback(&GamepadCallback);
+//  gamepad.RegisterGamepadDataCallback(&GamepadCallback);
 
   // Connect to NinjaV3Car
-  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
+//  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
 
   //ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
 
@@ -63,8 +63,8 @@ int main(int argc, char** argv) {
   commandMSG.set_steering_angle(0);
   commandMSG.set_throttle_percent(0);
   //////////////////////////////
-  hal::Posys vicon("vicon://tracker:[ninja]");
-  vicon.RegisterPosysDataCallback(&Posys_Handler);
+//  hal::Posys vicon("vicon://tracker:[ninja]");
+//  vicon.RegisterPosysDataCallback(&Posys_Handler);
   /////////////////////////////
   spSettings settings_obj;
   settings_obj.SetGuiType(spGuiType::GUI_PANGOSCENEGRAPH);
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
   // put waypoints on a elliptical path
   double a = 1.5;
   double b = 1.5;
-  int num_waypoints = 8;
+  int num_waypoints = 5;
   for(int ii=0; ii<num_waypoints; ii++) {
     // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
     double theta = ii*(2*SP_PI)/num_waypoints;
@@ -99,22 +99,22 @@ int main(int argc, char** argv) {
     double angle = atan2(-(x*b*b),(y*a*a));
     spPose pose(spPose::Identity());
     pose.translate(spTranslation(x,y,0.07));
-    Eigen::AngleAxisd rot(angle+SP_PI_HALF+0.6,Eigen::Vector3d::UnitZ());
+    Eigen::AngleAxisd rot(angle+SP_PI_HALF/*+0.6*/,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
-    traj.AddWaypoint(pose,3);
+    traj.AddWaypoint(pose,2);
     spRotVel rotvel(0,0,2);
     traj.GetWaypoint(ii).SetRotVel(rotvel);
-    traj.GetWaypoint(ii).SetLinearVelocityDirection(spLinVel(0.2,1,0));
+    traj.GetWaypoint(ii).SetLinearVelocityDirection(spLinVel(0,1,0));
   }
   spworld.gui_.Iterate(spworld.objects_);
   traj.IsLoop(true);
 
   spLocalPlanner localplanner(spworld.car_param,false,&spworld.gui_);
   spBVPWeightVec weight_vec;
-  weight_vec << 10, 10, 0.1, 0.1, 0.1, 0.2, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,100;
+  weight_vec << 100, 100, 0, 0, 0, 10, 0.009, 0.009, 0.009, 0.01, 0.01, 0.01,0.1;
   localplanner.SetCostWeight(weight_vec);
   for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
-    traj.SetTravelDuration(ii,0.4);
+    traj.SetTravelDuration(ii,1);
     localplanner.SolveInitialPlan(traj,ii);
     localplanner.SolveLocalPlan(traj,ii);
     spworld.gui_.Iterate(spworld.objects_);
@@ -122,22 +122,23 @@ int main(int argc, char** argv) {
 
 
   // set driving car's first pose
-//  spPose car_init_pose(traj.GetWaypoint(0).GetPose());
-//  car_init_pose.translate(spTranslation(0,0,0));
-//  car.SetPose(car_init_pose);
+  spPose car_init_pose(traj.GetWaypoint(0).GetPose());
+  car_init_pose.translate(spTranslation(0,0,0));
+  car.SetPose(car_init_pose);
 
 
   // create a MPC controller with horizon
   float horizon = 0.4;
   spMPC mpc(spworld.car_param,horizon);
+  //spMPC mpc2(spworld.car_param,horizon);
 
   spCtrlPts2ord_2dof controls;
 
   while(1){
-    car.SetPose(posys_);
-    controls.col(0) = Eigen::Vector2d(0,20);
-    controls.col(1) = Eigen::Vector2d(0,20);
-    controls.col(2) = Eigen::Vector2d(0,20);
+//    car.SetPose(posys_);
+    controls.col(0) = Eigen::Vector2d(0,10);
+    controls.col(1) = Eigen::Vector2d(0,10);
+    controls.col(2) = Eigen::Vector2d(0,10);
 
     //spTimestamp t0 = spGeneralTools::Tick();
     if(mpc.CalculateControls(traj,car.GetState(),controls)) {
@@ -145,10 +146,11 @@ int main(int argc, char** argv) {
       spPointXd next_control(2);
       controls_curve.SetBezierControlPoints(controls);
       // only get the control signal for next point and apply to car
-      controls_curve.GetPoint(next_control,2*DISCRETIZATION_STEP_SIZE/horizon);
+      controls_curve.GetPoint(next_control,0/*2*DISCRETIZATION_STEP_SIZE/horizon*/);
       std::cout << "next signals are " << std::fixed << std::setprecision(3) << next_control.transpose() << std::endl;
       car.SetFrontSteeringAngle(next_control[0]);
-      car.SetEngineMaxVel(next_control[1]);
+      car.SetEngineMaxVel(/*next_control[1]*/100);
+      car.SetEngineTorque(next_control[1]*0.00001);
       if(flag_auto) {
           if(next_control[1] > 30) {
               next_control[1] = 30;
@@ -162,7 +164,7 @@ int main(int argc, char** argv) {
           commandMSG.set_steering_angle(gamepad_steering);
           commandMSG.set_throttle_percent(gamepad_throttle);
       }
-      ninja_car.UpdateCarCommand(commandMSG);
+//      ninja_car.UpdateCarCommand(commandMSG);
       controls.col(0) = next_control;
       //double calc_time = spGeneralTools::Tock_ms(t0);
       //std::cout << "calc time was " << calc_time << std::endl;

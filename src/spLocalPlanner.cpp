@@ -32,12 +32,12 @@ double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simu
   }
   // set engine limits
   for(int ii=1; ii<6; ii+=2) {
-    min_limits[ii] = -200;
-    max_limits[ii] = 200;
+    min_limits[ii] = -20;
+    max_limits[ii] = 20;
   }
   // set time of travel limits
-  min_limits[6] = 0.5;
-  max_limits[6] = 20;
+  min_limits[6] = 0.2;
+  max_limits[6] = 3;
   // create loss function
   ceres::CostFunction* loss_function = new ParamLimitLossFunc<7>(min_limits,max_limits,100);
 
@@ -46,13 +46,13 @@ double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simu
     parameters[ii] = controls.data()[ii];
   }
   parameters[6] = simulation_duration;
-  problem.AddResidualBlock(cost_function, new ceres::CauchyLoss(0.5), parameters);
+  problem.AddResidualBlock(cost_function, new ceres::CauchyLoss(0.1), parameters);
   problem.AddResidualBlock(loss_function,NULL,parameters);
 
   std::vector<int> fix_param_vec;
   // fix the first two parameters
-  fix_param_vec.push_back(0);
-  fix_param_vec.push_back(1);
+//  fix_param_vec.push_back(0);
+//  fix_param_vec.push_back(1);
 
 //  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(7,fix_param_vec);
 //  problem.SetParameterization(parameters,subparam);
@@ -80,8 +80,8 @@ double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simu
   //  options.gradient_check_numeric_derivative_relative_step_size = 0.05;
   //  options.minimizer_type = ceres::MinimizerType::LINE_SEARCH;
 //    options.max_num_iterations = 30;
-  options.initial_trust_region_radius = 0.7;
-  options.max_trust_region_radius = 0.7;
+  options.initial_trust_region_radius = 0.1;
+  options.max_trust_region_radius = 0.1;
   options.linear_solver_type = ceres::DENSE_QR;
   options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
   options.minimizer_progress_to_stdout = false;
@@ -91,6 +91,7 @@ double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simu
     controls.data()[ii] = parameters[ii];
   }
   simulation_duration = parameters[6];
+  std::cout << "controls are \n" << controls << std::endl;
   return summary.final_cost;
 }
 

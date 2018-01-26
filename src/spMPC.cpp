@@ -95,8 +95,8 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
     max_limits[ii] = SP_PI_QUART;
   }
   for(int ii=1; ii<6; ii+=2) {
-    min_limits[ii] = -200;
-    max_limits[ii] = 200;
+    min_limits[ii] = -100;
+    max_limits[ii] = 100;
   }
   ceres::CostFunction* loss_function = new ParamLimitLossFunc<6>(min_limits,max_limits,100);
 
@@ -109,8 +109,9 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
 
   std::vector<int> fix_param_vec;
   // fix the first two parameters
-  fix_param_vec.push_back(0);
-  fix_param_vec.push_back(1);
+//  fix_param_vec.push_back(0);
+//  fix_param_vec.push_back(1);
+
 //  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(6,fix_param_vec);
 //  problem.SetParameterization(parameters,subparam);
 //  problem.SetParameterLowerBound(parameters,0,-((SP_PI/4)-FINITE_DIFF_EPSILON));

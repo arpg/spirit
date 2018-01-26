@@ -99,7 +99,9 @@ class CarSimFunctor {
     for (int ii = 0; ii < num_sim_steps; ii++) {
       control_curve.GetPoint(sample_control, ii / (double)num_sim_steps);
       car.SetFrontSteeringAngle(sample_control[0]);
-      car.SetEngineMaxVel(sample_control[1]);
+//      car.SetEngineMaxVel(sample_control[1]);
+      car.SetEngineMaxVel(100);
+      car.SetEngineTorque(sample_control[1]*0.00001);
       objects_->StepPhySimulation(step_size);
       if ((gui_ != nullptr)) {
         gui_->Iterate(*objects_);
