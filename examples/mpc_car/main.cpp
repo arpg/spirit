@@ -6,6 +6,7 @@
 //#include <signal.h>
 #include <spirit/spirit.h>
 #include <HAL/Posys/PosysDevice.h>
+#include <atomic>
 
 
 hal::CarCommandMsg commandMSG;
@@ -48,6 +49,64 @@ void CarSensorCallback(hal::CarStateMsg msg) {
 //              << std::endl;
 }
 
+std::atomic<double> st0;
+std::atomic<double> st1;
+std::atomic<double> st2;
+std::atomic<double> ac0;
+std::atomic<double> ac1;
+std::atomic<double> ac2;
+
+std::atomic<bool> gFlag;
+std::atomic<double> gCurrStr;
+std::atomic<double> gCurrAcc;
+
+void ApplyCommand() {
+//    hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
+    //ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
+  spCurve curve(2,2);
+  spCtrlPts2ord_2dof controls;
+  spPointXd next_control(2);
+  spTimestamp t0;
+  double timer;
+  double horizon = 0.6;
+  while(1){
+    if(gFlag) {
+      gFlag = false;
+      timer = 0;
+      controls.col(0) = Eigen::Vector2d(st0,ac0);
+      controls.col(1) = Eigen::Vector2d(st1,ac1);
+      controls.col(2) = Eigen::Vector2d(st2,ac2);
+      curve.SetBezierControlPoints(controls);
+      t0 = spGeneralTools::Tick();
+      curve.GetPoint(next_control,0);
+    } else {
+      timer = spGeneralTools::Tock_ms(t0)/1000;
+      if(timer<horizon) {
+        curve.GetPoint(next_control,timer/horizon);
+      } else {
+        curve.GetPoint(next_control,1);
+      }
+    }
+    gCurrStr = next_control[0];
+    gCurrAcc = next_control[1];
+
+    if(flag_auto) {
+        if(next_control[1] > 30) {
+            next_control[1] = 30;
+        }
+        if(next_control[1] < -30) {
+            next_control[1] = -30;
+        }
+        commandMSG.set_steering_angle(-next_control[0]);
+        commandMSG.set_throttle_percent(gamepad_throttle/*next_control[1]*/);
+    } else {
+        commandMSG.set_steering_angle(gamepad_steering);
+        commandMSG.set_throttle_percent(gamepad_throttle);
+    }
+    //  ninja_car.UpdateCarCommand(commandMSG);
+  }
+
+}
 
 int main(int argc, char** argv) {
   // connect to a gamepad
@@ -88,7 +147,7 @@ int main(int argc, char** argv) {
   // put waypoints on a elliptical path
   double a = 1.5;
   double b = 1.5;
-  int num_waypoints = 5;
+  int num_waypoints = 8;
   for(int ii=0; ii<num_waypoints; ii++) {
     // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
     double theta = ii*(2*SP_PI)/num_waypoints;
@@ -101,7 +160,7 @@ int main(int argc, char** argv) {
     pose.translate(spTranslation(x,y,0.07));
     Eigen::AngleAxisd rot(angle+SP_PI_HALF/*+0.6*/,Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
-    traj.AddWaypoint(pose,2);
+    traj.AddWaypoint(pose,1);
     spRotVel rotvel(0,0,2);
     traj.GetWaypoint(ii).SetRotVel(rotvel);
     traj.GetWaypoint(ii).SetLinearVelocityDirection(spLinVel(0,1,0));
@@ -114,7 +173,7 @@ int main(int argc, char** argv) {
   weight_vec << 100, 100, 0, 0, 0, 10, 0.009, 0.009, 0.009, 0.01, 0.01, 0.01,0.1;
   localplanner.SetCostWeight(weight_vec);
   for(int ii=0; ii<traj.GetNumWaypoints(); ii++) {
-    traj.SetTravelDuration(ii,1);
+    traj.SetTravelDuration(ii,0.5);
     localplanner.SolveInitialPlan(traj,ii);
     localplanner.SolveLocalPlan(traj,ii);
     spworld.gui_.Iterate(spworld.objects_);
@@ -128,48 +187,71 @@ int main(int argc, char** argv) {
 
 
   // create a MPC controller with horizon
-  float horizon = 0.4;
+  float horizon = 0.6;
   spMPC mpc(spworld.car_param,horizon);
   //spMPC mpc2(spworld.car_param,horizon);
 
   spCtrlPts2ord_2dof controls;
 
+  spState sst = car.GetState();
+
+  controls.col(0) = Eigen::Vector2d(0,10);
+  controls.col(1) = Eigen::Vector2d(0,10);
+  controls.col(2) = Eigen::Vector2d(0,10);
+
+  std::thread applycommand_thread(ApplyCommand);
+
   while(1){
 //    car.SetPose(posys_);
-    controls.col(0) = Eigen::Vector2d(0,10);
-    controls.col(1) = Eigen::Vector2d(0,10);
-    controls.col(2) = Eigen::Vector2d(0,10);
+//    spPose ps = car.GetPose();
+//    ps.translation()[2] = 0.07;
+//    car.SetPose(car_init_pose);
+//    car.SetState(sst);
 
-    //spTimestamp t0 = spGeneralTools::Tick();
+    spTimestamp t0 = spGeneralTools::Tick();
     if(mpc.CalculateControls(traj,car.GetState(),controls)) {
-      spCurve controls_curve(2,2);
-      spPointXd next_control(2);
-      controls_curve.SetBezierControlPoints(controls);
+      st0 = controls.col(0)[0];
+      ac0 = controls.col(0)[1];
+      st1 = controls.col(1)[0];
+      ac1 = controls.col(1)[1];
+      st2 = controls.col(2)[0];
+      ac2 = controls.col(2)[1];
+      gFlag = true;
+      double calc_time = spGeneralTools::Tock_ms(t0);
+      std::cout << "calc time was " << calc_time << std::endl;
+//      spCurve controls_curve(2,2);
+//      spPointXd next_control(2);
+//      calc_time /= 1000;
+//      spworld.objects_.StepPhySimulation(calc_time);
+//      spworld.gui_.Iterate(spworld.objects_);
+//      controls_curve.SetBezierControlPoints(controls);
       // only get the control signal for next point and apply to car
-      controls_curve.GetPoint(next_control,0/*2*DISCRETIZATION_STEP_SIZE/horizon*/);
-      std::cout << "next signals are " << std::fixed << std::setprecision(3) << next_control.transpose() << std::endl;
-      car.SetFrontSteeringAngle(next_control[0]);
-      car.SetEngineMaxVel(/*next_control[1]*/100);
-      car.SetEngineTorque(next_control[1]*0.00001);
-      if(flag_auto) {
-          if(next_control[1] > 30) {
-              next_control[1] = 30;
-          }
-          if(next_control[1] < -30) {
-              next_control[1] = -30;
-          }
-          commandMSG.set_steering_angle(-next_control[0]);
-          commandMSG.set_throttle_percent(gamepad_throttle/*next_control[1]*/);
-      } else {
-          commandMSG.set_steering_angle(gamepad_steering);
-          commandMSG.set_throttle_percent(gamepad_throttle);
-      }
+//      controls_curve.GetPoint(next_control,calc_time/horizon);
+//      std::cout << "next signals are " << std::fixed << std::setprecision(3) << next_control.transpose() << std::endl;
+//      car.SetFrontSteeringAngle(next_control[0]);
+//      car.SetEngineMaxVel(/*next_control[1]*/100);
+//      car.SetEngineTorque(next_control[1]*0.00001);
+//      car.SetEngineTorque(2*0.00001);
+//      if(flag_auto) {
+//          if(next_control[1] > 30) {
+//              next_control[1] = 30;
+//          }
+//          if(next_control[1] < -30) {
+//              next_control[1] = -30;
+//          }
+//          commandMSG.set_steering_angle(-next_control[0]);
+//          commandMSG.set_throttle_percent(gamepad_throttle/*next_control[1]*/);
+//      } else {
+//          commandMSG.set_steering_angle(gamepad_steering);
+//          commandMSG.set_throttle_percent(gamepad_throttle);
+//      }
+
 //      ninja_car.UpdateCarCommand(commandMSG);
-      controls.col(0) = next_control;
+//      controls.col(0) = next_control;
       //double calc_time = spGeneralTools::Tock_ms(t0);
       //std::cout << "calc time was " << calc_time << std::endl;
 
-      spworld.objects_.StepPhySimulation(DISCRETIZATION_STEP_SIZE);
+//      spworld.objects_.StepPhySimulation(DISCRETIZATION_STEP_SIZE);
       spworld.gui_.Iterate(spworld.objects_);
     } else {
       SPERROREXIT("No Controls could be calculated! ");
@@ -186,5 +268,6 @@ int main(int argc, char** argv) {
 //    }
 //    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
+  applycommand_thread.join();
   return 0;
 }
