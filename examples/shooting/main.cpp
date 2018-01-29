@@ -12,16 +12,40 @@
 hal::CarCommandMsg commandMSG;
 double gamepad_steering = 0;
 double gamepad_throttle = 0;
-spPose posys_;
 bool flag_auto = false;
 
-void Posys_Handler(hal::PoseMsg& PoseData) {
-    posys_ = spPose::Identity();
-    posys_.translate(spTranslation(PoseData.pose().data(0),PoseData.pose().data(1),0.06/*PoseData.pose().data(2)*/));
+spPose vicon_prev_pose;
+spLinVel ninja_linvel;
+spRotVel ninja_rotvel;
+spTimestamp vicon_t0;
+double vicon_time_elapsed = 0;
+bool init_state_flg = true;
+
+void vicon_poseHandler(hal::PoseMsg& PoseData) {
+//std::cout << "p0se data" << std::endl;
+    vicon_time_elapsed = spGeneralTools::Tock_ms(vicon_t0)/1000.0;
+    vicon_t0 = spGeneralTools::Tick();
+    vicon_pose = spPose::Identity();
+    vicon_pose.translate(spTranslation(PoseData.pose().data(0),PoseData.pose().data(1),0.07/*PoseData.pose().data(2)*/));
     spRotation rot(PoseData.pose().data(6),PoseData.pose().data(3),PoseData.pose().data(4),PoseData.pose().data(5));
     Eigen::AngleAxisd tracker_rot(-SP_PI_HALF,Eigen::Vector3d::UnitZ());
-    posys_.rotate(rot);
-    posys_.rotate(tracker_rot);
+    vicon_pose.rotate(rot);
+    vicon_pose.rotate(tracker_rot);
+
+
+    if(init_state_flg) {
+      ninja_linvel = spLinVel::Zero();
+      ninja_rotvel = spRotVel::Zero();
+      init_state_flg = false;
+    } else {
+        spPose diff = vicon_prev_pose.inverse()*vicon_pose;
+        ninja_linvel = (vicon_pose.translation()-vicon_prev_pose.translation())/vicon_time_elapsed;
+        Eigen::AngleAxisd angleaxis(diff.rotation());
+        Eigen::Vector3d rotvec(angleaxis.angle()*angleaxis.axis());
+        ninja_rotvel = rotvec/vicon_time_elapsed;
+    }
+    //std::cout << "lkinvel is ->  " << std::fixed << std::setprecision(3) << ninja_linvel[0] << "\t" << ninja_linvel[1] << "\t" << ninja_rotvel[2] <<std::endl;
+    vicon_prev_pose = vicon_pose;
 }
 
 void GamepadCallback(hal::GamepadMsg& _msg) {
@@ -52,10 +76,10 @@ void CarSensorCallback(hal::CarStateMsg msg) {
 int main(int argc, char** argv) {
   // connect to a gamepad
   hal::Gamepad gamepad("gamepad:/");
-//  gamepad.RegisterGamepadDataCallback(&GamepadCallback);
+  gamepad.RegisterGamepadDataCallback(&GamepadCallback);
 
   // Connect to NinjaV3Car
-//  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
+  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
 
   //ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
 
@@ -63,8 +87,8 @@ int main(int argc, char** argv) {
   commandMSG.set_steering_angle(0);
   commandMSG.set_throttle_percent(0);
   //////////////////////////////
-//  hal::Posys vicon("vicon://tracker:[ninja]");
-//  vicon.RegisterPosysDataCallback(&Posys_Handler);
+  hal::Posys vicon("vicon://tracker:[ninja]");
+  vicon.RegisterPosysDataCallback(&Posys_Handler);
   /////////////////////////////
   spSettings settings_obj;
   settings_obj.SetGuiType(spGuiType::GUI_PANGOSCENEGRAPH);
@@ -74,7 +98,7 @@ int main(int argc, char** argv) {
   std::vector<spObjectHandle> cars;
 #define num_cars 27
   double disc_step_size = 0.01;
-  double simulation_length = 1;
+  double simulation_length = 0.3;
 
   spworld.car_param.pose.translate(spTranslation(1.5,0,0));
   spObjectHandle car_handle = spworld.objects_.CreateVehicle(spworld.car_param);
@@ -102,9 +126,9 @@ int main(int argc, char** argv) {
   std::vector<spCtrlPts2ord_2dof> cntrl_vars_vec(num_cars);
   for(int jj=0; jj<=2; jj++) {
     for(int ii=0; ii<=8; ii++) {
-      cntrl_vars_vec[(9*jj)+ii].col(0) = Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/8,10+jj*5);
-      cntrl_vars_vec[(9*jj)+ii].col(1) = Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/8,10+jj*5);
-      cntrl_vars_vec[(9*jj)+ii].col(2) = Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/8,10+jj*5);
+      cntrl_vars_vec[(9*jj)+ii].col(0) = Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/8,70+jj*5);
+      cntrl_vars_vec[(9*jj)+ii].col(1) = Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/8,70+jj*5);
+      cntrl_vars_vec[(9*jj)+ii].col(2) = Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/8,70+jj*5);
     }
   }
 
@@ -146,13 +170,13 @@ int main(int argc, char** argv) {
 
     // calc the processing time
     double time = spGeneralTools::Tock_ms(t0);
-//    std::cout << "time is " << time << std::endl;
+    //std::cout << "time is " << time << std::endl;
 
-    std::cout << "cost " << lowest_cost << " , " << lowest_cost_index << std::endl;
-    estimation_car.SetFrontSteeringAngle((cntrl_vars_vec[lowest_cost_index]).col(0)[0]);
-    estimation_car.SetEngineMaxVel((cntrl_vars_vec[lowest_cost_index]).col(0)[1]);
-    spworld.objects_.StepPhySimulation(0.1);
-    spworld.gui_.Iterate(spworld.objects_);
+//    std::cout << "cost " << lowest_cost << " , " << lowest_cost_index << std::endl;
+//    estimation_car.SetFrontSteeringAngle((cntrl_vars_vec[lowest_cost_index]).col(0)[0]);
+//    estimation_car.SetEngineMaxVel((cntrl_vars_vec[lowest_cost_index]).col(0)[1]);
+//    spworld.objects_.StepPhySimulation(0.1);
+//    spworld.gui_.Iterate(spworld.objects_);
 //      std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   }
