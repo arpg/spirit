@@ -173,24 +173,26 @@ void spVehicle::SetState(const spState& state){
 //    SPERROR("state tree size mismatch.");
   }
   SetPose(state.pose);
-  SetChassisLinearVelocity(state.linvel);
-  SetChassisAngularVelocity(state.rotvel);
-//  if(state.substate_vec.size()<GetNumberOfWheels()) {
-//    MoveWheelsToAnchors(state.pose);
+MoveWheelsToAnchors(state.pose);
+ // SetChassisLinearVelocity(state.linvel);
+  //SetChassisAngularVelocity(state.rotvel);
+ // if(state.substate_vec.size()<GetNumberOfWheels()) {
+    
+
 //    for(int ii=0; ii<GetNumberOfWheels(); ii++) {
 //      GetWheel(ii)->SetLinVel(state.linvel);
-////      GetWheel(ii)->SetAngularVel(state.rotvel);
+//      GetWheel(ii)->SetAngularVel(state.rotvel);
 //      GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);
 //    }
-//    GetWheel(0)->InitializeSteeringServoAngle(state.front_steering);
-//    GetWheel(3)->InitializeSteeringServoAngle(state.front_steering);
+ //   GetWheel(0)->InitializeSteeringServoAngle(state.front_steering);
+ //   GetWheel(3)->InitializeSteeringServoAngle(state.front_steering);
 //  } else {
 //    for(int ii=0; ii<state.substate_vec.size(); ii++) {
-//      GetWheel(ii)->SetPose(state.substate_vec[ii]->pose);
-//      GetWheel(ii)->SetLinVel(state.substate_vec[ii]->linvel);
-//      GetWheel(ii)->SetAngularVel(state.substate_vec[ii]->rotvel);
+ //     GetWheel(ii)->SetPose(state.substate_vec[ii]->pose);
+  //    GetWheel(ii)->SetLinVel(state.substate_vec[ii]->linvel);
+  //    GetWheel(ii)->SetAngularVel(state.substate_vec[ii]->rotvel);
 //    }
-//  }
+ // }
 }
 
 void spVehicle::SetClampToSurfaceFlag() {

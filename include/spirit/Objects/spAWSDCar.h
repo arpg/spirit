@@ -9,6 +9,7 @@ public:
   spAWSDCar(const spVehicleConstructionInfo& vehicle_info, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world);
   ~spAWSDCar();
   void SetFrontSteeringAngle(double angle);
+  void UpdateWheelFriction(double friction);
   void SetRearSteeringAngle(double angle);
   void SetEngineMaxVel(double vel);
   void SetEngineTorque(double torque);

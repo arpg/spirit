@@ -40,6 +40,12 @@ void spAWSDCar::SetEngineTorque(double torque) {
   }
 }
 
+void spAWSDCar::UpdateWheelFriction(double friction) {
+    for(int ii=0;ii<4;ii++) {
+    GetWheel(ii)->SetFriction(friction);
+  }
+}
+
 //void spAWSDCar::SetSteeringServoMaxVel(double vel){
 //  for(int ii=0;ii<4;ii++) {
 //    GetWheel(ii)->SetSteeringServoMaxVelocity(vel);

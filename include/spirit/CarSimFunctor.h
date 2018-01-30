@@ -63,10 +63,11 @@ class CarSimFunctor {
                    int pert_index,
                    std::shared_ptr<spStateSeries> traj_states = nullptr,
                    std::shared_ptr<spState> init_state = nullptr,
-                   std::shared_ptr<double> cost = nullptr ) {
+                   std::shared_ptr<double> cost = nullptr,
+			std::shared_ptr<double> tire_friction = nullptr ) {
     thread_ = std::make_unique<std::thread>(
         &CarSimFunctor::operator(), this, thread_id, num_sim_steps, step_size,
-        cntrl_vars, epsilon, pert_index, traj_states,init_state,cost);
+        cntrl_vars, epsilon, pert_index, traj_states,init_state,cost,tire_friction);
   }
 
   void WaitForThreadJoin() {
@@ -79,12 +80,16 @@ class CarSimFunctor {
                   int pert_index,
                   std::shared_ptr<spStateSeries> traj_states = nullptr,
                   std::shared_ptr<spState> init_state = nullptr,
-                  std::shared_ptr<double> cost = nullptr ) {
-    double radius = 1.5;
+                  std::shared_ptr<double> cost = nullptr,
+			std::shared_ptr<double> tire_friction = nullptr ) {
+    double radius = 1;
     double total_cost = 0;
     spBox& gnd = (spBox&)objects_->GetObject(gnd_handle_);
     gnd.SetFriction(1);
     spAWSDCar& car = (spAWSDCar&)objects_->GetObject(car_handle_);
+     if(tire_friction != nullptr) {
+       car.UpdateWheelFriction(*tire_friction);
+     }
     if(init_state != nullptr) {
       car.SetState(*init_state);
     }
@@ -116,10 +121,11 @@ class CarSimFunctor {
       }
 
       if (cost != nullptr) {
+	double index_dif = 1;//(num_sim_steps-ii);
         spTranslation position = car.GetState().pose.translation();
         position[2] = 0;
         double curr_radius = position.norm();
-        total_cost += std::abs(radius-curr_radius);
+        total_cost += index_dif*index_dif*std::abs(radius-curr_radius);
       }
     }
     *cost = total_cost;
