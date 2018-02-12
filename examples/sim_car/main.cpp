@@ -19,27 +19,27 @@
 //}
 
 double V(double th, double x, double y, double v, double p){
-  return 0.39831236926*p + 2.11888596261*th*th + 3.32562359169*x*x + 2.0172737766*y*y + 2.29087402521*v*v - 1.87807867872*th*x + 1.06235865938*th*y - 0.228247036325*th*v + 0.801169764975*x*y - 0.930823893073*v*x - 0.209705878867*v*y;
+  return 0.403424099579*p + 2.2684832219*th*th + 3.15083310999*x*x + 1.92420459744*y*y + 2.26798439113*v*v - 1.54782652613*th*x + 0.787553933319*th*y - 0.574485322443*th*v + 1.15675099983*x*y - 1.25261170684*v*x + 0.108793361414*v*y;
 }
 
 double V_pure(double th, double x, double y, double v){
-  return 2.11888596261*th*th + 3.32562359169*x*x + 2.0172737766*y*y + 2.29087402521*v*v - 1.87807867872*th*x + 1.06235865938*th*y - 0.228247036325*th*v + 0.801169764975*x*y - 0.930823893073*v*x - 0.209705878867*v*y;
+  return 2.2684832219*th*th + 3.15083310999*x*x + 1.92420459744*y*y + 2.26798439113*v*v - 1.54782652613*th*x + 0.787553933319*th*y - 0.574485322443*th*v + 1.15675099983*x*y - 1.25261170684*v*x + 0.108793361414*v*y;
 }
 
 double dV(double u_1, double u_2, double u_3, double th, double x, double y, double v, double p){
   double v_r = 1.57;
-  double dth_r = 2*0.3927;
+  double dth_r = 1.047197551;
   double v_t = v + v_r;
   double sin_th = (-0.1569*th*th*th+0.9977*th);
   double cos_th = (-0.4622*th*th+0.9959);
-  double r = (2*2.11888596261*th - 1.87807867872*x + 1.06235865938*y - 0.228247036325*v)*(-2.9380*v_t*u_2 - dth_r*(1+u_3)) + 
-    (2*3.32562359169*x - 1.87807867872*th + 0.801169764975*y - 0.930823893073*v)*(dth_r*(1+u_3)*y + v_t*-sin_th) + 
-    (2*2.0172737766*y + 1.06235865938*th + 0.801169764975*x - 0.209705878867*v)*(dth_r*(1+u_3)*(-x) + v_t*cos_th - v_r*(1+u_3)) + 
-    (2*2.29087402521*v - 0.228247036325*th - 0.930823893073*x - 0.209705878867*y)*(u_1);
+  double r = (2*2.2684832219*th - 1.54782652613*x + 0.787553933319*y - 0.574485322443*v)*(-2.9380*v_t*u_2 - dth_r*(1+u_3)) + 
+    (2*3.15083310999*x - 1.54782652613*th + 1.15675099983*y - 1.25261170684*v)*(dth_r*(1+u_3)*y + v_t*-sin_th) + 
+    (2*1.92420459744*y + 0.787553933319*th + 1.15675099983*x + 0.108793361414*v)*(dth_r*(1+u_3)*(-x) + v_t*cos_th - v_r*(1+u_3)) + 
+    (2*2.26798439113*v - 0.574485322443*th - 1.25261170684*x + 0.108793361414*y)*(u_1);
   double boundary = 1;
   double L = V(th, x, y, v, p);
   if( L > boundary )
-    r += 0.39831236926*(1+u_3);
+    r += 0.403424099579*(1+u_3);
   return r;
 }
 
@@ -68,7 +68,7 @@ class Input{
 
 Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_prev, double u_1_prev, double u_2_prev, double u_3_prev){
   
-  double horizon = 2;
+  double horizon = 1.5;
   int seg = (int)(rem(p_t, horizon*4)/horizon);
   if(seg != seg_prev)
     std::cout << "\n\n\nsegment " << seg << "\n\n\n" << std::endl;
@@ -102,11 +102,11 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
 
   // std::cout << "state: " << th_t << ", " << x_t << ", " << y_t << ", " << v_t << ", " << p << std::endl;
 
-  double dth_r = 2*0.3927;
+  double dth_r = 1.047197551;
   double th_r = (dth_r*p);
   double v_r = 1.57;
-  double x_r = 2*cos(th_r);
-  double y_r = 2*sin(th_r);
+  double x_r = 1.5*cos(th_r);
+  double y_r = 1.5*sin(th_r);
   double th_d = th_t - th_r;
   double v_d  = v_t  - v_r;
   double x_d  = x_t  - x_r;
@@ -117,27 +117,27 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double y = sin(-th_r)*x_d+cos(-th_r)*y_d;
 
   double L = V(th, x, y, v, p);
-  // std::cout << "L: " << L << std::endl;
+  std::cout << "L: " << L << std::endl;
 
   double sin_th = (-0.1569*th*th*th+0.9977*th);
   double cos_th = (-0.4622*th*th+0.9959);
 
   double boundary = 1;
 
-  double b_1 = (2*2.29087402521*v - 0.228247036325*th - 0.930823893073*x - 0.209705878867*y);
-  double b_2 = (2*2.11888596261*th - 1.87807867872*x + 1.06235865938*y - 0.228247036325*v)*(-2.9380*(v_t));
-  double b_3 = (2*2.11888596261*th - 1.87807867872*x + 1.06235865938*y - 0.228247036325*v)*(- dth_r) + 
-    (2*3.32562359169*x - 1.87807867872*th + 0.801169764975*y - 0.930823893073*v)*(dth_r*y) + 
-    (2*2.0172737766*y + 1.06235865938*th + 0.801169764975*x - 0.209705878867*v)*(dth_r*(-x) - v_r);
+  double b_1 = (2*2.26798439113*v - 0.574485322443*th - 1.25261170684*x + 0.108793361414*y);
+  double b_2 = (2*2.2684832219*th - 1.54782652613*x + 0.787553933319*y - 0.574485322443*v)*(-2.9380*(v_t));
+  double b_3 = (2*2.2684832219*th - 1.54782652613*x + 0.787553933319*y - 0.574485322443*v)*(- dth_r) +
+    (2*3.15083310999*x - 1.54782652613*th + 1.15675099983*y - 1.25261170684*v)*(dth_r*y) + 
+    (2*1.92420459744*y + 0.787553933319*th + 1.15675099983*x + 0.108793361414*v)*(dth_r*(-x) - v_r);
   if (L > boundary){
-    b_3 += 0.39831236926;
+    b_3 += 0.403424099579;
   }
-  double a = (2*2.11888596261*th - 1.87807867872*x + 1.06235865938*y - 0.228247036325*v)*(-2.9380*v_t*0 - dth_r*(1+0)) + 
-    (2*3.32562359169*x - 1.87807867872*th + 0.801169764975*y - 0.930823893073*v)*(dth_r*(1+0)*y + v_t*-sin_th) + 
-    (2*2.0172737766*y + 1.06235865938*th + 0.801169764975*x - 0.209705878867*v)*(dth_r*(1+0)*(-x) + v_t*cos_th - v_r*(1+0)) + 
-    (2*2.29087402521*v - 0.228247036325*th - 0.930823893073*x - 0.209705878867*y)*(0);
+  double a = (2*2.2684832219*th - 1.54782652613*x + 0.787553933319*y - 0.574485322443*v)*(-2.9380*v_t*0 - dth_r*(1+0)) + 
+    (2*3.15083310999*x - 1.54782652613*th + 1.15675099983*y - 1.25261170684*v)*(dth_r*(1+0)*y + v_t*-sin_th) + 
+    (2*1.92420459744*y + 0.787553933319*th + 1.15675099983*x + 0.108793361414*v)*(dth_r*(1+0)*(-x) + v_t*cos_th - v_r*(1+0)) + 
+    (2*2.26798439113*v - 0.574485322443*th - 1.25261170684*x + 0.108793361414*y)*(0);
   if (L > boundary){
-    a += 0.39831236926;
+    a += 0.403424099579;
   }
   double beta = b_1*b_1 + b_2*b_2 + b_3*b_3;
   
@@ -323,7 +323,7 @@ while(1){
     car.SetFrontSteeringAngle(turn);
     // std::cout << "u: " << u_1 << ", " << u_2 << std::endl;
     // std::cout << "control: " << torque << ", " << turn << std::endl;
-
+    // std::cout << "radius: " << sqrt(x_t*x_t + y_t*y_t) << std::endl;
     spworld.objects_.StepPhySimulation(tau);
 
     spworld.gui_.Iterate(spworld.objects_);
