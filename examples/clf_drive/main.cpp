@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
         commandMSG.set_steering_angle(gamepad_steering);
         commandMSG.set_throttle_percent(gamepad_throttle);
       }
-      commandMSG.set_throttle_percent(gamepad_throttle);
+      //commandMSG.set_throttle_percent(gamepad_throttle);
       ninja_car.UpdateCarCommand(commandMSG);
     }
   }

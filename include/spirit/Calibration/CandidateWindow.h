@@ -7,6 +7,7 @@
 #include <mutex>
 #include <atomic>
 #include <functional>
+#include <condition_variable>
 
 class CandidateWindow {
  public:
