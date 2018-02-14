@@ -77,13 +77,13 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
       new_y = x_t;
       new_th = th_t+(SP_PI/2);
   }
-  new_th = rem((new_th+SP_PI), (2*SP_PI))-SP_PI;
+  new_th = rem((new_th+1.5*SP_PI), (2*SP_PI))-1.5*SP_PI;
 
   x_t = new_x;
   y_t = new_y;
   th_t = new_th;
 
-  // std::cout << "state: " << th_t << ", " << x_t << ", " << y_t << ", " << v_t << ", " << p << std::endl;
+   std::cout << "state: " << new_th << ", " << new_x << ", " << new_y <</* ", " << v_t << ", " << p <<*/ std::endl;
 
   double dth_r = 1.047197551;
   double th_r = (dth_r*p);
@@ -183,7 +183,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
       double dL_t = dV(u_1t, u_2t, u_3t, th, x, y, v, p);
       if (dL_t > dL){
         if (L > boundary){
-          std::cout << "error: dL increases... V:" << L << ", Beta:" << beta << std::endl;
+          //std::cout << "error: dL increases... V:" << L << ", Beta:" << beta << std::endl;
         }
         break;
       }
