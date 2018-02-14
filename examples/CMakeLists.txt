@@ -6,5 +6,6 @@ if( spirit_FOUND )
       add_subdirectory( sim_car )
       add_subdirectory( bvp_example )
       add_subdirectory( gamepad_drive )
+      add_subdirectory( clf_drive )
 endif()
 
