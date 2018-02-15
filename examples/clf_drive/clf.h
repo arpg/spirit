@@ -26,7 +26,7 @@ double dV(double u_1, double u_2, double u_3, double th, double x, double y, dou
     (2*2.75625642467*x - 0.901554090645*th + 0.868037357871*y - 0.265588939687*v)*(dth_r*(1+u_3)*y + v_t*-sin_th) +
     (2*2.63757975373*y - 0.14018527473*th + 0.868037357871*x - 0.887078198336*v)*(dth_r*(1+u_3)*(-x) + v_t*cos_th - v_r*(1+u_3)) +
     (2*0.655090054197*v - 0.306900880314*th - 0.265588939687*x - 0.887078198336*y)*(u_1);
-  double boundary = 1;
+  double boundary = 2;
   double L = V(th, x, y, v, p);
   if( L > boundary )
     r += 0.403424099579*(1+u_3);
@@ -112,7 +112,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double sin_th = (-0.1569*th*th*th+0.9977*th);
   double cos_th = (-0.4622*th*th+0.9959);
 
-  double boundary = 1;
+  double boundary = 2;
 
   double b_1 = (2*0.655090054197*v - 0.306900880314*th - 0.265588939687*x - 0.887078198336*y);
   double b_2 = (2*2.9925847119*th - 0.901554090645*x - 0.14018527473*y - 0.306900880314*v)*(-2.9380*(v_t));
@@ -154,7 +154,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     u_2 = u_2_prev;
     u_3 = u_3_prev;
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
-  }else if (Lpure < 0.1/2){
+  }else if (Lpure < boundary){
     u_1 = 0;
     u_2 = dth_r/(-2.9380*v_r);
     u_3 = 0;
@@ -163,7 +163,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     double phi = 0;
     double dec_rate = 0;
     if (beta > beta_low){ // Sontage formula
-      dec_rate = 0.5*sqrt(a*a+beta);
+      dec_rate = 0.1*sqrt(a*a+beta);
       phi = (dec_rate+a)/beta;
       u_1 = -b_1*phi;
       u_2 = -b_2*phi;
@@ -174,7 +174,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     }
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
 
-    double thresh = -0.1*L;
+    double thresh = -0.0*L;
     double coef = 1.1;
     while (dL > thresh){ // increase decrease rate size if L is not decreasing
       if(phi == 0 || beta < beta_low)
