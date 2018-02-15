@@ -119,7 +119,7 @@ bool prev_flag = false;
       double y_t = vicon_pose.translation()[1];
       double th_t = std::atan2(rotmat(1,0),rotmat(0,0));
       th_t -= SP_PI_HALF;
-      double v_t = ninja_linvel.norm();
+      double v_t = 1.57;//ninja_linvel.norm();
       p_t += (1+u_3_prev)*tau;
 
       Input feedback = K(th_t, x_t, y_t, v_t, p_t, seg_prev, u_1_prev, u_2_prev, u_3_prev);
@@ -136,7 +136,7 @@ bool prev_flag = false;
 
       //double torque = (u_1-0.3124)/13908;
       //torque += 0.0002;
-      double torque = u_1 *2  + 12;
+      double torque = u_1 *3  + 17;
       double turn = atan(u_2);
 
       if (cnt>1) {
@@ -149,11 +149,11 @@ bool prev_flag = false;
        }
 
       // Apply signals to the ninja car
-      if(flag_auto) {
+      if(!flag_auto) {
         if(turn > SP_PI_QUART)  turn = SP_PI_QUART;
         if(turn < -SP_PI_QUART)  turn = -SP_PI_QUART;
-        if(torque > 20)  turn = 20;
-        if(torque < -20)  turn = -20;
+        if(torque > 30)  torque = 30;
+        if(torque < -30)  torque = -30;
         commandMSG.set_steering_angle(-turn);
         commandMSG.set_throttle_percent(-torque);
       } else {

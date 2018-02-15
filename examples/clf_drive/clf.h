@@ -77,7 +77,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
       new_y = x_t;
       new_th = th_t+(SP_PI/2);
   }
-  new_th = rem((new_th+1.5*SP_PI), (2*SP_PI))-1.5*SP_PI;
+  new_th = rem((new_th+3.5*SP_PI), (2*SP_PI))-1.5*SP_PI;
 
   x_t = new_x;
   y_t = new_y;
@@ -157,7 +157,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     double phi = 0;
     double dec_rate = 0;
     if (beta > beta_low){ // Sontage formula
-      dec_rate = (0.5*sqrt(a*a+beta)+a)/beta;
+      dec_rate = (0.5*sqrt(a*a+beta));
       phi = (dec_rate+a)/beta;
       u_1 = -b_1*phi;
       u_2 = -b_2*phi;
