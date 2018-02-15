@@ -84,7 +84,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
       new_y = x_t;
       new_th = th_t+(SP_PI/2);
   }
-  new_th = rem((new_th+1.5*SP_PI), (2*SP_PI))-1.5*SP_PI;
+  new_th = rem((new_th+2.5*SP_PI), (2*SP_PI))-1.5*SP_PI;
 
   x_t = new_x;
   y_t = new_y;
