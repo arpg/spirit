@@ -136,6 +136,13 @@ bool prev_flag = false;
 
       //double torque = (u_1-0.3124)/13908;
       //torque += 0.0002;
+      
+      // double torque = 0;
+      // if(u_1 >= 0){
+      //   torque = u_1*2 + 12;
+      // }else{
+      //   torque = 2*u_1;
+      // }
       double torque = u_1 *2  + 12;
       double turn = atan(u_2);
 

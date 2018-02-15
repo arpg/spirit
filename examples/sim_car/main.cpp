@@ -174,7 +174,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     double phi = 0;
     double dec_rate = 0;
     if (beta > beta_low){ // Sontage formula
-      dec_rate = (0.5*sqrt(a*a+beta)+a)/beta;
+      dec_rate = (0.5*sqrt(a*a+beta));
       phi = (dec_rate+a)/beta;
       u_1 = -b_1*phi;
       u_2 = -b_2*phi;
@@ -314,6 +314,9 @@ while(1){
     u_3_prev = u_3;
     seg_prev = seg;
     
+    std::cout << "log:" << x_t << "\t,\t" << y_t << "\t,\t" << th_t << "\t,\t" << v_t << "\t,\t" << p_t << std::endl;
+    std::cout << "inp:" << u_1 << "\t,\t" << u_2 << "\t,\t" << u_3 << std::endl;
+
     double torque = (u_1-0.3124)/13908;
     torque += 0.0002;
     double turn = atan(u_2);
