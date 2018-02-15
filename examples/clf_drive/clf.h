@@ -29,7 +29,7 @@ double dV(double u_1, double u_2, double u_3, double th, double x, double y, dou
   double boundary = 2;
   double L = V(th, x, y, v, p);
   if( L > boundary )
-    r += 0.403424099579*(1+u_3);
+    r += 0.118015205445*(1+u_3);
   return r;
 }
 
@@ -120,13 +120,13 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     (2*2.75625642467*x - 0.901554090645*th + 0.868037357871*y - 0.265588939687*v)*(dth_r*y) +
     (2*2.63757975373*y - 0.14018527473*th + 0.868037357871*x - 0.887078198336*v)*(dth_r*(-x) - v_r);
   if (L > boundary){
-    b_3 += 0.403424099579;
+    b_3 += 0.118015205445;
   }
   double a = (2*2.9925847119*th - 0.901554090645*x - 0.14018527473*y - 0.306900880314*v)*(-2.9380*v_t*0 - dth_r*(1+0)) +
     (2*2.75625642467*x - 0.901554090645*th + 0.868037357871*y - 0.265588939687*v)*(dth_r*(1+0)*y + v_t*-sin_th) +
     (2*2.63757975373*y - 0.14018527473*th + 0.868037357871*x - 0.887078198336*v)*(dth_r*(1+0)*(-x) + v_t*cos_th - v_r*(1+0));
   if (L > boundary){
-    a += 0.403424099579;
+    a += 0.118015205445;
   }
   double beta = b_1*b_1 + b_2*b_2 + b_3*b_3;
 
