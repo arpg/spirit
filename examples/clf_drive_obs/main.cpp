@@ -24,6 +24,8 @@ spTimestamp vicon_t0;
 double vicon_time_elapsed = 0;
 bool init_state_flg = true;
 
+double speed_buf[5]={0,0,0,0,0};
+
 void vicon_poseHandler(hal::PoseMsg& PoseData) {
     vicon_time_elapsed = spGeneralTools::Tock_ms(vicon_t0)/1000.0;
 if(vicon_time_elapsed == 0)   return;
@@ -101,7 +103,7 @@ int main(int argc, char** argv) {
 
 bool prev_flag = false;
 
-  while(1){
+
 
     double p_t = p0;
     double u_1_prev = torque0;
@@ -112,14 +114,23 @@ bool prev_flag = false;
 
     int seg_prev = 0;
     int cnt = 0;
-
+int buf_index = 0;
     while(p_t <2) {
       Eigen::Matrix3d rotmat = vicon_pose.rotation();
       double x_t = vicon_pose.translation()[1];
       double y_t = -vicon_pose.translation()[0];
       double th_t = std::atan2(rotmat(1,0),rotmat(0,0))+1.5*SP_PI;
       th_t -= SP_PI_HALF;
-      double v_t = ninja_linvel.norm();
+      speed_buf[buf_index] = ninja_linvel.norm();
+      double sum=0;
+      for(int ii=0;ii<5;ii++) {
+	sum += speed_buf[ii];
+      }
+      sum /= 5;
+      if(buf_index<4)    buf_index++;
+      else buf_index = 0;
+
+      double v_t = sum; //ninja_linvel.norm();
       p_t += (1+u_3_prev)*tau;
 
       Input feedback = K(th_t, x_t, y_t, v_t, p_t, seg_prev, u_1_prev, u_2_prev, u_3_prev);
@@ -137,14 +148,16 @@ bool prev_flag = false;
       //double torque = (u_1-0.3124)/13908;
       //torque += 0.0002;
 
-      double torque = u_1 *3  + 20;
+      double torque = u_1 *5 + 18;
 
       double turn = atan(u_2);
 
       if (cnt>1) {
+	if(x_t<1.5) {
         std::cout << "log : " << x_t << "\t , \t" << y_t << "\t , \t"<< th_t << "\t , \t"  << v_t << "\t , \t" << p_t<< std::endl;
         std::cout << "inp : " << u_1 << "\t , \t" << u_2 << "\t , \t"<< u_3  << std::endl;
-        std::cout << "rad :" << std::sqrt(x_t*x_t+y_t*y_t) << std::endl;
+       // std::cout << "rad :" << std::sqrt(x_t*x_t+y_t*y_t) << std::endl;
+        }
         cnt = 0;
        } else {
 	 cnt++;
@@ -158,8 +171,10 @@ bool prev_flag = false;
         if(torque < -30)  torque = -30;
         if(x_t>1.5) {
 	  turn = 0;
-          torque = -20;
-        }
+          torque = 22;
+          p_t = 0;
+          //v_t = 2;
+        } 
         commandMSG.set_steering_angle(-turn);
         commandMSG.set_throttle_percent(-torque);
       } else {
@@ -174,7 +189,6 @@ bool prev_flag = false;
     }
         commandMSG.set_steering_angle(0);
         commandMSG.set_throttle_percent(0);
-	break;
-  }
+
   return 0;
 }
