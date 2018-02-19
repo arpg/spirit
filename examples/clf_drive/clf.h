@@ -63,11 +63,12 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   if(seg != seg_prev)
     std::cout << "\n\n\nsegment " << seg << "\n\n\n" << std::endl;
 
-  double p = rem(p_t, horizon);
-
+ // double p = rem(p_t, horizon);
+double p = p_t;
   double new_x = x_t;
   double new_y = y_t;
   double new_th = th_t;
+/*
   if (seg == 1){
       new_x = y_t;
       new_y = -x_t;
@@ -84,7 +85,9 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
       new_y = x_t;
       new_th = th_t+(SP_PI/2);
   }
-  new_th = rem((new_th+2.5*SP_PI), (2*SP_PI))-1.5*SP_PI;
+
+*/
+  new_th = rem((new_th+3.5*SP_PI), (2*SP_PI))-1.5*SP_PI;
 
   x_t = new_x;
   y_t = new_y;
@@ -93,7 +96,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
    std::cout << "state: " << new_th << ", " << new_x << ", " << new_y <</* ", " << v_t << ", " << p <<*/ std::endl;
 
   double dth_r = 1.047197551;
-  double th_r = (dth_r*p);
+  double th_r = rem((dth_r*p+3.5*SP_PI), (2*SP_PI))-1.5*SP_PI;
   double v_r = 1.57;
   double x_r = 1.5*cos(th_r);
   double y_r = 1.5*sin(th_r);
@@ -107,7 +110,8 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double y = sin(-th_r)*x_d+cos(-th_r)*y_d;
 
   double L = V(th, x, y, v, p);
-  std::cout << "L: " << L << std::endl;
+double Lpure = V_pure(th, x, y, v);
+  std::cout << "L: " << Lpure << std::endl;
 
   double sin_th = (-0.1569*th*th*th+0.9977*th);
   double cos_th = (-0.4622*th*th+0.9959);
@@ -143,7 +147,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double u_3 = 0;
 
   double dL = 0;
-  double Lpure = V_pure(th, x, y, v);
+  
   if (beta < beta_low){ // use default u if L is small
     u_1 = 0;
     u_2 = 0;
@@ -154,7 +158,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     u_2 = u_2_prev;
     u_3 = u_3_prev;
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
-  }else if (Lpure < boundary){
+  }else if (Lpure < 0.4){
     u_1 = 0;
     u_2 = dth_r/(-2.9380*v_r);
     u_3 = 0;
@@ -163,7 +167,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     double phi = 0;
     double dec_rate = 0;
     if (beta > beta_low){ // Sontage formula
-      dec_rate = 0.1*sqrt(a*a+beta);
+      dec_rate = (0.5*sqrt(a*a+beta));
       phi = (dec_rate+a)/beta;
       u_1 = -b_1*phi;
       u_2 = -b_2*phi;

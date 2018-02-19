@@ -136,14 +136,9 @@ bool prev_flag = false;
 
       //double torque = (u_1-0.3124)/13908;
       //torque += 0.0002;
-      
-      // double torque = 0;
-      // if(u_1 >= 0){
-      //   torque = u_1*2 + 12;
-      // }else{
-      //   torque = 2*u_1;
-      // }
-      double torque = u_1 *2  + 12;
+
+      double torque = u_1 *3  + 17;
+
       double turn = atan(u_2);
 
       if (cnt>1) {
@@ -156,11 +151,11 @@ bool prev_flag = false;
        }
 
       // Apply signals to the ninja car
-      if(flag_auto) {
+      if(!flag_auto) {
         if(turn > SP_PI_QUART)  turn = SP_PI_QUART;
         if(turn < -SP_PI_QUART)  turn = -SP_PI_QUART;
-        if(torque > 20)  turn = 20;
-        if(torque < -20)  turn = -20;
+        if(torque > 30)  torque = 30;
+        if(torque < -30)  torque = -30;
         commandMSG.set_steering_angle(-turn);
         commandMSG.set_throttle_percent(-torque);
       } else {
