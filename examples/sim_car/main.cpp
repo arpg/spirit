@@ -299,11 +299,11 @@ while(1){
     // Input
     
     Eigen::Matrix3d rotmat = car.GetPose().rotation();
-    double x_t = car.GetState().pose.translation()[0];
-    double y_t = car.GetState().pose.translation()[1];
-    double th_t = std::atan2(rotmat(1,0),rotmat(0,0));
+    double x_t = car.GetState().pose.translation()[1];
+    double y_t = -car.GetState().pose.translation()[0];
+    double th_t = std::atan2(rotmat(1,0),rotmat(0,0)) + 3*SP_PI/2;
     double v_t = car.GetState().linvel.norm();
-    p_t += (1+u_3_prev)*tau;
+    
 
     
     Input feedback = K(th_t, x_t, y_t, v_t, p_t, seg_prev, u_1_prev, u_2_prev, u_3_prev);
@@ -332,6 +332,7 @@ while(1){
     // std::cout << "control: " << torque << ", " << turn << std::endl;
     // std::cout << "radius: " << sqrt(x_t*x_t + y_t*y_t) << std::endl;
     spworld.objects_.StepPhySimulation(tau);
+    p_t += (1+u_3_prev)*tau;
 
     spworld.gui_.Iterate(spworld.objects_);
     std::this_thread::sleep_for(std::chrono::milliseconds((int)(tau*1000*(1))));
