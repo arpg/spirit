@@ -83,78 +83,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   x_t = new_x;
   y_t = new_y;
   th_t = new_th;
-double V(double th, double x, double y, double v, double p){
-  return 0.249999989812*p + 15.5363574309*th*th + 36.3157269731*x*x + 36.8049532397*y*y + 42.5683695983*v*v - 20.7293153886*th*x - 7.81647454596*th*y - 1.67422174172*th*v + 17.5873008649*x*y + 18.0292270703*v*x + 15.8886367948*v*y;
-}
 
-double V_pure(double th, double x, double y, double v){
-  return 15.5363574309*th*th + 36.3157269731*x*x + 36.8049532397*y*y + 42.5683695983*v*v - 20.7293153886*th*x - 7.81647454596*th*y - 1.67422174172*th*v + 17.5873008649*x*y + 18.0292270703*v*x + 15.8886367948*v*y;
-}
-
-double dV(double u_1, double u_2, double u_3, double th, double x, double y, double v, double p){
-  double v_r = 2;
-  double dth_r = -2*(3*(p-1)*(p-1)-1);
-  double v_t = v + v_r;
-  double sin_th = (-0.1569*th*th*th+0.9977*th);
-  double cos_th = (-0.4622*th*th+0.9959);
-  double r = (2*15.5363574309*th -20.7293153886*x - 7.81647454596 *y - 1.67422174172*v)*(-2.9380*v_t*u_2 - dth_r*(1+u_3)) + 
-    (2*36.3157269731*x -20.7293153886*th +17.5873008649*y + 18.0292270703 *v)*(dth_r*(1+u_3)*y + v_t*-sin_th) + 
-    (2*36.8049532397*y - 7.81647454596 *th +17.5873008649*x + 15.8886367948*v)*(dth_r*(1+u_3)*(-x) + v_t*cos_th - v_r*(1+u_3)) + 
-    (2*42.5683695983*v - 1.67422174172*th + 18.0292270703 *x + 15.8886367948*y)*(u_1);
-  double boundary = 1;
-  double L = V(th, x, y, v, p);
-  if( L > boundary )
-    r += 0.249999989812*(1+u_3);
-  return r;
-}
-
-double rem(double a, double b){
-  double q = a / b;
-  return a - ((int)q)*b;
-}
-
-double rem(double a, int b){
-  double dec = a - (int) a;
-  return ((int)a % b) + dec;
-}
-
-class Input{
-  public: double u_1;
-  public: double u_2;
-  public: double u_3;
-  public: int seg;
-  public: Input(double u_1, double u_2, double u_3, int seg){
-    this->u_1 = u_1;
-    this->u_2 = u_2;
-    this->u_3 = u_3;
-    this->seg = seg;
-  }
-};
-
-Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_prev, double u_1_prev, double u_2_prev, double u_3_prev){
-  
-  // double horizon = 1.5;
-  // int seg = (int)(rem(p_t, horizon*4)/horizon);
-  // if(seg != seg_prev)
-  //   std::cout << "\n\n\nsegment " << seg << "\n\n\n" << std::endl;
-  int seg = seg_prev;
-
-  double p = p_t;//rem(p_t, horizon);
-
-  double new_x = x_t;
-  double new_y = y_t;
-  double new_th = th_t;
-  // if (seg == 1){
-  //     new_x = y_t;
-  //     new_y = -x_t;
-  //     new_th = th_t-(SP_PI/2);
-  // }
-  // if (seg == 2){
-  //     new_x = -x_t;
-  //     new_y = -y_t;
-  //     new_th = th_t+SP_PI;
-  //     // std::cout << new_th << ":" << rem((new_th+SP_PI), (2*SP_PI))-SP_PI << std::endl;
-  // }
   // std::cout << "state: " << th_t << ", " << x_t << ", " << y_t << ", " << v_t << ", " << p << std::endl;
 
   double dth_r = -2*(3*(p-1)*(p-1)-1);
