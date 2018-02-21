@@ -288,9 +288,9 @@ while(1){
     // Input
     
     Eigen::Matrix3d rotmat = car.GetPose().rotation();
-    double x_t = car.GetState().pose.translation()[0];
-    double y_t = car.GetState().pose.translation()[1];
-    double th_t = std::atan2(rotmat(1,0),rotmat(0,0));
+    double x_t = car.GetState().pose.translation()[1];
+    double y_t = -car.GetState().pose.translation()[0];
+    double th_t = std::atan2(rotmat(1,0),rotmat(0,0)) - SP_PI/2;
     double v_t = car.GetState().linvel.norm();
     p_t += (1+u_3_prev)*tau;
 
