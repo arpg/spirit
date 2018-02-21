@@ -102,7 +102,8 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double y = sin(-th_r)*x_d+cos(-th_r)*y_d;
 
   double L = V(th, x, y, v, p);
-  std::cout << "L: " << L << std::endl;
+  double Lpure = V_pure(th, x, y, v);
+  std::cout << "L: " << Lpure << std::endl;
 
   double sin_th = (-0.1569*th*th*th+0.9977*th);
   double cos_th = (-0.4622*th*th+0.9959);
@@ -119,7 +120,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     // b_3 += 0.249999989812;
     b_3 += 0.372503132228;
   }
-  double a = (2*1.97248006041*th -2.21861909747*x - 0.252299355612 *y + 0.279942258467*v)*(-2.9380*v_t*u_2 - dth_r*(1+0)) + 
+  double a = (2*1.97248006041*th -2.21861909747*x - 0.252299355612 *y + 0.279942258467*v)*(-2.9380*v_t*0 - dth_r*(1+0)) + 
      (2*2.75481825315*x - 2.21861909747*th +0.0578921429474*y + 0.132761213741 *v)*(dth_r*(1+0)*y + v_t*-sin_th) + 
      (2*2.59443611808*y - 0.252299355612 *th +0.0578921429474*x - 0.536165847515*v)*(dth_r*(1+0)*(-x) + v_t*cos_th - v_r*(1+0)) + 
      (2*2.46570845211*v + 0.279942258467*th + 0.132761213741 *x - 0.536165847515*y)*(0);
@@ -136,13 +137,14 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double u3_max = 9;
   double u3_min = -0.9;
 
-  double beta_low = 0.1/2;
+  double beta_low = 0.1/4;
   double u_1 = 0;
   double u_2 = 0;
   double u_3 = 0;
 
   double dL = 0;
-  double Lpure = V_pure(th, x, y, v);
+
+std::cout << "beta:  " << beta <<  std::endl;
   if (beta < beta_low){ // use default u if L is small
     u_1 = 0;
     u_2 = 0;
@@ -153,7 +155,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     u_2 = u_2_prev;
     u_3 = u_3_prev;
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
-  }else if (Lpure < 0.5){
+  }else if (Lpure < 0.3){
     u_1 = 0;
     u_2 = dth_r/(-2.9380*v_r);
     u_3 = 0;

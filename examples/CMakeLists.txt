@@ -9,5 +9,6 @@ if( spirit_FOUND )
       add_subdirectory( clf_drive )
       add_subdirectory( clf_drive_obs )
       add_subdirectory( clf_drive_straight )
+      add_subdirectory( clf_drive_straight_PF )
 endif()
 
