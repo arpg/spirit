@@ -115,7 +115,7 @@ bool prev_flag = false;
     int seg_prev = 0;
     int cnt = 0;
 int buf_index = 0;
-    while(p_t <2) {
+    while(p_t <3.25) {
       Eigen::Matrix3d rotmat = vicon_pose.rotation();
       double x_t = -vicon_pose.translation()[1];
       double y_t = vicon_pose.translation()[0];
@@ -148,15 +148,17 @@ int buf_index = 0;
       //double torque = (u_1-0.3124)/13908;
       //torque += 0.0002;
 
-      double torque = u_1 *5 + 18;
+      double torque = u_1 *2 + 15;
 
       double turn = atan(u_2);
 
       if (cnt>1) {
+      if(x_t > -2.5){
         std::cout << "log : " << x_t << "\t , \t" << y_t << "\t , \t"<< th_t << "\t , \t"  << v_t << "\t , \t" << p_t<< std::endl;
         std::cout << "inp : " << u_1 << "\t , \t" << u_2 << "\t , \t"<< u_3  << std::endl;
        // std::cout << "rad :" << std::sqrt(x_t*x_t+y_t*y_t) << std::endl;
-        cnt = 0;
+        }
+      cnt = 0;
        } else {
 	 cnt++;
        }
@@ -167,12 +169,12 @@ int buf_index = 0;
         if(turn < -SP_PI_QUART)  turn = -SP_PI_QUART;
         if(torque > 30)  torque = 30;
         if(torque < -30)  torque = -30;
-   //      if(x_t>1.5) {
-	  // turn = 0;
-   //        torque = 17;
-   //        p_t = 0;
-   //        //v_t = 2;
-   //      } 
+         if(x_t<-2.5) {
+	   turn = 0;
+           torque = 17;
+           p_t = 0.75;
+           //v_t = 2;
+         } 
         commandMSG.set_steering_angle(-turn);
         commandMSG.set_throttle_percent(-torque);
       } else {

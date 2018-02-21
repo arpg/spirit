@@ -8,5 +8,6 @@ if( spirit_FOUND )
 	#add_subdirectory( gamepad_drive )
       add_subdirectory( clf_drive )
       add_subdirectory( clf_drive_obs )
+      add_subdirectory( clf_drive_straight )
 endif()
 

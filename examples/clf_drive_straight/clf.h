@@ -133,8 +133,8 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double u1_min = -4;
   double u2_max = 1;
   double u2_min = -1;
-  double u3_max = 9;
-  double u3_min = -0.9;
+  double u3_max = 0;
+  double u3_min = -0.0;
 
   double beta_low = 0.1/2;
   double u_1 = 0;
@@ -153,7 +153,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     u_2 = u_2_prev;
     u_3 = u_3_prev;
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
-  }else if (Lpure < 0.5){
+  }else if (Lpure < 1){
     u_1 = 0;
     u_2 = dth_r/(-2.9380*v_r);
     u_3 = 0;
@@ -173,7 +173,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     }
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
 
-    double thresh = -0.1*L;
+    double thresh = -0.5*L;
     double coef = 1.1;
     while (dL > thresh){ // increase decrease rate size if L is not decreasing
       if(phi == 0 || beta < beta_low)
