@@ -19,36 +19,28 @@
 //}
 
 double V(double th, double x, double y, double v, double p){
-  //path following:
-  // return 0.403424099579*p + 2.2684832219*th*th + 3.15083310999*x*x + 1.92420459744*y*y + 2.26798439113*v*v - 1.54782652613*th*x + 0.787553933319*th*y - 0.574485322443*th*v + 1.15675099983*x*y - 1.25261170684*v*x + 0.108793361414*v*y;
-  //trajectory tracking:
-  return 0.136864339389*p + 2.35990637874*th*th + 2.88032400644*x*x + 3.05405733143*y*y + 1.26298238226*v*v - 2.01042483011*th*x - 0.883165777049*th*y + 0.35500634302*th*v - 0.781556260427*x*y - 1.20281289607*v*x + 0.956481098708*v*y;
+  return 0.190624486308*p + 1.96773363112*th*th + 3.63058416146*x*x + 3.52728977122*y*y + 1.97925944398*v*v - 1.19032956317*th*x + 0.139231847089*th*y + 0.199779394346*th*v - 0.0833258535883*x*y + 0.0545824013467*v*x + 1.75893785671*v*y;
 }
 
 double V_pure(double th, double x, double y, double v){
-  // return 2.2684832219*th*th + 3.15083310999*x*x + 1.92420459744*y*y + 2.26798439113*v*v - 1.54782652613*th*x + 0.787553933319*th*y - 0.574485322443*th*v + 1.15675099983*x*y - 1.25261170684*v*x + 0.108793361414*v*y;
-  return 2.35990637874*th*th + 2.88032400644*x*x + 3.05405733143*y*y + 1.26298238226*v*v - 2.01042483011*th*x - 0.883165777049*th*y + 0.35500634302*th*v - 0.781556260427*x*y - 1.20281289607*v*x + 0.956481098708*v*y;
+  return 1.96773363112*th*th + 3.63058416146*x*x + 3.52728977122*y*y + 1.97925944398*v*v - 1.19032956317*th*x + 0.139231847089*th*y + 0.199779394346*th*v - 0.0833258535883*x*y + 0.0545824013467*v*x + 1.75893785671*v*y;
 }
 
 double dV(double u_1, double u_2, double u_3, double th, double x, double y, double v, double p){
-  double v_r = 1.57;
-  double dth_r = 1.047197551;
+  double v_r = 2;
+  double dth_r = 0;
   double v_t = v + v_r;
   double sin_th = (-0.1569*th*th*th+0.9977*th);
   double cos_th = (-0.4622*th*th+0.9959);
-  // double r = (2*2.2684832219*th - 1.54782652613*x + 0.787553933319*y - 0.574485322443*v)*(-2.9380*v_t*u_2 - dth_r*(1+u_3)) + 
-  //   (2*3.15083310999*x - 1.54782652613*th + 1.15675099983*y - 1.25261170684*v)*(dth_r*(1+u_3)*y + v_t*-sin_th) + 
-  //   (2*1.92420459744*y + 0.787553933319*th + 1.15675099983*x + 0.108793361414*v)*(dth_r*(1+u_3)*(-x) + v_t*cos_th - v_r*(1+u_3)) + 
-  //   (2*2.26798439113*v - 0.574485322443*th - 1.25261170684*x + 0.108793361414*y)*(u_1);
-  double r = (2*2.35990637874*th - 2.01042483011*x - 0.883165777049*y + 0.35500634302*v)*(-2.9380*v_t*u_2 - dth_r*(1+u_3)) + 
-    (2*2.88032400644*x - 2.01042483011*th - 0.781556260427*y - 1.20281289607*v)*(dth_r*(1+u_3)*y + v_t*-sin_th) + 
-    (2*3.05405733143*y - 0.883165777049*th - 0.781556260427*x + 0.956481098708*v)*(dth_r*(1+u_3)*(-x) + v_t*cos_th - v_r*(1+u_3)) + 
-    (2*1.26298238226*v + 0.35500634302*th - 1.20281289607*x + 0.956481098708*y)*(u_1);
+  double r = (2*1.96773363112*th -1.19032956317*x + 0.139231847089 *y + 0.199779394346*v)*(-2.9380*v_t*u_2 - dth_r*(1+u_3)) + 
+     (2*3.63058416146*x - 1.19032956317*th -0.0833258535883*y + 0.0545824013467 *v)*(dth_r*(1+u_3)*y + v_t*-sin_th) + 
+     (2*3.52728977122*y + 0.139231847089 *th -0.0833258535883*x + 1.75893785671*v)*(dth_r*(1+u_3)*(-x) + v_t*cos_th - v_r*(1+u_3)) + 
+     (2*1.97925944398*v + 0.199779394346*th + 0.0545824013467 *x + 1.75893785671*y)*(u_1);
   double boundary = 1;
   double L = V(th, x, y, v, p);
   if( L > boundary )
-    // r += 0.403424099579*(1+u_3);
-    r += 0.136864339389*(1+u_3);
+    // r += 0.249999989812*(1+u_3);
+    r += 0.190624486308*(1+u_3);
   return r;
 }
 
@@ -77,10 +69,11 @@ class Input{
 
 Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_prev, double u_1_prev, double u_2_prev, double u_3_prev){
   
-  double horizon = 1.5;
-  int seg = (int)(rem(p_t, horizon*4)/horizon);
-  if(seg != seg_prev)
-    std::cout << "\n\n\nsegment " << seg << "\n\n\n" << std::endl;
+  // double horizon = 1.5;
+  // int seg = (int)(rem(p_t, horizon*4)/horizon);
+  // if(seg != seg_prev)
+  //   std::cout << "\n\n\nsegment " << seg << "\n\n\n" << std::endl;
+  int seg = seg_prev;
 
   double p = p_t;//rem(p_t, horizon);
 
@@ -111,11 +104,11 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
 
   // std::cout << "state: " << th_t << ", " << x_t << ", " << y_t << ", " << v_t << ", " << p << std::endl;
 
-  double dth_r = 1.047197551;
-  double th_r = rem((dth_r*p+SP_PI), (2*SP_PI))-SP_PI;
-  double v_r = 1.57;
-  double x_r = 1.5*cos(th_r);
-  double y_r = 1.5*sin(th_r);
+  double dth_r = 0;
+  double th_r = 0 - SP_PI/2;
+  double v_r = 2;
+  double x_r = -4 + 2*p;
+  double y_r = 0;
   double th_d = th_t - th_r;
   double v_d  = v_t  - v_r;
   double x_d  = x_t  - x_r;
@@ -124,41 +117,32 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double v = v_d;
   double x = cos(-th_r)*x_d-sin(-th_r)*y_d;
   double y = sin(-th_r)*x_d+cos(-th_r)*y_d;
-  double Lpure = V_pure(th, x, y, v);
+
   double L = V(th, x, y, v, p);
-  std::cout << "L: " << Lpure << std::endl;
+  std::cout << "L: " << L << std::endl;
 
   double sin_th = (-0.1569*th*th*th+0.9977*th);
   double cos_th = (-0.4622*th*th+0.9959);
 
   double boundary = 1;
 
-  // double b_1 = (2*2.26798439113*v - 0.574485322443*th - 1.25261170684*x + 0.108793361414*y);
-  // double b_2 = (2*2.2684832219*th - 1.54782652613*x + 0.787553933319*y - 0.574485322443*v)*(-2.9380*(v_t));
-  // double b_3 = (2*2.2684832219*th - 1.54782652613*x + 0.787553933319*y - 0.574485322443*v)*(- dth_r) +
-  //   (2*3.15083310999*x - 1.54782652613*th + 1.15675099983*y - 1.25261170684*v)*(dth_r*y) + 
-  //   (2*1.92420459744*y + 0.787553933319*th + 1.15675099983*x + 0.108793361414*v)*(dth_r*(-x) - v_r);
-  double b_1 = (2*1.26298238226*v + 0.35500634302*th - 1.20281289607*x + 0.956481098708*y);
-  double b_2 = (2*2.35990637874*th - 2.01042483011*x - 0.883165777049*y + 0.35500634302*v)*(-2.9380*v_t);
-  double b_3 = (2*2.35990637874*th - 2.01042483011*x - 0.883165777049*y + 0.35500634302*v)*(-2.9380*v_t*0 - dth_r*(1+0)) + 
-    (2*2.88032400644*x - 2.01042483011*th - 0.781556260427*y - 1.20281289607*v)*(dth_r*(1+0)*y) + 
-    (2*3.05405733143*y - 0.883165777049*th - 0.781556260427*x + 0.956481098708*v)*(dth_r*(1+0)*(-x) - v_r*(1+0)) + 
-    (2*1.26298238226*v + 0.35500634302*th - 1.20281289607*x + 0.956481098708*y)*(0);
+  double  b_1 = (2*1.97925944398*v + 0.199779394346*th + 0.0545824013467 *x + 1.75893785671*y);
+  double  b_2 = (2*1.96773363112*th -1.19032956317*x + 0.139231847089 *y + 0.199779394346*v)*(-2.9380*(v_t));
+  double  b_3 = (2*1.96773363112*th -1.19032956317*x + 0.139231847089 *y + 0.199779394346*v)*(-2.9380*v_t*0 - dth_r*(1+0)) + 
+     (2*3.63058416146*x - 1.19032956317*th -0.0833258535883*y + 0.0545824013467 *v)*(dth_r*(1+0)*y) + 
+     (2*3.52728977122*y + 0.139231847089 *th -0.0833258535883*x + 1.75893785671*v)*(dth_r*(1+0)*(-x) - v_r*(1+0)) + 
+     (2*1.97925944398*v + 0.199779394346*th + 0.0545824013467 *x + 1.75893785671*y)*(0);
   if (L > boundary){
-    // b_3 += 0.403424099579;
-    b_3 += 0.136864339389;
+    // b_3 += 0.249999989812;
+    b_3 += 0.190624486308;
   }
-  // double a = (2*2.2684832219*th - 1.54782652613*x + 0.787553933319*y - 0.574485322443*v)*(-2.9380*v_t*0 - dth_r*(1+0)) + 
-  //   (2*3.15083310999*x - 1.54782652613*th + 1.15675099983*y - 1.25261170684*v)*(dth_r*(1+0)*y + v_t*-sin_th) + 
-  //   (2*1.92420459744*y + 0.787553933319*th + 1.15675099983*x + 0.108793361414*v)*(dth_r*(1+0)*(-x) + v_t*cos_th - v_r*(1+0)) + 
-  //   (2*2.26798439113*v - 0.574485322443*th - 1.25261170684*x + 0.108793361414*y)*(0);
-  double a = (2*2.35990637874*th - 2.01042483011*x - 0.883165777049*y + 0.35500634302*v)*(-2.9380*v_t*0 - dth_r*(1+0)) + 
-    (2*2.88032400644*x - 2.01042483011*th - 0.781556260427*y - 1.20281289607*v)*(dth_r*(1+0)*y + v_t*-sin_th) + 
-    (2*3.05405733143*y - 0.883165777049*th - 0.781556260427*x + 0.956481098708*v)*(dth_r*(1+0)*(-x) + v_t*cos_th - v_r*(1+0)) + 
-    (2*1.26298238226*v + 0.35500634302*th - 1.20281289607*x + 0.956481098708*y)*(0);
+  double a = (2*1.96773363112*th -1.19032956317*x + 0.139231847089 *y + 0.199779394346*v)*(-2.9380*v_t*0 - dth_r*(1+0)) + 
+     (2*3.63058416146*x - 1.19032956317*th -0.0833258535883*y + 0.0545824013467 *v)*(dth_r*(1+0)*y + v_t*-sin_th) + 
+     (2*3.52728977122*y + 0.139231847089 *th -0.0833258535883*x + 1.75893785671*v)*(dth_r*(1+0)*(-x) + v_t*cos_th - v_r*(1+0)) + 
+     (2*1.97925944398*v + 0.199779394346*th + 0.0545824013467 *x + 1.75893785671*y)*(0);
   if (L > boundary){
-    // a += 0.403424099579;
-    a += 0.136864339389;
+    // a += 0.249999989812;
+    a += 0.190624486308;
   }
   double beta = b_1*b_1 + b_2*b_2 + b_3*b_3;
   
@@ -175,7 +159,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double u_3 = 0;
 
   double dL = 0;
-  
+  double Lpure = V_pure(th, x, y, v);
   if (beta < beta_low){ // use default u if L is small
     u_1 = 0;
     u_2 = 0;
@@ -308,7 +292,7 @@ while(1){
   double tau = 0.01;
 
   int seg_prev = 0;
-  while(p_t < 64) {
+  while(p_t < 4) {
 //    car.SetEngineMaxVel(commandMSG.throttle_percent());
 //    car.SetFrontSteeringAngle(commandMSG.steering_angle());
 
@@ -316,11 +300,11 @@ while(1){
     // Input
     
     Eigen::Matrix3d rotmat = car.GetPose().rotation();
-    double x_t = car.GetState().pose.translation()[0];
-    double y_t = car.GetState().pose.translation()[1];
-    double th_t = std::atan2(rotmat(1,0),rotmat(0,0));
+    double x_t = -car.GetState().pose.translation()[1];
+    double y_t = car.GetState().pose.translation()[0];
+    double th_t = std::atan2(rotmat(1,0),rotmat(0,0)) + 2*SP_PI + 1*SP_PI/2;
     double v_t = car.GetState().linvel.norm();
-    p_t += (1+u_3_prev)*tau;
+    
 
     
     Input feedback = K(th_t, x_t, y_t, v_t, p_t, seg_prev, u_1_prev, u_2_prev, u_3_prev);
@@ -349,6 +333,7 @@ while(1){
     // std::cout << "control: " << torque << ", " << turn << std::endl;
     // std::cout << "radius: " << sqrt(x_t*x_t + y_t*y_t) << std::endl;
     spworld.objects_.StepPhySimulation(tau);
+    p_t += (1+u_3_prev)*tau;
 
     spworld.gui_.Iterate(spworld.objects_);
     std::this_thread::sleep_for(std::chrono::milliseconds((int)(tau*1000*(1))));
