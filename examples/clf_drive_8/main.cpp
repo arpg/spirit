@@ -24,8 +24,6 @@ spTimestamp vicon_t0;
 double vicon_time_elapsed = 0;
 bool init_state_flg = true;
 
-double speed_buf[5]={0,0,0,0,0};
-
 void vicon_poseHandler(hal::PoseMsg& PoseData) {
     vicon_time_elapsed = spGeneralTools::Tock_ms(vicon_t0)/1000.0;
 if(vicon_time_elapsed == 0)   return;
@@ -103,7 +101,7 @@ int main(int argc, char** argv) {
 
 bool prev_flag = false;
 
-
+  while(1){
 
     double p_t = p0;
     double u_1_prev = torque0;
@@ -114,23 +112,15 @@ bool prev_flag = false;
 
     int seg_prev = 0;
     int cnt = 0;
-int buf_index = 0;
-    while(p_t <3.0) {
-      Eigen::Matrix3d rotmat = vicon_pose.rotation();
-      double x_t = -vicon_pose.translation()[1];
-      double y_t = vicon_pose.translation()[0];
-      double th_t = std::atan2(rotmat(1,0),rotmat(0,0))+0.5*SP_PI;
-      th_t -= SP_PI_HALF;
-      speed_buf[buf_index] = ninja_linvel.norm();
-      double sum=0;
-      for(int ii=0;ii<5;ii++) {
-	sum += speed_buf[ii];
-      }
-      sum /= 5;
-      if(buf_index<4)    buf_index++;
-      else buf_index = 0;
 
-      double v_t = sum; //ninja_linvel.norm();
+    while(p_t < 10000) {
+      Eigen::Matrix3d rotmat = vicon_pose.rotation();
+      double x_t = vicon_pose.translation()[1];
+      double y_t = -vicon_pose.translation()[0];
+      y_t = y_t + 2;
+      double th_t = std::atan2(rotmat(1,0),rotmat(0,0)) - SP_PI_HALF;
+      th_t -= SP_PI_HALF;
+      double v_t = ninja_linvel.norm();
       p_t += (1+u_3_prev)*tau;
 
       Input feedback = K(th_t, x_t, y_t, v_t, p_t, seg_prev, u_1_prev, u_2_prev, u_3_prev);
@@ -148,17 +138,15 @@ int buf_index = 0;
       //double torque = (u_1-0.3124)/13908;
       //torque += 0.0002;
 
-      double torque = u_1 *2 + 18;
+      double torque = u_1 *3  + 17;
 
       double turn = atan(u_2);
 
       if (cnt>1) {
-      if(x_t > -2.0){
         std::cout << "log : " << x_t << "\t , \t" << y_t << "\t , \t"<< th_t << "\t , \t"  << v_t << "\t , \t" << p_t<< std::endl;
         std::cout << "inp : " << u_1 << "\t , \t" << u_2 << "\t , \t"<< u_3  << std::endl;
-       // std::cout << "rad :" << std::sqrt(x_t*x_t+y_t*y_t) << std::endl;
-        }
-      cnt = 0;
+        std::cout << "rad :" << std::sqrt(x_t*x_t+y_t*y_t) << std::endl;
+        cnt = 0;
        } else {
 	 cnt++;
        }
@@ -169,12 +157,6 @@ int buf_index = 0;
         if(turn < -SP_PI_QUART)  turn = -SP_PI_QUART;
         if(torque > 30)  torque = 30;
         if(torque < -30)  torque = -30;
-         if(x_t<-2.0) {
-	   turn = 0;
-           torque = 17;
-           p_t = 1;
-           //v_t = 2;
-         } 
         commandMSG.set_steering_angle(-turn);
         commandMSG.set_throttle_percent(-torque);
       } else {
@@ -187,8 +169,6 @@ int buf_index = 0;
       prev_flag = flag_auto;
       std::this_thread::sleep_for(std::chrono::milliseconds((int)(tau*1000*(1))));
     }
-        commandMSG.set_steering_angle(0);
-        commandMSG.set_throttle_percent(0);
-
+  }
   return 0;
 }

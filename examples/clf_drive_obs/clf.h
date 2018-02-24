@@ -2,7 +2,9 @@
 #define CLF_H__
 
 double V(double th, double x, double y, double v, double p){
+  // Path Following:
   // return 0.249999989812*p + 15.5363574309*th*th + 36.3157269731*x*x + 36.8049532397*y*y + 42.5683695983*v*v - 20.7293153886*th*x - 7.81647454596*th*y - 1.67422174172*th*v + 17.5873008649*x*y + 18.0292270703*v*x + 15.8886367948*v*y;
+  // Trajectory Tracking:
   return 0.308442640854*p + 14.3343025074*th*th + 5.01370493039*x*x + 4.3228973109*y*y + 2.39547903927*v*v - 5.8502319747*th*x + 0.410115549268*th*y + 1.70487162233 *th*v -0.35232265023*x*y + 1.12866155309 *v*x + 0.747137447174*v*y;
 }
 
@@ -161,17 +163,12 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
 
   double dL = 0;
   double Lpure = V_pure(th, x, y, v);
-  if (beta < beta_low){ // use default u if L is small
-    u_1 = 0;
-    u_2 = 0;
-    u_3 = 0;
-    dL = dV(u_1, u_2, u_3, th, x, y, v, p);
-  }else if (beta < 2*beta_low && u_1_prev == 0 && u_2_prev == 0 && u_3_prev == 0){ // continue using default u
+  if (Lpure < 0.04 && u_1_prev == 0 && u_2_prev == dth_r/(-2.9380*v_r) && u_3_prev == 0){ // continue using default u
     u_1 = u_1_prev;
     u_2 = u_2_prev;
     u_3 = u_3_prev;
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
-  }else if (Lpure < 0.7){
+  }else if (Lpure < 0.02){
     u_1 = 0;
     u_2 = dth_r/(-2.9380*v_r);
     u_3 = 0;
@@ -191,7 +188,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     }
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
 
-    double thresh = -0.1*L;
+    double thresh = -0.0*L;
     double coef = 1.1;
     while (dL > thresh){ // increase decrease rate size if L is not decreasing
       if(phi == 0 || beta < beta_low)
