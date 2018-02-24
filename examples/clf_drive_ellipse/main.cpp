@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <iostream>
+#include <fstream>
 #include "clf.h"
 
 hal::CarCommandMsg commandMSG;
@@ -34,7 +36,6 @@ if(vicon_time_elapsed == 0)   return;
     Eigen::AngleAxisd tracker_rot(-SP_PI_HALF,Eigen::Vector3d::UnitZ());
     vicon_pose.rotate(rot);
     vicon_pose.rotate(tracker_rot);
-
 
     if(init_state_flg) {
       ninja_linvel = spLinVel::Zero();
@@ -100,6 +101,8 @@ int main(int argc, char** argv) {
 //  double v0_y = v0*cos(th0);
 
 bool prev_flag = false;
+std::ofstream myfile;
+myfile.open ("log.csv");
 
   while(1){
 
@@ -113,14 +116,27 @@ bool prev_flag = false;
     int seg_prev = 0;
     int cnt = 0;
 
-    while(p_t < 10000) {
+    int buf_size = 20;
+    double velocity_buff[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    int buf_ind = 0;
+    while(p_t < 64) {
       Eigen::Matrix3d rotmat = vicon_pose.rotation();
       double x_t = vicon_pose.translation()[1];
       double y_t = -vicon_pose.translation()[0];
-      double th_t = std::atan2(rotmat(1,0),rotmat(0,0)) - SP_PI_HALF;
+      double th_t = std::atan2(rotmat(1,0),rotmat(0,0))-SP_PI_HALF;
       th_t -= SP_PI_HALF;
       double v_t = ninja_linvel.norm();
       p_t += (1+u_3_prev)*tau;
+
+      velocity_buff[buf_ind] = v_t;
+      double sum = 0;
+      for(int ii = 0; ii < buf_size; ii++){
+        sum+=velocity_buff[ii];
+      }
+      buf_ind++;
+      if (buf_ind == buf_size)
+        buf_ind = 0;
+      v_t = sum/buf_size;
 
       Input feedback = K(th_t, x_t, y_t, v_t, p_t, seg_prev, u_1_prev, u_2_prev, u_3_prev);
 
@@ -137,7 +153,7 @@ bool prev_flag = false;
       //double torque = (u_1-0.3124)/13908;
       //torque += 0.0002;
 
-      double torque = u_1 *3  + 17;
+      double torque = u_1 *2  + 16;
 
       double turn = atan(u_2);
 
@@ -145,6 +161,7 @@ bool prev_flag = false;
         std::cout << "log : " << x_t << "\t , \t" << y_t << "\t , \t"<< th_t << "\t , \t"  << v_t << "\t , \t" << p_t<< std::endl;
         std::cout << "inp : " << u_1 << "\t , \t" << u_2 << "\t , \t"<< u_3  << std::endl;
         std::cout << "rad :" << std::sqrt(x_t*x_t+y_t*y_t) << std::endl;
+        myfile << x_t << "," << y_t << "," << th_t << "," << v_t << "," << p_t << "," << u_1 << "," << u_2 << "," << u_3 << std::endl;
         cnt = 0;
        } else {
 	 cnt++;
@@ -168,6 +185,7 @@ bool prev_flag = false;
       prev_flag = flag_auto;
       std::this_thread::sleep_for(std::chrono::milliseconds((int)(tau*1000*(1))));
     }
+    myfile.close();
   }
   return 0;
 }

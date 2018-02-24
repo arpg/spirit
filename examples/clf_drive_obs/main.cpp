@@ -24,7 +24,7 @@ spTimestamp vicon_t0;
 double vicon_time_elapsed = 0;
 bool init_state_flg = true;
 
-double speed_buf[5]={0,0,0,0,0};
+double speed_buf[10]={0,0,0,0,0,0,0,0,0,0};
 
 void vicon_poseHandler(hal::PoseMsg& PoseData) {
     vicon_time_elapsed = spGeneralTools::Tock_ms(vicon_t0)/1000.0;
@@ -123,11 +123,11 @@ int buf_index = 0;
       th_t -= SP_PI_HALF;
       speed_buf[buf_index] = ninja_linvel.norm();
       double sum=0;
-      for(int ii=0;ii<5;ii++) {
+      for(int ii=0;ii<10;ii++) {
 	sum += speed_buf[ii];
       }
-      sum /= 5;
-      if(buf_index<4)    buf_index++;
+      sum /= 10;
+      if(buf_index<9)    buf_index++;
       else buf_index = 0;
 
       double v_t = sum; //ninja_linvel.norm();
@@ -153,7 +153,7 @@ int buf_index = 0;
       double turn = atan(u_2);
 
       if (cnt>1) {
-	if(x_t<1.5) {
+	if(x_t<1.6) {
         std::cout << "log : " << x_t << "\t , \t" << y_t << "\t , \t"<< th_t << "\t , \t"  << v_t << "\t , \t" << p_t<< std::endl;
         std::cout << "inp : " << u_1 << "\t , \t" << u_2 << "\t , \t"<< u_3  << std::endl;
        // std::cout << "rad :" << std::sqrt(x_t*x_t+y_t*y_t) << std::endl;
@@ -169,12 +169,12 @@ int buf_index = 0;
         if(turn < -SP_PI_QUART)  turn = -SP_PI_QUART;
         if(torque > 30)  torque = 30;
         if(torque < -30)  torque = -30;
-        if(x_t>1.5) {
+        if(x_t>1.6) {
 	  turn = 0;
           torque = 17;
           p_t = 0;
           //v_t = 2;
-        } 
+        }
         commandMSG.set_steering_angle(-turn);
         commandMSG.set_throttle_percent(-torque);
       } else {
@@ -187,8 +187,10 @@ int buf_index = 0;
       prev_flag = flag_auto;
       std::this_thread::sleep_for(std::chrono::milliseconds((int)(tau*1000*(1))));
     }
+while(1){
         commandMSG.set_steering_angle(0);
         commandMSG.set_throttle_percent(0);
-
+std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
   return 0;
 }

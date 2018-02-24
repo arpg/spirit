@@ -9,7 +9,7 @@ double V(double th, double x, double y, double v, double p){
 double V_pure(double th, double x, double y, double v){
   return 1.63456357893*th*th + 3.00993802074*x*x + 3.61402339917*y*y + 1.60970679636*v*v -1.59174813962*th*x + 0.0921162459212*th*y +0.0279626412588*th*v + 0.493507533181*x*y -0.317799799472*v*x -0.444818507944*v*y;
 }
-
+static bool is_close = false;
 double dV(double u_1, double u_2, double u_3, double th, double x, double y, double v, double p){
   double v_r = 1.57;
   double dth_r = (3.1416/11.0437848)*(0.8+1.2*(3*(p-1.53)*(p-1.53)));
@@ -103,7 +103,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double b_2 = (2*1.63456357893*th -1.59174813962*x + 0.0921162459212*y +0.0279626412588*v)*(-2.9380*(v_t));
   double b_3 = (2*1.63456357893*th -1.59174813962*x + 0.0921162459212*y +0.0279626412588*v)*(-2.9380*v_t*0 - dth_r*(1+0)) + 
     (2*3.00993802074*x - 1.54782652613*th + 0.493507533181*y -0.317799799472*v)*(dth_r*(1+0)*y) + 
-    (2*3.61402339917*y + 0.0921162459212*th + 0.493507533181*x -0.444818507944*v)*(dth_r*(1+0)*(-x) - v_r*(1+0)) + 
+    (2*3.61402339917*y + 0.0921162459212*th + 0.493507533181*x -0.444818507944*v)*(dth_r*(1+0)*(-x) - v_r*(1+0)) +
     (2*1.60970679636*v +0.0279626412588*th -0.317799799472*x + -0.444818507944*y)*(0);
   if (L > boundary){
     b_3 += 0.23467930931;
@@ -130,18 +130,21 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
   double u_3 = 0;
 
   double dL = 0;
-  
-  if (Lpure < 0.04 && u_1_prev == 0 && u_2_prev == dth_r/(-2.9380*v_r) && u_3_prev == 0){ // continue using default u
+  /*
+  if (Lpure < 0.04 && is_close){ // continue using default u
     u_1 = u_1_prev;
     u_2 = u_2_prev;
     u_3 = u_3_prev;
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
-  }else if (Lpure < 0.02){
+  }else */ 
+if (Lpure < 0.05){
+    is_close = true;
     u_1 = 0;
     u_2 = dth_r/(-2.9380*v_r);
     u_3 = 0;
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
   }else{
+    is_close = false;
     double phi = 0;
     double dec_rate = 0;
     if (beta > beta_low){ // Sontage formula
@@ -156,7 +159,7 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
     }
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
 
-    double thresh = -0.0*L;
+    double thresh = -0.5*L;
     double e_q = 0.3;
     if (L > boundary)
       thresh -= e_q;

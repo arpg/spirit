@@ -9,8 +9,6 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <iostream>
-#include <fstream>
 #include "clf.h"
 
 hal::CarCommandMsg commandMSG;
@@ -102,8 +100,6 @@ int main(int argc, char** argv) {
 //  double v0_y = v0*cos(th0);
 
 bool prev_flag = false;
-std::ofstream myfile;
-myfile.open ("log.csv");
 
   while(1){
 
@@ -117,11 +113,11 @@ myfile.open ("log.csv");
     int seg_prev = 0;
     int cnt = 0;
 
-    while(p_t < 64) {
+    while(p_t < 10000) {
       Eigen::Matrix3d rotmat = vicon_pose.rotation();
-      double x_t = vicon_pose.translation()[0];
-      double y_t = vicon_pose.translation()[1];
-      double th_t = std::atan2(rotmat(1,0),rotmat(0,0));
+      double x_t = vicon_pose.translation()[1];
+      double y_t = -vicon_pose.translation()[0];
+      double th_t = std::atan2(rotmat(1,0),rotmat(0,0)) - SP_PI_HALF;
       th_t -= SP_PI_HALF;
       double v_t = ninja_linvel.norm();
       p_t += (1+u_3_prev)*tau;
@@ -149,7 +145,6 @@ myfile.open ("log.csv");
         std::cout << "log : " << x_t << "\t , \t" << y_t << "\t , \t"<< th_t << "\t , \t"  << v_t << "\t , \t" << p_t<< std::endl;
         std::cout << "inp : " << u_1 << "\t , \t" << u_2 << "\t , \t"<< u_3  << std::endl;
         std::cout << "rad :" << std::sqrt(x_t*x_t+y_t*y_t) << std::endl;
-        myfile << x_t << "," << y_t << "," << th_t << "," << v_t << "," << p_t << "," << u_1 << "," << u_2 << "," << u_3 << std::endl;
         cnt = 0;
        } else {
 	 cnt++;
@@ -173,7 +168,6 @@ myfile.open ("log.csv");
       prev_flag = flag_auto;
       std::this_thread::sleep_for(std::chrono::milliseconds((int)(tau*1000*(1))));
     }
-    myfile.close();
   }
   return 0;
 }

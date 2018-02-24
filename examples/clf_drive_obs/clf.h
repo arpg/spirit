@@ -58,6 +58,7 @@ class Input{
   }
 };
 
+static bool is_close = false;
 Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_prev, double u_1_prev, double u_2_prev, double u_3_prev){
   
   // double horizon = 1.5;
@@ -163,12 +164,13 @@ Input K(double th_t, double x_t, double y_t, double v_t, double p_t, int seg_pre
 
   double dL = 0;
   double Lpure = V_pure(th, x, y, v);
-  if (Lpure < 0.04 && u_1_prev == 0 && u_2_prev == dth_r/(-2.9380*v_r) && u_3_prev == 0){ // continue using default u
+  /*if (Lpure < 0.04 && is_close){ // continue using default u
     u_1 = u_1_prev;
     u_2 = u_2_prev;
     u_3 = u_3_prev;
     dL = dV(u_1, u_2, u_3, th, x, y, v, p);
-  }else if (Lpure < 0.02){
+  }else*/ 
+if (Lpure < 0.05){
     u_1 = 0;
     u_2 = dth_r/(-2.9380*v_r);
     u_3 = 0;
