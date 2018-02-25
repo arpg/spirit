@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <iostream>
+#include <fstream>
 #include "clf.h"
 
 hal::CarCommandMsg commandMSG;
@@ -114,6 +116,8 @@ bool prev_flag = false;
 
     int seg_prev = 0;
     int cnt = 0;
+    std::ofstream myfile;
+    myfile.open ("log.csv");
 int buf_index = 0;
     while(p_t <2) {
       Eigen::Matrix3d rotmat = vicon_pose.rotation();
@@ -153,10 +157,13 @@ int buf_index = 0;
       double turn = atan(u_2);
 
       if (cnt>1) {
+
 	if(x_t<1.6) {
         std::cout << "log : " << x_t << "\t , \t" << y_t << "\t , \t"<< th_t << "\t , \t"  << v_t << "\t , \t" << p_t<< std::endl;
         std::cout << "inp : " << u_1 << "\t , \t" << u_2 << "\t , \t"<< u_3  << std::endl;
        // std::cout << "rad :" << std::sqrt(x_t*x_t+y_t*y_t) << std::endl;
+        myfile << x_t << "," << y_t << "," << th_t << "," << v_t << "," << p_t << "," << u_1 << "," << u_2 << "," << u_3 << std::endl;
+
         }
         cnt = 0;
        } else {
@@ -171,7 +178,7 @@ int buf_index = 0;
         if(torque < -30)  torque = -30;
         if(x_t>1.6) {
 	  turn = 0;
-          torque = 17;
+          torque = 40;
           p_t = 0;
           //v_t = 2;
         }
@@ -187,9 +194,11 @@ int buf_index = 0;
       prev_flag = flag_auto;
       std::this_thread::sleep_for(std::chrono::milliseconds((int)(tau*1000*(1))));
     }
+    myfile.close();
 while(1){
         commandMSG.set_steering_angle(0);
         commandMSG.set_throttle_percent(0);
+        ninja_car.UpdateCarCommand(commandMSG);
 std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
   return 0;
