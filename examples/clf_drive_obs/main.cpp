@@ -178,7 +178,7 @@ int buf_index = 0;
         if(torque < -30)  torque = -30;
         if(x_t>1.6) {
 	  turn = 0;
-          torque = 40;
+          torque = 25;
           p_t = 0;
           //v_t = 2;
         }
