@@ -8,6 +8,7 @@ public:
   spWheel(const spVehicleConstructionInfo& vehicle_info, int wheel_index, std::shared_ptr<btRigidBody> chassis_body, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world);
   ~spWheel();
   void SetPose(const spPose& pose);
+  void SetFriction(double friction);
   const spPose& GetPose();
   void SetColor(const spColor& color);
   const spColor& GetColor();

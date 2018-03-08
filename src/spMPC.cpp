@@ -80,7 +80,7 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
 //  residual_weight << 4, 4, 4, 3, 3, 3, 0.07, 0.07, 0.07, 0.1, 0.1, 0.1;
 //  residual_weight << 1,1,1,0.5,0.5,0.5,0.1,0.1,0.1,0,0,0;
 //  residual_weight << 1,1,1,0.4,0.4,0.4,0.001,0.001,0.001,0.001,0.001,0.001;
-  residual_weight << 1,1,1,0,0,0,0,0,0,0,0,0.3;
+  residual_weight << 1,1,0,0,0,1,0,0,0,0,0,0;
   Eigen::VectorXd traj_point_weight(horizon_);
   traj_point_weight.setOnes(horizon_);
 //  traj_point_weight[0] = 0.5;
@@ -95,22 +95,24 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
     max_limits[ii] = SP_PI_QUART;
   }
   for(int ii=1; ii<6; ii+=2) {
-    min_limits[ii] = -200;
-    max_limits[ii] = 200;
+    min_limits[ii] = -20;
+    max_limits[ii] = 20;
   }
   ceres::CostFunction* loss_function = new ParamLimitLossFunc<6>(min_limits,max_limits,100);
 
+//  std::cout << "init controls\n" << controls << std::endl;
   double parameters[6];
   for (int ii = 0; ii < 6; ++ii) {
     parameters[ii] = controls.data()[ii];
   }
-  problem.AddResidualBlock(cost_function, NULL, parameters);
+  problem.AddResidualBlock(cost_function, NULL/*new ceres::CauchyLoss(0.1)*/, parameters);
   problem.AddResidualBlock(loss_function,NULL,parameters);
 
   std::vector<int> fix_param_vec;
   // fix the first two parameters
-  fix_param_vec.push_back(0);
-  fix_param_vec.push_back(1);
+//  fix_param_vec.push_back(0);
+//  fix_param_vec.push_back(1);
+
 //  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(6,fix_param_vec);
 //  problem.SetParameterization(parameters,subparam);
 //  problem.SetParameterLowerBound(parameters,0,-((SP_PI/4)-FINITE_DIFF_EPSILON));
@@ -138,8 +140,8 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
 //  options.max_num_iterations = 10;
 //  options.min_relative_decrease = 1e-2;
 //  options.max_solver_time_in_seconds = 0.1;
-  options.initial_trust_region_radius = 0.7;
-  options.max_trust_region_radius = 0.7;
+  options.initial_trust_region_radius = 0.5;
+  options.max_trust_region_radius = 0.5;
 //  options.min_trust_region_radius = 1e-32;
   options.parameter_tolerance = 1e-2;
   options.linear_solver_type = ceres::DENSE_QR;
@@ -148,6 +150,7 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
 //  std::cout << summary.FullReport() << std::endl;
+//  std::cout << "cost is " << summary.final_cost << std::endl;
 
   // calculate final Covariance
   /*

@@ -62,10 +62,12 @@ class CarSimFunctor {
                    const spCtrlPts2ord_2dof& cntrl_vars, double epsilon,
                    int pert_index,
                    std::shared_ptr<spStateSeries> traj_states = nullptr,
-                   std::shared_ptr<spState> init_state = nullptr) {
+                   std::shared_ptr<spState> init_state = nullptr,
+                   std::shared_ptr<double> cost = nullptr,
+			std::shared_ptr<double> tire_friction = nullptr ) {
     thread_ = std::make_unique<std::thread>(
         &CarSimFunctor::operator(), this, thread_id, num_sim_steps, step_size,
-        cntrl_vars, epsilon, pert_index, traj_states,init_state);
+        cntrl_vars, epsilon, pert_index, traj_states,init_state,cost,tire_friction);
   }
 
   void WaitForThreadJoin() {
@@ -77,10 +79,17 @@ class CarSimFunctor {
                   const spCtrlPts2ord_2dof& cntrl_vars, double epsilon,
                   int pert_index,
                   std::shared_ptr<spStateSeries> traj_states = nullptr,
-                  std::shared_ptr<spState> init_state = nullptr ) {
+                  std::shared_ptr<spState> init_state = nullptr,
+                  std::shared_ptr<double> cost = nullptr,
+			std::shared_ptr<double> tire_friction = nullptr ) {
+    double radius = 1;
+    double total_cost = 0;
     spBox& gnd = (spBox&)objects_->GetObject(gnd_handle_);
     gnd.SetFriction(1);
     spAWSDCar& car = (spAWSDCar&)objects_->GetObject(car_handle_);
+     if(tire_friction != nullptr) {
+       car.UpdateWheelFriction(*tire_friction);
+     }
     if(init_state != nullptr) {
       car.SetState(*init_state);
     }
@@ -100,6 +109,8 @@ class CarSimFunctor {
       control_curve.GetPoint(sample_control, ii / (double)num_sim_steps);
       car.SetFrontSteeringAngle(sample_control[0]);
       car.SetEngineMaxVel(sample_control[1]);
+//      car.SetEngineMaxVel(100);
+//      car.SetEngineTorque(sample_control[1]*0.00001);
       objects_->StepPhySimulation(step_size);
       if ((gui_ != nullptr)) {
         gui_->Iterate(*objects_);
@@ -108,7 +119,16 @@ class CarSimFunctor {
       if (traj_states != nullptr) {
         traj_states->push_back(std::make_shared<spState>(car.GetState()));
       }
+
+      if (cost != nullptr) {
+	double index_dif = 1;//(num_sim_steps-ii);
+        spTranslation position = car.GetState().pose.translation();
+        position[2] = 0;
+        double curr_radius = position.norm();
+        total_cost += index_dif*index_dif*std::abs(radius-curr_radius);
+      }
     }
+    *cost = total_cost;
   }
 
   const spState& GetState() {

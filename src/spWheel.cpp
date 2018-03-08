@@ -64,6 +64,10 @@ spWheel::~spWheel()
 //  delete hinge_;
 }
 
+void spWheel::SetFriction(double friction) {
+  rigid_body_->setFriction(friction);
+}
+
 void spWheel::SetPose(const spPose& pose)
 {
   btTransform tr;
