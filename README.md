@@ -22,7 +22,8 @@ notes for this.
 
 The following images are from a MATLAB animation of the bicycle model. 
 
-<img src="bikeSimMATLAB/bike1.jpg" width = "200" height = "200">
+<img src="bikeSimMATLAB/bike1.jpg" width = "500" height = "500">
+<img src="bikeSimMATLAB/bike2.jpg" width = "500" height = "500">
 
 ![](bikeSimMATLAB/bike1.jpg)
 ![](bikeSimMATLAB/bike2.jpg)
