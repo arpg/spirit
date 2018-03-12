@@ -21,7 +21,8 @@ a mesh, using a RK4 integrator rather than bullet. Here are some of the
 notes for this.
 
 The following images are from a MATLAB animation of the bicycle model. The
-vehicle currently moves in a XY plane.
+vehicle currently moves in a XY plane. A trajectory is drawn from the vehicles 
+center of gravity.
 
 <img src="bikeSimMATLAB/bike1.jpg" width = "350" height = "350">
 <img src="bikeSimMATLAB/bike2.jpg" width = "350" height = "350">
