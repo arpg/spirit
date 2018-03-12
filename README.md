@@ -17,9 +17,10 @@ spirit is a library to control a non-holonomic vehicle with a Model-based predic
 
 ## Bicycle Model notes
 We would like to create a bicycle model which is kinematic and fixed to
-a mesh, using a RK45 integrator rather than bullet. Here are some of the
+a mesh, using a RK4 integrator rather than bullet. Here are some of the
 notes for this.
 
-<img src="bikeSimMATLAB/bike1.jpg" width"100">
+The following images are from a MATLAB animation of the bicycle model. 
 
 ![](bikeSimMATLAB/bike1.jpg)
+![](bikeSimMATLAB/bike2.jpg)
