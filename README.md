@@ -20,4 +20,6 @@ We would like to create a bicycle model which is kinematic and fixed to
 a mesh, using a RK45 integrator rather than bullet. Here are some of the
 notes for this.
 
+<img src="bikeSimMATLAB/bike1.jpg" width"100">
+
 ![](bikeSimMATLAB/bike1.jpg)
