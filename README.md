@@ -20,7 +20,8 @@ We would like to create a bicycle model which is kinematic and fixed to
 a mesh, using a RK4 integrator rather than bullet. Here are some of the
 notes for this.
 
-The following images are from a MATLAB animation of the bicycle model. 
+The following images are from a MATLAB animation of the bicycle model. The
+vehicle currently moves in a XY plane.
 
 <img src="bikeSimMATLAB/bike1.jpg" width = "350" height = "350">
 <img src="bikeSimMATLAB/bike2.jpg" width = "350" height = "350">
