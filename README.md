@@ -22,5 +22,5 @@ notes for this.
 
 The following images are from a MATLAB animation of the bicycle model. 
 
-![](bikeSimMATLAB/bike1.jpg)
+![](bikeSimMATLAB/bike1.jpg){:height = "50%" width = "50%"}
 ![](bikeSimMATLAB/bike2.jpg)
