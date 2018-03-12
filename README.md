@@ -21,6 +21,8 @@ a mesh, using a RK4 integrator rather than bullet. Here are some of the
 notes for this.
 
 The following images are from a MATLAB animation of the bicycle model. 
-<img src="bikeSimMATLAB/bike1.jpg" width = "50" height = "50">
+
+<img src="bikeSimMATLAB/bike1.jpg" width = "200" height = "200">
+
 ![](bikeSimMATLAB/bike1.jpg)
 ![](bikeSimMATLAB/bike2.jpg)
