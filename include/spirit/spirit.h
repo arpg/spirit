@@ -18,6 +18,7 @@
 #include <spirit/Planners/VehicleCeresCostFunc.h>
 #include <spirit/Planners/spCirclePlanner.h>
 #include <fstream>
+#include <spirit/RK4.h>
 
 
 class spirit {
