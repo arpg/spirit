@@ -158,7 +158,7 @@ Eigen::ArrayXd CarODE2(Eigen::VectorXd y_t) {
 }
 
 // where theta is not equal to sigma and sigma is non zero
-Eigen::ArrayXd CarODE1(Eigen::VectorXd y_t) {
+Eigen::ArrayXd CarODE(Eigen::VectorXd y_t) {
   Eigen::VectorXd y_dot(y_t);
   double sigma = -SP_PI/6;
 //  std::cout << "sigma " << sigma << std::endl;
