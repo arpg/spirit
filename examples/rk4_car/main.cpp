@@ -10,7 +10,7 @@
 int main(int argc, char** argv) {
 
   RK4 rk4solver;
-  rk4solver.RegisterODE(&CarODE1);
+  rk4solver.RegisterODE(&CarODE);
 
   Eigen::ArrayXd init(7);
   init[0] = 0.0;
