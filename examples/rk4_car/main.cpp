@@ -10,7 +10,7 @@
 int main(int argc, char** argv) {
 
   RK4 rk4solver;
-  rk4solver.RegisterODE(&CarODE2);
+  rk4solver.RegisterODE(&CarODE1);
 
   Eigen::ArrayXd init(7);
   init[0] = 0.0;
@@ -26,10 +26,16 @@ int main(int argc, char** argv) {
 //return 0;
 
   rk4solver.SetStepSize(0.01);
-  Eigen::ArrayXXd traj = rk4solver.Solve(init,10);
+  Eigen::ArrayXXd traj = rk4solver.Solve(init,20);
   std::cout << "traj cols " << traj.cols() << std::endl;
   std::cout << "traj rows " << traj.rows() << std::endl;
-  std::cout << traj.row(2).transpose() << std::endl;
+  for(int ii=0; ii<traj.cols(); ii++) {
+    std::cout << "res -> " << traj.col(ii).transpose() << std::endl;
+  }
+//  std::cout << traj.row(0).transpose() << std::endl;
+//  std::cout << traj.row(0)[99999] << std::endl;
+//  std::cout << traj.row(1)[99999] << std::endl;
+//  std::cout << traj.row(2)[99999] << std::endl;
 
   std::cout << "Done ... !" << std::endl;
 
