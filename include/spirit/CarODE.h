@@ -1,9 +1,8 @@
 #include <eigen3/Eigen/Eigen>
-#include <spirit/CarFunc.h>
 
 Eigen::ArrayXd CarODE(Eigen::VectorXd y_t) {
   Eigen::VectorXd y_dot(y_t);
-  double sigma = 0;//SP_PI/10;
+  double sigma = SP_PI/10;
   double theta = SP_PI/4.0;
   double TF_c00r = std::sin(sigma);
   double TF_c03r = std::sin(sigma);
@@ -51,14 +50,6 @@ Eigen::ArrayXd CarODE(Eigen::VectorXd y_t) {
   double TireLon1TFr = Radius;
   double TireLon2TFr = Radius;
   double TireLon3TFr = Radius;
-//  double TireLat0Rr = LatFriction;
-//  double TireLat1Rr = LatFriction;
-//  double TireLat2Rr = LatFriction;
-//  double TireLat3Rr = LatFriction;
-//  double TireLon0Rr = LonFriction;
-//  double TireLon1Rr = LonFriction;
-//  double TireLon2Rr = LonFriction;
-//  double TireLon3Rr = LonFriction;
 
   double xmagic_d = 100.68;
   double xmagic_b = 8.22;
@@ -108,7 +99,7 @@ Eigen::ArrayXd CarODE(Eigen::VectorXd y_t) {
   double bet3 = std::abs(theta - sigma);
   double TireLat3Rr = ymagic_d*std::sin(ymagic_c*std::atan(ymagic_b*(1-ymagic_e)*bet3+ymagic_e*std::atan(ymagic_b*bet3)));
 
-#if 0
+#if 1
   double Sepe = Seeffort;
   double TireLon0Ipf = TireLon0Istate / TireLon0Ii;
   double TireLon1Ipf = TireLon1Istate / TireLon1Ii;
@@ -121,9 +112,9 @@ Eigen::ArrayXd CarODE(Eigen::VectorXd y_t) {
   double TireLon2TFp2f = TireLon2TFr * TireLon2Ipf;
   double TireLon3TFp2f = TireLon3TFr * TireLon3Ipf;
   double ZeroJunctionp5v = ((TireLon0Ipf + TireLon3Ipf) + TireLon2Ipf) + TireLon1Ipf;
-//  if(ZeroJunctionp5v >10) {
-//    Sepe = 0;
-//  }
+  if(ZeroJunctionp5v >10) {
+    Sepe = 0;
+  }
   double TF_c27p1f = Jzpf * TF_c27r;
   double TF_c04p1f = Iypf * TF_c04r;
   double TF_c10p1f = Ixpf * TF_c10r;
@@ -200,13 +191,11 @@ Eigen::ArrayXd CarODE(Eigen::VectorXd y_t) {
   double TireLon1Ipe = Seeffort - TireLon1TFr * TireLon1Rr * (TireLon1TFr * (TireLon1Istate / TireLon1Ii) - (Ixstate / Ixi) - (Jzstate / Jzi) * TF_c21r);
   double TireLon2Ipe = Seeffort - TireLon2TFr * TireLon2Rr * (TireLon2TFr * (TireLon2Istate / TireLon2Ii) - (Ixstate / Ixi) - (Jzstate / Jzi) * TF_c22r);
   double TireLon3Ipe = Seeffort - TireLon3TFr * TireLon3Rr * (TireLon3TFr * (TireLon3Istate / TireLon3Ii) - (Iystate / Iyi) * TF_c03r - (Ixstate / Ixi) * TF_c13r - (Jzstate / Jzi) * TF_c23r);
+  double Jzpe = ((((((((Jzstate / Jzi) * TF_c27r + (Ixstate / Ixi) * TF_c17r + (Iystate / Iyi) * TF_c07r) * -TireLat3Rr * TF_c27r + (TireLon0Rr * (TireLon0TFr * (TireLon0Istate / TireLon0Ii) - (Iystate / Iyi) * TF_c00r - (Ixstate / Ixi) * TF_c10r - (Jzstate / Jzi) * TF_c20r) * TF_c20r)) + (TireLon1Rr * TF_c21r * (TireLon1TFr * (TireLon1Istate / TireLon1Ii) - (Ixstate / Ixi) - (Jzstate / Jzi) * TF_c21r))) + (TireLon2Rr * (TireLon2TFr * (TireLon2Istate / TireLon2Ii) - (Ixstate / Ixi) - (Jzstate / Jzi) * TF_c22r) * TF_c22r)) + (TireLon3Rr * (TireLon3TFr * (TireLon3Istate / TireLon3Ii) - (Iystate / Iyi) * TF_c03r - (Ixstate / Ixi) * TF_c13r - (Jzstate / Jzi) * TF_c23r) * TF_c23r)) - TireLat0Rr * ((Jzstate / Jzi) * TF_c24r + (Ixstate / Ixi) * TF_c14r + (Iystate / Iyi) * TF_c04r) * TF_c24r) - TireLat1Rr * ((Jzstate / Jzi) * TF_c25r + Iystate / Iyi) * TF_c25r) - TireLat2Rr * ((Jzstate / Jzi) * TF_c26r + Iystate / Iyi) * TF_c26r;
   double Ixpe = ((((((TireLon0Rr * (TireLon0TFr * (TireLon0Istate / TireLon0Ii) - (Iystate / Iyi) * TF_c00r - (Ixstate / Ixi) * TF_c10r - (Jzstate / Jzi) * TF_c20r) * TF_c10r) + TireLon2Rr * (TireLon2TFr * (TireLon2Istate / TireLon2Ii) - (Ixstate / Ixi) - (Jzstate / Jzi) * TF_c22r)) + TireLon1Rr * (TireLon1TFr * (TireLon1Istate / TireLon1Ii) - (Ixstate / Ixi) - (Jzstate / Jzi) * TF_c21r)) + ((Jzstate / Jzi) * TF_c27r + (Ixstate / Ixi) * TF_c17r + (Iystate / Iyi) * TF_c07r) * -TireLat3Rr * TF_c17r + (-TireLat0Rr * ((Jzstate / Jzi) * TF_c24r + (Ixstate / Ixi) * TF_c14r + (Iystate / Iyi) * TF_c04r) * TF_c14r))) + GainK * (Jzstate / Jzi) * (Iystate / Iyi)) + TireLon3Rr * (TireLon3TFr * (TireLon3Istate / TireLon3Ii) - (Iystate / Iyi) * TF_c03r - (Ixstate / Ixi) * TF_c13r - (Jzstate / Jzi) * TF_c23r) * TF_c13r;
   double Iype = ((((-TireLat0Rr * ((Jzstate / Jzi) * TF_c24r + (Ixstate / Ixi) * TF_c14r + (Iystate / Iyi) * TF_c04r) * TF_c04r - TireLat2Rr * ((Jzstate / Jzi) * TF_c26r + Iystate / Iyi)) - TireLat1Rr * ((Jzstate / Jzi) * TF_c25r + Iystate / Iyi)) + TireLon3Rr * (TireLon3TFr * (TireLon3Istate / TireLon3Ii) - (Iystate / Iyi) * TF_c03r - (Ixstate / Ixi) * TF_c13r - (Jzstate / Jzi) * TF_c23r) * TF_c03r + TireLon0Rr * (TireLon0TFr * (TireLon0Istate / TireLon0Ii) - (Iystate / Iyi) * TF_c00r - (Ixstate / Ixi) * TF_c10r - (Jzstate / Jzi) * TF_c20r) * TF_c00r) + ((Jzstate / Jzi) * TF_c27r + (Ixstate / Ixi) * TF_c17r + (Iystate / Iyi) * TF_c07r) * -TireLat3Rr * TF_c07r) - GainK * (Jzstate / Jzi) * (Ixstate / Ixi);
-  double Jzpe = ((((((( (TireLat3Rr * (-((((Jzstate / Jzi) * TF_c27r) + ((Ixstate / Ixi) * TF_c17r)) + ((Iystate / Iyi) * TF_c07r)))) * TF_c27r) + ((TireLon0Rr * ((TireLon0TFr * (TireLon0Istate / TireLon0Ii)) - ((((Iystate / Iyi) * TF_c00r) + ((Ixstate / Ixi) * TF_c10r)) + ((Jzstate / Jzi) * TF_c20r)))) * TF_c20r)) + ((TireLon1Rr * ((TireLon1TFr * (TireLon1Istate / TireLon1Ii)) - ((Ixstate / Ixi) + ((Jzstate / Jzi) * TF_c21r)))) * TF_c21r)) + ((TireLon2Rr * ((TireLon2TFr * (TireLon2Istate / TireLon2Ii)) - ((Ixstate / Ixi) + ((Jzstate / Jzi) * TF_c22r)))) * TF_c22r)) + ((TireLon3Rr * ((TireLon3TFr * (TireLon3Istate / TireLon3Ii)) - ((((Iystate / Iyi) * TF_c03r) + ((Ixstate / Ixi) * TF_c13r)) + ((Jzstate / Jzi) * TF_c23r)))) * TF_c23r)) + ((TireLat0Rr * (-((((Jzstate / Jzi) * TF_c24r) + ((Ixstate / Ixi) * TF_c14r)) + ((Iystate / Iyi) * TF_c04r)))) * TF_c24r)) + ((TireLat1Rr * (-(((Jzstate / Jzi) * TF_c25r) + (Iystate / Iyi)))) * TF_c25r)) + ((TireLat2Rr * (-(((Jzstate / Jzi) * TF_c26r) + (Iystate / Iyi)))) * TF_c26r);
-//  double Ixpe = (((((((TireLon0Rr * ((TireLon0TFr * (TireLon0Istate / TireLon0Ii)) - ((((Iystate / Iyi) * TF_c00r) + ((Ixstate / Ixi) * TF_c10r)) + ((Jzstate / Jzi) * TF_c20r)))) * TF_c10r) + (TireLon2Rr * ((TireLon2TFr * (TireLon2Istate / TireLon2Ii)) - ((Ixstate / Ixi) + ((Jzstate / Jzi) * TF_c22r))))) + (TireLon1Rr * ((TireLon1TFr * (TireLon1Istate / TireLon1Ii)) - ((Ixstate / Ixi) + ((Jzstate / Jzi) * TF_c21r))))) + ((TireLat3Rr * (-((((Jzstate / Jzi) * TF_c27r) + ((Ixstate / Ixi) * TF_c17r)) + ((Iystate / Iyi) * TF_c07r)))) * TF_c17r)) + ((TireLat0Rr * (-((((Jzstate / Jzi) * TF_c24r) + ((Ixstate / Ixi) * TF_c14r)) + ((Iystate / Iyi) * TF_c04r)))) * TF_c14r)) + ((GainK * (Jzstate / Jzi)) * (Iystate / Iyi))) + ((TireLon3Rr * ((TireLon3TFr * (TireLon3Istate / TireLon3Ii)) - ((((Iystate / Iyi) * TF_c03r) + ((Ixstate / Ixi) * TF_c13r)) + ((Jzstate / Jzi) * TF_c23r)))) * TF_c13r);
-//  double Iype = (((((((TireLat0Rr * (-((((Jzstate / Jzi) * TF_c24r) + ((Ixstate / Ixi) * TF_c14r)) + ((Iystate / Iyi) * TF_c04r)))) * TF_c04r) + (TireLat2Rr * (-(((Jzstate / Jzi) * TF_c26r) + (Iystate / Iyi))))) + (TireLat1Rr * (-(((Jzstate / Jzi) * TF_c25r) + (Iystate / Iyi))))) + ((TireLon3Rr * ((TireLon3TFr * (TireLon3Istate / TireLon3Ii)) - ((((Iystate / Iyi) * TF_c03r) + ((Ixstate / Ixi) * TF_c13r)) + ((Jzstate / Jzi) * TF_c23r)))) * TF_c03r)) + ((TireLon0Rr * ((TireLon0TFr * (TireLon0Istate / TireLon0Ii)) - ((((Iystate / Iyi) * TF_c00r) + ((Ixstate / Ixi) * TF_c10r)) + ((Jzstate / Jzi) * TF_c20r)))) * TF_c00r)) + ((TireLat3Rr * (-((((Jzstate / Jzi) * TF_c27r) + ((Ixstate / Ixi) * TF_c17r)) + ((Iystate / Iyi) * TF_c07r)))) * TF_c07r)) - ((GainK * (Jzstate / Jzi)) * (Ixstate / Ixi));
-  // Simplified Notation
 
+  // Simplified Notation
 //  double w0_d = tau - r * mu_n0 * (r * (w0 / I_t0) - (p_y / I_y) * c00 - (p_x / I_x) * c10 - (p_omega / I_omega) * c20);
 //  double w1_d = tau - r * mu_n1 * (r * (w1 / I_t1) - (p_x / I_x) - (p_omega / I_omega) * c21);
 //  double w2_d = tau - r * mu_n2 * (r * (w2 / I_t2) - (p_x / I_x) - (p_omega / I_omega) * c22);

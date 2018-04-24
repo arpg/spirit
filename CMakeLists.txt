@@ -72,6 +72,8 @@ set( HDRS
 	include/spirit/Types/spTypes.h
 	include/spirit/Objects/spLineStrip.h
 	include/spirit/CarSimFunctor.h
+#	include/spirit/CarSimFunctorRK4.h
+include/spirit/CarFunc.h
 	include/spirit/Controllers/spPID.h
 	include/spirit/Planners/spTrajectory.h
 	include/spirit//Planners/VehicleCeresCostFunc.h
@@ -86,6 +88,7 @@ set( HDRS
 	include/spirit/Calibration/EntropyTable.h
 	include/spirit/Planners/spCirclePlanner.h
 	include/spirit/RK4.h
+	include/spirit/CarODE.h
 	)
 
 set( SRCS

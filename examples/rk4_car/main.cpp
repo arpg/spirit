@@ -8,7 +8,7 @@
 int main(int argc, char** argv) {
 
   RK4 rk4solver;
-  rk4solver.RegisterODE(&CarODE1);
+  rk4solver.RegisterODE(&CarODE);
 
   Eigen::ArrayXd init(10);
   init[0] = 0.01;
@@ -34,9 +34,9 @@ int main(int argc, char** argv) {
   std::cout << "traj rows " << traj.rows() << std::endl;
   for(int ii=0; ii<traj.cols(); ii++)
   {
-//    std::cout << traj.col(ii).transpose() << std::endl;
+    std::cout << traj.col(ii).transpose() << std::endl;
 //    std::cout << traj.col(ii)[7] << "," << traj.col(ii)[8] << "," << traj.col(ii)[9] << std::endl;
-    std::cout << traj.col(ii)[0] << "," << traj.col(ii)[1] << "," << traj.col(ii)[2] << "," << traj.col(ii)[7] << "," << traj.col(ii)[8] << "," << traj.col(ii)[9] << std::endl;
+//    std::cout << traj.col(ii)[0] << "," << traj.col(ii)[1] << "," << traj.col(ii)[2] << "," << traj.col(ii)[7] << "," << traj.col(ii)[8] << "," << traj.col(ii)[9] << std::endl;
   }
 
   std::cout << "Done ... !" << std::endl;
