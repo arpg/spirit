@@ -5,6 +5,7 @@
 #include <spirit/spSettings.h>
 #include <spirit/CarODE.h>
 #include <spirit/RK4.h>
+#include <spirit/CarODE.h>
 
 class CarSimFunctor {
  public:
@@ -50,6 +51,9 @@ class CarSimFunctor {
                   std::shared_ptr<spStateSeries> traj_states = nullptr,
                   std::shared_ptr<spState> init_state = nullptr ) {
     Eigen::ArrayXd init(10);
+    RK4 rk4solver;
+    rk4solver.RegisterODE(&CarODE);
+    rk4solver.SetStepSize(0.01);
     if(init_state != nullptr) {
       // rotate from inertial frame to body frame
       init[0] = 0.01;
@@ -78,11 +82,15 @@ class CarSimFunctor {
     }
     for (int ii = 0; ii < num_sim_steps; ii++) {
       control_curve.GetPoint(sample_control, ii / (double)num_sim_steps);
+      Eigen::ArrayXXd traj = rk4solver.Solve(init,500);
+
+
       car.SetFrontSteeringAngle(sample_control[0]);
       car.SetEngineMaxVel(sample_control[1]);
 //      car.SetEngineMaxVel(100);
 //      car.SetEngineTorque(sample_control[1]*0.00001);
       objects_->StepPhySimulation(step_size);
+      CarODE(Eigen::VectorXd y_t,double sigma, double tau)
       if ((gui_ != nullptr)) {
         gui_->Iterate(*objects_);
         spGeneralTools::Delay_ms(1000 * step_size);
