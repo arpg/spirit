@@ -68,10 +68,10 @@ Eigen::ArrayXd CarODE(Eigen::VectorXd y_t,Eigen::VectorXd u_t) {
   double bet3 = std::abs(beta - sigma);
 
 
-  double TireLon0Rr = 0.2+(1/(1+20*(k0^2)));
-  double TireLon1Rr = 0.2+(1/(1+20*(k1^2)));
-  double TireLon2Rr = 0.2+(1/(1+20*(k2^2)));
-  double TireLon3Rr = 0.2+(1/(1+20*(k3^2)));
+  double TireLon0Rr = 0.2+(1/(1+20*(k0*k0)));
+  double TireLon1Rr = 0.2+(1/(1+20*(k1*k1)));
+  double TireLon2Rr = 0.2+(1/(1+20*(k2*k2)));
+  double TireLon3Rr = 0.2+(1/(1+20*(k3*k3)));
 
   // lateral friction
   bet0 = sin(bet0);
@@ -84,10 +84,10 @@ Eigen::ArrayXd CarODE(Eigen::VectorXd y_t,Eigen::VectorXd u_t) {
 //     TireLat2Rr = 1+(0.2/(1+20*(bet2^2)));
 //     TireLat3Rr = 1+(0.2/(1+20*(bet3^2)));
 
-  double TireLat0Rr = -(bet0^2)+1;
-  double TireLat1Rr = -(bet1^2)+1;
-  double TireLat2Rr = -(bet2^2)+1;
-  double TireLat3Rr = -(bet3^2)+1;
+  double TireLat0Rr = -(bet0*bet0)+1;
+  double TireLat1Rr = -(bet1*bet1)+1;
+  double TireLat2Rr = -(bet2*bet2)+1;
+  double TireLat3Rr = -(bet3*bet3)+1;
 
   double TireLon0Ipe = Seeffort - TireLon0TFr * TireLon0Rr * (TireLon0TFr * (TireLon0Istate / TireLon0Ii) - (Iystate / Iyi) * TF_c00r - (Ixstate / Ixi) * TF_c10r - (Jzstate / Jzi) * TF_c20r);
   double TireLon1Ipe = Seeffort - TireLon1TFr * TireLon1Rr * (TireLon1TFr * (TireLon1Istate / TireLon1Ii) - (Ixstate / Ixi) - (Jzstate / Jzi) * TF_c21r);
