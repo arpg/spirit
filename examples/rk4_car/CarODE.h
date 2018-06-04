@@ -1,9 +1,9 @@
 #include <eigen3/Eigen/Eigen>
 #include <spirit/CarFunc.h>
 
-Eigen::ArrayXd CarODE(Eigen::VectorXd y_t) {
+Eigen::ArrayXd CarODE(Eigen::VectorXd y_t,Eigen::VectorXd u_t) {
   Eigen::VectorXd y_dot(y_t);
-  double sigma = 0;//SP_PI/10;
+  double sigma = u_t[0];//SP_PI/10;
   double theta = SP_PI/4.0;
   double TF_c00r = std::sin(sigma);
   double TF_c03r = std::sin(sigma);
@@ -43,7 +43,7 @@ Eigen::ArrayXd CarODE(Eigen::VectorXd y_t) {
   double TireLon1Ii = 1;
   double TireLon2Ii = 1;
   double TireLon3Ii = 1;
-  double Seeffort = 1;
+  double Seeffort = u_t[1];
   double LonFriction = 100;
   double LatFriction = 100;
   double Radius = 0.1;
