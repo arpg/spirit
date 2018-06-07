@@ -8,7 +8,7 @@ RK4::~RK4(){
 }
 
 // Solve Atunomous Diff Eq
-void RK4::RegisterODE(std::function<Eigen::VectorXd(Eigen::VectorXd)> ode_func) {
+void RK4::RegisterODE(std::function<Eigen::VectorXd(const Eigen::VectorXd)> ode_func) {
   ode_auto_func_ = ode_func;
 }
 
@@ -36,7 +36,7 @@ void RK4::RK4Iteration(Eigen::VectorXd& x_t) {
 }
 
 // Solve Diff Eq with system inputs
-void RK4::RegisterODE(std::function<Eigen::VectorXd(Eigen::VectorXd,const Eigen::VectorXd)> ode_func) {
+void RK4::RegisterODE(std::function<Eigen::VectorXd(const Eigen::VectorXd,const Eigen::VectorXd)> ode_func) {
   ode_func_ = ode_func;
 }
 
@@ -60,6 +60,6 @@ void RK4::RK4Iteration(Eigen::VectorXd& x_t, const Eigen::VectorXd& u_t) {
   k2 = ode_func_(x_t+int_step_*(0.5*k1),u_t);
   k3 = ode_func_(x_t+int_step_*(0.5*k2),u_t);
   k4 = ode_func_(x_t+int_step_*k3,u_t);
-  x_t = x_t+(int_step_/6.0)*(k1+2*k2+2*k3+k4,u_t);
+  x_t = x_t+(int_step_/6.0)*(k1+2*k2+2*k3+k4);
 }
 
