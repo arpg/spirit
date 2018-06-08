@@ -3,11 +3,11 @@
 #include <spirit/spirit.h>
 #include <eigen3/Eigen/Eigen>
 #include <math.h>
-#include "CarODE.h"
+#include <spirit/CarODE.h>
 
 int main(int argc, char** argv) {
 
-  RK4 rk4solver(0.001);
+  RK4 rk4solver(0.1);
   rk4solver.RegisterODE(&CarODE);
 
   Eigen::VectorXd init(10);
@@ -23,15 +23,15 @@ int main(int argc, char** argv) {
   init[9] = 0.0;
 
   Eigen::VectorXd u(2);
-  u[0] = SP_PI/10;
-  u[1] = 2;
+  u[0] = SP_PI/4;
+  u[1] = 1;
 
 //  Eigen::VectorXd y_dot = TestODE(init);
 //  std::cout << "dot " << y_dot << std::endl;
 //return 0;
 
   spTimestamp t0 = spGeneralTools::Tick();
-  Eigen::ArrayXXd traj = rk4solver.Solve(init,u,500);
+  Eigen::ArrayXXd traj = rk4solver.Solve(init,u,100);
   double calc_time = spGeneralTools::Tock_us(t0);
   std::cout << "traj cols " << traj.cols() << std::endl;
   std::cout << "traj rows " << traj.rows() << std::endl;

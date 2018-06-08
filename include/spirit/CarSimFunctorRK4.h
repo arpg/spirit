@@ -7,15 +7,15 @@
 #include <spirit/RK4.h>
 #include <spirit/CarODE.h>
 
-class CarSimFunctor {
+class CarSimFunctorRK4 {
  public:
-  CarSimFunctor(
+  CarSimFunctorRK4(
       const spVehicleConstructionInfo& info, const spState& initial_state)
       : initial_state_(initial_state),
         thread_(nullptr) {
   }
 
-  ~CarSimFunctor() {
+  ~CarSimFunctorRK4() {
     if (thread_ != nullptr) {
       if (thread_->joinable()) {
         thread_->join();
@@ -24,7 +24,7 @@ class CarSimFunctor {
     }
   }
 
-  CarSimFunctor(const CarSimFunctor& obj) : vehicle_info_(obj.vehicle_info_) {
+  CarSimFunctorRK4(const CarSimFunctorRK4& obj) : vehicle_info_(obj.vehicle_info_) {
     SPERROREXIT("cpy constructor called. AVOID calling cpyConstructors");
   }
 
@@ -36,7 +36,7 @@ class CarSimFunctor {
                    std::shared_ptr<double> cost = nullptr,
       std::shared_ptr<double> tire_friction = nullptr ) {
     thread_ = std::make_unique<std::thread>(
-        &CarSimFunctor::operator(), this, thread_id, num_sim_steps, step_size,
+        &CarSimFunctorRK4::operator(), this, thread_id, num_sim_steps, step_size,
         cntrl_vars, epsilon, pert_index, traj_states,init_state,cost,tire_friction);
   }
 
@@ -51,14 +51,16 @@ class CarSimFunctor {
                   std::shared_ptr<spStateSeries> traj_states = nullptr,
                   std::shared_ptr<spState> init_state = nullptr ) {
     Eigen::ArrayXd init(10);
-    RK4 rk4solver;
+    RK4 rk4solver(0.01);
     rk4solver.RegisterODE(&CarODE);
-    rk4solver.SetStepSize(0.01);
     if(init_state != nullptr) {
       // rotate from inertial frame to body frame
-      init[0] = 0.01;
+      Eigen::Vector3d g_linvel = init_state->linvel;
+      Eigen::Vector3d g_rotvel = ;
+
+      init[0] = 0.001;
       init[1] = 0;
-      init[2] = 0;
+      init[2] = init_state->rotvel[2];
       init[3] = init_state->wheel_speeds[0];
       init[4] = init_state->wheel_speeds[1];
       init[5] = init_state->wheel_speeds[2];
@@ -90,7 +92,7 @@ class CarSimFunctor {
 //      car.SetEngineMaxVel(100);
 //      car.SetEngineTorque(sample_control[1]*0.00001);
       objects_->StepPhySimulation(step_size);
-      CarODE(Eigen::VectorXd y_t,double sigma, double tau)
+
       if ((gui_ != nullptr)) {
         gui_->Iterate(*objects_);
         spGeneralTools::Delay_ms(1000 * step_size);

@@ -1,7 +1,7 @@
 #include <eigen3/Eigen/Eigen>
 #include <spirit/CarFunc.h>
 
-Eigen::ArrayXd CarODE(Eigen::VectorXd y_t,Eigen::VectorXd u_t) {
+Eigen::ArrayXd CarODE(Eigen::VectorXd y_t,const Eigen::VectorXd u_t) {
   Eigen::VectorXd y_dot(y_t);
   double sigma = u_t[0];//SP_PI/10;
   double theta = SP_PI/4.0;
