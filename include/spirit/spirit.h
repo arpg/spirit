@@ -14,6 +14,8 @@
 #include <spirit/Calibration/EntropyTable.h>
 #include <iomanip>
 #include <spirit/CarSimFunctor.h>
+#include <spirit/CarSimFunctorRK4.h>
+#include <spirit/CarODE.h>
 #include <spirit/Planners/spTrajectory.h>
 #include <spirit/Planners/VehicleCeresCostFunc.h>
 #include <spirit/Planners/spCirclePlanner.h>

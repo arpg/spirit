@@ -42,7 +42,7 @@ set( _INCLUDE_DIRS
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	)
 
-message("Ceres Libs: ${CeresSolver_LIBRARIES}")
+#message("Ceres Libs: ${CeresSolver_LIBRARIES}")
 
 set( _LIBRARIES
 	${Pangolin_LIBRARIES}

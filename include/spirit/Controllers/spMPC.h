@@ -2,7 +2,7 @@
 #define SPMPC_H__
 #include <spirit/Types/spTypes.h>
 #include <spirit/spGeneralTools.h>
-#include <spirit/spirit.h>
+#include<spirit/Planners/spTrajectory.h>
 #include <spirit/Controllers/MPCCostFunc.h>
 #include <spirit/ParamLimitLossFunc.h>
 

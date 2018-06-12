@@ -23,7 +23,6 @@ include_directories(${HAL_INCLUDE_DIRS})
 # Find SPIRIT
 find_package( spirit REQUIRED)
 include_directories(${spirit_INCLUDE_DIRS})
-message("libs -> ${HAL_LIBRARIES}")
 add_executable( ${ProjectId} main.cpp)
 target_link_libraries(${ProjectId}
                       ${HAL_LIBRARIES}

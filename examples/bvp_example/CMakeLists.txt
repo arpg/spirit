@@ -7,7 +7,7 @@
   add_executable( ${ProjectId} main.cpp)
   target_link_libraries(${ProjectId}
                         ${spirit_LIBRARIES}
-glog
-pthread
+#glog
+#pthread
 dl
                         )

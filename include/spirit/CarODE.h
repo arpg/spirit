@@ -1,3 +1,6 @@
+#ifndef CARODE_H__
+#define CARODE_H__
+
 #include <eigen3/Eigen/Eigen>
 
 Eigen::ArrayXd CarODE(const Eigen::VectorXd y_t, const Eigen::VectorXd u_t) {
@@ -115,10 +118,12 @@ Eigen::ArrayXd CarODE(const Eigen::VectorXd y_t, const Eigen::VectorXd u_t) {
   y_dot[6] = TireLon3Ipe;
   // x_dot in inertial frame
   y_dot[7] = V*std::cos(chi+beta);
-  // x_dot in inertial frame
+  // y_dot in inertial frame
   y_dot[8] = V*std::sin(chi+beta);
   // kai_dot = omega rotational speed
   y_dot[9] = Jzstate/Jzi;
 
   return y_dot;
 }
+
+#endif //CARODE_H__
