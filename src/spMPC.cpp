@@ -45,6 +45,17 @@ int spMPC::CalculateControls(const spTrajectory& ref_traj, const spState& curr_s
   return 1;
 }
 
+// Maneuver Regulation for circular trajectory
+int spMPC::CircleManReg(const spState& curr_state, spCtrlPts2ord_2dof& controls, double radius, double tangent_vel) {
+  // create and initialize the maneuver
+  CircleMan maneuver(radius,tangent_vel);
+
+  // construct and minimize the MPC cost function, then return controls found
+  MinimizeMPCError(maneuver,curr_state,controls);
+  return 1;
+}
+
+
 void spMPC::SetHorizon(float horizon_duration) {
   horizon_ = (int)(horizon_duration/DISCRETIZATION_STEP_SIZE);
 }
@@ -178,4 +189,52 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
 
 //  std::cout << "MPCcontrols: \n" << controls << std::endl;
 
+}
+
+void spMPC::MinimizeMPCError(const Maneuver& maneuver, const spState& current_state, spCtrlPts2ord_2dof& controls) {
+  ceres::Problem problem;
+  Eigen::VectorXd residual_weight(12);
+  residual_weight << 1,1,0,0,0,0,1,1,0,0,0,0;
+  Eigen::VectorXd traj_point_weight(horizon_);
+  traj_point_weight.setOnes(horizon_);
+  // put more weight on trajecotry point errors rather than residula weights
+  traj_point_weight = 1*traj_point_weight;
+  ceres::CostFunction* cost_function = new MPCManRegCostFunc(car_params_,current_state,maneuver,horizon_,residual_weight,traj_point_weight);
+  Eigen::VectorXd min_limits(6);
+  Eigen::VectorXd max_limits(6);
+  for(int ii=0; ii<6; ii+=2) {
+    min_limits[ii] = -SP_PI_QUART;
+    max_limits[ii] = SP_PI_QUART;
+  }
+  for(int ii=1; ii<6; ii+=2) {
+    min_limits[ii] = -100;
+    max_limits[ii] = 100;
+  }
+  ceres::CostFunction* loss_function = new ParamLimitLossFunc<6>(min_limits,max_limits,100);
+
+  double parameters[6];
+  for (int ii = 0; ii < 6; ++ii) {
+    parameters[ii] = controls.data()[ii];
+  }
+  problem.AddResidualBlock(cost_function, NULL/*new ceres::CauchyLoss(0.1)*/, parameters);
+  problem.AddResidualBlock(loss_function,NULL,parameters);
+
+  // Run the solver!
+  ceres::Solver::Options options;
+  options.initial_trust_region_radius = 0.1;
+  options.max_trust_region_radius = 0.2;
+  options.parameter_tolerance = 1e-4;
+  options.linear_solver_type = ceres::DENSE_QR;
+  options.trust_region_strategy_type = ceres::DOGLEG;
+//  options.dogleg_type = ceres::SUBSPACE_DOGLEG;
+  options.max_num_iterations = 1000;
+  options.minimizer_progress_to_stdout = true;
+  options.gradient_check_numeric_derivative_relative_step_size = 0.1;
+  options.check_gradients = false;
+  ceres::Solver::Summary summary;
+  ceres::Solve(options, &problem, &summary);
+  std::cout << summary.FullReport() << std::endl;
+  for (int ii = 0; ii < 6; ++ii) {
+    controls.data()[ii] = parameters[ii];
+  }
 }

@@ -3,8 +3,8 @@
 
 #include <eigen3/Eigen/Eigen>
 
-Eigen::ArrayXd CarODE(const Eigen::VectorXd y_t, const Eigen::VectorXd u_t) {
-  double sigma = u_t[0];
+inline Eigen::ArrayXd CarODE(const Eigen::VectorXd y_t, const Eigen::VectorXd u_t) {
+  double sigma = -u_t[0];
   double Seeffort = u_t[1];
   double theta = SP_PI/4.0;
 
@@ -87,10 +87,10 @@ Eigen::ArrayXd CarODE(const Eigen::VectorXd y_t, const Eigen::VectorXd u_t) {
   bet2 = sin(bet2);
   bet3 = sin(bet3);
 
-  double TireLat0Rr = 1+(0.2/(1+20*(bet0*bet0)));
-  double TireLat1Rr = 1+(0.2/(1+20*(bet1*bet1)));
-  double TireLat2Rr = 1+(0.2/(1+20*(bet2*bet2)));
-  double TireLat3Rr = 1+(0.2/(1+20*(bet3*bet3)));
+  double TireLat0Rr = 15+(0.2/(1+20*(bet0*bet0)));
+  double TireLat1Rr = 15+(0.2/(1+20*(bet1*bet1)));
+  double TireLat2Rr = 15+(0.2/(1+20*(bet2*bet2)));
+  double TireLat3Rr = 15+(0.2/(1+20*(bet3*bet3)));
 
 //  double TireLat0Rr = -(bet0*bet0)+10;
 //  double TireLat1Rr = -(bet1*bet1)+10;

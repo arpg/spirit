@@ -80,6 +80,9 @@ set( HDRS
 	include/spirit/Planners/spLocalPlanner.h
 	include/spirit/Controllers/spMPC.h
 	include/spirit/Controllers/MPCCostFunc.h
+	include/spirit/Controllers/MPCManRegCostFunc.h
+	include/spirit/Controllers/Maneuver.h
+	include/spirit/Controllers/CircleMan.h
 	include/spirit/Calibration/CalibCostFunc.h
 	include/spirit/ParamLimitLossFunc.h
 	include/spirit/Calibration/PriorityQueue.h

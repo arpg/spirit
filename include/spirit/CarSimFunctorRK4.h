@@ -45,30 +45,34 @@ class CarSimFunctorRK4 {
     RK4 rk4solver(0.01);
     rk4solver.RegisterODE(&CarODE);
     if(init_state != nullptr) {
-      // rotate from inertial frame to body frame
-      double chi = init_state->pose.rotation().eulerAngles(0,1,2)[2];
-
-      Eigen::Vector2d linvel_chassis;
-      // rotate from inertial frame to chassis frame
-      linvel_chassis[1] = std::cos(chi)*init_state->linvel[0] - std::sin(chi)*init_state->linvel[1];
-      linvel_chassis[0] = std::sin(chi)*init_state->linvel[0] + std::cos(chi)*init_state->linvel[1];
-
-      // vehicle's frame is in traditional NED frame with x as forward and y as right and z down
-      if(linvel_chassis[0] == 0){
-        // ode can not handle zero forward velocity
-        linvel_chassis[0] = 0.000001;
-      }
-      init[0] = linvel_chassis[0];
-      init[1] = linvel_chassis[1];
-      init[2] = init_state->rotvel[2];
-      init[3] = init_state->wheel_speeds[0];
-      init[4] = init_state->wheel_speeds[1];
-      init[5] = init_state->wheel_speeds[2];
-      init[6] = init_state->wheel_speeds[3];
-      init[7] = init_state->pose.translation()[0];
-      init[8] = init_state->pose.translation()[1];
-      init[9] = chi;
+      initial_state_ = *init_state;
     }
+    // rotate from inertial frame to body frame
+    double chi = initial_state_.pose.rotation().eulerAngles(0,1,2)[2]+SP_PI_HALF;
+
+    Eigen::Vector2d linvel_chassis;
+    // rotate from inertial frame to chassis frame
+//    linvel_chassis[1] = std::cos(chi)*initial_state_.linvel[0] - std::sin(chi)*initial_state_.linvel[1];
+//    linvel_chassis[0] = std::sin(chi)*initial_state_.linvel[0] + std::cos(chi)*initial_state_.linvel[1];
+    linvel_chassis[0] = std::cos(-chi)*initial_state_.linvel[0] - std::sin(-chi)*initial_state_.linvel[1];
+    linvel_chassis[1] = std::sin(-chi)*initial_state_.linvel[0] + std::cos(-chi)*initial_state_.linvel[1];
+
+    // vehicle's frame is in traditional NED frame with x as forward and y as right and z down
+    if(linvel_chassis[0] == 0){
+      // ode can not handle zero forward velocity
+      linvel_chassis[0] = 0.000001;
+    }
+    init[0] = linvel_chassis[0];
+    init[1] = linvel_chassis[1];
+    init[2] = initial_state_.rotvel[2];
+    init[3] = initial_state_.wheel_speeds[0];
+    init[4] = initial_state_.wheel_speeds[1];
+    init[5] = initial_state_.wheel_speeds[2];
+    init[6] = initial_state_.wheel_speeds[3];
+    init[7] = initial_state_.pose.translation()[0];
+    init[8] = initial_state_.pose.translation()[1];
+    init[9] = chi;
+
 
     spCurve control_curve(2, 2);
     control_curve.SetBezierControlPoints(cntrl_vars);
@@ -80,7 +84,7 @@ class CarSimFunctorRK4 {
           pert_index, epsilon);
     }
     if (traj_states != nullptr) {
-      traj_states->push_back(init_state);
+      traj_states->push_back(std::make_shared<spState>(initial_state_));
     }
     Eigen::VectorXd u(2);
     for (int ii = 0; ii < num_sim_steps; ii++) {
@@ -92,22 +96,28 @@ class CarSimFunctorRK4 {
       state.pose = spPose::Identity();
 //      int tmp = init[7]/(2*SP_PI);
 //      init[7] = init[7]-(tmp*2*SP_PI);
-      state.pose.translate(spTranslation(init[7],init[8],init_state->pose.translation()[2]));
-      Eigen::AngleAxisd rot1(init[9],Eigen::Vector3d::UnitZ());
+      state.pose.translate(spTranslation(init[7],init[8],initial_state_.pose.translation()[2]));
+      Eigen::AngleAxisd rot1(init[9]-SP_PI_HALF,Eigen::Vector3d::UnitZ());
       state.pose.rotate(rot1);
-      state.linvel[0] = std::cos(-init[9])*init[1] - std::sin(-init[9])*init[0];
-      state.linvel[1] = std::sin(-init[9])*init[1] + std::cos(-init[9])*init[0];
+      // rotate back to inertial frame
+      state.linvel = spLinVel(0,0,0);
+      state.rotvel = spRotVel(0,0,0);
+//      state.linvel[0] = std::cos(-init[9])*init[1] - std::sin(-init[9])*init[0];
+//      state.linvel[1] = std::sin(-init[9])*init[1] + std::cos(-init[9])*init[0];
+      state.linvel[0] = std::cos(init[9])*init[0] - std::sin(init[9])*init[1];
+      state.linvel[1] = std::sin(init[9])*init[0] + std::cos(init[9])*init[1];
       state.rotvel[2] = init[2];
       state.wheel_speeds[0] = init[3];
       state.wheel_speeds[1] = init[4];
       state.wheel_speeds[2] = init[5];
       state.wheel_speeds[3] = init[6];
-
       if (traj_states != nullptr) {
         traj_states->push_back(std::make_shared<spState>(state));
       }
       curr_state_ = state;
-      *init_state = state;
+      if(init_state != nullptr) {
+        *init_state = state;
+      }
     }
 	}
 

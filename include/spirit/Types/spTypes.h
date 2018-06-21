@@ -40,7 +40,7 @@
 // recommended step sizes
 // Forward diff step = 0.09
 // Central diff step = 0.05
-#define FINITE_DIFF_EPSILON 0.09
+#define FINITE_DIFF_EPSILON 0.00001
 
 // Trajectory discretization step size in seconds
 #define DISCRETIZATION_STEP_SIZE 0.1
@@ -56,6 +56,14 @@ enum BulletCollissionType{
   COL_CHASSIS = BIT(2), // Collide with car chassis
   COL_WHEEL = BIT(3)    // Collide with wheel
 };
+
+typedef Eigen::Matrix4d spMat4x4;
+
+enum class spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
+enum class spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
+enum class spPhyEngineType{PHY_NONE,PHY_BULLET};
+enum class spObjectType{BOX,VEHICLE_AWSD,WHEEL,WAYPOINT,LINESTRIP};
+enum class spManeuverType{CIRCLE,ROUND_RECTANGLE,LINE};
 
 // spirit types
 typedef Eigen::Transform<double,3,Eigen::Affine> spPose;
@@ -262,12 +270,7 @@ private:
 //  spStateVec state_vec_;
 };
 
-typedef Eigen::Matrix4d spMat4x4;
 
-enum class spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
-enum class spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
-enum class spPhyEngineType{PHY_NONE,PHY_BULLET};
-enum class spObjectType{BOX,VEHICLE_AWSD,WHEEL,WAYPOINT,LINESTRIP};
 
 //*********************************************************
 
