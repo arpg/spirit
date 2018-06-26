@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   spState state;
   state.pose = spPose::Identity();
   state.pose.translate(spTranslation(2,1,0));
-  Eigen::AngleAxisd rot1(SP_PI/10,Eigen::Vector3d::UnitZ());
+  Eigen::AngleAxisd rot1(0/*SP_PI/10*/,Eigen::Vector3d::UnitZ());
   state.pose.rotate(rot1);
   state.linvel = spLinVel(0,0,0);
   state.rotvel = spRotVel(0,0,0);
@@ -45,14 +45,16 @@ int main(int argc, char** argv) {
   spworld.gui_.Iterate(spworld.objects_);
 //while(1);
   CarSimFunctorRK4 mysim(info,state);
-  for(int ii=0;ii<50000;ii++){
+  for(int ii=0;ii<1000;ii++){
     mysim(0,1,0.1,inputcmd_curve,0,0,nullptr,state_ptr);
     car.SetState(mysim.GetState());
     spworld.gui_.Iterate(spworld.objects_);
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-//    std::cout << mysim.GetState().pose.translation()[0] << "," << mysim.GetState().pose.translation()[1] << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::cout << mysim.GetState().linvel[0] << "," << mysim.GetState().linvel[1] << std::endl;
   }
-
+  while(1){
+    spworld.gui_.Iterate(spworld.objects_);
+  }
   std::cout << "Done ... !" << std::endl;
 
   return 0;

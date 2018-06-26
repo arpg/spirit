@@ -40,7 +40,7 @@
 // recommended step sizes
 // Forward diff step = 0.09
 // Central diff step = 0.05
-#define FINITE_DIFF_EPSILON 0.00001
+#define FINITE_DIFF_EPSILON 0.000001
 
 // Trajectory discretization step size in seconds
 #define DISCRETIZATION_STEP_SIZE 0.1

@@ -92,15 +92,15 @@ class MPCManRegCostFunc : public ceres::DynamicCostFunction {
       for (int ii = 0; ii<parameter_block_sizes()[0]; ii++) {
         for(int jj = 0; jj<num_residual_blocks_; jj++) {
           // we have -j since we are calculating (z-h(x)) and then derivative of h(x) would be -J(x)
-          jac.block<12,1>(jj*12,ii) = -(((*(*sim_traj[ii])[jj+1]) - (*(*sim_traj[parameter_block_sizes()[0]])[jj+1])).vector())/FINITE_DIFF_EPSILON;
-//          jac.block<12,1>(jj*12,ii) = -((-ref_maneuver_.GetStateError(*(*sim_traj[ii])[jj+1]) + ref_maneuver_.GetStateError(*(*sim_traj[parameter_block_sizes()[0]])[jj+1])))/FINITE_DIFF_EPSILON;
+//          jac.block<12,1>(jj*12,ii) = -(((*(*sim_traj[ii])[jj+1]) - (*(*sim_traj[parameter_block_sizes()[0]])[jj+1])).vector())/FINITE_DIFF_EPSILON;
+          jac.block<12,1>(jj*12,ii) = ((ref_maneuver_.GetStateError(*(*sim_traj[ii])[jj+1]) - ref_maneuver_.GetStateError(*(*sim_traj[parameter_block_sizes()[0]])[jj+1])))/FINITE_DIFF_EPSILON;
         }
       }
 #endif
 
       // Calculate residual
       for(int jj = 0; jj<num_residual_blocks_; jj++) {
-        res.block<12,1>(jj*12,0) = -ref_maneuver_.GetStateError(*(*sim_traj[parameter_block_sizes()[0]])[jj+1]);
+        res.block<12,1>(jj*12,0) = ref_maneuver_.GetStateError(*(*sim_traj[parameter_block_sizes()[0]])[jj+1]);
 //        res.block<12,1>(jj*12,0) = (*(ref_states_[jj]) - (*(*sim_traj[parameter_block_sizes()[0]])[jj+1])).vector();
       }
 
@@ -119,7 +119,7 @@ class MPCManRegCostFunc : public ceres::DynamicCostFunction {
       sims(0, (int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, 0, -1, curr_states);
       // Calculate residual
       for(int jj = 0; jj<num_residual_blocks_; jj++) {
-        res.block<12,1>(jj*12,0) = -ref_maneuver_.GetStateError(*((*curr_states)[jj+1]));
+        res.block<12,1>(jj*12,0) = ref_maneuver_.GetStateError(*((*curr_states)[jj+1]));
 //        res.block<12,1>(jj*12,0) = (*(ref_states_[jj]) - *((*curr_states)[jj+1])).vector();
       }
       res = residual_weight_ * res;

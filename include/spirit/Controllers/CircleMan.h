@@ -22,7 +22,6 @@ public:
     spStateVec vec;
     vec[0] = state.pose.translation()[0]-radius_*std::cos(theta);
     vec[1] = state.pose.translation()[1]-radius_*std::sin(theta);
-//    std::cout << "are " << vec[0] << "  tr  " << state.pose.translation()[0] << "  ref  " << radius_*std::cos(theta) << std::endl;
     vec[2] = 0;
 
     // Rotational vector error
@@ -34,8 +33,8 @@ public:
     vec[6] = state.linvel[0] + tan_vel_*std::sin(theta);
     vec[7] = state.linvel[1] - tan_vel_*std::cos(theta);
     vec[8] = 0;
-    vec[6] *= 0.1;
-    vec[7] *= 0.1;
+    vec[6] *= 0.5;
+    vec[7] *= 0.5;
 //    std::cout << "linvel0 is " << state.linvel[0] << "  --  " << -tan_vel_*std::sin(theta) << std::endl;
 //    std::cout << "linvel1 is " << state.linvel[1] << "  --  " << tan_vel_*std::cos(theta) << std::endl;
 

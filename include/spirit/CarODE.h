@@ -8,6 +8,8 @@ inline Eigen::ArrayXd CarODE(const Eigen::VectorXd y_t, const Eigen::VectorXd u_
   double Seeffort = u_t[1];
   double theta = SP_PI/4.0;
 
+  double wheel_dist = 0.2;
+
   double TF_c00r = std::sin(sigma);
   double TF_c03r = std::sin(sigma);
   double TF_c04r = std::cos(sigma);
@@ -16,14 +18,14 @@ inline Eigen::ArrayXd CarODE(const Eigen::VectorXd y_t, const Eigen::VectorXd u_
   double TF_c13r = std::cos(sigma);
   double TF_c14r = -std::sin(sigma);
   double TF_c17r = -std::sin(sigma);
-  double TF_c20r = std::cos(-sigma+theta);
-  double TF_c21r = std::cos(theta);
-  double TF_c22r = -std::cos(theta);
-  double TF_c23r = -std::cos(theta+sigma);
-  double TF_c24r = std::sin(theta-sigma);
-  double TF_c25r = -std::sin(theta);
-  double TF_c26r = -std::sin(theta);
-  double TF_c27r = std::sin(sigma+theta);
+  double TF_c20r = wheel_dist*std::cos(-sigma+theta);
+  double TF_c21r = wheel_dist*std::cos(theta);
+  double TF_c22r = -wheel_dist*std::cos(theta);
+  double TF_c23r = -wheel_dist*std::cos(theta+sigma);
+  double TF_c24r = wheel_dist*std::sin(theta-sigma);
+  double TF_c25r = -wheel_dist*std::sin(theta);
+  double TF_c26r = -wheel_dist*std::sin(theta);
+  double TF_c27r = wheel_dist*std::sin(sigma+theta);
 
   double Ixi = 2;
   double Iyi = 2;
@@ -76,10 +78,10 @@ inline Eigen::ArrayXd CarODE(const Eigen::VectorXd y_t, const Eigen::VectorXd u_
   double bet3 = std::abs(beta - sigma);
 
 
-  double TireLon0Rr = 0.2+(1/(1+20*(k0*k0)));
-  double TireLon1Rr = 0.2+(1/(1+20*(k1*k1)));
-  double TireLon2Rr = 0.2+(1/(1+20*(k2*k2)));
-  double TireLon3Rr = 0.2+(1/(1+20*(k3*k3)));
+  double TireLon0Rr = 2.2+(1/(1+20*(k0*k0)));
+  double TireLon1Rr = 2.2+(1/(1+20*(k1*k1)));
+  double TireLon2Rr = 2.2+(1/(1+20*(k2*k2)));
+  double TireLon3Rr = 2.2+(1/(1+20*(k3*k3)));
 
   // lateral friction
   bet0 = sin(bet0);
@@ -87,10 +89,10 @@ inline Eigen::ArrayXd CarODE(const Eigen::VectorXd y_t, const Eigen::VectorXd u_
   bet2 = sin(bet2);
   bet3 = sin(bet3);
 
-  double TireLat0Rr = 15+(0.2/(1+20*(bet0*bet0)));
-  double TireLat1Rr = 15+(0.2/(1+20*(bet1*bet1)));
-  double TireLat2Rr = 15+(0.2/(1+20*(bet2*bet2)));
-  double TireLat3Rr = 15+(0.2/(1+20*(bet3*bet3)));
+  double TireLat0Rr = 1.5+(0.2/(1+20*(bet0*bet0)));
+  double TireLat1Rr = 1.5+(0.2/(1+20*(bet1*bet1)));
+  double TireLat2Rr = 1.5+(0.2/(1+20*(bet2*bet2)));
+  double TireLat3Rr = 1.5+(0.2/(1+20*(bet3*bet3)));
 
 //  double TireLat0Rr = -(bet0*bet0)+10;
 //  double TireLat1Rr = -(bet1*bet1)+10;

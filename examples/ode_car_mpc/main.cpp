@@ -24,10 +24,10 @@ int main(int argc, char** argv) {
 
   spState state;
   state.pose = spPose::Identity();
-  state.pose.translate(spTranslation(1.1,0,0));
-  Eigen::AngleAxisd rot1(0,Eigen::Vector3d::UnitZ());
+  state.pose.translate(spTranslation(2,0,0));
+  Eigen::AngleAxisd rot1(-SP_PI_HALF+0.01,Eigen::Vector3d::UnitZ());
   state.pose.rotate(rot1);
-  state.linvel = spLinVel(0.0,0,0);
+  state.linvel = spLinVel(0.0001,0,0);
   state.rotvel = spRotVel(0,0,0);
   state.wheel_speeds = spWheelSpeedVec(0,0,0,0);
 
@@ -38,15 +38,18 @@ int main(int argc, char** argv) {
   // set driving car's first pose
 
   // create a MPC controller with horizon
-  float horizon = 2;
+  float horizon = 5;
   spMPC mpc(spworld.car_param,horizon);
 
   spCtrlPts2ord_2dof controls;
-  controls.col(0) = Eigen::Vector2d(0,1);
-  controls.col(1) = Eigen::Vector2d(0,1);
-  controls.col(2) = Eigen::Vector2d(0,1);
+  controls.col(0) = Eigen::Vector2d(-0.7,10);
+  controls.col(1) = Eigen::Vector2d(-0.7,10);
+  controls.col(2) = Eigen::Vector2d(-0.7,10);
 
-  while(1){
+  CarSimFunctorRK4 mysim(spworld.car_param,state);
+
+int cnt = 0;
+  /*while(1)*/{
 //    car.SetPose(posys_);
 //    spPose ps = car.GetPose();
 //    ps.translation()[2] = 0.07;
@@ -57,7 +60,26 @@ int main(int argc, char** argv) {
     if(mpc.CircleManReg(state,controls,2,3)) {
       double calc_time = spGeneralTools::Tock_ms(t0);
       std::cout << "controls -> \n" << controls << std::endl;
-      while(1);
+
+      std::shared_ptr<spStateSeries> series = std::make_shared<spStateSeries>();
+      mysim(0,(int)(horizon/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,controls,0,-1,series,std::make_shared<spState>(state));
+      while(1){
+      for(int ii=0; ii<(int)(horizon/DISCRETIZATION_STEP_SIZE); ii++){
+        spState tstate(*((*series)[ii]));
+        car.SetState(tstate);
+        spworld.gui_.Iterate(spworld.objects_);
+        std::cout << "speed -> " << tstate.linvel.norm() << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      }
+      std::cout << "done " << std::endl;
+        spworld.gui_.Iterate(spworld.objects_);
+      }
+
+//      if(cnt<3){
+//        cnt++;
+//      } else {
+//        break;
+//      }
 //      spCurve controls_curve(2,2);
 //      spPointXd next_control(2);
 //      calc_time /= 1000;
