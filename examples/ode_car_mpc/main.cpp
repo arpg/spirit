@@ -19,15 +19,12 @@ int main(int argc, char** argv) {
   spObjectHandle gnd_handle = spworld.objects_.CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
   spworld.gui_.AddObject(spworld.objects_.GetObject(gnd_handle));
 
-  // set friction coefficent of ground
-  ((spBox&)spworld.objects_.GetObject(gnd_handle)).SetFriction(1);
-
   spState state;
   state.pose = spPose::Identity();
   state.pose.translate(spTranslation(2,0,0));
-  Eigen::AngleAxisd rot1(-SP_PI_HALF+0.01,Eigen::Vector3d::UnitZ());
+  Eigen::AngleAxisd rot1(3*SP_PI_QUART,Eigen::Vector3d::UnitZ());
   state.pose.rotate(rot1);
-  state.linvel = spLinVel(0.0001,0,0);
+  state.linvel = spLinVel(0.0,0,0);
   state.rotvel = spRotVel(0,0,0);
   state.wheel_speeds = spWheelSpeedVec(0,0,0,0);
 
@@ -42,9 +39,9 @@ int main(int argc, char** argv) {
   spMPC mpc(spworld.car_param,horizon);
 
   spCtrlPts2ord_2dof controls;
-  controls.col(0) = Eigen::Vector2d(-0.7,10);
-  controls.col(1) = Eigen::Vector2d(-0.7,10);
-  controls.col(2) = Eigen::Vector2d(-0.7,10);
+  controls.col(0) = Eigen::Vector2d(0,0);
+  controls.col(1) = Eigen::Vector2d(0,0);
+  controls.col(2) = Eigen::Vector2d(0,0);
 
   CarSimFunctorRK4 mysim(spworld.car_param,state);
 

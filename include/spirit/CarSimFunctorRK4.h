@@ -60,7 +60,7 @@ class CarSimFunctorRK4 {
     // vehicle's frame is in traditional NED frame with x as forward and y as right and z down
     if(linvel_chassis[0] == 0){
       // ode can not handle zero forward velocity
-      linvel_chassis[0] = 0.000001;
+      linvel_chassis[0] = 0.0000000001;
     }
     init[0] = linvel_chassis[0];
     init[1] = linvel_chassis[1];

@@ -194,14 +194,14 @@ void spMPC::MinimizeMPCError(const spStateSeries& ref_states,const spState& curr
 void spMPC::MinimizeMPCError(const Maneuver& maneuver, const spState& current_state, spCtrlPts2ord_2dof& controls) {
   ceres::Problem problem;
   Eigen::VectorXd residual_weight(12);
-  residual_weight << 1,1,0,0,0,0,1,1,0,0,0,0;
+  residual_weight << 1,1,0,0,0,1,1,1,0,0,0,0;
   Eigen::VectorXd traj_point_weight(horizon_);
   traj_point_weight.setOnes(horizon_);
-  traj_point_weight << 0.1,0.1,0.1,0.1,0.1,0.3,0.3,0.4,0.4,0.5,0.5,0.6,0.6,0.6,1,1,1,1,1;
+//  traj_point_weight << 0.1,0.1,0.1,0.1,0.1,0.3,0.3,0.4,0.4,0.5,0.5,0.6,0.6,0.6,1,1,1,1,1;
 //  std::cout << "vec " << traj_point_weight.transpose() << std::endl;
-  for(int ii=0;ii<horizon_; ii++){
-    traj_point_weight[ii] = (double)ii/horizon_;
-  }
+//  for(int ii=0;ii<horizon_; ii++){
+//    traj_point_weight[ii] = (double)ii/horizon_;
+//  }
   // put more weight on trajecotry point errors rather than residula weights
   traj_point_weight = 1*traj_point_weight;
   ceres::CostFunction* cost_function = new MPCManRegCostFunc(car_params_,current_state,maneuver,horizon_,residual_weight,traj_point_weight);
@@ -212,10 +212,12 @@ void spMPC::MinimizeMPCError(const Maneuver& maneuver, const spState& current_st
     max_limits[ii] = SP_PI_QUART;
   }
   for(int ii=1; ii<6; ii+=2) {
-    min_limits[ii] = -100;
-    max_limits[ii] = 100;
+    min_limits[ii] = -200;
+    max_limits[ii] = 200;
   }
-  ceres::CostFunction* loss_function = new ParamLimitLossFunc<6>(min_limits,max_limits,100);
+//  ceres::CostFunction* loss_function = new ParamLimitLossFunc<6>(min_limits,max_limits,100);
+  ceres::CostFunction* loss_function = new LogBaarrierLossFunc<6>(min_limits,max_limits,0.1);
+
 
   double parameters[6];
   for (int ii = 0; ii < 6; ++ii) {
@@ -224,24 +226,44 @@ void spMPC::MinimizeMPCError(const Maneuver& maneuver, const spState& current_st
   problem.AddResidualBlock(cost_function, NULL/*new ceres::CauchyLoss(0.8)*/, parameters);
   problem.AddResidualBlock(loss_function,NULL,parameters);
 
+  // fix the first two parameters
+//  std::vector<int> fix_param_vec;
+//  fix_param_vec.push_back(0);
+//  fix_param_vec.push_back(1);
+//   ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(6,fix_param_vec);
+//  problem.SetParameterization(parameters,subparam);
+
+//  problem.SetParameterLowerBound(parameters,0,-(SP_PI_QUART-FINITE_DIFF_EPSILON));
+//  problem.SetParameterUpperBound(parameters,0,(SP_PI_QUART-FINITE_DIFF_EPSILON));
+//  problem.SetParameterLowerBound(parameters,1,-200);
+//  problem.SetParameterUpperBound(parameters,1,200);
+//  problem.SetParameterLowerBound(parameters,2,-(SP_PI_QUART-FINITE_DIFF_EPSILON));
+//  problem.SetParameterUpperBound(parameters,2,(SP_PI_QUART-FINITE_DIFF_EPSILON));
+//  problem.SetParameterLowerBound(parameters,3,-200);
+//  problem.SetParameterUpperBound(parameters,3,200);
+//  problem.SetParameterLowerBound(parameters,4,-(SP_PI_QUART-FINITE_DIFF_EPSILON));
+//  problem.SetParameterUpperBound(parameters,4,(SP_PI_QUART-FINITE_DIFF_EPSILON));
+//  problem.SetParameterLowerBound(parameters,5,-200);
+//  problem.SetParameterUpperBound(parameters,5,200);
+
   // Run the solver!
   ceres::Solver::Options options;
-//  options.minimizer_type = ceres::LINE_SEARCH;
+//  options.minimizer _type = ceres::LINE_SEARCH;
 //  options.line_search_type = ceres::ARMIJO;
 //  options.min_line_search_step_size = 1e-6;
 //  options.line_search_direction_type = ceres::STEEPEST_DESCENT;
-  options.initial_trust_region_radius = 0.01;
-  options.max_trust_region_radius = 0.01;
-  options.parameter_tolerance = 1e-8;
+  options.initial_trust_region_radius = 0.1;
+//  options.max_trust_region_radius = 100000;
+  options.parameter_tolerance = 1e-3;
   options.linear_solver_type = ceres::DENSE_QR;
-  options.trust_region_strategy_type = ceres::DOGLEG;
-  options.max_consecutive_nonmonotonic_steps = 10;
-  options.max_num_consecutive_invalid_steps = 2;
-  options.min_relative_decrease = 1e-6;
-  options.function_tolerance = 1e-12;
-  options.gradient_tolerance = 1e-12;
-  options.use_nonmonotonic_steps = true;
-  options.max_num_iterations = 10000;
+  options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
+//  options.max_consecutive_nonmonotonic_steps = 10;
+//  options.max_num_consecutive_invalid_steps = 2;
+  options.min_relative_decrease = 1e-3;
+  options.function_tolerance = 1e-6;
+  options.gradient_tolerance = 1e-4;
+//  options.use_nonmonotonic_steps = true;
+  options.max_num_iterations = 400;
   options.minimizer_progress_to_stdout = true;
   options.gradient_check_numeric_derivative_relative_step_size = 0.1;
   options.check_gradients = false;

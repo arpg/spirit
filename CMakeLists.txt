@@ -92,6 +92,7 @@ set( HDRS
 	include/spirit/Planners/spCirclePlanner.h
 	include/spirit/RK4.h
 	include/spirit/CarODE.h
+	include/spirit/LogBarrierLossFunc.h
 	)
 
 set( SRCS

@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
 
   spState state;
   state.pose = spPose::Identity();
-  state.pose.translate(spTranslation(2,1,0));
+  state.pose.translate(spTranslation(-1,0,0));
   Eigen::AngleAxisd rot1(0/*SP_PI/10*/,Eigen::Vector3d::UnitZ());
   state.pose.rotate(rot1);
   state.linvel = spLinVel(0,0,0);
@@ -37,9 +37,9 @@ int main(int argc, char** argv) {
   spVehicleConstructionInfo info;
 
   spCtrlPts2ord_2dof inputcmd_curve;
-  inputcmd_curve.col(0) = Eigen::Vector2d(0.7,1);
-  inputcmd_curve.col(1) = Eigen::Vector2d(0.7,1);
-  inputcmd_curve.col(2) = Eigen::Vector2d(0.7,1);
+  inputcmd_curve.col(0) = Eigen::Vector2d(0.3,1);
+  inputcmd_curve.col(1) = Eigen::Vector2d(0.3,1);
+  inputcmd_curve.col(2) = Eigen::Vector2d(0.3,1);
 
   car.SetFrontSteeringAngle(0.7);
   spworld.gui_.Iterate(spworld.objects_);
@@ -50,7 +50,10 @@ int main(int argc, char** argv) {
     car.SetState(mysim.GetState());
     spworld.gui_.Iterate(spworld.objects_);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    std::cout << mysim.GetState().linvel[0] << "," << mysim.GetState().linvel[1] << std::endl;
+//    std::cout << mysim.GetState().linvel[0] << "," << mysim.GetState().linvel[1] << std::endl;
+    double theta = std::atan2(mysim.GetState().pose.translation()[1],mysim.GetState().pose.translation()[0]);
+    double chi = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
+    std::cout << "chi: " << chi << "   theta: " << theta << std::endl;
   }
   while(1){
     spworld.gui_.Iterate(spworld.objects_);

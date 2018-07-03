@@ -6,6 +6,7 @@
 #include <spirit/Controllers/MPCCostFunc.h>
 #include <spirit/Controllers/MPCManRegCostFunc.h>
 #include <spirit/ParamLimitLossFunc.h>
+#include <spirit/LogBarrierLossFunc.h>
 
 class spMPC {
  public:
