@@ -4,6 +4,7 @@
 #include <spirit/Gui/spCommonGui.h>
 #include <spirit/Gui/spPangolinScenegraphGui.h>
 #include <spirit/Objects.h>
+#include <spirit/Gui/spOpenSceneGraphGui.h>
 
 class Gui {
 public:

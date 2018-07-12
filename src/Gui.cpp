@@ -17,6 +17,10 @@ void Gui::Create(const spGuiType gui_type) {
       gui_.reset();
       gui_ = std::make_shared<spPangolinScenegraphGui>();
       break;
+    case spGuiType::GUI_OSG:
+      gui_.reset();
+      gui_ = std::make_shared<spOpenSceneGraphGui>();
+      break;
     default:
       std::cerr << "Wrong type of GUI has been selected" << std::endl;
   }

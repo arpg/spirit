@@ -1,0 +1,3 @@
+/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles/edit_cache.dir
+/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles/rebuild_cache.dir
+/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles/spirit.dir

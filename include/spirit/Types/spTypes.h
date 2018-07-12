@@ -60,7 +60,7 @@ enum BulletCollissionType{
 typedef Eigen::Matrix4d spMat4x4;
 
 enum class spPhysolver{MLCP_DANTZIG,SEQUENTIAL_IMPULSE,MLCP_PROJECTEDGAUSSSEIDEL};
-enum class spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH};
+enum class spGuiType{GUI_NONE,GUI_PANGOSCENEGRAPH,GUI_OSG};
 enum class spPhyEngineType{PHY_NONE,PHY_BULLET};
 enum class spObjectType{BOX,VEHICLE_AWSD,WHEEL,WAYPOINT,LINESTRIP};
 enum class spManeuverType{CIRCLE,ROUND_RECTANGLE,LINE};

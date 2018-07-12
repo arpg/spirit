@@ -28,6 +28,12 @@ find_package( Bullet REQUIRED )
 find_package( SceneGraph 0.1 REQUIRED )
 find_package( Eigen3 REQUIRED )
 find_package( CeresSolver REQUIRED)
+FIND_PACKAGE(OpenThreads)
+FIND_PACKAGE(osg)
+FIND_PACKAGE(osgDB)
+FIND_PACKAGE(osgUtil)
+FIND_PACKAGE(osgGA)
+FIND_PACKAGE(osgViewer)
 #find_package( Matlab	REQUIRED ENG_LIBRARY MX_LIBRARY MAT_LIBRARY)
 #find_package( tbb REQUIRED)
 
@@ -37,6 +43,8 @@ set( _INCLUDE_DIRS
 	${SceneGraph_INCLUDE_DIRS}
 	${BULLET_INCLUDE_DIR}
 	${CeresSolver_INCLUDE_DIRS}
+        ${OPENTHREADS_INCLUDE_DIR}
+        ${OSG_INCLUDE_DIR}
 #	${Matlab_INCLUDE_DIRS}
 #	${TBB_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -49,6 +57,12 @@ set( _LIBRARIES
 	${SceneGraph_LIBRARIES}
 	${BULLET_LIBRARIES}
 	${CeresSolver_LIBRARIES}
+        ${OSG_LIBRARIES}
+        ${OSGVIEWER_LIBRARIES}
+        ${OSGUTIL_LIBRARIES}
+        ${OSGDB_LIBRARIES}
+        ${OSGGA_LIBRARIES}
+        ${OPENTHREADS_LIBRARIES}
 #	${Matlab_LIBRARIES}
 #	${TBB_LIBRARY_DIRS}
 	)
@@ -57,7 +71,7 @@ set( HDRS
 	include/spirit/spirit.h
 	include/spirit/Gui/spCommonGui.h
 	include/spirit/Gui/spPangolinScenegraphGui.h
-        include/spirit/Gui/spopenscenegraphgui.h
+	include/spirit/Gui/spOpenSceneGraphGui.h
 	include/spirit/Objects.h
 	include/spirit/Gui.h
 	include/spirit/spGeneralTools.h
@@ -101,7 +115,7 @@ set( SRCS
 	src/Gui.cpp
 	src/spLocalPlanner.cpp
 	src/spPangolinScenegraphGui.cpp
-        src/spopenscenegraphgui.cpp
+	src/spOpenSceneGraphGui.cpp
 	src/spGeneralTools.cpp
 	src/spSettings.cpp
 	src/spBox.cpp

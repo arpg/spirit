@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: lib
+Description: Vehicle Controller and GUI
+Version: 0.1
+Cflags: -I  -I/home/boston/Documents/spirit_dep/spirit/build -I/usr/include -I/usr/include/x86_64-linux-gnu -I/usr/include/eigen3 -I/home/boston/Documents/spirit_dep/Pangolin/include -I/home/boston/Documents/spirit_dep/Pangolin/build/include -I/usr/include/IL -I/usr/include/IL/.. -I/home/boston/Documents/spirit_dep/SceneGraph/include -I/home/boston/Documents/spirit_dep/SceneGraph/build/include -I/usr/local/include/bullet -I/usr/local/include -I/home/boston/Documents/spirit_dep/spirit/include
+Libs: -L${libdir}  -l 
+
