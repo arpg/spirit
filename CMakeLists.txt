@@ -85,6 +85,7 @@ set( HDRS
 	include/spirit/Calibration/CalibCarSimFunctor.h
 	include/spirit/Calibration/EntropyTable.h
 	include/spirit/Planners/spCirclePlanner.h
+	include/spirit/ShootingCarSimFunctor.h
 	)
 
 set( SRCS

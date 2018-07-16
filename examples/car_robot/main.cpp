@@ -74,7 +74,8 @@ int main(int argc, char** argv) {
 //  sp_world.zibil();
 //  sp_world.DummyTests();
 //  sp_world.NonlinControl();
-  sp_world.ScenarioSteadyStateCircle();
+//  sp_world.ScenarioSteadyStateCircle();
+  sp_world.ScenarioWorldBoxFall();
 
   while(sp_world.ShouldRun()) {
     sp_world.IterateWorld();

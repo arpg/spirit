@@ -1,14 +1,14 @@
-#ifndef CARSIMFUNCTOR_H__
-#define CARSIMFUNCTOR_H__
+#ifndef SHOOTINGCARSIMFUNCTOR_H__
+#define SHOOTINGCARSIMFUNCTOR_H__
 #include <iostream>
 #include <spirit/Types/spTypes.h>
 #include <spirit/spSettings.h>
 #include <spirit/Objects.h>
 #include <spirit/Gui.h>
 
-class CarSimFunctor {
+class ShootingCarSimFunctor {
  public:
-  CarSimFunctor(
+  ShootingCarSimFunctor(
       const spVehicleConstructionInfo& info, const spState& initial_state,
       Gui* gui = nullptr /*, const std::shared_ptr<Objects>& objects=nullptr*/)
       : vehicle_info_(info),
@@ -20,6 +20,10 @@ class CarSimFunctor {
     gnd_pose_.translate(spTranslation(0, 0, -0.5));
     gnd_handle_ = objects_->CreateBox(gnd_pose_, spBoxSize(20, 20, 1), 0,
                                       spColor(1, 0, 0));
+    spPose box_pose(spPose::Identity());
+    box_pose.translate(spTranslation(0, 0, 0.25));
+    box_handle_ = objects_->CreateBox(box_pose, spBoxSize(0.5, 0.5, 0.5), 0, spColor(1, 1, 0));
+
     car_handle_ = objects_->CreateVehicle(vehicle_info_);
     if (initial_state_.substate_vec.size() != info.wheels_anchor.size()) {
       SPERROR("Provided state does not match the VehicleInfo");
@@ -40,7 +44,7 @@ class CarSimFunctor {
     }
   }
 
-  ~CarSimFunctor() {
+  ~ShootingCarSimFunctor() {
     if ((gui_ != nullptr)) {
       gui_->RemoveObject(objects_->GetObject(car_handle_));
     }
@@ -54,7 +58,7 @@ class CarSimFunctor {
     }
   }
 
-  CarSimFunctor(const CarSimFunctor& obj) : vehicle_info_(obj.vehicle_info_) {
+  ShootingCarSimFunctor(const ShootingCarSimFunctor& obj) : vehicle_info_(obj.vehicle_info_) {
     SPERROR("cpy constructor called. AVOID calling cpyConstructors");
   }
 
@@ -64,10 +68,11 @@ class CarSimFunctor {
                    std::shared_ptr<spStateSeries> traj_states = nullptr,
                    std::shared_ptr<spState> init_state = nullptr,
                    std::shared_ptr<double> cost = nullptr,
+                   std::shared_ptr<spPose> obs_pose = nullptr,
 			std::shared_ptr<double> tire_friction = nullptr ) {
     thread_ = std::make_unique<std::thread>(
-        &CarSimFunctor::operator(), this, thread_id, num_sim_steps, step_size,
-        cntrl_vars, epsilon, pert_index, traj_states,init_state,cost,tire_friction);
+        &ShootingCarSimFunctor::operator(), this, thread_id, num_sim_steps, step_size,
+        cntrl_vars, epsilon, pert_index, traj_states,init_state,cost,obs_pose,tire_friction);
   }
 
   void WaitForThreadJoin() {
@@ -81,6 +86,7 @@ class CarSimFunctor {
                   std::shared_ptr<spStateSeries> traj_states = nullptr,
                   std::shared_ptr<spState> init_state = nullptr,
                   std::shared_ptr<double> cost = nullptr,
+                  std::shared_ptr<spPose> obs_pose = nullptr,
 			std::shared_ptr<double> tire_friction = nullptr ) {
     double radius = 1;
     double total_cost = 0;
@@ -92,6 +98,11 @@ class CarSimFunctor {
      }
     if(init_state != nullptr) {
       car.SetState(*init_state);
+    }
+
+    // set obstacle pose
+    if(obs_pose != nullptr){
+      ((spBox&)objects_->GetObject(box_handle_)).SetPose(*obs_pose);
     }
     spCurve control_curve(2, 2);
     control_curve.SetBezierControlPoints(cntrl_vars);
@@ -121,11 +132,19 @@ class CarSimFunctor {
       }
 
       if (cost != nullptr) {
-        double index_dif = 1;//(num_sim_steps-ii);
-        spTranslation position = car.GetState().pose.translation();
-        position[2] = 0;
-        double curr_radius = position.norm();
-        total_cost += index_dif*index_dif*std::abs(radius-curr_radius);
+        // check distance from box to check for collision
+        spTranslation dist_vec(car.GetState().pose.translation()-obs_pose->translation());
+        dist_vec[2] = 0;
+        double c2c_min_dist = 0.5;
+        if(dist_vec.norm()<c2c_min_dist){
+          total_cost += 1000;
+        } else {
+          double index_dif = 1;//(num_sim_steps-ii);
+          spTranslation position = car.GetState().pose.translation();
+          position[2] = 0;
+          double curr_radius = position.norm();
+          total_cost += index_dif*index_dif*std::abs(radius-curr_radius);
+        }
       }
     }
     *cost = total_cost;
@@ -146,9 +165,11 @@ class CarSimFunctor {
   std::shared_ptr<Objects> objects_;
   spObjectHandle gnd_handle_;
   spObjectHandle car_handle_;
+  spObjectHandle box_handle_;
   spState initial_state_;
   Gui* gui_;
   std::unique_ptr<std::thread> thread_;
+
 };
 
-#endif  // CARSIMFUNCTOR_H__
+#endif  // SHOOTINGCARSIMFUNCTOR_H__
