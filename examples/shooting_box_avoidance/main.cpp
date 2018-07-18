@@ -31,6 +31,12 @@ void vicon_poseHandler(hal::PoseMsg& PoseData) {
   Eigen::AngleAxisd tracker_rot(-SP_PI_HALF,Eigen::Vector3d::UnitZ());
   vicon_pose.rotate(rot);
   vicon_pose.rotate(tracker_rot);
+//  spRotation rot(PoseData.pose().data(6),PoseData.pose().data(3),PoseData.pose().data(4),PoseData.pose().data(5));
+//  double yaw = rot.matrix().eulerAngles(0,1,2)[2];
+//  Eigen::AngleAxisd zrotation(yaw,Eigen::Vector3d::UnitZ());
+//  Eigen::AngleAxisd tracker_rot(-SP_PI_HALF,Eigen::Vector3d::UnitZ());
+//  vicon_pose.rotate(zrotation);
+//  vicon_pose.rotate(tracker_rot);
 
   if(init_state_flg) {
     ninja_linvel = spLinVel::Zero();
@@ -84,11 +90,11 @@ int main(int argc, char** argv) {
   double disc_step_size = 0.1;
   double simulation_length = 0.6;
 
-  spworld.car_param.pose.translate(spTranslation(1.5,0,0));
+  spworld.car_param.pose.translate(spTranslation(1.5,0,0.07));
   spObjectHandle car_handle = spworld.objects_.CreateVehicle(spworld.car_param);
   spworld.gui_.AddObject(spworld.objects_.GetObject(car_handle));
   spAWSDCar& estimation_car = (spAWSDCar&) spworld.objects_.GetObject(car_handle);
-
+ spworld.objects_.StepPhySimulation(1);
   // create a flat ground
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
@@ -114,18 +120,21 @@ int main(int argc, char** argv) {
   int speed = 110;
   for(int ii=0; ii<num_cars; ii++) {
     cntrl_vars_vec[(9*jj)+ii].col(0) = Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/(num_cars-1),speed);
-    cntrl_vars_vec[(9*jj)+ii].col(1) = Eigen::Vector2d(0.1,speed);//Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/(num_cars-1),speed);
-    cntrl_vars_vec[(9*jj)+ii].col(2) = Eigen::Vector2d(0.1,speed);//Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/(num_cars-1),speed);
-  }
-
-  // create cars.
-  for(int ii = 0; ii < num_cars; ii++) {
-    //state_ptr.push_back(std::make_shared<spState>(current_state));
-    sims.push_back(std::make_shared<ShootingCarSimFunctor>(spworld.car_param,current_state));
-    costs.push_back(std::make_shared<double>(0));
+    cntrl_vars_vec[(9*jj)+ii].col(1) = /*Eigen::Vector2d(0.1,speed);//*/Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/(num_cars-1),speed);
+    cntrl_vars_vec[(9*jj)+ii].col(2) = /*Eigen::Vector2d(0.1,speed);//*/Eigen::Vector2d(spworld.car_param.steering_servo_lower_limit+ii*(spworld.car_param.steering_servo_upper_limit-spworld.car_param.steering_servo_lower_limit)/(num_cars-1),speed);
   }
 
   while(1){
+      sims.clear();
+      costs.clear();
+      // create cars.
+      for(int ii = 0; ii < num_cars; ii++) {
+        //state_ptr.push_back(std::make_shared<spState>(current_state));
+//          sims.push_back(std::make_shared<ShootingCarSimFunctor>(spworld.car_param,current_state,&spworld.gui_));
+          sims.push_back(std::make_shared<ShootingCarSimFunctor>(spworld.car_param,current_state));
+        costs.push_back(std::make_shared<double>(0));
+      }
+
     spTimestamp t0 = spGeneralTools::Tick();
     sim_traj.clear();
     costs.clear();
@@ -137,16 +146,15 @@ int main(int argc, char** argv) {
     //*state_ptr = estimation_car.GetState();
     state_ptr.reset(new spState(current_state));
     state_ptr->pose = vicon_pose;
+//    state_ptr->linvel = spLinVel(0,0,0);
+//    state_ptr->rotvel = spRotVel(0,0,0);
+
     state_ptr->linvel = ninja_linvel;
     state_ptr->rotvel = ninja_rotvel;
 
-		if(state_ptr->pose.translation()[0]>0) {
-			tire_friction.reset(new double(0.5));
-		} else {
-			tire_friction.reset(new double(0.5));
-		}
+    tire_friction.reset(new double(0.4));
 
-    std::cout << std::fixed << std::setprecision(3) << state_ptr->pose.translation()[0] << ","  << state_ptr->pose.translation()[1] << ";"   <<std::endl;
+    std::cout << std::fixed << std::setprecision(3) << state_ptr->pose.translation()[0] << ","  << state_ptr->pose.translation()[1] << ","  << state_ptr->pose.translation()[2] << ";"   <<std::endl;
     
 /*
 	    state_ptr[ii]->substate_vec[0]->linvel = ninja_linvel;
@@ -161,12 +169,15 @@ int main(int argc, char** argv) {
 */
 
     std::shared_ptr<spPose> box_pose = std::make_shared<spPose>(spPose::Identity());
+    box_pose->translation()[0] = 1.5;
+    box_pose->translation()[1] = 0;
     box_pose->translation()[2] = 0.25;
 
     // Run simulations
     for(int ii = 0; ii < num_cars; ii++) {
       sim_traj.push_back(std::make_shared<spStateSeries>());
       sims[ii]->RunInThread(ii,(int)(simulation_length/disc_step_size), disc_step_size, cntrl_vars_vec[ii], 0, -1, sim_traj[ii], state_ptr,costs[ii],box_pose,tire_friction);
+//      sims[ii]->operator()(ii,(int)(simulation_length/disc_step_size), disc_step_size, cntrl_vars_vec[ii], 0, -1, sim_traj[ii], state_ptr,costs[ii],box_pose,tire_friction);
     }
 
     for(int ii = 0; ii < num_cars; ii++) {
@@ -178,11 +189,13 @@ int main(int argc, char** argv) {
     int lowest_cost_index = 0;
     double lowest_cost = *(costs[lowest_cost_index]);
     for(int ii=1; ii<num_cars; ii++) {
-      if(*(costs[ii])<lowest_cost) {
-        lowest_cost = *(costs[ii]);
-        lowest_cost_index = ii;
-      }
+        std::cout << *(costs[ii]) << "  -  ";
+         if(*(costs[ii])<lowest_cost) {
+            lowest_cost = *(costs[ii]);
+            lowest_cost_index = ii;
+        }
     }
+    std::cout << std::endl;
 
     // calc the processing time
     double time = spGeneralTools::Tock_ms(t0);
@@ -190,7 +203,7 @@ int main(int argc, char** argv) {
 
     // apply signal to the car
     double steering = (cntrl_vars_vec[lowest_cost_index]).col(0)[0];
-    steering *= 1;
+    steering *= 0.9;
     if(flag_auto) {
       commandMSG.set_steering_angle(-steering);
     } else {
@@ -199,10 +212,11 @@ int main(int argc, char** argv) {
     commandMSG.set_throttle_percent(gamepad_throttle);
     ninja_car.UpdateCarCommand(commandMSG);
 
+    std::cout << steering << std::endl;
 //    std::cout << "cost " << lowest_cost << " , " << lowest_cost_index << std::endl;
 //    estimation_car.SetFrontSteeringAngle((cntrl_vars_vec[lowest_cost_index]).col(0)[0]);
 //    estimation_car.SetEngineMaxVel((cntrl_vars_vec[lowest_cost_index]).col(0)[1]);
-    spworld.gui_.Iterate(spworld.objects_);
+  //  spworld.gui_.Iterate(spworld.objects_);
  //   spworld.objects_.StepPhySimulation(simulation_length);
   //  spworld.gui_.Iterate(spworld.objects_);
 //      std::this_thread::sleep_for(std::chrono::milliseconds(100));

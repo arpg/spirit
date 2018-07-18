@@ -88,7 +88,7 @@ class ShootingCarSimFunctor {
                   std::shared_ptr<double> cost = nullptr,
                   std::shared_ptr<spPose> obs_pose = nullptr,
 			std::shared_ptr<double> tire_friction = nullptr ) {
-    double radius = 1;
+    double radius = 1.5;
     double total_cost = 0;
     spBox& gnd = (spBox&)objects_->GetObject(gnd_handle_);
     gnd.SetFriction(1);
@@ -122,10 +122,16 @@ class ShootingCarSimFunctor {
       car.SetEngineMaxVel(sample_control[1]);
 //      car.SetEngineMaxVel(100);
 //      car.SetEngineTorque(sample_control[1]*0.00001);
+
+//      std::cout << car.GetState().linvel.transpose() << std::endl;
+//      std::cout << car.GetState().rotvel.transpose() << std::endl;
       objects_->StepPhySimulation(step_size);
+//      while(1){
+//          gui_->Iterate(*objects_);
+//      }
       if ((gui_ != nullptr)) {
         gui_->Iterate(*objects_);
-        spGeneralTools::Delay_ms(1000 * step_size);
+        //spGeneralTools::Delay_ms(1000 * step_size);
       }
       if (traj_states != nullptr) {
         traj_states->push_back(std::make_shared<spState>(car.GetState()));
@@ -135,7 +141,7 @@ class ShootingCarSimFunctor {
         // check distance from box to check for collision
         spTranslation dist_vec(car.GetState().pose.translation()-obs_pose->translation());
         dist_vec[2] = 0;
-        double c2c_min_dist = 0.5;
+        double c2c_min_dist = 0.7;
         if(dist_vec.norm()<c2c_min_dist){
           total_cost += 1000;
         } else {
