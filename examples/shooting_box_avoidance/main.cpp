@@ -7,6 +7,7 @@
 #include <HAL/Posys/PosysDevice.h>
 #include <atomic>
 #include <spirit/ShootingCarSimFunctor.h>
+#include "RecvNode.h"
 
 
 hal::CarCommandMsg commandMSG;
@@ -29,7 +30,7 @@ void vicon_poseHandler(hal::PoseMsg& PoseData) {
   vicon_pose.translate(spTranslation(PoseData.pose().data(0),PoseData.pose().data(1),0.07/*PoseData.pose().data(2)*/));
   spRotation rot(PoseData.pose().data(6),PoseData.pose().data(3),PoseData.pose().data(4),PoseData.pose().data(5));
   Eigen::AngleAxisd tracker_rot(-SP_PI_HALF,Eigen::Vector3d::UnitZ());
-  vicon_pose.rotate(rot);
+  //c.rotate(rot);
   vicon_pose.rotate(tracker_rot);
 //  spRotation rot(PoseData.pose().data(6),PoseData.pose().data(3),PoseData.pose().data(4),PoseData.pose().data(5));
 //  double yaw = rot.matrix().eulerAngles(0,1,2)[2];
@@ -65,6 +66,15 @@ void GamepadCallback(hal::GamepadMsg& _msg) {
   }
 }
 
+
+void NewPoseReceived(float x, float y, float yaw){
+  std::cout << "got Pose data " << x << " - " << y << " - " << yaw  << std::endl;
+  vicon_pose = spPose::Identity();
+  vicon_pose.translate(spTranslation(x,y,0.07/*PoseData.pose().data(2)*/));
+  Eigen::AngleAxisd tracker_rot(yaw,Eigen::Vector3d::UnitZ());
+  vicon_pose.rotate(tracker_rot);
+}
+
 int main(int argc, char** argv) {
   // connect to a gamepad
   hal::Gamepad gamepad("gamepad:/");
@@ -77,8 +87,17 @@ int main(int argc, char** argv) {
   commandMSG.set_steering_angle(0);
   commandMSG.set_throttle_percent(0);
   //////////////////////////////
-  hal::Posys vicon("vicon://tracker:[ninja]");
-  vicon.RegisterPosysDataCallback(&vicon_poseHandler);
+ // hal::Posys vicon("vicon://tracker:[ninja]");
+  //vicon.RegisterPosysDataCallback(&vicon_poseHandler);
+  /////////////////////////////
+  unsigned int port = 21234;
+  RecvNode node(port);
+  node.RegisterPoseUpdateCallBack(&NewPoseReceived);
+  //node.RegisterObsUpdateCallBack(&NewObsReceived);
+  node.InitServer();
+
+  std::cout << "Listening to port ... " << std::endl;
+while(1){};
   /////////////////////////////
   spSettings settings_obj;
   settings_obj.SetGuiType(spGuiType::GUI_PANGOSCENEGRAPH);

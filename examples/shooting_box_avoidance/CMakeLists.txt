@@ -16,7 +16,7 @@ include_directories(${HAL_INCLUDE_DIRS})
 find_package(spirit REQUIRED)
 include_directories(${spirit_INCLUDE_DIRS})
 
-add_executable( ${ProjectId} main.cpp)
+add_executable( ${ProjectId} RecvNode.h main.cpp)
 target_link_libraries(${ProjectId}
                       ${HAL_LIBRARIES}
                       ${spirit_LIBRARIES}
