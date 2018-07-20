@@ -59,7 +59,7 @@ CMAKE_BINARY_DIR = /home/boston/Documents/spirit_dep/spirit/build
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/cmake-gui -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -122,6 +122,58 @@ spirit: cmake_check_build_system
 spirit/fast:
 	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/build
 .PHONY : spirit/fast
+
+#=============================================================================
+# Target rules for targets named car_robot
+
+# Build rule for target.
+car_robot: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 car_robot
+.PHONY : car_robot
+
+# fast build rule for target.
+car_robot/fast:
+	$(MAKE) -f examples/car_robot/CMakeFiles/car_robot.dir/build.make examples/car_robot/CMakeFiles/car_robot.dir/build
+.PHONY : car_robot/fast
+
+#=============================================================================
+# Target rules for targets named mpc_car
+
+# Build rule for target.
+mpc_car: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 mpc_car
+.PHONY : mpc_car
+
+# fast build rule for target.
+mpc_car/fast:
+	$(MAKE) -f examples/mpc_car/CMakeFiles/mpc_car.dir/build.make examples/mpc_car/CMakeFiles/mpc_car.dir/build
+.PHONY : mpc_car/fast
+
+#=============================================================================
+# Target rules for targets named rk4_spirit_car
+
+# Build rule for target.
+rk4_spirit_car: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rk4_spirit_car
+.PHONY : rk4_spirit_car
+
+# fast build rule for target.
+rk4_spirit_car/fast:
+	$(MAKE) -f examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/build.make examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/build
+.PHONY : rk4_spirit_car/fast
+
+#=============================================================================
+# Target rules for targets named rk4_3D_car
+
+# Build rule for target.
+rk4_3D_car: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rk4_3D_car
+.PHONY : rk4_3D_car
+
+# fast build rule for target.
+rk4_3D_car/fast:
+	$(MAKE) -f examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/build.make examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/build
+.PHONY : rk4_3D_car/fast
 
 src/Gui.o: src/Gui.cpp.o
 
@@ -230,6 +282,33 @@ src/spAWSDCar.s: src/spAWSDCar.cpp.s
 src/spAWSDCar.cpp.s:
 	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/src/spAWSDCar.cpp.s
 .PHONY : src/spAWSDCar.cpp.s
+
+src/spBike.o: src/spBike.cpp.o
+
+.PHONY : src/spBike.o
+
+# target to build an object file
+src/spBike.cpp.o:
+	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/src/spBike.cpp.o
+.PHONY : src/spBike.cpp.o
+
+src/spBike.i: src/spBike.cpp.i
+
+.PHONY : src/spBike.i
+
+# target to preprocess a source file
+src/spBike.cpp.i:
+	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/src/spBike.cpp.i
+.PHONY : src/spBike.cpp.i
+
+src/spBike.s: src/spBike.cpp.s
+
+.PHONY : src/spBike.s
+
+# target to generate assembly for a file
+src/spBike.cpp.s:
+	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/src/spBike.cpp.s
+.PHONY : src/spBike.cpp.s
 
 src/spBox.o: src/spBox.cpp.o
 
@@ -699,6 +778,10 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... spirit"
+	@echo "... car_robot"
+	@echo "... mpc_car"
+	@echo "... rk4_spirit_car"
+	@echo "... rk4_3D_car"
 	@echo "... src/Gui.o"
 	@echo "... src/Gui.i"
 	@echo "... src/Gui.s"
@@ -711,6 +794,9 @@ help:
 	@echo "... src/spAWSDCar.o"
 	@echo "... src/spAWSDCar.i"
 	@echo "... src/spAWSDCar.s"
+	@echo "... src/spBike.o"
+	@echo "... src/spBike.i"
+	@echo "... src/spBike.s"
 	@echo "... src/spBox.o"
 	@echo "... src/spBox.i"
 	@echo "... src/spBox.s"

@@ -43,8 +43,8 @@ set( _INCLUDE_DIRS
 	${SceneGraph_INCLUDE_DIRS}
 	${BULLET_INCLUDE_DIR}
 	${CeresSolver_INCLUDE_DIRS}
-        ${OPENTHREADS_INCLUDE_DIR}
-        ${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
 #	${Matlab_INCLUDE_DIRS}
 #	${TBB_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -57,12 +57,12 @@ set( _LIBRARIES
 	${SceneGraph_LIBRARIES}
 	${BULLET_LIBRARIES}
 	${CeresSolver_LIBRARIES}
-        ${OSG_LIBRARIES}
-        ${OSGVIEWER_LIBRARIES}
-        ${OSGUTIL_LIBRARIES}
-        ${OSGDB_LIBRARIES}
-        ${OSGGA_LIBRARIES}
-        ${OPENTHREADS_LIBRARIES}
+	${OSG_LIBRARIES}
+	${OSGVIEWER_LIBRARIES}
+	${OSGUTIL_LIBRARIES}
+	${OSGDB_LIBRARIES}
+	${OSGGA_LIBRARIES}
+	${OPENTHREADS_LIBRARIES}
 #	${Matlab_LIBRARIES}
 #	${TBB_LIBRARY_DIRS}
 	)
@@ -82,12 +82,14 @@ set( HDRS
 	include/spirit/Objects/spMesh.h
 	include/spirit/Objects/spVehicle.h
 	include/spirit/Objects/spAWSDCar.h
+	include/spirit/Objects/spBike.h
 	include/spirit/Objects/spWheel.h
 	include/spirit/Objects/spWaypoint.h
 	include/spirit/Types/spTypes.h
 	include/spirit/Objects/spLineStrip.h
 	include/spirit/CarSimFunctor.h
 	include/spirit/CarSimFunctorRK4.h
+	include/spirit/BikeSimFunctorRK4.h
 	include/spirit/CarFunc.h
 	include/spirit/Controllers/spPID.h
 	include/spirit/Planners/spTrajectory.h
@@ -107,6 +109,8 @@ set( HDRS
 	include/spirit/Planners/spCirclePlanner.h
 	include/spirit/RK4.h
 	include/spirit/CarODE.h
+	include/spirit/BikeODE.h
+	include/spirit/BikeParameters.h
 	include/spirit/LogBarrierLossFunc.h
 	)
 
@@ -125,6 +129,7 @@ set( SRCS
 	src/spMesh.cpp
 	src/spVehicle.cpp
 	src/spAWSDCar.cpp
+	src/spBike.cpp
 	src/spWheel.cpp
 	src/spLineStrip.cpp
 	src/spPID.cpp

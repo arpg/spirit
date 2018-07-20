@@ -104,10 +104,10 @@ examples/rk4_3D_car/rk4_3D_car: /usr/lib/x86_64-linux-gnu/libIL.so
 examples/rk4_3D_car/rk4_3D_car: /usr/lib/x86_64-linux-gnu/libILU.so
 examples/rk4_3D_car/rk4_3D_car: /usr/lib/x86_64-linux-gnu/libILUT.so
 examples/rk4_3D_car/rk4_3D_car: /home/boston/Documents/spirit_dep/SceneGraph/build/libscenegraph.so
-examples/rk4_3D_car/rk4_3D_car: /usr/local/lib/libBulletDynamics.a
-examples/rk4_3D_car/rk4_3D_car: /usr/local/lib/libBulletCollision.a
-examples/rk4_3D_car/rk4_3D_car: /usr/local/lib/libLinearMath.a
-examples/rk4_3D_car/rk4_3D_car: /usr/local/lib/libBulletSoftBody.a
+examples/rk4_3D_car/rk4_3D_car: /usr/local/lib/libBulletDynamics.so
+examples/rk4_3D_car/rk4_3D_car: /usr/local/lib/libBulletCollision.so
+examples/rk4_3D_car/rk4_3D_car: /usr/local/lib/libLinearMath.so
+examples/rk4_3D_car/rk4_3D_car: /usr/local/lib/libBulletSoftBody.so
 examples/rk4_3D_car/rk4_3D_car: /usr/local/lib/libceres.so
 examples/rk4_3D_car/rk4_3D_car: /usr/lib/x86_64-linux-gnu/libglog.so
 examples/rk4_3D_car/rk4_3D_car: /usr/lib/x86_64-linux-gnu/libcholmod.so

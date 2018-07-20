@@ -8,6 +8,7 @@ CMakeFiles/spirit.dir/src/Gui.cpp.o
  ../include/spirit/Gui/spPangolinScenegraphGui.h
  ../include/spirit/Objects.h
  ../include/spirit/Objects/spAWSDCar.h
+ ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
  ../include/spirit/Objects/spLineStrip.h
@@ -825,6 +826,7 @@ CMakeFiles/spirit.dir/src/Gui.cpp.o
 CMakeFiles/spirit.dir/src/Objects.cpp.o
  ../include/spirit/Objects.h
  ../include/spirit/Objects/spAWSDCar.h
+ ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
  ../include/spirit/Objects/spLineStrip.h
@@ -2207,6 +2209,544 @@ CMakeFiles/spirit.dir/src/spAWSDCar.cpp.o
  /usr/local/include/bullet/LinearMath/btVector3.h
  /usr/local/include/bullet/btBulletCollisionCommon.h
  /usr/local/include/bullet/btBulletDynamicsCommon.h
+CMakeFiles/spirit.dir/src/spBike.cpp.o
+ ../include/spirit/Objects/spBike.h
+ ../include/spirit/Objects/spBox.h
+ ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spVehicle.h
+ ../include/spirit/Objects/spWheel.h
+ ../include/spirit/Types/spTypes.h
+ ../include/spirit/spGeneralTools.h
+ /home/boston/Documents/spirit_dep/Pangolin/build/include/pangolin/PangolinConfig.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/attach.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/colour.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/compat/boostd.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/compat/function.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/compat/ovr.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/compat/type_traits.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/datalog.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/display.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/display_android.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/display_glut.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/file_utils.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/gl.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/gl.hpp
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/gl2engine.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/gl_es_compat.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/glchar.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/gldraw.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/glfont.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/glinclude.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/glpangoglu.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/glplatform.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/glsl.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/glstate.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/gltext.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/handler.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/handler_enums.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/image.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/image_load.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/opengl_render_state.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/pangolin.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/platform.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/plotter.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/range.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/simple_math.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/type_convert.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/var/var.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/var/varextra.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/var/varstate.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/var/varvalue.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/var/varvaluegeneric.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/var/varvaluet.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/var/varwrapper.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/video.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/video_common.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/video_output.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/view.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/viewport.h
+ /home/boston/Documents/spirit_dep/Pangolin/include/pangolin/widgets.h
+ /home/boston/Documents/spirit_dep/spirit/src/spBike.cpp
+ /usr/include/IL/../EGL/egl.h
+ /usr/include/IL/../EGL/eglplatform.h
+ /usr/include/IL/../GL/gl.h
+ /usr/include/IL/../GL/gl_mangle.h
+ /usr/include/IL/../GL/glew.h
+ /usr/include/IL/../GL/glext.h
+ /usr/include/IL/../GL/glu.h
+ /usr/include/IL/../GL/glu_mangle.h
+ /usr/include/IL/../GLES2/gl2.h
+ /usr/include/IL/../GLES2/gl2ext.h
+ /usr/include/IL/../GLES2/gl2platform.h
+ /usr/include/IL/../KHR/khrplatform.h
+ /usr/include/IL/../X11/X.h
+ /usr/include/IL/../X11/Xfuncproto.h
+ /usr/include/IL/../X11/Xlib.h
+ /usr/include/IL/../X11/Xmd.h
+ /usr/include/IL/../X11/Xosdefs.h
+ /usr/include/IL/../X11/Xutil.h
+ /usr/include/IL/../X11/keysym.h
+ /usr/include/IL/../X11/keysymdef.h
+ /usr/include/IL/../_G_config.h
+ /usr/include/IL/../alloca.h
+ /usr/include/IL/../assert.h
+ /usr/include/IL/../ctype.h
+ /usr/include/IL/../endian.h
+ /usr/include/IL/../fcntl.h
+ /usr/include/IL/../features.h
+ /usr/include/IL/../gconv.h
+ /usr/include/IL/../getopt.h
+ /usr/include/IL/../inttypes.h
+ /usr/include/IL/../libio.h
+ /usr/include/IL/../malloc.h
+ /usr/include/IL/../math.h
+ /usr/include/IL/../memory.h
+ /usr/include/IL/../poll.h
+ /usr/include/IL/../pthread.h
+ /usr/include/IL/../sched.h
+ /usr/include/IL/../stdc-predef.h
+ /usr/include/IL/../stdint.h
+ /usr/include/IL/../stdio.h
+ /usr/include/IL/../stdlib.h
+ /usr/include/IL/../string.h
+ /usr/include/IL/../termios.h
+ /usr/include/IL/../time.h
+ /usr/include/IL/../unistd.h
+ /usr/include/IL/../wchar.h
+ /usr/include/IL/../wctype.h
+ /usr/include/IL/../xlocale.h
+ /usr/include/eigen3/Eigen/Cholesky
+ /usr/include/eigen3/Eigen/Core
+ /usr/include/eigen3/Eigen/Dense
+ /usr/include/eigen3/Eigen/Eigen
+ /usr/include/eigen3/Eigen/Eigenvalues
+ /usr/include/eigen3/Eigen/Geometry
+ /usr/include/eigen3/Eigen/Householder
+ /usr/include/eigen3/Eigen/IterativeLinearSolvers
+ /usr/include/eigen3/Eigen/Jacobi
+ /usr/include/eigen3/Eigen/LU
+ /usr/include/eigen3/Eigen/OrderingMethods
+ /usr/include/eigen3/Eigen/QR
+ /usr/include/eigen3/Eigen/SVD
+ /usr/include/eigen3/Eigen/Sparse
+ /usr/include/eigen3/Eigen/SparseCholesky
+ /usr/include/eigen3/Eigen/SparseCore
+ /usr/include/eigen3/Eigen/SparseLU
+ /usr/include/eigen3/Eigen/SparseQR
+ /usr/include/eigen3/Eigen/src/Cholesky/LDLT.h
+ /usr/include/eigen3/Eigen/src/Cholesky/LLT.h
+ /usr/include/eigen3/Eigen/src/Cholesky/LLT_MKL.h
+ /usr/include/eigen3/Eigen/src/Core/Array.h
+ /usr/include/eigen3/Eigen/src/Core/ArrayBase.h
+ /usr/include/eigen3/Eigen/src/Core/ArrayWrapper.h
+ /usr/include/eigen3/Eigen/src/Core/Assign.h
+ /usr/include/eigen3/Eigen/src/Core/AssignEvaluator.h
+ /usr/include/eigen3/Eigen/src/Core/Assign_MKL.h
+ /usr/include/eigen3/Eigen/src/Core/BandMatrix.h
+ /usr/include/eigen3/Eigen/src/Core/Block.h
+ /usr/include/eigen3/Eigen/src/Core/BooleanRedux.h
+ /usr/include/eigen3/Eigen/src/Core/CommaInitializer.h
+ /usr/include/eigen3/Eigen/src/Core/CoreEvaluators.h
+ /usr/include/eigen3/Eigen/src/Core/CoreIterators.h
+ /usr/include/eigen3/Eigen/src/Core/CwiseBinaryOp.h
+ /usr/include/eigen3/Eigen/src/Core/CwiseNullaryOp.h
+ /usr/include/eigen3/Eigen/src/Core/CwiseUnaryOp.h
+ /usr/include/eigen3/Eigen/src/Core/CwiseUnaryView.h
+ /usr/include/eigen3/Eigen/src/Core/DenseBase.h
+ /usr/include/eigen3/Eigen/src/Core/DenseCoeffsBase.h
+ /usr/include/eigen3/Eigen/src/Core/DenseStorage.h
+ /usr/include/eigen3/Eigen/src/Core/Diagonal.h
+ /usr/include/eigen3/Eigen/src/Core/DiagonalMatrix.h
+ /usr/include/eigen3/Eigen/src/Core/DiagonalProduct.h
+ /usr/include/eigen3/Eigen/src/Core/Dot.h
+ /usr/include/eigen3/Eigen/src/Core/EigenBase.h
+ /usr/include/eigen3/Eigen/src/Core/Fuzzy.h
+ /usr/include/eigen3/Eigen/src/Core/GeneralProduct.h
+ /usr/include/eigen3/Eigen/src/Core/GenericPacketMath.h
+ /usr/include/eigen3/Eigen/src/Core/GlobalFunctions.h
+ /usr/include/eigen3/Eigen/src/Core/IO.h
+ /usr/include/eigen3/Eigen/src/Core/Inverse.h
+ /usr/include/eigen3/Eigen/src/Core/Map.h
+ /usr/include/eigen3/Eigen/src/Core/MapBase.h
+ /usr/include/eigen3/Eigen/src/Core/MathFunctions.h
+ /usr/include/eigen3/Eigen/src/Core/Matrix.h
+ /usr/include/eigen3/Eigen/src/Core/MatrixBase.h
+ /usr/include/eigen3/Eigen/src/Core/NestByValue.h
+ /usr/include/eigen3/Eigen/src/Core/NoAlias.h
+ /usr/include/eigen3/Eigen/src/Core/NumTraits.h
+ /usr/include/eigen3/Eigen/src/Core/PermutationMatrix.h
+ /usr/include/eigen3/Eigen/src/Core/PlainObjectBase.h
+ /usr/include/eigen3/Eigen/src/Core/Product.h
+ /usr/include/eigen3/Eigen/src/Core/ProductEvaluators.h
+ /usr/include/eigen3/Eigen/src/Core/Random.h
+ /usr/include/eigen3/Eigen/src/Core/Redux.h
+ /usr/include/eigen3/Eigen/src/Core/Ref.h
+ /usr/include/eigen3/Eigen/src/Core/Replicate.h
+ /usr/include/eigen3/Eigen/src/Core/ReturnByValue.h
+ /usr/include/eigen3/Eigen/src/Core/Reverse.h
+ /usr/include/eigen3/Eigen/src/Core/Select.h
+ /usr/include/eigen3/Eigen/src/Core/SelfAdjointView.h
+ /usr/include/eigen3/Eigen/src/Core/SelfCwiseBinaryOp.h
+ /usr/include/eigen3/Eigen/src/Core/Solve.h
+ /usr/include/eigen3/Eigen/src/Core/SolveTriangular.h
+ /usr/include/eigen3/Eigen/src/Core/SolverBase.h
+ /usr/include/eigen3/Eigen/src/Core/SpecialFunctions.h
+ /usr/include/eigen3/Eigen/src/Core/StableNorm.h
+ /usr/include/eigen3/Eigen/src/Core/Stride.h
+ /usr/include/eigen3/Eigen/src/Core/Swap.h
+ /usr/include/eigen3/Eigen/src/Core/Transpose.h
+ /usr/include/eigen3/Eigen/src/Core/Transpositions.h
+ /usr/include/eigen3/Eigen/src/Core/TriangularMatrix.h
+ /usr/include/eigen3/Eigen/src/Core/VectorBlock.h
+ /usr/include/eigen3/Eigen/src/Core/VectorwiseOp.h
+ /usr/include/eigen3/Eigen/src/Core/Visitor.h
+ /usr/include/eigen3/Eigen/src/Core/arch/AVX/Complex.h
+ /usr/include/eigen3/Eigen/src/Core/arch/AVX/MathFunctions.h
+ /usr/include/eigen3/Eigen/src/Core/arch/AVX/PacketMath.h
+ /usr/include/eigen3/Eigen/src/Core/arch/AVX/TypeCasting.h
+ /usr/include/eigen3/Eigen/src/Core/arch/AltiVec/Complex.h
+ /usr/include/eigen3/Eigen/src/Core/arch/AltiVec/MathFunctions.h
+ /usr/include/eigen3/Eigen/src/Core/arch/AltiVec/PacketMath.h
+ /usr/include/eigen3/Eigen/src/Core/arch/CUDA/MathFunctions.h
+ /usr/include/eigen3/Eigen/src/Core/arch/CUDA/PacketMath.h
+ /usr/include/eigen3/Eigen/src/Core/arch/Default/Settings.h
+ /usr/include/eigen3/Eigen/src/Core/arch/NEON/Complex.h
+ /usr/include/eigen3/Eigen/src/Core/arch/NEON/MathFunctions.h
+ /usr/include/eigen3/Eigen/src/Core/arch/NEON/PacketMath.h
+ /usr/include/eigen3/Eigen/src/Core/arch/SSE/Complex.h
+ /usr/include/eigen3/Eigen/src/Core/arch/SSE/MathFunctions.h
+ /usr/include/eigen3/Eigen/src/Core/arch/SSE/PacketMath.h
+ /usr/include/eigen3/Eigen/src/Core/arch/SSE/TypeCasting.h
+ /usr/include/eigen3/Eigen/src/Core/functors/AssignmentFunctors.h
+ /usr/include/eigen3/Eigen/src/Core/functors/BinaryFunctors.h
+ /usr/include/eigen3/Eigen/src/Core/functors/NullaryFunctors.h
+ /usr/include/eigen3/Eigen/src/Core/functors/StlFunctors.h
+ /usr/include/eigen3/Eigen/src/Core/functors/UnaryFunctors.h
+ /usr/include/eigen3/Eigen/src/Core/products/GeneralBlockPanelKernel.h
+ /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrix.h
+ /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrixTriangular.h
+ /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrixTriangular_MKL.h
+ /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrix_MKL.h
+ /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixVector.h
+ /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixVector_MKL.h
+ /usr/include/eigen3/Eigen/src/Core/products/Parallelizer.h
+ /usr/include/eigen3/Eigen/src/Core/products/SelfadjointMatrixMatrix.h
+ /usr/include/eigen3/Eigen/src/Core/products/SelfadjointMatrixMatrix_MKL.h
+ /usr/include/eigen3/Eigen/src/Core/products/SelfadjointMatrixVector.h
+ /usr/include/eigen3/Eigen/src/Core/products/SelfadjointMatrixVector_MKL.h
+ /usr/include/eigen3/Eigen/src/Core/products/SelfadjointProduct.h
+ /usr/include/eigen3/Eigen/src/Core/products/SelfadjointRank2Update.h
+ /usr/include/eigen3/Eigen/src/Core/products/TriangularMatrixMatrix.h
+ /usr/include/eigen3/Eigen/src/Core/products/TriangularMatrixMatrix_MKL.h
+ /usr/include/eigen3/Eigen/src/Core/products/TriangularMatrixVector.h
+ /usr/include/eigen3/Eigen/src/Core/products/TriangularMatrixVector_MKL.h
+ /usr/include/eigen3/Eigen/src/Core/products/TriangularSolverMatrix.h
+ /usr/include/eigen3/Eigen/src/Core/products/TriangularSolverMatrix_MKL.h
+ /usr/include/eigen3/Eigen/src/Core/products/TriangularSolverVector.h
+ /usr/include/eigen3/Eigen/src/Core/util/BlasUtil.h
+ /usr/include/eigen3/Eigen/src/Core/util/Constants.h
+ /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h
+ /usr/include/eigen3/Eigen/src/Core/util/ForwardDeclarations.h
+ /usr/include/eigen3/Eigen/src/Core/util/MKL_support.h
+ /usr/include/eigen3/Eigen/src/Core/util/Macros.h
+ /usr/include/eigen3/Eigen/src/Core/util/Memory.h
+ /usr/include/eigen3/Eigen/src/Core/util/Meta.h
+ /usr/include/eigen3/Eigen/src/Core/util/NonMPL2.h
+ /usr/include/eigen3/Eigen/src/Core/util/ReenableStupidWarnings.h
+ /usr/include/eigen3/Eigen/src/Core/util/StaticAssert.h
+ /usr/include/eigen3/Eigen/src/Core/util/XprHelper.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/./ComplexSchur.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/./HessenbergDecomposition.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/./RealQZ.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/./RealSchur.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/./Tridiagonalization.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/ComplexEigenSolver.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/ComplexSchur.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/ComplexSchur_MKL.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/EigenSolver.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/GeneralizedSelfAdjointEigenSolver.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/HessenbergDecomposition.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/RealSchur.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/RealSchur_MKL.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/SelfAdjointEigenSolver_MKL.h
+ /usr/include/eigen3/Eigen/src/Eigenvalues/Tridiagonalization.h
+ /usr/include/eigen3/Eigen/src/Geometry/AlignedBox.h
+ /usr/include/eigen3/Eigen/src/Geometry/AngleAxis.h
+ /usr/include/eigen3/Eigen/src/Geometry/EulerAngles.h
+ /usr/include/eigen3/Eigen/src/Geometry/Homogeneous.h
+ /usr/include/eigen3/Eigen/src/Geometry/Hyperplane.h
+ /usr/include/eigen3/Eigen/src/Geometry/OrthoMethods.h
+ /usr/include/eigen3/Eigen/src/Geometry/ParametrizedLine.h
+ /usr/include/eigen3/Eigen/src/Geometry/Quaternion.h
+ /usr/include/eigen3/Eigen/src/Geometry/Rotation2D.h
+ /usr/include/eigen3/Eigen/src/Geometry/RotationBase.h
+ /usr/include/eigen3/Eigen/src/Geometry/Scaling.h
+ /usr/include/eigen3/Eigen/src/Geometry/Transform.h
+ /usr/include/eigen3/Eigen/src/Geometry/Translation.h
+ /usr/include/eigen3/Eigen/src/Geometry/Umeyama.h
+ /usr/include/eigen3/Eigen/src/Geometry/arch/Geometry_SSE.h
+ /usr/include/eigen3/Eigen/src/Householder/BlockHouseholder.h
+ /usr/include/eigen3/Eigen/src/Householder/Householder.h
+ /usr/include/eigen3/Eigen/src/Householder/HouseholderSequence.h
+ /usr/include/eigen3/Eigen/src/IterativeLinearSolvers/BasicPreconditioners.h
+ /usr/include/eigen3/Eigen/src/IterativeLinearSolvers/BiCGSTAB.h
+ /usr/include/eigen3/Eigen/src/IterativeLinearSolvers/ConjugateGradient.h
+ /usr/include/eigen3/Eigen/src/IterativeLinearSolvers/IncompleteCholesky.h
+ /usr/include/eigen3/Eigen/src/IterativeLinearSolvers/IncompleteLUT.h
+ /usr/include/eigen3/Eigen/src/IterativeLinearSolvers/IterativeSolverBase.h
+ /usr/include/eigen3/Eigen/src/IterativeLinearSolvers/LeastSquareConjugateGradient.h
+ /usr/include/eigen3/Eigen/src/IterativeLinearSolvers/SolveWithGuess.h
+ /usr/include/eigen3/Eigen/src/Jacobi/Jacobi.h
+ /usr/include/eigen3/Eigen/src/LU/Determinant.h
+ /usr/include/eigen3/Eigen/src/LU/FullPivLU.h
+ /usr/include/eigen3/Eigen/src/LU/InverseImpl.h
+ /usr/include/eigen3/Eigen/src/LU/PartialPivLU.h
+ /usr/include/eigen3/Eigen/src/LU/PartialPivLU_MKL.h
+ /usr/include/eigen3/Eigen/src/LU/arch/Inverse_SSE.h
+ /usr/include/eigen3/Eigen/src/OrderingMethods/Amd.h
+ /usr/include/eigen3/Eigen/src/OrderingMethods/Eigen_Colamd.h
+ /usr/include/eigen3/Eigen/src/OrderingMethods/Ordering.h
+ /usr/include/eigen3/Eigen/src/QR/ColPivHouseholderQR.h
+ /usr/include/eigen3/Eigen/src/QR/ColPivHouseholderQR_MKL.h
+ /usr/include/eigen3/Eigen/src/QR/FullPivHouseholderQR.h
+ /usr/include/eigen3/Eigen/src/QR/HouseholderQR.h
+ /usr/include/eigen3/Eigen/src/QR/HouseholderQR_MKL.h
+ /usr/include/eigen3/Eigen/src/SVD/BDCSVD.h
+ /usr/include/eigen3/Eigen/src/SVD/JacobiSVD.h
+ /usr/include/eigen3/Eigen/src/SVD/JacobiSVD_MKL.h
+ /usr/include/eigen3/Eigen/src/SVD/SVDBase.h
+ /usr/include/eigen3/Eigen/src/SVD/UpperBidiagonalization.h
+ /usr/include/eigen3/Eigen/src/SparseCholesky/SimplicialCholesky.h
+ /usr/include/eigen3/Eigen/src/SparseCholesky/SimplicialCholesky_impl.h
+ /usr/include/eigen3/Eigen/src/SparseCore/AmbiVector.h
+ /usr/include/eigen3/Eigen/src/SparseCore/CompressedStorage.h
+ /usr/include/eigen3/Eigen/src/SparseCore/ConservativeSparseSparseProduct.h
+ /usr/include/eigen3/Eigen/src/SparseCore/MappedSparseMatrix.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseAssign.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseBlock.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseColEtree.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseCompressedBase.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseCwiseBinaryOp.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseCwiseUnaryOp.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseDenseProduct.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseDiagonalProduct.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseDot.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseFuzzy.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseMap.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseMatrix.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseMatrixBase.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparsePermutation.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseProduct.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseRedux.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseRef.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseSelfAdjointView.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseSolverBase.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseSparseProductWithPruning.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseTranspose.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseTriangularView.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseUtil.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseVector.h
+ /usr/include/eigen3/Eigen/src/SparseCore/SparseView.h
+ /usr/include/eigen3/Eigen/src/SparseCore/TriangularSolver.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLUImpl.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_Memory.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_Structs.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_SupernodalMatrix.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_Utils.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_column_bmod.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_column_dfs.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_copy_to_ucol.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_gemm_kernel.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_heap_relax_snode.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_kernel_bmod.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_panel_bmod.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_panel_dfs.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_pivotL.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_pruneL.h
+ /usr/include/eigen3/Eigen/src/SparseLU/SparseLU_relax_snode.h
+ /usr/include/eigen3/Eigen/src/SparseQR/SparseQR.h
+ /usr/include/eigen3/Eigen/src/misc/Image.h
+ /usr/include/eigen3/Eigen/src/misc/Kernel.h
+ /usr/include/eigen3/Eigen/src/plugins/ArrayCwiseBinaryOps.h
+ /usr/include/eigen3/Eigen/src/plugins/ArrayCwiseUnaryOps.h
+ /usr/include/eigen3/Eigen/src/plugins/BlockMethods.h
+ /usr/include/eigen3/Eigen/src/plugins/CommonCwiseBinaryOps.h
+ /usr/include/eigen3/Eigen/src/plugins/CommonCwiseUnaryOps.h
+ /usr/include/eigen3/Eigen/src/plugins/MatrixCwiseBinaryOps.h
+ /usr/include/eigen3/Eigen/src/plugins/MatrixCwiseUnaryOps.h
+ /usr/include/x86_64-linux-gnu/bits/byteswap-16.h
+ /usr/include/x86_64-linux-gnu/bits/byteswap.h
+ /usr/include/x86_64-linux-gnu/bits/confname.h
+ /usr/include/x86_64-linux-gnu/bits/endian.h
+ /usr/include/x86_64-linux-gnu/bits/environments.h
+ /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h
+ /usr/include/x86_64-linux-gnu/bits/fcntl.h
+ /usr/include/x86_64-linux-gnu/bits/fcntl2.h
+ /usr/include/x86_64-linux-gnu/bits/huge_val.h
+ /usr/include/x86_64-linux-gnu/bits/huge_valf.h
+ /usr/include/x86_64-linux-gnu/bits/huge_vall.h
+ /usr/include/x86_64-linux-gnu/bits/inf.h
+ /usr/include/x86_64-linux-gnu/bits/libio-ldbl.h
+ /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h
+ /usr/include/x86_64-linux-gnu/bits/math-finite.h
+ /usr/include/x86_64-linux-gnu/bits/math-vector.h
+ /usr/include/x86_64-linux-gnu/bits/mathcalls.h
+ /usr/include/x86_64-linux-gnu/bits/mathdef.h
+ /usr/include/x86_64-linux-gnu/bits/mathinline.h
+ /usr/include/x86_64-linux-gnu/bits/nan.h
+ /usr/include/x86_64-linux-gnu/bits/poll.h
+ /usr/include/x86_64-linux-gnu/bits/poll2.h
+ /usr/include/x86_64-linux-gnu/bits/posix_opt.h
+ /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h
+ /usr/include/x86_64-linux-gnu/bits/sched.h
+ /usr/include/x86_64-linux-gnu/bits/select.h
+ /usr/include/x86_64-linux-gnu/bits/select2.h
+ /usr/include/x86_64-linux-gnu/bits/setjmp.h
+ /usr/include/x86_64-linux-gnu/bits/sigset.h
+ /usr/include/x86_64-linux-gnu/bits/stat.h
+ /usr/include/x86_64-linux-gnu/bits/stdio-ldbl.h
+ /usr/include/x86_64-linux-gnu/bits/stdio.h
+ /usr/include/x86_64-linux-gnu/bits/stdio2.h
+ /usr/include/x86_64-linux-gnu/bits/stdio_lim.h
+ /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h
+ /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
+ /usr/include/x86_64-linux-gnu/bits/stdlib-ldbl.h
+ /usr/include/x86_64-linux-gnu/bits/stdlib.h
+ /usr/include/x86_64-linux-gnu/bits/string.h
+ /usr/include/x86_64-linux-gnu/bits/string2.h
+ /usr/include/x86_64-linux-gnu/bits/string3.h
+ /usr/include/x86_64-linux-gnu/bits/sys_errlist.h
+ /usr/include/x86_64-linux-gnu/bits/termios.h
+ /usr/include/x86_64-linux-gnu/bits/time.h
+ /usr/include/x86_64-linux-gnu/bits/timex.h
+ /usr/include/x86_64-linux-gnu/bits/types.h
+ /usr/include/x86_64-linux-gnu/bits/typesizes.h
+ /usr/include/x86_64-linux-gnu/bits/uio.h
+ /usr/include/x86_64-linux-gnu/bits/unistd.h
+ /usr/include/x86_64-linux-gnu/bits/waitflags.h
+ /usr/include/x86_64-linux-gnu/bits/waitstatus.h
+ /usr/include/x86_64-linux-gnu/bits/wchar-ldbl.h
+ /usr/include/x86_64-linux-gnu/bits/wchar.h
+ /usr/include/x86_64-linux-gnu/bits/wchar2.h
+ /usr/include/x86_64-linux-gnu/bits/wordsize.h
+ /usr/include/x86_64-linux-gnu/gnu/stubs-64.h
+ /usr/include/x86_64-linux-gnu/gnu/stubs.h
+ /usr/include/x86_64-linux-gnu/sys/cdefs.h
+ /usr/include/x86_64-linux-gnu/sys/poll.h
+ /usr/include/x86_64-linux-gnu/sys/select.h
+ /usr/include/x86_64-linux-gnu/sys/stat.h
+ /usr/include/x86_64-linux-gnu/sys/sysmacros.h
+ /usr/include/x86_64-linux-gnu/sys/ttydefaults.h
+ /usr/include/x86_64-linux-gnu/sys/types.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btAxisSweep3.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseInterface.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btBroadphaseProxy.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btDbvt.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btDbvtBroadphase.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btDispatcher.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btMultiSapBroadphase.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCache.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btOverlappingPairCallback.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btQuantizedBvh.h
+ /usr/local/include/bullet/BulletCollision/BroadphaseCollision/btSimpleBroadphase.h
+ /usr/local/include/bullet/BulletCollision/CollisionDispatch/btActivatingCollisionAlgorithm.h
+ /usr/local/include/bullet/BulletCollision/CollisionDispatch/btCollisionConfiguration.h
+ /usr/local/include/bullet/BulletCollision/CollisionDispatch/btCollisionCreateFunc.h
+ /usr/local/include/bullet/BulletCollision/CollisionDispatch/btCollisionDispatcher.h
+ /usr/local/include/bullet/BulletCollision/CollisionDispatch/btCollisionObject.h
+ /usr/local/include/bullet/BulletCollision/CollisionDispatch/btCollisionObjectWrapper.h
+ /usr/local/include/bullet/BulletCollision/CollisionDispatch/btCollisionWorld.h
+ /usr/local/include/bullet/BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h
+ /usr/local/include/bullet/BulletCollision/CollisionDispatch/btManifoldResult.h
+ /usr/local/include/bullet/BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btBoxShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btCapsuleShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btCollisionMargin.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btCollisionShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btCompoundShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btConcaveShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btConeShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btConvexHullShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btConvexInternalShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btConvexShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btConvexTriangleMeshShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btCylinderShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btEmptyShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btMultiSphereShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btOptimizedBvh.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btPolyhedralConvexShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btScaledBvhTriangleMeshShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btSphereShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btStridingMeshInterface.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btTetrahedronShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btTriangleCallback.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btTriangleInfoMap.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btTriangleMesh.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btTriangleMeshShape.h
+ /usr/local/include/bullet/BulletCollision/CollisionShapes/btUniformScalingShape.h
+ /usr/local/include/bullet/BulletCollision/NarrowPhaseCollision/btDiscreteCollisionDetectorInterface.h
+ /usr/local/include/bullet/BulletCollision/NarrowPhaseCollision/btManifoldPoint.h
+ /usr/local/include/bullet/BulletCollision/NarrowPhaseCollision/btPersistentManifold.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btConstraintSolver.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btContactSolverInfo.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btGearConstraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpring2Constraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btGeneric6DofSpringConstraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btHinge2Constraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btJacobianEntry.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btSolverBody.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btSolverConstraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btTypedConstraint.h
+ /usr/local/include/bullet/BulletDynamics/ConstraintSolver/btUniversalConstraint.h
+ /usr/local/include/bullet/BulletDynamics/Dynamics/btActionInterface.h
+ /usr/local/include/bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h
+ /usr/local/include/bullet/BulletDynamics/Dynamics/btDynamicsWorld.h
+ /usr/local/include/bullet/BulletDynamics/Dynamics/btRigidBody.h
+ /usr/local/include/bullet/BulletDynamics/Dynamics/btSimpleDynamicsWorld.h
+ /usr/local/include/bullet/BulletDynamics/MLCPSolvers/btDantzigLCP.h
+ /usr/local/include/bullet/BulletDynamics/MLCPSolvers/btDantzigSolver.h
+ /usr/local/include/bullet/BulletDynamics/MLCPSolvers/btMLCPSolver.h
+ /usr/local/include/bullet/BulletDynamics/MLCPSolvers/btMLCPSolverInterface.h
+ /usr/local/include/bullet/BulletDynamics/MLCPSolvers/btSolveProjectedGaussSeidel.h
+ /usr/local/include/bullet/BulletDynamics/Vehicle/btRaycastVehicle.h
+ /usr/local/include/bullet/BulletDynamics/Vehicle/btVehicleRaycaster.h
+ /usr/local/include/bullet/BulletDynamics/Vehicle/btWheelInfo.h
+ /usr/local/include/bullet/LinearMath/btAabbUtil2.h
+ /usr/local/include/bullet/LinearMath/btAlignedAllocator.h
+ /usr/local/include/bullet/LinearMath/btAlignedObjectArray.h
+ /usr/local/include/bullet/LinearMath/btDefaultMotionState.h
+ /usr/local/include/bullet/LinearMath/btHashMap.h
+ /usr/local/include/bullet/LinearMath/btIDebugDraw.h
+ /usr/local/include/bullet/LinearMath/btMatrix3x3.h
+ /usr/local/include/bullet/LinearMath/btMatrixX.h
+ /usr/local/include/bullet/LinearMath/btMinMax.h
+ /usr/local/include/bullet/LinearMath/btMotionState.h
+ /usr/local/include/bullet/LinearMath/btQuadWord.h
+ /usr/local/include/bullet/LinearMath/btQuaternion.h
+ /usr/local/include/bullet/LinearMath/btQuickprof.h
+ /usr/local/include/bullet/LinearMath/btScalar.h
+ /usr/local/include/bullet/LinearMath/btSerializer.h
+ /usr/local/include/bullet/LinearMath/btTransform.h
+ /usr/local/include/bullet/LinearMath/btTransformUtil.h
+ /usr/local/include/bullet/LinearMath/btVector3.h
+ /usr/local/include/bullet/btBulletCollisionCommon.h
+ /usr/local/include/bullet/btBulletDynamicsCommon.h
 CMakeFiles/spirit.dir/src/spBox.cpp.o
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
@@ -2750,6 +3290,7 @@ CMakeFiles/spirit.dir/src/spCirclePlanner.cpp.o
  ../include/spirit/Gui/spPangolinScenegraphGui.h
  ../include/spirit/Objects.h
  ../include/spirit/Objects/spAWSDCar.h
+ ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
  ../include/spirit/Objects/spLineStrip.h
@@ -5115,6 +5656,7 @@ CMakeFiles/spirit.dir/src/spLocalPlanner.cpp.o
  ../include/spirit/Gui/spPangolinScenegraphGui.h
  ../include/spirit/Objects.h
  ../include/spirit/Objects/spAWSDCar.h
+ ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
  ../include/spirit/Objects/spLineStrip.h
@@ -5993,6 +6535,7 @@ CMakeFiles/spirit.dir/src/spMPC.cpp.o
  ../include/spirit/LogBarrierLossFunc.h
  ../include/spirit/Objects.h
  ../include/spirit/Objects/spAWSDCar.h
+ ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
  ../include/spirit/Objects/spLineStrip.h
@@ -7395,6 +7938,7 @@ CMakeFiles/spirit.dir/src/spOpenSceneGraphGui.cpp.o
  ../include/spirit/Gui/spOpenSceneGraphGui.h
  ../include/spirit/Objects.h
  ../include/spirit/Objects/spAWSDCar.h
+ ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
  ../include/spirit/Objects/spLineStrip.h
@@ -8661,6 +9205,7 @@ CMakeFiles/spirit.dir/src/spPangolinScenegraphGui.cpp.o
  ../include/spirit/Gui/spPangolinScenegraphGui.h
  ../include/spirit/Objects.h
  ../include/spirit/Objects/spAWSDCar.h
+ ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
  ../include/spirit/Objects/spLineStrip.h
@@ -9828,6 +10373,7 @@ CMakeFiles/spirit.dir/src/spTrajectory.cpp.o
  ../include/spirit/Gui/spPangolinScenegraphGui.h
  ../include/spirit/Objects.h
  ../include/spirit/Objects/spAWSDCar.h
+ ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
  ../include/spirit/Objects/spLineStrip.h
@@ -12271,6 +12817,7 @@ CMakeFiles/spirit.dir/src/spirit.cpp.o
  ../include/spirit/LogBarrierLossFunc.h
  ../include/spirit/Objects.h
  ../include/spirit/Objects/spAWSDCar.h
+ ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
  ../include/spirit/Objects/spLineStrip.h

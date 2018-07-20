@@ -24,19 +24,19 @@ AMD_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libamd.so
 BLAS_LIB:FILEPATH=/usr/lib/libblas.so
 
 //Build Examples
-BUILD_Examples:BOOL=OFF
+BUILD_Examples:BOOL=ON
 
 //Build shared libraries.
 BUILD_SHARED_LIBS:BOOL=ON
 
 //Path to a library.
-BULLET_COLLISION_LIBRARY:FILEPATH=/usr/local/lib/libBulletCollision.a
+BULLET_COLLISION_LIBRARY:FILEPATH=/usr/local/lib/libBulletCollision.so
 
 //Path to a library.
 BULLET_COLLISION_LIBRARY_DEBUG:FILEPATH=BULLET_COLLISION_LIBRARY_DEBUG-NOTFOUND
 
 //Path to a library.
-BULLET_DYNAMICS_LIBRARY:FILEPATH=/usr/local/lib/libBulletDynamics.a
+BULLET_DYNAMICS_LIBRARY:FILEPATH=/usr/local/lib/libBulletDynamics.so
 
 //Path to a library.
 BULLET_DYNAMICS_LIBRARY_DEBUG:FILEPATH=BULLET_DYNAMICS_LIBRARY_DEBUG-NOTFOUND
@@ -45,13 +45,13 @@ BULLET_DYNAMICS_LIBRARY_DEBUG:FILEPATH=BULLET_DYNAMICS_LIBRARY_DEBUG-NOTFOUND
 BULLET_INCLUDE_DIR:PATH=/usr/local/include/bullet
 
 //Path to a library.
-BULLET_MATH_LIBRARY:FILEPATH=/usr/local/lib/libLinearMath.a
+BULLET_MATH_LIBRARY:FILEPATH=/usr/local/lib/libLinearMath.so
 
 //Path to a library.
 BULLET_MATH_LIBRARY_DEBUG:FILEPATH=BULLET_MATH_LIBRARY_DEBUG-NOTFOUND
 
 //Path to a library.
-BULLET_SOFTBODY_LIBRARY:FILEPATH=/usr/local/lib/libBulletSoftBody.a
+BULLET_SOFTBODY_LIBRARY:FILEPATH=/usr/local/lib/libBulletSoftBody.so
 
 //Path to a library.
 BULLET_SOFTBODY_LIBRARY_DEBUG:FILEPATH=BULLET_SOFTBODY_LIBRARY_DEBUG-NOTFOUND
@@ -373,7 +373,7 @@ spirit_BINARY_DIR:STATIC=/home/boston/Documents/spirit_dep/spirit/build
 spirit_DIR:PATH=/home/boston/Documents/spirit_dep/spirit/build
 
 //Dependencies for the target
-spirit_LIB_DEPENDS:STATIC=general;/usr/lib/x86_64-linux-gnu/libGLU.so;general;/usr/lib/x86_64-linux-gnu/libGL.so;general;/usr/lib/x86_64-linux-gnu/libGLEW.so;general;/usr/lib/x86_64-linux-gnu/libglut.so;general;/usr/lib/x86_64-linux-gnu/libpng.so;general;/usr/lib/x86_64-linux-gnu/libz.so;general;/usr/lib/x86_64-linux-gnu/libjpeg.so;general;/usr/lib/x86_64-linux-gnu/libtiff.so;general;/home/boston/Documents/spirit_dep/Pangolin/build/libpangolin.so;general;/usr/lib/x86_64-linux-gnu/libGLU.so;general;/usr/lib/x86_64-linux-gnu/libGL.so;general;/usr/lib/x86_64-linux-gnu/libGLEW.so;general;/usr/lib/x86_64-linux-gnu/libassimp.so;general;/usr/lib/x86_64-linux-gnu/libIL.so;general;/usr/lib/x86_64-linux-gnu/libILU.so;general;/usr/lib/x86_64-linux-gnu/libILUT.so;general;/usr/lib/x86_64-linux-gnu/libpng.so;general;/usr/lib/x86_64-linux-gnu/libjpeg.so;general;/usr/lib/x86_64-linux-gnu/libtiff.so;general;/usr/lib/x86_64-linux-gnu/libglut.so;general;/usr/lib/x86_64-linux-gnu/libz.so;general;/home/boston/Documents/spirit_dep/Pangolin/build/libpangolin.so;general;/home/boston/Documents/spirit_dep/SceneGraph/build/libscenegraph.so;general;/usr/local/lib/libBulletDynamics.a;general;/usr/local/lib/libBulletCollision.a;general;/usr/local/lib/libLinearMath.a;general;/usr/local/lib/libBulletSoftBody.a;general;/usr/local/lib/libceres.so;general;/usr/lib/x86_64-linux-gnu/libglog.so;general;/usr/lib/x86_64-linux-gnu/libcholmod.so;general;/usr/lib/x86_64-linux-gnu/libccolamd.so;general;/usr/lib/x86_64-linux-gnu/libcamd.so;general;/usr/lib/x86_64-linux-gnu/libcolamd.so;general;/usr/lib/x86_64-linux-gnu/libamd.so;general;/usr/lib/x86_64-linux-gnu/libsuitesparseconfig.so;general;/usr/lib/liblapack.so;general;/usr/lib/libblas.so;general;/usr/lib/x86_64-linux-gnu/libcxsparse.so;general;gomp;general;/usr/lib/x86_64-linux-gnu/libprotobuf.so;general;/usr/local/lib/libosg.so;general;/usr/local/lib/libosgViewer.so;general;/usr/local/lib/libosgUtil.so;general;/usr/local/lib/libosgDB.so;general;/usr/local/lib/libosgGA.so;general;/usr/local/lib/libOpenThreads.so;
+spirit_LIB_DEPENDS:STATIC=general;/usr/lib/x86_64-linux-gnu/libGLU.so;general;/usr/lib/x86_64-linux-gnu/libGL.so;general;/usr/lib/x86_64-linux-gnu/libGLEW.so;general;/usr/lib/x86_64-linux-gnu/libglut.so;general;/usr/lib/x86_64-linux-gnu/libpng.so;general;/usr/lib/x86_64-linux-gnu/libz.so;general;/usr/lib/x86_64-linux-gnu/libjpeg.so;general;/usr/lib/x86_64-linux-gnu/libtiff.so;general;/home/boston/Documents/spirit_dep/Pangolin/build/libpangolin.so;general;/usr/lib/x86_64-linux-gnu/libGLU.so;general;/usr/lib/x86_64-linux-gnu/libGL.so;general;/usr/lib/x86_64-linux-gnu/libGLEW.so;general;/usr/lib/x86_64-linux-gnu/libassimp.so;general;/usr/lib/x86_64-linux-gnu/libIL.so;general;/usr/lib/x86_64-linux-gnu/libILU.so;general;/usr/lib/x86_64-linux-gnu/libILUT.so;general;/usr/lib/x86_64-linux-gnu/libpng.so;general;/usr/lib/x86_64-linux-gnu/libjpeg.so;general;/usr/lib/x86_64-linux-gnu/libtiff.so;general;/usr/lib/x86_64-linux-gnu/libglut.so;general;/usr/lib/x86_64-linux-gnu/libz.so;general;/home/boston/Documents/spirit_dep/Pangolin/build/libpangolin.so;general;/home/boston/Documents/spirit_dep/SceneGraph/build/libscenegraph.so;general;/usr/local/lib/libBulletDynamics.so;general;/usr/local/lib/libBulletCollision.so;general;/usr/local/lib/libLinearMath.so;general;/usr/local/lib/libBulletSoftBody.so;general;/usr/local/lib/libceres.so;general;/usr/lib/x86_64-linux-gnu/libglog.so;general;/usr/lib/x86_64-linux-gnu/libcholmod.so;general;/usr/lib/x86_64-linux-gnu/libccolamd.so;general;/usr/lib/x86_64-linux-gnu/libcamd.so;general;/usr/lib/x86_64-linux-gnu/libcolamd.so;general;/usr/lib/x86_64-linux-gnu/libamd.so;general;/usr/lib/x86_64-linux-gnu/libsuitesparseconfig.so;general;/usr/lib/liblapack.so;general;/usr/lib/libblas.so;general;/usr/lib/x86_64-linux-gnu/libcxsparse.so;general;gomp;general;/usr/lib/x86_64-linux-gnu/libprotobuf.so;general;/usr/local/lib/libosg.so;general;/usr/local/lib/libosgViewer.so;general;/usr/local/lib/libosgUtil.so;general;/usr/local/lib/libosgDB.so;general;/usr/local/lib/libosgGA.so;general;/usr/local/lib/libOpenThreads.so;
 
 //Value Computed by CMake
 spirit_SOURCE_DIR:STATIC=/home/boston/Documents/spirit_dep/spirit
@@ -497,7 +497,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -543,7 +543,7 @@ EXPORT_spirit-ADVANCED:INTERNAL=1
 //MODIFIED property for variable: EXPORT_spirit
 EXPORT_spirit-MODIFIED:INTERNAL=ON
 //Details about finding Bullet
-FIND_PACKAGE_MESSAGE_DETAILS_Bullet:INTERNAL=[/usr/local/lib/libBulletDynamics.a][/usr/local/lib/libBulletCollision.a][/usr/local/lib/libLinearMath.a][/usr/local/lib/libBulletSoftBody.a][/usr/local/include/bullet][v()]
+FIND_PACKAGE_MESSAGE_DETAILS_Bullet:INTERNAL=[/usr/local/lib/libBulletDynamics.so][/usr/local/lib/libBulletCollision.so][/usr/local/lib/libLinearMath.so][/usr/local/lib/libBulletSoftBody.so][/usr/local/include/bullet][v()]
 //Details about finding Eigen3
 FIND_PACKAGE_MESSAGE_DETAILS_Eigen3:INTERNAL=[/usr/include/eigen3][v()]
 //Details about finding OpenMP
@@ -564,10 +564,16 @@ FIND_PACKAGE_MESSAGE_DETAILS_osgGA:INTERNAL=[/usr/local/lib/libosgGA.so][/usr/lo
 FIND_PACKAGE_MESSAGE_DETAILS_osgUtil:INTERNAL=[/usr/local/lib/libosgUtil.so][/usr/local/include][v()]
 //Details about finding osgViewer
 FIND_PACKAGE_MESSAGE_DETAILS_osgViewer:INTERNAL=[/usr/local/lib/libosgViewer.so][/usr/local/include][v()]
+//ADVANCED property for variable: HAL_INCLUDE_DIRS
+HAL_INCLUDE_DIRS-ADVANCED:INTERNAL=1
 //HAL include directories
 HAL_INCLUDE_DIRS:INTERNAL=/usr/include/eigen3;/home/boston/Documents/spirit_dep/Sophus/include;/home/boston/Documents/spirit_dep/Sophus/build/include;/usr/include;/home/boston/Documents/spirit_dep/HAL;/home/boston/Documents/spirit_dep/HAL/build
+//ADVANCED property for variable: HAL_LIBRARIES
+HAL_LIBRARIES-ADVANCED:INTERNAL=1
 //HAL libraries
 HAL_LIBRARIES:INTERNAL=/usr/lib/x86_64-linux-gnu/libtinyxml2.so;/usr/lib/x86_64-linux-gnu/libdc1394.so;/usr/lib/x86_64-linux-gnu/libraw1394.so;/usr/lib/x86_64-linux-gnu/libopencv_core.so.2.4.9;/usr/lib/x86_64-linux-gnu/libopencv_imgproc.so.2.4.9;/usr/lib/x86_64-linux-gnu/libopencv_highgui.so.2.4.9;/usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread;/usr/lib/x86_64-linux-gnu/libglog.so;/home/boston/Documents/spirit_dep/HAL/build/HAL/libhal.a
+//ADVANCED property for variable: HAL_LIBRARY_DIRS
+HAL_LIBRARY_DIRS-ADVANCED:INTERNAL=1
 //HAL library directories
 HAL_LIBRARY_DIRS:INTERNAL=
 //ADVANCED property for variable: OpenMP_CXX_FLAGS
@@ -616,10 +622,16 @@ SceneGraph_LIBRARIES:INTERNAL=/usr/lib/x86_64-linux-gnu/libGLU.so;/usr/lib/x86_6
 SceneGraph_LIBRARY_DIRS-ADVANCED:INTERNAL=1
 //SceneGraph library directories
 SceneGraph_LIBRARY_DIRS:INTERNAL=
+//ADVANCED property for variable: spirit_INCLUDE_DIRS
+spirit_INCLUDE_DIRS-ADVANCED:INTERNAL=1
 //spirit include directories
 spirit_INCLUDE_DIRS:INTERNAL=/home/boston/Documents/spirit_dep/spirit/build;/usr/include;/usr/include/x86_64-linux-gnu;/usr/include/eigen3;/home/boston/Documents/spirit_dep/Pangolin/include;/home/boston/Documents/spirit_dep/Pangolin/build/include;/usr/include/IL;/usr/include/IL/..;/home/boston/Documents/spirit_dep/SceneGraph/include;/home/boston/Documents/spirit_dep/SceneGraph/build/include;/usr/local/include/bullet;/usr/local/include;/home/boston/Documents/spirit_dep/spirit/include;/home/boston/Documents/spirit_dep/spirit/include;/home/boston/Documents/spirit_dep/spirit/build/include
+//ADVANCED property for variable: spirit_LIBRARIES
+spirit_LIBRARIES-ADVANCED:INTERNAL=1
 //spirit libraries
-spirit_LIBRARIES:INTERNAL=/usr/lib/x86_64-linux-gnu/libGLU.so;/usr/lib/x86_64-linux-gnu/libGL.so;/usr/lib/x86_64-linux-gnu/libGLEW.so;/usr/lib/x86_64-linux-gnu/libglut.so;/usr/lib/x86_64-linux-gnu/libpng.so;/usr/lib/x86_64-linux-gnu/libz.so;/usr/lib/x86_64-linux-gnu/libjpeg.so;/usr/lib/x86_64-linux-gnu/libtiff.so;/home/boston/Documents/spirit_dep/Pangolin/build/libpangolin.so;/usr/lib/x86_64-linux-gnu/libassimp.so;/usr/lib/x86_64-linux-gnu/libIL.so;/usr/lib/x86_64-linux-gnu/libILU.so;/usr/lib/x86_64-linux-gnu/libILUT.so;/home/boston/Documents/spirit_dep/SceneGraph/build/libscenegraph.so;/usr/local/lib/libBulletDynamics.a;/usr/local/lib/libBulletCollision.a;/usr/local/lib/libLinearMath.a;/usr/local/lib/libBulletSoftBody.a;/usr/local/lib/libceres.so;/usr/lib/x86_64-linux-gnu/libglog.so;/usr/lib/x86_64-linux-gnu/libcholmod.so;/usr/lib/x86_64-linux-gnu/libccolamd.so;/usr/lib/x86_64-linux-gnu/libcamd.so;/usr/lib/x86_64-linux-gnu/libcolamd.so;/usr/lib/x86_64-linux-gnu/libamd.so;/usr/lib/x86_64-linux-gnu/libsuitesparseconfig.so;/usr/lib/liblapack.so;/usr/lib/libblas.so;/usr/lib/x86_64-linux-gnu/libcxsparse.so;gomp;/usr/lib/x86_64-linux-gnu/libprotobuf.so;/usr/local/lib/libosg.so;/usr/local/lib/libosgViewer.so;/usr/local/lib/libosgUtil.so;/usr/local/lib/libosgDB.so;/usr/local/lib/libosgGA.so;/usr/local/lib/libOpenThreads.so;/home/boston/Documents/spirit_dep/spirit/build/libspirit.so
+spirit_LIBRARIES:INTERNAL=/usr/lib/x86_64-linux-gnu/libGLU.so;/usr/lib/x86_64-linux-gnu/libGL.so;/usr/lib/x86_64-linux-gnu/libGLEW.so;/usr/lib/x86_64-linux-gnu/libglut.so;/usr/lib/x86_64-linux-gnu/libpng.so;/usr/lib/x86_64-linux-gnu/libz.so;/usr/lib/x86_64-linux-gnu/libjpeg.so;/usr/lib/x86_64-linux-gnu/libtiff.so;/home/boston/Documents/spirit_dep/Pangolin/build/libpangolin.so;/usr/lib/x86_64-linux-gnu/libassimp.so;/usr/lib/x86_64-linux-gnu/libIL.so;/usr/lib/x86_64-linux-gnu/libILU.so;/usr/lib/x86_64-linux-gnu/libILUT.so;/home/boston/Documents/spirit_dep/SceneGraph/build/libscenegraph.so;/usr/local/lib/libBulletDynamics.so;/usr/local/lib/libBulletCollision.so;/usr/local/lib/libLinearMath.so;/usr/local/lib/libBulletSoftBody.so;/usr/local/lib/libceres.so;/usr/lib/x86_64-linux-gnu/libglog.so;/usr/lib/x86_64-linux-gnu/libcholmod.so;/usr/lib/x86_64-linux-gnu/libccolamd.so;/usr/lib/x86_64-linux-gnu/libcamd.so;/usr/lib/x86_64-linux-gnu/libcolamd.so;/usr/lib/x86_64-linux-gnu/libamd.so;/usr/lib/x86_64-linux-gnu/libsuitesparseconfig.so;/usr/lib/liblapack.so;/usr/lib/libblas.so;/usr/lib/x86_64-linux-gnu/libcxsparse.so;gomp;/usr/lib/x86_64-linux-gnu/libprotobuf.so;/usr/local/lib/libosg.so;/usr/local/lib/libosgViewer.so;/usr/local/lib/libosgUtil.so;/usr/local/lib/libosgDB.so;/usr/local/lib/libosgGA.so;/usr/local/lib/libOpenThreads.so;/home/boston/Documents/spirit_dep/spirit/build/libspirit.so
+//ADVANCED property for variable: spirit_LIBRARY_DIRS
+spirit_LIBRARY_DIRS-ADVANCED:INTERNAL=1
 //spirit library directories
 spirit_LIBRARY_DIRS:INTERNAL=
 

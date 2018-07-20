@@ -5,6 +5,7 @@
 #include <spirit/Objects/spBox.h>
 #include <spirit/Objects/spVehicle.h>
 #include <spirit/Objects/spAWSDCar.h>
+#include <spirit/Objects/spBike.h>
 #include <spirit/Objects/spWaypoint.h>
 #include <spirit/Objects/spLineStrip.h>
 

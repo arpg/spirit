@@ -34,6 +34,8 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+  include("/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/cmake_install.cmake")
+  include("/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/cmake_install.cmake")
   include("/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/cmake_install.cmake")
   include("/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_3D_car/cmake_install.cmake")
 

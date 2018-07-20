@@ -243,12 +243,20 @@ spirit/Objects/spVehicle.h
 -
 spirit/Objects/spAWSDCar.h
 -
+spirit/Objects/spBike.h
+-
 spirit/Objects/spWaypoint.h
 -
 spirit/Objects/spLineStrip.h
 -
 
 ../include/spirit/Objects/spAWSDCar.h
+spirit/Objects/spVehicle.h
+-
+spirit/Objects/spBox.h
+-
+
+../include/spirit/Objects/spBike.h
 spirit/Objects/spVehicle.h
 -
 spirit/Objects/spBox.h
@@ -1290,6 +1298,10 @@ spirit/RK4.h
 
 /home/boston/Documents/spirit_dep/spirit/src/spAWSDCar.cpp
 spirit/Objects/spAWSDCar.h
+-
+
+/home/boston/Documents/spirit_dep/spirit/src/spBike.cpp
+spirit/Objects/spBike.h
 -
 
 /home/boston/Documents/spirit_dep/spirit/src/spBox.cpp

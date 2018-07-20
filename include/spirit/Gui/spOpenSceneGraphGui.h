@@ -18,6 +18,7 @@
 #include <osgViewer/ViewerEventHandlers>
 #include <osgGA/GUIEventHandler>
 
+
 //// this class is the interface between OpenSceneGraph and spGui
 class spOpenSceneGraphGui : public spCommonGUI
 {
@@ -41,18 +42,43 @@ class spOpenSceneGraphGui : public spCommonGUI
         //static void KeyActionMethodSample();
         void UpdateBoxGuiObject(spBox& spobj);
         //void UpdateWaypointGuiObject(spWaypoint& spobj);
-        //void UpdateVehicleGuiObject(spVehicle& spobj);
+        void UpdateVehicleGuiObject(spVehicle& spobj);
         //void UpdateLineStripGuiObject(spLineStrip& spobj);
 
 
         // variables relevent to OSG visualizer
         osgViewer::Viewer viewer_;
-        osg::ref_ptr<osg::Group> root_;
+        osg::ref_ptr<osg::Group> root_ = new osg::Group();
+        double simtime_;
 
-        // relevent to box
-        osg::ref_ptr<osg::MatrixTransform> transformbox_;
-        osg::Matrix translatebox_, rotx_, roty_, rotz_;
+        struct OSGobj
+        {
+            std::string name_;
+            osg::ref_ptr<osg::MatrixTransform> transform_ = new osg::MatrixTransform;
+            osg::Matrix translate_, rotx_, roty_, rotz_;
 
+            osg::ref_ptr<osg::ShapeDrawable> shape_ = new osg::ShapeDrawable;
+            osg::ref_ptr<osg::Geode> geoshape_ = new osg::Geode;
+
+        };
+
+        std::vector<OSGobj*> osgobj_;
 };
 
 #endif // SPOPENSCENEGRAPHGUI_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

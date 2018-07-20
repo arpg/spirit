@@ -1,0 +1,26 @@
+*~
+NinjaArm\ THUMB\ Debug
+NinjaArm THUMB Debug
+Example\ THUMB\ Debug
+Example THUMB Debug/
+Build
+build
+CMakeLists.txt.user
+*.autosave
+*.d
+*.o
+*.elf
+*.ld
+*.map
+*.o
+*.d
+*.txt.user
+*.txt.user.*
+*.txt.swp
+*.zip
+*.rar
+*.bak
+*.swp
+.DS_Store
+cmake.check_cache
+Ninja-CubeMX-v-3-2.uvguix.sina

@@ -2,16 +2,20 @@
 
 
 spOpenSceneGraphGui::spOpenSceneGraphGui()
-{}
+{
+    simtime_ = 0.0;
+}
 
 spOpenSceneGraphGui::~spOpenSceneGraphGui()
 {}
 
 void spOpenSceneGraphGui::InitGui()
 {
-    viewer_.getCamera()->setViewMatrixAsLookAt( osg::Vec3(0.0f,-100.0f,0.0f), osg::Vec3(), osg::Z_AXIS );
-    viewer_.setUpViewInWindow(20,20, 750, 750);
+    //viewer_.getCamera()->setViewMatrixAsLookAt( osg::Vec3(0.0f,-100.0f,0.0f), osg::Vec3(), osg::Z_AXIS );
+    //viewer_.setSceneData(root_.get());
+    viewer_.setUpViewInWindow(20,20, 650, 650);
     viewer_.setCameraManipulator(new osgGA::TrackballManipulator());
+    viewer_.realize();
 }
 
 bool spOpenSceneGraphGui::ShouldQuit()
@@ -21,7 +25,8 @@ bool spOpenSceneGraphGui::ShouldQuit()
 void spOpenSceneGraphGui::Refresh()
 {
     viewer_.setSceneData(root_.get());
-    viewer_.realize();
+    viewer_.frame(simtime_);
+    simtime_ += 0.001;
 }
 void spOpenSceneGraphGui::CheckKeyboardAction()
 {
@@ -31,33 +36,162 @@ void spOpenSceneGraphGui::CheckKeyboardAction()
 void spOpenSceneGraphGui::AddBox(spBox& box)
 {
     Eigen::Vector3d dim = box.GetDimensions();
-    translatebox_ = osg::Matrixd::translate(osg::Vec3( box.GetPose().translation()[0], box.GetPose().translation()[1], box.GetPose().translation()[2] ));
-    rotx_ = osg::Matrix::rotate( box.GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0) );
-    roty_ = osg::Matrix::rotate( box.GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0) );
-    rotz_ = osg::Matrix::rotate( box.GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0) );
 
-    osg::ref_ptr<osg::ShapeDrawable> shape = new osg::ShapeDrawable;
+    OSGobj* boxobj = new OSGobj;
+    boxobj->name_ = "box";
+    boxobj->translate_ = osg::Matrixd::translate(osg::Vec3(box.GetPose().translation()[0], box.GetPose().translation()[1], box.GetPose().translation()[2]));
+    boxobj->rotx_ = osg::Matrix::rotate(box.GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0));
+    boxobj->roty_ = osg::Matrix::rotate(box.GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0));
+    boxobj->rotz_ = osg::Matrix::rotate(box.GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
+
     // vector is box center, the following are width, height, andd depth
-    shape->setShape( new osg::Box(osg::Vec3(0.0f, 0.0f, 0.0f), (float)dim[0], (float)dim[1], (float)dim[2]) );
-    shape->setColor( osg::Vec4((float)box.GetColor()[0], (float)box.GetColor()[1], (float)box.GetColor()[2], 1.0f) );
-    osg::ref_ptr<osg::Geode> gbox = new osg::Geode;
-    gbox->addDrawable(shape.get());
+    boxobj->shape_->setShape(new osg::Box(osg::Vec3(0.0f, 0.0f, 0.0f), dim[0], dim[1], dim[2]));
+    boxobj->shape_->setColor(osg::Vec4(box.GetColor()[0], box.GetColor()[1], box.GetColor()[2], 1.0f));
+    boxobj->geoshape_->addDrawable(boxobj->shape_.get());
 
-    transformbox_->setMatrix(rotx_*roty_*rotz_*translatebox_);
-    transformbox_->addChild(gbox.get());
-    root_->addChild(transformbox_);
+    boxobj->transform_->setMatrix(boxobj->rotx_ * boxobj->roty_ * boxobj->rotz_ * boxobj->translate_);
+    boxobj->transform_->addChild(boxobj->geoshape_.get());
 
+    osgobj_.push_back(boxobj);
+    box.SetGuiIndex(osgobj_.size()-1);
+    root_->addChild(boxobj->transform_.get());
+
+    // NOT ideal to have this here but oh well for now
+    //viewer_.setSceneData(root_.get());
 }
 
 void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
 {
-    std::cout<<"AddWaypoint(spWaypoint& waypoint) currently has no functionality"<<std::endl;
+    OSGobj* waypts = new OSGobj;
+    waypts->name_ ="waypoint";
+    waypts->translate_ = osg::Matrixd::translate(osg::Vec3(waypoint.GetPose().translation()[0], waypoint.GetPose().translation()[1], waypoint.GetPose().translation()[2]));
+    waypts->rotx_ = osg::Matrix::rotate(waypoint.GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0));
+    waypts->roty_ = osg::Matrix::rotate(waypoint.GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0));
+    waypts->rotz_ = osg::Matrix::rotate(waypoint.GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
+
+    waypts->shape_->setShape(new osg::Box(osg::Vec3(0.0f, 0.0f, 0.0f), 0.25, 0.25, 0.25));
+    waypts->shape_->setColor(osg::Vec4(waypoint.GetColor()[0], waypoint.GetColor()[1], waypoint.GetColor()[2], 1.0f));
+    waypts->geoshape_->addDrawable(waypts->shape_.get());
+
+    waypts->transform_->setMatrix(waypts->rotx_ * waypts->roty_ * waypts->rotz_ * waypts->translate_);
+    waypts->transform_->addChild(waypts->geoshape_.get());
+
+    osgobj_.push_back(waypts);
+    waypoint.SetGuiIndex(osgobj_.size()-1);
+    root_->addChild(waypts->transform_.get());
+
+    // normal vectors
+    double vecdist = 0.25;
+    osg::Vec3 start(waypoint.GetPose().translation()[0], waypoint.GetPose().translation()[1], waypoint.GetPose().translation()[2]);
+    osg::Vec3 xf(waypoint.GetPose().translation()[0] + vecdist, waypoint.GetPose().translation()[1], waypoint.GetPose().translation()[2]);
+    osg::ref_ptr<osg::Vec3Array> xpts = new osg::Vec3Array;
+    xpts->push_back( start );
+    xpts->push_back( xf );
+    osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
+    normals->push_back( osg::Vec3(0.0f,-1.0f, 0.0f) );
+    osg::ref_ptr<osg::Vec4Array> xcolor = new osg::Vec4Array;
+    xcolor->push_back(osg::Vec4(1.0,0.0,0.0,1.0));
+    osg::ref_ptr<osg::Geometry> xline = new osg::Geometry;
+    xline->setVertexArray(xpts.get());
+    xline->setNormalArray(normals.get());
+    xline->setNormalBinding(osg::Geometry::BIND_OVERALL);
+    xline->setColorArray(xcolor.get());
+    xline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+    xline->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,2));
+    root_->addChild(xline.get());
+
+    osg::Vec3 yf(waypoint.GetPose().translation()[0], waypoint.GetPose().translation()[1] + vecdist, waypoint.GetPose().translation()[2]);
+    osg::ref_ptr<osg::Vec3Array> ypts = new osg::Vec3Array;
+    ypts->push_back( start );
+    ypts->push_back( yf );
+    osg::ref_ptr<osg::Vec4Array> ycolor = new osg::Vec4Array;
+    ycolor->push_back(osg::Vec4(0.0,1.0,0.0,1.0));
+    osg::ref_ptr<osg::Geometry> yline = new osg::Geometry;
+    yline->setVertexArray(ypts.get());
+    yline->setNormalArray(normals.get());
+    yline->setNormalBinding(osg::Geometry::BIND_OVERALL);
+    yline->setColorArray(ycolor.get());
+    yline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+    yline->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,2));
+    root_->addChild(yline.get());
+
+    osg::Vec3 zf(waypoint.GetPose().translation()[0], waypoint.GetPose().translation()[1], waypoint.GetPose().translation()[2] + vecdist);
+    osg::ref_ptr<osg::Vec3Array> zpts = new osg::Vec3Array;
+    zpts->push_back( start );
+    zpts->push_back( zf );
+    osg::ref_ptr<osg::Vec4Array> zcolor = new osg::Vec4Array;
+    zcolor->push_back(osg::Vec4(0.0,0.0,1.0,1.0));
+    osg::ref_ptr<osg::Geometry> zline = new osg::Geometry;
+    zline->setVertexArray(zpts.get());
+    zline->setNormalArray(normals.get());
+    zline->setNormalBinding(osg::Geometry::BIND_OVERALL);
+    zline->setColorArray(zcolor.get());
+    zline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+    zline->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,2));
+    root_->addChild(zline.get());
+
+    // velocity vector
+    osg::Vec3 vel(waypoint.GetLinearVelocityInWorld()[0], waypoint.GetLinearVelocityInWorld()[1], waypoint.GetLinearVelocityInWorld()[2]);
+    osg::ref_ptr<osg::Vec3Array> vpts = new osg::Vec3Array;
+    vpts->push_back( start );
+    vpts->push_back( vel );
+    osg::ref_ptr<osg::Vec4Array> velcolor = new osg::Vec4Array;
+    velcolor->push_back(osg::Vec4(1.0,1.0,1.0,1.0));
+    osg::ref_ptr<osg::Geometry> vline = new osg::Geometry;
+    vline->setVertexArray(vpts.get());
+    vline->setNormalArray(normals.get());
+    vline->setNormalBinding(osg::Geometry::BIND_OVERALL);
+    vline->setColorArray(velcolor.get());
+    vline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+    vline->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,2));
+    root_->addChild(vline.get());
 
 }
 void spOpenSceneGraphGui::AddVehicle(spVehicle& vehicle)
 {
-    std::cout<<"AddVehicle(spVehicle& vehicle) currently has no functionality"<<std::endl;
+    OSGobj* bikeparts = new OSGobj;
+    bikeparts->name_ = "frame";
+    bikeparts->translate_ = osg::Matrixd::translate(osg::Vec3(vehicle.GetPose().translation()[0], vehicle.GetPose().translation()[1], vehicle.GetPose().translation()[2]));
+    bikeparts->rotx_ = osg::Matrix::rotate(vehicle.GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0));
+    bikeparts->roty_ = osg::Matrix::rotate(vehicle.GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0));
+    bikeparts->rotz_ = osg::Matrix::rotate(vehicle.GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
 
+    Eigen::Vector3d framedim = vehicle.GetChassisSize();
+    //std::cout<<vehicle.GetPose().rotation().eulerAngles(0,1,2)[0]<<std::endl;
+    bikeparts->shape_->setShape(new osg::Box(osg::Vec3(0.0f, 0.0f, 0.0f), framedim[0], framedim[1], framedim[2]));
+    bikeparts->shape_->setColor(osg::Vec4(0.0f, 0.0f, 1.0f, 1.0f));
+    bikeparts->geoshape_->addDrawable(bikeparts->shape_.get());
+
+    bikeparts->transform_->setMatrix(bikeparts->rotx_ * bikeparts->roty_ * bikeparts->rotz_ * bikeparts->translate_);
+    bikeparts->transform_->addChild(bikeparts->geoshape_.get());
+
+    osgobj_.push_back(bikeparts);
+    vehicle.SetGuiIndex(osgobj_.size()-1);
+    root_->addChild(bikeparts->transform_.get());
+
+    for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
+        OSGobj* bikeparts = new OSGobj;
+        bikeparts->name_ = "wheel";
+        bikeparts->translate_ = osg::Matrixd::translate(osg::Vec3(vehicle.GetWheel(ii)->GetPose().translation()[0], vehicle.GetWheel(ii)->GetPose().translation()[1], vehicle.GetWheel(ii)->GetPose().translation()[2]));
+        bikeparts->rotx_ = osg::Matrix::rotate(vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0));
+        bikeparts->roty_ = osg::Matrix::rotate(SP_PI/2/*vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[1]*/, osg::Vec3(0.0, 1.0, 0.0));
+        bikeparts->rotz_ = osg::Matrix::rotate(vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
+
+        bikeparts->shape_->setShape(new osg::Cylinder(osg::Vec3(0.0f, 0.0f, 0.0f), vehicle.GetWheel(ii)->GetRadius(), vehicle.GetWheel(ii)->GetWidth()));
+        bikeparts->shape_->setColor(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+        bikeparts->geoshape_->addDrawable(bikeparts->shape_.get());
+
+        bikeparts->transform_->setMatrix(bikeparts->rotx_ * bikeparts->roty_ * bikeparts->rotz_ * bikeparts->translate_);
+        bikeparts->transform_->addChild(bikeparts->geoshape_.get());
+
+        osgobj_.push_back(bikeparts);
+        vehicle.GetWheel(ii)->SetGuiIndex(osgobj_.size()-1);
+        root_->addChild(bikeparts->transform_.get());
+    }
+
+
+    // NOT ideal to have this here but oh well for now
+    //viewer_.setSceneData(root_.get());
 }
 void spOpenSceneGraphGui::AddLineStrip(spLineStrip& linestrip)
 {
@@ -67,18 +201,24 @@ void spOpenSceneGraphGui::AddLineStrip(spLineStrip& linestrip)
 
 void spOpenSceneGraphGui::UpdateBoxGuiObject(spBox& spobj)
 {
-/*  int gui_index = spobj.GetGuiIndex();
-  if((!(spobj.GetGuiIndex()<globjects_.size())) || (globjects_[gui_index]->ObjectName().compare("box"))){
-    SPERROREXIT("gui object doesn't match spobject.");
-  }
-  globjects_[gui_index]->SetPose(spobj.GetPose().matrix());
-  globjects_[gui_index]->SetScale(spobj.GetDimensions()); */
+   int gui_index = spobj.GetGuiIndex();
+   //std::cout<<"The gui index is: "<<gui_index<<std::endl;
 
-  translatebox_ = osg::Matrixd::translate(osg::Vec3( spobj.GetPose().translation()[0], spobj.GetPose().translation()[1], spobj.GetPose().translation()[2] ));
-  rotx_ = osg::Matrix::rotate( spobj.GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0) );
-  roty_ = osg::Matrix::rotate( spobj.GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0) );
-  rotz_ = osg::Matrix::rotate( spobj.GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0) );
-  transformbox_->setMatrix(rotx_*roty_*rotz_*translatebox_);
+   if((!(spobj.GetGuiIndex() < osgobj_.size())) || (osgobj_[gui_index]->name_.compare("box")) != 0){
+     SPERROREXIT("gui object doesn't match spobject.");
+    }
+
+   osgobj_[gui_index]->translate_ = osg::Matrixd::translate(osg::Vec3(spobj.GetPose().translation()[0], spobj.GetPose().translation()[1], spobj.GetPose().translation()[2]));
+   osgobj_[gui_index]->rotx_ = osg::Matrix::rotate(spobj.GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0));
+   osgobj_[gui_index]->roty_ = osg::Matrix::rotate(spobj.GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0));
+   osgobj_[gui_index]->rotz_ = osg::Matrix::rotate(spobj.GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
+   osgobj_[gui_index]->transform_->setMatrix(osgobj_[gui_index]->rotx_ * osgobj_[gui_index]->roty_ * osgobj_[gui_index]->rotz_ * osgobj_[gui_index]->translate_);
+
+}
+
+void spOpenSceneGraphGui::UpdateVehicleGuiObject(spVehicle& vehicle)
+{
+    std::cout<<"Currently not updating vehicle"<<std::endl;
 }
 
 void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
@@ -96,17 +236,25 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
           }
           case spObjectType::WAYPOINT:
           {
-            SPERROREXIT("WAYPOINT object should not be created by itself.");
+            std::cout<<"WAYPOINT not currently updates."<<std::endl;;
             break;
           }
           case spObjectType::BOX:
           {
             UpdateBoxGuiObject((spBox&)spobj.GetObject(ii));
+            //SPERROREXIT("BOX object not in use.");
             break;
           }
+          //case spObjectType::VEHICLE_AWSD:
+          case spObjectType::VEHICLE_BIKE:
+          {
+            UpdateVehicleGuiObject((spVehicle&)spobj.GetObject(ii));
+            //SPERROREXIT("VEHICLE_AWSD not is use.");
+            break;
+            }
           case spObjectType::LINESTRIP:
           {
-            SPERROREXIT("LINESTRIP object should not be created by itself.");
+            SPERROREXIT("LINESTRIP not in use.");
             break;
           }
           default:

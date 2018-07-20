@@ -7,6 +7,8 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
+  "/home/boston/Documents/spirit_dep/HAL/build/HAL/HALConfig.cmake"
+  "/home/boston/Documents/spirit_dep/HAL/build/HAL/HALConfigVersion.cmake"
   "/home/boston/Documents/spirit_dep/Pangolin/build/PangolinConfig.cmake"
   "/home/boston/Documents/spirit_dep/Pangolin/build/PangolinConfigVersion.cmake"
   "/home/boston/Documents/spirit_dep/SceneGraph/build/SceneGraphConfig.cmake"
@@ -15,12 +17,19 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.5.1/CMakeCCompiler.cmake"
   "CMakeFiles/3.5.1/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.5.1/CMakeSystem.cmake"
+  "spiritConfig.cmake"
+  "spiritConfigVersion.cmake"
   "../cmake_modules/FindCeresSolver.cmake"
   "../cmake_modules/FindEigen3.cmake"
   "../cmake_modules/FindPackage.cmake.in"
   "../cmake_modules/PackageConfig.cmake.in"
   "../cmake_modules/PackageConfigVersion.cmake.in"
   "../cmake_modules/install_package.cmake"
+  "../examples/CMakeLists.txt"
+  "../examples/car_robot/CMakeLists.txt"
+  "../examples/mpc_car/CMakeLists.txt"
+  "../examples/rk4_3D_car/CMakeLists.txt"
+  "../examples/rk4_spirit_car/CMakeLists.txt"
   "/usr/share/cmake-3.5/Modules/CMakeCInformation.cmake"
   "/usr/share/cmake-3.5/Modules/CMakeCXXInformation.cmake"
   "/usr/share/cmake-3.5/Modules/CMakeCommonLanguageInclude.cmake"
@@ -67,9 +76,18 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "spiritConfig.cmake"
   "Findspirit.cmake"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
+  "examples/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "examples/car_robot/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "examples/mpc_car/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "examples/rk4_spirit_car/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "examples/rk4_3D_car/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/spirit.dir/DependInfo.cmake"
+  "examples/car_robot/CMakeFiles/car_robot.dir/DependInfo.cmake"
+  "examples/mpc_car/CMakeFiles/mpc_car.dir/DependInfo.cmake"
+  "examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/DependInfo.cmake"
+  "examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/DependInfo.cmake"
   )

@@ -103,6 +103,13 @@ spObjectHandle Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_i
       objects_.push_back(a_vehicle);
       break;
     }
+    case spObjectType::VEHICLE_BIKE:
+    {
+       btAlignedObjectArray<btCollisionShape*>	collisionShapes_;
+       std::shared_ptr<spBike> a_vehicle = std::make_shared<spBike>(vehicle_info,dynamics_world_);
+       objects_.push_back(a_vehicle);
+       break;
+    }
     default:
       std::cout << "this is not supported" << std::endl;
   }

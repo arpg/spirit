@@ -393,9 +393,33 @@ CMakeFiles/spirit.dir/src/spAWSDCar.cpp.o.provides: CMakeFiles/spirit.dir/src/sp
 CMakeFiles/spirit.dir/src/spAWSDCar.cpp.o.provides.build: CMakeFiles/spirit.dir/src/spAWSDCar.cpp.o
 
 
+CMakeFiles/spirit.dir/src/spBike.cpp.o: CMakeFiles/spirit.dir/flags.make
+CMakeFiles/spirit.dir/src/spBike.cpp.o: ../src/spBike.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/spirit.dir/src/spBike.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/spirit.dir/src/spBike.cpp.o -c /home/boston/Documents/spirit_dep/spirit/src/spBike.cpp
+
+CMakeFiles/spirit.dir/src/spBike.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/spirit.dir/src/spBike.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/boston/Documents/spirit_dep/spirit/src/spBike.cpp > CMakeFiles/spirit.dir/src/spBike.cpp.i
+
+CMakeFiles/spirit.dir/src/spBike.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/spirit.dir/src/spBike.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/boston/Documents/spirit_dep/spirit/src/spBike.cpp -o CMakeFiles/spirit.dir/src/spBike.cpp.s
+
+CMakeFiles/spirit.dir/src/spBike.cpp.o.requires:
+
+.PHONY : CMakeFiles/spirit.dir/src/spBike.cpp.o.requires
+
+CMakeFiles/spirit.dir/src/spBike.cpp.o.provides: CMakeFiles/spirit.dir/src/spBike.cpp.o.requires
+	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/src/spBike.cpp.o.provides.build
+.PHONY : CMakeFiles/spirit.dir/src/spBike.cpp.o.provides
+
+CMakeFiles/spirit.dir/src/spBike.cpp.o.provides.build: CMakeFiles/spirit.dir/src/spBike.cpp.o
+
+
 CMakeFiles/spirit.dir/src/spWheel.cpp.o: CMakeFiles/spirit.dir/flags.make
 CMakeFiles/spirit.dir/src/spWheel.cpp.o: ../src/spWheel.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/spirit.dir/src/spWheel.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/spirit.dir/src/spWheel.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/spirit.dir/src/spWheel.cpp.o -c /home/boston/Documents/spirit_dep/spirit/src/spWheel.cpp
 
 CMakeFiles/spirit.dir/src/spWheel.cpp.i: cmake_force
@@ -419,7 +443,7 @@ CMakeFiles/spirit.dir/src/spWheel.cpp.o.provides.build: CMakeFiles/spirit.dir/sr
 
 CMakeFiles/spirit.dir/src/spLineStrip.cpp.o: CMakeFiles/spirit.dir/flags.make
 CMakeFiles/spirit.dir/src/spLineStrip.cpp.o: ../src/spLineStrip.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/spirit.dir/src/spLineStrip.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/spirit.dir/src/spLineStrip.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/spirit.dir/src/spLineStrip.cpp.o -c /home/boston/Documents/spirit_dep/spirit/src/spLineStrip.cpp
 
 CMakeFiles/spirit.dir/src/spLineStrip.cpp.i: cmake_force
@@ -443,7 +467,7 @@ CMakeFiles/spirit.dir/src/spLineStrip.cpp.o.provides.build: CMakeFiles/spirit.di
 
 CMakeFiles/spirit.dir/src/spPID.cpp.o: CMakeFiles/spirit.dir/flags.make
 CMakeFiles/spirit.dir/src/spPID.cpp.o: ../src/spPID.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/spirit.dir/src/spPID.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/spirit.dir/src/spPID.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/spirit.dir/src/spPID.cpp.o -c /home/boston/Documents/spirit_dep/spirit/src/spPID.cpp
 
 CMakeFiles/spirit.dir/src/spPID.cpp.i: cmake_force
@@ -467,7 +491,7 @@ CMakeFiles/spirit.dir/src/spPID.cpp.o.provides.build: CMakeFiles/spirit.dir/src/
 
 CMakeFiles/spirit.dir/src/spTrajectory.cpp.o: CMakeFiles/spirit.dir/flags.make
 CMakeFiles/spirit.dir/src/spTrajectory.cpp.o: ../src/spTrajectory.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/spirit.dir/src/spTrajectory.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/spirit.dir/src/spTrajectory.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/spirit.dir/src/spTrajectory.cpp.o -c /home/boston/Documents/spirit_dep/spirit/src/spTrajectory.cpp
 
 CMakeFiles/spirit.dir/src/spTrajectory.cpp.i: cmake_force
@@ -491,7 +515,7 @@ CMakeFiles/spirit.dir/src/spTrajectory.cpp.o.provides.build: CMakeFiles/spirit.d
 
 CMakeFiles/spirit.dir/src/spMPC.cpp.o: CMakeFiles/spirit.dir/flags.make
 CMakeFiles/spirit.dir/src/spMPC.cpp.o: ../src/spMPC.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/spirit.dir/src/spMPC.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/spirit.dir/src/spMPC.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/spirit.dir/src/spMPC.cpp.o -c /home/boston/Documents/spirit_dep/spirit/src/spMPC.cpp
 
 CMakeFiles/spirit.dir/src/spMPC.cpp.i: cmake_force
@@ -515,7 +539,7 @@ CMakeFiles/spirit.dir/src/spMPC.cpp.o.provides.build: CMakeFiles/spirit.dir/src/
 
 CMakeFiles/spirit.dir/src/spCirclePlanner.cpp.o: CMakeFiles/spirit.dir/flags.make
 CMakeFiles/spirit.dir/src/spCirclePlanner.cpp.o: ../src/spCirclePlanner.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/spirit.dir/src/spCirclePlanner.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/spirit.dir/src/spCirclePlanner.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/spirit.dir/src/spCirclePlanner.cpp.o -c /home/boston/Documents/spirit_dep/spirit/src/spCirclePlanner.cpp
 
 CMakeFiles/spirit.dir/src/spCirclePlanner.cpp.i: cmake_force
@@ -539,7 +563,7 @@ CMakeFiles/spirit.dir/src/spCirclePlanner.cpp.o.provides.build: CMakeFiles/spiri
 
 CMakeFiles/spirit.dir/src/RK4.cpp.o: CMakeFiles/spirit.dir/flags.make
 CMakeFiles/spirit.dir/src/RK4.cpp.o: ../src/RK4.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/spirit.dir/src/RK4.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/spirit.dir/src/RK4.cpp.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/spirit.dir/src/RK4.cpp.o -c /home/boston/Documents/spirit_dep/spirit/src/RK4.cpp
 
 CMakeFiles/spirit.dir/src/RK4.cpp.i: cmake_force
@@ -577,6 +601,7 @@ spirit_OBJECTS = \
 "CMakeFiles/spirit.dir/src/spMesh.cpp.o" \
 "CMakeFiles/spirit.dir/src/spVehicle.cpp.o" \
 "CMakeFiles/spirit.dir/src/spAWSDCar.cpp.o" \
+"CMakeFiles/spirit.dir/src/spBike.cpp.o" \
 "CMakeFiles/spirit.dir/src/spWheel.cpp.o" \
 "CMakeFiles/spirit.dir/src/spLineStrip.cpp.o" \
 "CMakeFiles/spirit.dir/src/spPID.cpp.o" \
@@ -602,6 +627,7 @@ libspirit.so: CMakeFiles/spirit.dir/src/Objects.cpp.o
 libspirit.so: CMakeFiles/spirit.dir/src/spMesh.cpp.o
 libspirit.so: CMakeFiles/spirit.dir/src/spVehicle.cpp.o
 libspirit.so: CMakeFiles/spirit.dir/src/spAWSDCar.cpp.o
+libspirit.so: CMakeFiles/spirit.dir/src/spBike.cpp.o
 libspirit.so: CMakeFiles/spirit.dir/src/spWheel.cpp.o
 libspirit.so: CMakeFiles/spirit.dir/src/spLineStrip.cpp.o
 libspirit.so: CMakeFiles/spirit.dir/src/spPID.cpp.o
@@ -633,10 +659,10 @@ libspirit.so: /usr/lib/x86_64-linux-gnu/libglut.so
 libspirit.so: /usr/lib/x86_64-linux-gnu/libz.so
 libspirit.so: /home/boston/Documents/spirit_dep/Pangolin/build/libpangolin.so
 libspirit.so: /home/boston/Documents/spirit_dep/SceneGraph/build/libscenegraph.so
-libspirit.so: /usr/local/lib/libBulletDynamics.a
-libspirit.so: /usr/local/lib/libBulletCollision.a
-libspirit.so: /usr/local/lib/libLinearMath.a
-libspirit.so: /usr/local/lib/libBulletSoftBody.a
+libspirit.so: /usr/local/lib/libBulletDynamics.so
+libspirit.so: /usr/local/lib/libBulletCollision.so
+libspirit.so: /usr/local/lib/libLinearMath.so
+libspirit.so: /usr/local/lib/libBulletSoftBody.so
 libspirit.so: /usr/local/lib/libceres.so
 libspirit.so: /usr/lib/x86_64-linux-gnu/libglog.so
 libspirit.so: /usr/lib/x86_64-linux-gnu/libcholmod.so
@@ -663,10 +689,10 @@ libspirit.so: /usr/lib/x86_64-linux-gnu/libIL.so
 libspirit.so: /usr/lib/x86_64-linux-gnu/libILU.so
 libspirit.so: /usr/lib/x86_64-linux-gnu/libILUT.so
 libspirit.so: /home/boston/Documents/spirit_dep/SceneGraph/build/libscenegraph.so
-libspirit.so: /usr/local/lib/libBulletDynamics.a
-libspirit.so: /usr/local/lib/libBulletCollision.a
-libspirit.so: /usr/local/lib/libLinearMath.a
-libspirit.so: /usr/local/lib/libBulletSoftBody.a
+libspirit.so: /usr/local/lib/libBulletDynamics.so
+libspirit.so: /usr/local/lib/libBulletCollision.so
+libspirit.so: /usr/local/lib/libLinearMath.so
+libspirit.so: /usr/local/lib/libBulletSoftBody.so
 libspirit.so: /usr/local/lib/libceres.so
 libspirit.so: /usr/lib/x86_64-linux-gnu/libglog.so
 libspirit.so: /usr/lib/x86_64-linux-gnu/libcholmod.so
@@ -686,7 +712,7 @@ libspirit.so: /usr/local/lib/libosgDB.so
 libspirit.so: /usr/local/lib/libosgGA.so
 libspirit.so: /usr/local/lib/libOpenThreads.so
 libspirit.so: CMakeFiles/spirit.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Linking CXX shared library libspirit.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Linking CXX shared library libspirit.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/spirit.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -708,6 +734,7 @@ CMakeFiles/spirit.dir/requires: CMakeFiles/spirit.dir/src/Objects.cpp.o.requires
 CMakeFiles/spirit.dir/requires: CMakeFiles/spirit.dir/src/spMesh.cpp.o.requires
 CMakeFiles/spirit.dir/requires: CMakeFiles/spirit.dir/src/spVehicle.cpp.o.requires
 CMakeFiles/spirit.dir/requires: CMakeFiles/spirit.dir/src/spAWSDCar.cpp.o.requires
+CMakeFiles/spirit.dir/requires: CMakeFiles/spirit.dir/src/spBike.cpp.o.requires
 CMakeFiles/spirit.dir/requires: CMakeFiles/spirit.dir/src/spWheel.cpp.o.requires
 CMakeFiles/spirit.dir/requires: CMakeFiles/spirit.dir/src/spLineStrip.cpp.o.requires
 CMakeFiles/spirit.dir/requires: CMakeFiles/spirit.dir/src/spPID.cpp.o.requires

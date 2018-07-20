@@ -612,7 +612,9 @@ void spirit::IterateWorld() {
   gui_.Iterate(objects_);
   //  double gui_cost = spGeneralTools::Tock_ms(gui_tick);
   //  std::cout << "Gui Iteration time:   " << gui_cost << "ms" << std::endl;
-  static int fl = 0;
+  //static int fl = 0;
+
+  objects_.StepPhySimulation(0.1);
 
   // local planner tests
 //  spBezierPlanner plan;
@@ -630,8 +632,8 @@ void spirit::IterateWorld() {
 //               std::endl;
 //  plan.UpdateCurves();
   spGeneralTools::Delay_ms(100);
-SPERROREXIT("ENDOFPROGRAM");
-  if (fl<500) {
+//SPERROREXIT("ENDOFPROGRAM");
+  //if (fl<500) {
 //    spAWSDCar& car = (spAWSDCar&) objects_.GetObject(obj_car_index);
 //    car.GetStateVecor();
 //    spPose pose(spPose::Identity());
@@ -647,10 +649,10 @@ SPERROREXIT("ENDOFPROGRAM");
 //    objects_.StepPhySimulation(0.01);
 
     //    std::cout << "wheel pose is\n" << car.GetWheel(0)->GetPose().matrix() << std::endl;
-    fl++;
+    //fl++;
 //    double phy_cost = spGeneralTools::Tock_us(phy_tick);
 //    std::cout << "Phy Iteration time:   " << phy_cost/1000 << "ms" << std::endl;
 
-  }
+  //}
 
 }

@@ -57,7 +57,12 @@ void Gui::AddObject(spCommonObject &obj) {
       gui_->AddBox((spBox&) obj);
       break;
     }
-    case spObjectType::VEHICLE_AWSD :
+    case spObjectType::VEHICLE_AWSD:
+    {
+      gui_->AddVehicle((spVehicle&) obj);
+      break;
+    }
+    case spObjectType::VEHICLE_BIKE:
     {
       gui_->AddVehicle((spVehicle&) obj);
       break;
