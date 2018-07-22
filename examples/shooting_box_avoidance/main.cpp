@@ -70,7 +70,7 @@ void GamepadCallback(hal::GamepadMsg& _msg) {
 void NewPoseReceived(float x, float y, float yaw){
   std::cout << "got Pose data " << x << " - " << y << " - " << yaw  << std::endl;
   vicon_pose = spPose::Identity();
-  vicon_pose.translate(spTranslation(x,y,0.07/*PoseData.pose().data(2)*/));
+  vicon_pose.translate(spTranslation(x,y,0.07));
   Eigen::AngleAxisd tracker_rot(yaw,Eigen::Vector3d::UnitZ());
   vicon_pose.rotate(tracker_rot);
 }
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
   node.InitServer();
 
   std::cout << "Listening to port ... " << std::endl;
-while(1){};
+
   /////////////////////////////
   spSettings settings_obj;
   settings_obj.SetGuiType(spGuiType::GUI_PANGOSCENEGRAPH);
@@ -173,7 +173,7 @@ while(1){};
 
     tire_friction.reset(new double(0.4));
 
-    std::cout << std::fixed << std::setprecision(3) << state_ptr->pose.translation()[0] << ","  << state_ptr->pose.translation()[1] << ","  << state_ptr->pose.translation()[2] << ";"   <<std::endl;
+    //std::cout << std::fixed << std::setprecision(3) << state_ptr->pose.translation()[0] << ","  << state_ptr->pose.translation()[1] << ","  << state_ptr->pose.translation()[2] << ";"   <<std::endl;
     
 /*
 	    state_ptr[ii]->substate_vec[0]->linvel = ninja_linvel;
@@ -208,13 +208,13 @@ while(1){};
     int lowest_cost_index = 0;
     double lowest_cost = *(costs[lowest_cost_index]);
     for(int ii=1; ii<num_cars; ii++) {
-        std::cout << *(costs[ii]) << "  -  ";
+        //std::cout << *(costs[ii]) << "  -  ";
          if(*(costs[ii])<lowest_cost) {
             lowest_cost = *(costs[ii]);
             lowest_cost_index = ii;
         }
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 
     // calc the processing time
     double time = spGeneralTools::Tock_ms(t0);
@@ -231,7 +231,7 @@ while(1){};
     commandMSG.set_throttle_percent(gamepad_throttle);
     ninja_car.UpdateCarCommand(commandMSG);
 
-    std::cout << steering << std::endl;
+    //std::cout << steering << std::endl;
 //    std::cout << "cost " << lowest_cost << " , " << lowest_cost_index << std::endl;
 //    estimation_car.SetFrontSteeringAngle((cntrl_vars_vec[lowest_cost_index]).col(0)[0]);
 //    estimation_car.SetEngineMaxVel((cntrl_vars_vec[lowest_cost_index]).col(0)[1]);
