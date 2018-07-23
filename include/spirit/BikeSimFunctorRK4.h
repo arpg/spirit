@@ -41,7 +41,7 @@ class BikeSimFunctorRK4 {
                   int pert_index,
                   std::shared_ptr<spStateSeries> traj_states = nullptr,
                   std::shared_ptr<spState> init_state = nullptr ) {
-    Eigen::VectorXd init(10);
+    Eigen::VectorXd init(4);
     RK4 rk4solver(0.01);
     rk4solver.RegisterODE(&BikeODE);
     if(init_state != nullptr) {
@@ -51,9 +51,9 @@ class BikeSimFunctorRK4 {
     init[0] = initial_state_.pose.translation()[0];
     init[1] = initial_state_.pose.translation()[1];
     init[2] = initial_state_.pose.rotation().eulerAngles(0,1,2)[2]; // yaw
-    init[3] = 0;
+    init[3] = 2;
 
-     /*
+
     spCurve control_curve(2, 2);
     control_curve.SetBezierControlPoints(cntrl_vars);
     spPointXd sample_control(2);
@@ -64,19 +64,22 @@ class BikeSimFunctorRK4 {
     if (traj_states != nullptr) {
       traj_states->push_back(std::make_shared<spState>(initial_state_));
     }
-    // */
 
-    Eigen::VectorXd u(3);
+
+    Eigen::VectorXd u(2);
     for (int ii = 0; ii < num_sim_steps; ii++) {
       // control inputs
-      u[0] = SP_PI/10; // steering
-      u[1] = 1; // speed
+      control_curve.GetPoint(sample_control, ii / (double)num_sim_steps);
+      u[0] = sample_control[0]; // steering
+      u[1] = sample_control[1]; // acceleration
       rk4solver.Solve(init,u,step_size);
       spState state;
       state.pose = spPose::Identity();
       state.pose.translate(spTranslation(init[0],init[1],initial_state_.pose.translation()[2]));
       Eigen::AngleAxisd rot1(init[2],Eigen::Vector3d::UnitZ());
       state.pose.rotate(rot1);
+      state.front_steering = u[0];
+      //std::cout<<"The speed: "<<state.linvel<<std::endl;
 
       if (traj_states != nullptr) {
         traj_states->push_back(std::make_shared<spState>(state));

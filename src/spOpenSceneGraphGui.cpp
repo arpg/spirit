@@ -175,7 +175,7 @@ void spOpenSceneGraphGui::AddVehicle(spVehicle& vehicle)
         bikeparts->translate_ = osg::Matrixd::translate(osg::Vec3(vehicle.GetWheel(ii)->GetPose().translation()[0], vehicle.GetWheel(ii)->GetPose().translation()[1], vehicle.GetWheel(ii)->GetPose().translation()[2]));
         bikeparts->rotx_ = osg::Matrix::rotate(vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0));
         bikeparts->roty_ = osg::Matrix::rotate(SP_PI/2 + vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0));
-        bikeparts->rotz_ = osg::Matrix::rotate(vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
+        bikeparts->rotz_ = osg::Matrix::rotate(SP_PI/2 + vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
 
         bikeparts->shape_->setShape(new osg::Cylinder(osg::Vec3(0.0f, 0.0f, 0.0f), vehicle.GetWheel(ii)->GetRadius(), vehicle.GetWheel(ii)->GetWidth()));
         bikeparts->shape_->setColor(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -233,7 +233,7 @@ void spOpenSceneGraphGui::UpdateVehicleGuiObject(spVehicle& vehicle)
      osgobj_[wheel_index]->translate_ = osg::Matrixd::translate(osg::Vec3(vehicle.GetWheel(ii)->GetPose().translation()[0], vehicle.GetWheel(ii)->GetPose().translation()[1], vehicle.GetWheel(ii)->GetPose().translation()[2]));
      osgobj_[wheel_index]->rotx_ = osg::Matrix::rotate(vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0));
      osgobj_[wheel_index]->roty_ = osg::Matrix::rotate(SP_PI/2 + vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0));
-     osgobj_[wheel_index]->rotz_ = osg::Matrix::rotate(vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
+     osgobj_[wheel_index]->rotz_ = osg::Matrix::rotate(SP_PI/2 + vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
      osgobj_[wheel_index]->transform_->setMatrix(osgobj_[wheel_index]->rotx_ * osgobj_[wheel_index]->roty_ * osgobj_[wheel_index]->rotz_ * osgobj_[wheel_index]->translate_);
    }
 }
@@ -253,7 +253,7 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
           }
           case spObjectType::WAYPOINT:
           {
-            std::cout<<"WAYPOINT not currently updates."<<std::endl;;
+            std::cout<<"WAYPOINT currently no update functionality."<<std::endl;
             break;
           }
           case spObjectType::BOX:
@@ -271,7 +271,7 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
             }
           case spObjectType::LINESTRIP:
           {
-            SPERROREXIT("LINESTRIP not in use.");
+            std::cout<<"LINESTRIP currently no update functionality."<<std::endl;
             break;
           }
           default:

@@ -173,13 +173,19 @@ void spVehicle::SetState(const spState& state){
 //    SPERROR("state tree size mismatch.");
   }
   SetPose(state.pose);
-MoveWheelsToAnchors(state.pose);
+  MoveWheelsToAnchors(state.pose);
+  // turn front wheel
+  spPose p = spPose::Identity();
+  p.translate(spTranslation(GetWheel(1)->GetPose().translation()[0],GetWheel(1)->GetPose().translation()[1],GetWheel(1)->GetPose().translation()[2]));
+  Eigen::AngleAxisd rot1(state.front_steering + state.pose.rotation().eulerAngles(0,1,2)[2], Eigen::Vector3d::UnitZ());
+  p.rotate(rot1);
+  GetWheel(1)->SetPose(p);
  // SetChassisLinearVelocity(state.linvel);
   //SetChassisAngularVelocity(state.rotvel);
  // if(state.substate_vec.size()<GetNumberOfWheels()) {
     
 
-//    for(int ii=0; ii<GetNumberOfWheels(); ii++) {
+   //for(int ii=0; ii<GetNumberOfWheels(); ii++) {
 //      GetWheel(ii)->SetLinVel(state.linvel);
 //      GetWheel(ii)->SetAngularVel(state.rotvel);
 //      GetWheel(ii)->SetWheelSpeed(state.wheel_speeds[ii]);

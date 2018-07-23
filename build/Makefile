@@ -124,45 +124,6 @@ spirit/fast:
 .PHONY : spirit/fast
 
 #=============================================================================
-# Target rules for targets named car_robot
-
-# Build rule for target.
-car_robot: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 car_robot
-.PHONY : car_robot
-
-# fast build rule for target.
-car_robot/fast:
-	$(MAKE) -f examples/car_robot/CMakeFiles/car_robot.dir/build.make examples/car_robot/CMakeFiles/car_robot.dir/build
-.PHONY : car_robot/fast
-
-#=============================================================================
-# Target rules for targets named mpc_car
-
-# Build rule for target.
-mpc_car: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 mpc_car
-.PHONY : mpc_car
-
-# fast build rule for target.
-mpc_car/fast:
-	$(MAKE) -f examples/mpc_car/CMakeFiles/mpc_car.dir/build.make examples/mpc_car/CMakeFiles/mpc_car.dir/build
-.PHONY : mpc_car/fast
-
-#=============================================================================
-# Target rules for targets named rk4_spirit_car
-
-# Build rule for target.
-rk4_spirit_car: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 rk4_spirit_car
-.PHONY : rk4_spirit_car
-
-# fast build rule for target.
-rk4_spirit_car/fast:
-	$(MAKE) -f examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/build.make examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/build
-.PHONY : rk4_spirit_car/fast
-
-#=============================================================================
 # Target rules for targets named rk4_3D_car
 
 # Build rule for target.
@@ -778,9 +739,6 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... spirit"
-	@echo "... car_robot"
-	@echo "... mpc_car"
-	@echo "... rk4_spirit_car"
 	@echo "... rk4_3D_car"
 	@echo "... src/Gui.o"
 	@echo "... src/Gui.i"

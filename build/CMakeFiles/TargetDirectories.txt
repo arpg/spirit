@@ -3,15 +3,6 @@
 /home/boston/Documents/spirit_dep/spirit/build/CMakeFiles/spirit.dir
 /home/boston/Documents/spirit_dep/spirit/build/examples/CMakeFiles/edit_cache.dir
 /home/boston/Documents/spirit_dep/spirit/build/examples/CMakeFiles/rebuild_cache.dir
-/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/CMakeFiles/edit_cache.dir
-/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/CMakeFiles/rebuild_cache.dir
-/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/CMakeFiles/car_robot.dir
-/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/CMakeFiles/edit_cache.dir
-/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/CMakeFiles/rebuild_cache.dir
-/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/CMakeFiles/mpc_car.dir
-/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/CMakeFiles/rebuild_cache.dir
-/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/CMakeFiles/edit_cache.dir
-/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir
 /home/boston/Documents/spirit_dep/spirit/build/examples/rk4_3D_car/CMakeFiles/edit_cache.dir
 /home/boston/Documents/spirit_dep/spirit/build/examples/rk4_3D_car/CMakeFiles/rebuild_cache.dir
 /home/boston/Documents/spirit_dep/spirit/build/examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir

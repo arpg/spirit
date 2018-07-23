@@ -66,7 +66,7 @@ CMAKE_BINARY_DIR = /home/boston/Documents/spirit_dep/spirit/build
 CMakeFiles/spirit.dir/all:
 	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/depend
 	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 "Built target spirit"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25 "Built target spirit"
 .PHONY : CMakeFiles/spirit.dir/all
 
 # Include target in all.
@@ -100,193 +100,19 @@ clean: CMakeFiles/spirit.dir/clean
 # Directory level rules for directory examples
 
 # Convenience name for "all" pass in the directory.
-examples/all: examples/car_robot/all
-examples/all: examples/mpc_car/all
-examples/all: examples/rk4_spirit_car/all
 examples/all: examples/rk4_3D_car/all
 
 .PHONY : examples/all
 
 # Convenience name for "clean" pass in the directory.
-examples/clean: examples/car_robot/clean
-examples/clean: examples/mpc_car/clean
-examples/clean: examples/rk4_spirit_car/clean
 examples/clean: examples/rk4_3D_car/clean
 
 .PHONY : examples/clean
 
 # Convenience name for "preinstall" pass in the directory.
-examples/preinstall: examples/car_robot/preinstall
-examples/preinstall: examples/mpc_car/preinstall
-examples/preinstall: examples/rk4_spirit_car/preinstall
 examples/preinstall: examples/rk4_3D_car/preinstall
 
 .PHONY : examples/preinstall
-
-#=============================================================================
-# Directory level rules for directory examples/car_robot
-
-# Convenience name for "all" pass in the directory.
-examples/car_robot/all: examples/car_robot/CMakeFiles/car_robot.dir/all
-
-.PHONY : examples/car_robot/all
-
-# Convenience name for "clean" pass in the directory.
-examples/car_robot/clean: examples/car_robot/CMakeFiles/car_robot.dir/clean
-
-.PHONY : examples/car_robot/clean
-
-# Convenience name for "preinstall" pass in the directory.
-examples/car_robot/preinstall:
-
-.PHONY : examples/car_robot/preinstall
-
-#=============================================================================
-# Target rules for target examples/car_robot/CMakeFiles/car_robot.dir
-
-# All Build rule for target.
-examples/car_robot/CMakeFiles/car_robot.dir/all:
-	$(MAKE) -f examples/car_robot/CMakeFiles/car_robot.dir/build.make examples/car_robot/CMakeFiles/car_robot.dir/depend
-	$(MAKE) -f examples/car_robot/CMakeFiles/car_robot.dir/build.make examples/car_robot/CMakeFiles/car_robot.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=1,2 "Built target car_robot"
-.PHONY : examples/car_robot/CMakeFiles/car_robot.dir/all
-
-# Include target in all.
-all: examples/car_robot/CMakeFiles/car_robot.dir/all
-
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-examples/car_robot/CMakeFiles/car_robot.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/boston/Documents/spirit_dep/spirit/build/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 examples/car_robot/CMakeFiles/car_robot.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/boston/Documents/spirit_dep/spirit/build/CMakeFiles 0
-.PHONY : examples/car_robot/CMakeFiles/car_robot.dir/rule
-
-# Convenience name for target.
-car_robot: examples/car_robot/CMakeFiles/car_robot.dir/rule
-
-.PHONY : car_robot
-
-# clean rule for target.
-examples/car_robot/CMakeFiles/car_robot.dir/clean:
-	$(MAKE) -f examples/car_robot/CMakeFiles/car_robot.dir/build.make examples/car_robot/CMakeFiles/car_robot.dir/clean
-.PHONY : examples/car_robot/CMakeFiles/car_robot.dir/clean
-
-# clean rule for target.
-clean: examples/car_robot/CMakeFiles/car_robot.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
-# Directory level rules for directory examples/mpc_car
-
-# Convenience name for "all" pass in the directory.
-examples/mpc_car/all: examples/mpc_car/CMakeFiles/mpc_car.dir/all
-
-.PHONY : examples/mpc_car/all
-
-# Convenience name for "clean" pass in the directory.
-examples/mpc_car/clean: examples/mpc_car/CMakeFiles/mpc_car.dir/clean
-
-.PHONY : examples/mpc_car/clean
-
-# Convenience name for "preinstall" pass in the directory.
-examples/mpc_car/preinstall:
-
-.PHONY : examples/mpc_car/preinstall
-
-#=============================================================================
-# Target rules for target examples/mpc_car/CMakeFiles/mpc_car.dir
-
-# All Build rule for target.
-examples/mpc_car/CMakeFiles/mpc_car.dir/all:
-	$(MAKE) -f examples/mpc_car/CMakeFiles/mpc_car.dir/build.make examples/mpc_car/CMakeFiles/mpc_car.dir/depend
-	$(MAKE) -f examples/mpc_car/CMakeFiles/mpc_car.dir/build.make examples/mpc_car/CMakeFiles/mpc_car.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=3,4 "Built target mpc_car"
-.PHONY : examples/mpc_car/CMakeFiles/mpc_car.dir/all
-
-# Include target in all.
-all: examples/mpc_car/CMakeFiles/mpc_car.dir/all
-
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-examples/mpc_car/CMakeFiles/mpc_car.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/boston/Documents/spirit_dep/spirit/build/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 examples/mpc_car/CMakeFiles/mpc_car.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/boston/Documents/spirit_dep/spirit/build/CMakeFiles 0
-.PHONY : examples/mpc_car/CMakeFiles/mpc_car.dir/rule
-
-# Convenience name for target.
-mpc_car: examples/mpc_car/CMakeFiles/mpc_car.dir/rule
-
-.PHONY : mpc_car
-
-# clean rule for target.
-examples/mpc_car/CMakeFiles/mpc_car.dir/clean:
-	$(MAKE) -f examples/mpc_car/CMakeFiles/mpc_car.dir/build.make examples/mpc_car/CMakeFiles/mpc_car.dir/clean
-.PHONY : examples/mpc_car/CMakeFiles/mpc_car.dir/clean
-
-# clean rule for target.
-clean: examples/mpc_car/CMakeFiles/mpc_car.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
-# Directory level rules for directory examples/rk4_spirit_car
-
-# Convenience name for "all" pass in the directory.
-examples/rk4_spirit_car/all: examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/all
-
-.PHONY : examples/rk4_spirit_car/all
-
-# Convenience name for "clean" pass in the directory.
-examples/rk4_spirit_car/clean: examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/clean
-
-.PHONY : examples/rk4_spirit_car/clean
-
-# Convenience name for "preinstall" pass in the directory.
-examples/rk4_spirit_car/preinstall:
-
-.PHONY : examples/rk4_spirit_car/preinstall
-
-#=============================================================================
-# Target rules for target examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir
-
-# All Build rule for target.
-examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/all:
-	$(MAKE) -f examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/build.make examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/depend
-	$(MAKE) -f examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/build.make examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=7,8 "Built target rk4_spirit_car"
-.PHONY : examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/all
-
-# Include target in all.
-all: examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/all
-
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/boston/Documents/spirit_dep/spirit/build/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/boston/Documents/spirit_dep/spirit/build/CMakeFiles 0
-.PHONY : examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/rule
-
-# Convenience name for target.
-rk4_spirit_car: examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/rule
-
-.PHONY : rk4_spirit_car
-
-# clean rule for target.
-examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/clean:
-	$(MAKE) -f examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/build.make examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/clean
-.PHONY : examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/clean
-
-# clean rule for target.
-clean: examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/clean
-
-.PHONY : clean
 
 #=============================================================================
 # Directory level rules for directory examples/rk4_3D_car
@@ -313,7 +139,7 @@ examples/rk4_3D_car/preinstall:
 examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/all:
 	$(MAKE) -f examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/build.make examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/depend
 	$(MAKE) -f examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/build.make examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=5,6 "Built target rk4_3D_car"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/boston/Documents/spirit_dep/spirit/build/CMakeFiles --progress-num=1,2 "Built target rk4_3D_car"
 .PHONY : examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/all
 
 # Include target in all.

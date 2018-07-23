@@ -42,7 +42,7 @@ int main(int argc, char** argv){
     inputcmd_curve.col(1) = Eigen::Vector2d(0.3,1);
     inputcmd_curve.col(2) = Eigen::Vector2d(0.3,1);
 
-    bike.SetFrontSteeringAngle(SP_PI/4);
+    //bike.SetFrontSteeringAngle(0);
 
 
     while(!gui.ShouldQuit())
@@ -55,8 +55,7 @@ int main(int argc, char** argv){
 
           std::this_thread::sleep_for(std::chrono::milliseconds(100));
           double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
-          std::cout << "yaw: " << yaw << std::endl;
-          //spGeneralTools::Delay_ms(100);
+          //std::cout << "yaw: " << yaw << std::endl;
         //}
     }
     return 0;

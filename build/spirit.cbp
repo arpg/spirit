@@ -5,7 +5,7 @@
       <Option title="spirit" />
       <Option makefile_is_custom="1" />
       <Option compiler="gcc" />
-      <Option virtualFolders="CMake Files\;CMake Files\cmake_modules\;CMake Files\..\;CMake Files\..\Pangolin\;CMake Files\..\Pangolin\build\;CMake Files\..\SceneGraph\;CMake Files\..\SceneGraph\build\;CMake Files\..\HAL\;CMake Files\..\HAL\build\;CMake Files\..\HAL\build\HAL\;CMake Files\examples\;CMake Files\examples\car_robot\;CMake Files\examples\mpc_car\;CMake Files\examples\rk4_spirit_car\;CMake Files\examples\rk4_3D_car\;CMake Files\build\;" />
+      <Option virtualFolders="CMake Files\;CMake Files\cmake_modules\;CMake Files\..\;CMake Files\..\Pangolin\;CMake Files\..\Pangolin\build\;CMake Files\..\SceneGraph\;CMake Files\..\SceneGraph\build\;CMake Files\examples\;CMake Files\examples\rk4_3D_car\;CMake Files\build\;" />
       <Build>
       <Target title="all">
          <Option working_dir="/home/boston/Documents/spirit_dep/spirit/build" />
@@ -91,198 +91,6 @@
             <DistClean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/Makefile&quot;  VERBOSE=1 clean" />
          </MakeCommands>
       </Target>
-      <Target title="car_robot">
-         <Option output="/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/car_robot" prefix_auto="0" extension_auto="0" />
-         <Option working_dir="/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot" />
-         <Option object_output="./" />
-         <Option type="1" />
-         <Option compiler="gcc" />
-         <Compiler>
-            <Add directory="/home/boston/Documents/spirit_dep/HAL" />
-            <Add directory="/home/boston/Documents/spirit_dep/HAL/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/include" />
-            <Add directory="/usr/include/IL" />
-            <Add directory="/usr/include/IL/.." />
-            <Add directory="/usr/include/eigen3" />
-            <Add directory="/usr/include/x86_64-linux-gnu" />
-            <Add directory="/usr/local/include" />
-            <Add directory="/usr/local/include/bullet" />
-         </Compiler>
-         <MakeCommands>
-            <Build command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/Makefile&quot;  VERBOSE=1 car_robot" />
-            <CompileFile command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
-            <Clean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/Makefile&quot;  VERBOSE=1 clean" />
-            <DistClean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/Makefile&quot;  VERBOSE=1 clean" />
-         </MakeCommands>
-      </Target>
-      <Target title="car_robot/fast">
-         <Option output="/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/car_robot" prefix_auto="0" extension_auto="0" />
-         <Option working_dir="/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot" />
-         <Option object_output="./" />
-         <Option type="1" />
-         <Option compiler="gcc" />
-         <Compiler>
-            <Add directory="/home/boston/Documents/spirit_dep/HAL" />
-            <Add directory="/home/boston/Documents/spirit_dep/HAL/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/include" />
-            <Add directory="/usr/include/IL" />
-            <Add directory="/usr/include/IL/.." />
-            <Add directory="/usr/include/eigen3" />
-            <Add directory="/usr/include/x86_64-linux-gnu" />
-            <Add directory="/usr/local/include" />
-            <Add directory="/usr/local/include/bullet" />
-         </Compiler>
-         <MakeCommands>
-            <Build command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/Makefile&quot;  VERBOSE=1 car_robot/fast" />
-            <CompileFile command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
-            <Clean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/Makefile&quot;  VERBOSE=1 clean" />
-            <DistClean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/car_robot/Makefile&quot;  VERBOSE=1 clean" />
-         </MakeCommands>
-      </Target>
-      <Target title="mpc_car">
-         <Option output="/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/mpc_car" prefix_auto="0" extension_auto="0" />
-         <Option working_dir="/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car" />
-         <Option object_output="./" />
-         <Option type="1" />
-         <Option compiler="gcc" />
-         <Compiler>
-            <Add directory="/home/boston/Documents/spirit_dep/HAL" />
-            <Add directory="/home/boston/Documents/spirit_dep/HAL/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/include" />
-            <Add directory="/usr/include/IL" />
-            <Add directory="/usr/include/IL/.." />
-            <Add directory="/usr/include/eigen3" />
-            <Add directory="/usr/include/x86_64-linux-gnu" />
-            <Add directory="/usr/local/include" />
-            <Add directory="/usr/local/include/bullet" />
-         </Compiler>
-         <MakeCommands>
-            <Build command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/Makefile&quot;  VERBOSE=1 mpc_car" />
-            <CompileFile command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
-            <Clean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/Makefile&quot;  VERBOSE=1 clean" />
-            <DistClean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/Makefile&quot;  VERBOSE=1 clean" />
-         </MakeCommands>
-      </Target>
-      <Target title="mpc_car/fast">
-         <Option output="/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/mpc_car" prefix_auto="0" extension_auto="0" />
-         <Option working_dir="/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car" />
-         <Option object_output="./" />
-         <Option type="1" />
-         <Option compiler="gcc" />
-         <Compiler>
-            <Add directory="/home/boston/Documents/spirit_dep/HAL" />
-            <Add directory="/home/boston/Documents/spirit_dep/HAL/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/include" />
-            <Add directory="/usr/include/IL" />
-            <Add directory="/usr/include/IL/.." />
-            <Add directory="/usr/include/eigen3" />
-            <Add directory="/usr/include/x86_64-linux-gnu" />
-            <Add directory="/usr/local/include" />
-            <Add directory="/usr/local/include/bullet" />
-         </Compiler>
-         <MakeCommands>
-            <Build command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/Makefile&quot;  VERBOSE=1 mpc_car/fast" />
-            <CompileFile command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
-            <Clean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/Makefile&quot;  VERBOSE=1 clean" />
-            <DistClean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/mpc_car/Makefile&quot;  VERBOSE=1 clean" />
-         </MakeCommands>
-      </Target>
-      <Target title="rk4_spirit_car">
-         <Option output="/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/rk4_spirit_car" prefix_auto="0" extension_auto="0" />
-         <Option working_dir="/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car" />
-         <Option object_output="./" />
-         <Option type="1" />
-         <Option compiler="gcc" />
-         <Compiler>
-            <Add directory="/home/boston/Documents/spirit_dep/HAL" />
-            <Add directory="/home/boston/Documents/spirit_dep/HAL/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/include" />
-            <Add directory="/usr/include/IL" />
-            <Add directory="/usr/include/IL/.." />
-            <Add directory="/usr/include/eigen3" />
-            <Add directory="/usr/include/x86_64-linux-gnu" />
-            <Add directory="/usr/local/include" />
-            <Add directory="/usr/local/include/bullet" />
-         </Compiler>
-         <MakeCommands>
-            <Build command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/Makefile&quot;  VERBOSE=1 rk4_spirit_car" />
-            <CompileFile command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
-            <Clean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/Makefile&quot;  VERBOSE=1 clean" />
-            <DistClean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/Makefile&quot;  VERBOSE=1 clean" />
-         </MakeCommands>
-      </Target>
-      <Target title="rk4_spirit_car/fast">
-         <Option output="/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/rk4_spirit_car" prefix_auto="0" extension_auto="0" />
-         <Option working_dir="/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car" />
-         <Option object_output="./" />
-         <Option type="1" />
-         <Option compiler="gcc" />
-         <Compiler>
-            <Add directory="/home/boston/Documents/spirit_dep/HAL" />
-            <Add directory="/home/boston/Documents/spirit_dep/HAL/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Pangolin/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/SceneGraph/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/Sophus/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/build/include" />
-            <Add directory="/home/boston/Documents/spirit_dep/spirit/include" />
-            <Add directory="/usr/include/IL" />
-            <Add directory="/usr/include/IL/.." />
-            <Add directory="/usr/include/eigen3" />
-            <Add directory="/usr/include/x86_64-linux-gnu" />
-            <Add directory="/usr/local/include" />
-            <Add directory="/usr/local/include/bullet" />
-         </Compiler>
-         <MakeCommands>
-            <Build command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/Makefile&quot;  VERBOSE=1 rk4_spirit_car/fast" />
-            <CompileFile command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
-            <Clean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/Makefile&quot;  VERBOSE=1 clean" />
-            <DistClean command="/usr/bin/make -f &quot;/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_spirit_car/Makefile&quot;  VERBOSE=1 clean" />
-         </MakeCommands>
-      </Target>
       <Target title="rk4_3D_car">
          <Option output="/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_3D_car/rk4_3D_car" prefix_auto="0" extension_auto="0" />
          <Option working_dir="/home/boston/Documents/spirit_dep/spirit/build/examples/rk4_3D_car" />
@@ -340,17 +148,8 @@
          </MakeCommands>
       </Target>
       </Build>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/examples/car_robot/main.cpp">
-         <Option target="car_robot"/>
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/examples/mpc_car/main.cpp">
-         <Option target="mpc_car"/>
-      </Unit>
       <Unit filename="/home/boston/Documents/spirit_dep/spirit/examples/rk4_3D_car/main.cpp">
          <Option target="rk4_3D_car"/>
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/examples/rk4_spirit_car/main.cpp">
-         <Option target="rk4_spirit_car"/>
       </Unit>
       <Unit filename="/home/boston/Documents/spirit_dep/spirit/include/spirit/BikeODE.h">
          <Option target="spirit"/>
@@ -580,56 +379,11 @@
       <Unit filename="/home/boston/Documents/spirit_dep/spirit/../SceneGraph/build/SceneGraphConfig.cmake">
           <Option virtualFolder="CMake Files\..\SceneGraph\build\" />
       </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/../HAL/build/HAL/HALConfigVersion.cmake">
-          <Option virtualFolder="CMake Files\..\HAL\build\HAL\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/../HAL/build/HAL/HALConfig.cmake">
-          <Option virtualFolder="CMake Files\..\HAL\build\HAL\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/../HAL/build/HAL/HALConfigVersion.cmake">
-          <Option virtualFolder="CMake Files\..\HAL\build\HAL\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/../HAL/build/HAL/HALConfig.cmake">
-          <Option virtualFolder="CMake Files\..\HAL\build\HAL\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/../HAL/build/HAL/HALConfigVersion.cmake">
-          <Option virtualFolder="CMake Files\..\HAL\build\HAL\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/../HAL/build/HAL/HALConfig.cmake">
-          <Option virtualFolder="CMake Files\..\HAL\build\HAL\" />
-      </Unit>
       <Unit filename="/home/boston/Documents/spirit_dep/spirit/examples/CMakeLists.txt">
           <Option virtualFolder="CMake Files\examples\" />
       </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/examples/car_robot/CMakeLists.txt">
-          <Option virtualFolder="CMake Files\examples\car_robot\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/examples/mpc_car/CMakeLists.txt">
-          <Option virtualFolder="CMake Files\examples\mpc_car\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/examples/rk4_spirit_car/CMakeLists.txt">
-          <Option virtualFolder="CMake Files\examples\rk4_spirit_car\" />
-      </Unit>
       <Unit filename="/home/boston/Documents/spirit_dep/spirit/examples/rk4_3D_car/CMakeLists.txt">
           <Option virtualFolder="CMake Files\examples\rk4_3D_car\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/build/spiritConfigVersion.cmake">
-          <Option virtualFolder="CMake Files\build\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/build/spiritConfig.cmake">
-          <Option virtualFolder="CMake Files\build\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/build/spiritConfigVersion.cmake">
-          <Option virtualFolder="CMake Files\build\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/build/spiritConfig.cmake">
-          <Option virtualFolder="CMake Files\build\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/build/spiritConfigVersion.cmake">
-          <Option virtualFolder="CMake Files\build\" />
-      </Unit>
-      <Unit filename="/home/boston/Documents/spirit_dep/spirit/build/spiritConfig.cmake">
-          <Option virtualFolder="CMake Files\build\" />
       </Unit>
       <Unit filename="/home/boston/Documents/spirit_dep/spirit/build/spiritConfigVersion.cmake">
           <Option virtualFolder="CMake Files\build\" />

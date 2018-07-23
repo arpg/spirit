@@ -12,9 +12,9 @@ class BikeParams {
         bike_param.vehicle_type = spObjectType::VEHICLE_BIKE;
         bike_param.pose = spPose::Identity();
         bike_param.pose.translate(spTranslation(0,0,0.0));
-        bike_param.wheels_anchor.push_back(spTranslation(0, -0.27, 0));
-        bike_param.wheels_anchor.push_back(spTranslation(0, 0.27, 0));
-        bike_param.chassis_size = spBoxSize(0.1, 0.42, 0.05);
+        bike_param.wheels_anchor.push_back(spTranslation(-0.27, 0, 0));
+        bike_param.wheels_anchor.push_back(spTranslation(0.27, 0, 0));
+        bike_param.chassis_size = spBoxSize(0.42, 0.1, 0.05);
         bike_param.cog = spTranslation(0, 0, 0);
         bike_param.chassis_friction = 0;
         bike_param.wheel_rollingfriction = 0.1;
