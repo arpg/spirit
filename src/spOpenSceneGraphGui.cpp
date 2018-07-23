@@ -30,7 +30,7 @@ void spOpenSceneGraphGui::Refresh()
 }
 void spOpenSceneGraphGui::CheckKeyboardAction()
 {
-    std::cout<<"CheckKeyboardAction() currently has no functionality"<<std::endl;
+    //std::cout<<"CheckKeyboardAction() currently has no functionality"<<std::endl;
 
 }
 void spOpenSceneGraphGui::AddBox(spBox& box)
@@ -174,7 +174,7 @@ void spOpenSceneGraphGui::AddVehicle(spVehicle& vehicle)
         bikeparts->name_ = "wheel";
         bikeparts->translate_ = osg::Matrixd::translate(osg::Vec3(vehicle.GetWheel(ii)->GetPose().translation()[0], vehicle.GetWheel(ii)->GetPose().translation()[1], vehicle.GetWheel(ii)->GetPose().translation()[2]));
         bikeparts->rotx_ = osg::Matrix::rotate(vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0));
-        bikeparts->roty_ = osg::Matrix::rotate(SP_PI/2/*vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[1]*/, osg::Vec3(0.0, 1.0, 0.0));
+        bikeparts->roty_ = osg::Matrix::rotate(SP_PI/2 + vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0));
         bikeparts->rotz_ = osg::Matrix::rotate(vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
 
         bikeparts->shape_->setShape(new osg::Cylinder(osg::Vec3(0.0f, 0.0f, 0.0f), vehicle.GetWheel(ii)->GetRadius(), vehicle.GetWheel(ii)->GetWidth()));
@@ -204,7 +204,7 @@ void spOpenSceneGraphGui::UpdateBoxGuiObject(spBox& spobj)
    int gui_index = spobj.GetGuiIndex();
    //std::cout<<"The gui index is: "<<gui_index<<std::endl;
 
-   if((!(spobj.GetGuiIndex() < osgobj_.size())) || (osgobj_[gui_index]->name_.compare("box")) != 0){
+   if((!(spobj.GetGuiIndex() < osgobj_.size())) || (osgobj_[gui_index]->name_.compare("box"))){
      SPERROREXIT("gui object doesn't match spobject.");
     }
 
@@ -218,7 +218,24 @@ void spOpenSceneGraphGui::UpdateBoxGuiObject(spBox& spobj)
 
 void spOpenSceneGraphGui::UpdateVehicleGuiObject(spVehicle& vehicle)
 {
-    std::cout<<"Currently not updating vehicle"<<std::endl;
+   int chassis_index = vehicle.GetGuiIndex();
+   if((!(vehicle.GetGuiIndex() < osgobj_.size())) || (osgobj_[chassis_index]->name_.compare("frame"))){
+     SPERROREXIT("gui object doesn't match spobject.");
+   }
+   osgobj_[chassis_index]->translate_ = osg::Matrixd::translate(osg::Vec3(vehicle.GetPose().translation()[0], vehicle.GetPose().translation()[1], vehicle.GetPose().translation()[2]));
+   osgobj_[chassis_index]->rotx_ = osg::Matrix::rotate(vehicle.GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0));
+   osgobj_[chassis_index]->roty_ = osg::Matrix::rotate(vehicle.GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0));
+   osgobj_[chassis_index]->rotz_ = osg::Matrix::rotate(vehicle.GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
+   osgobj_[chassis_index]->transform_->setMatrix(osgobj_[chassis_index]->rotx_ * osgobj_[chassis_index]->roty_ * osgobj_[chassis_index]->rotz_ * osgobj_[chassis_index]->translate_);
+
+   for(int ii=0; ii<vehicle.GetNumberOfWheels(); ii++) {
+     int wheel_index = vehicle.GetWheel(ii)->GetGuiIndex();
+     osgobj_[wheel_index]->translate_ = osg::Matrixd::translate(osg::Vec3(vehicle.GetWheel(ii)->GetPose().translation()[0], vehicle.GetWheel(ii)->GetPose().translation()[1], vehicle.GetWheel(ii)->GetPose().translation()[2]));
+     osgobj_[wheel_index]->rotx_ = osg::Matrix::rotate(vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[0], osg::Vec3(1.0, 0.0, 0.0));
+     osgobj_[wheel_index]->roty_ = osg::Matrix::rotate(SP_PI/2 + vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[1], osg::Vec3(0.0, 1.0, 0.0));
+     osgobj_[wheel_index]->rotz_ = osg::Matrix::rotate(vehicle.GetWheel(ii)->GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
+     osgobj_[wheel_index]->transform_->setMatrix(osgobj_[wheel_index]->rotx_ * osgobj_[wheel_index]->roty_ * osgobj_[wheel_index]->rotz_ * osgobj_[wheel_index]->translate_);
+   }
 }
 
 void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
@@ -269,7 +286,7 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
 
 void spOpenSceneGraphGui::UpdateSpiritObjectsFromGui(Objects& spobjects)
 {
-    std::cout<<"UpdateSpiritObjectsFromGui(Objects& spobjects) currently has no functionality"<<std::endl;
+    //std::cout<<"UpdateSpiritObjectsFromGui(Objects& spobjects) currently has no functionality"<<std::endl;
 
 }
 void spOpenSceneGraphGui::RemoveVehicle(spVehicle& vehicle)

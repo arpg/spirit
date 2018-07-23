@@ -12795,6 +12795,8 @@ CMakeFiles/spirit.dir/src/spWheel.cpp.o: /usr/local/include/bullet/LinearMath/bt
 CMakeFiles/spirit.dir/src/spWheel.cpp.o: /usr/local/include/bullet/btBulletCollisionCommon.h
 CMakeFiles/spirit.dir/src/spWheel.cpp.o: /usr/local/include/bullet/btBulletDynamicsCommon.h
 
+CMakeFiles/spirit.dir/src/spirit.cpp.o: ../include/spirit/BikeODE.h
+CMakeFiles/spirit.dir/src/spirit.cpp.o: ../include/spirit/BikeSimFunctorRK4.h
 CMakeFiles/spirit.dir/src/spirit.cpp.o: ../include/spirit/Calibration/CalibCarSimFunctor.h
 CMakeFiles/spirit.dir/src/spirit.cpp.o: ../include/spirit/Calibration/CalibCostFunc.h
 CMakeFiles/spirit.dir/src/spirit.cpp.o: ../include/spirit/Calibration/CandidateWindow.h

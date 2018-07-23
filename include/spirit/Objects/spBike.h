@@ -10,7 +10,7 @@ public:
   ~spBike();
   void SetFrontSteeringAngle(double angle);
   void UpdateWheelFriction(double friction);
-  void SetRearSteeringAngle(double angle);
+  void SetRearSteeringAngle(void);
   void SetEngineMaxVel(double vel);
   void SetEngineTorque(double torque);
 //  void SetSteeringServoMaxVel(double vel);

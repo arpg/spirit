@@ -6,10 +6,22 @@
 
 #IncludeRegexTransform: 
 
+../include/spirit/BikeODE.h
+eigen3/Eigen/Eigen
+-
+
 ../include/spirit/BikeParameters.h
 spirit/Types/spTypes.h
 -
 eigen3/Eigen/Eigen
+-
+
+../include/spirit/BikeSimFunctorRK4.h
+spirit/Types/spTypes.h
+-
+spirit/BikeODE.h
+-
+spirit/RK4.h
 -
 
 ../include/spirit/Calibration/CalibCarSimFunctor.h
@@ -450,6 +462,8 @@ iomanip
 spirit/CarSimFunctor.h
 -
 spirit/CarSimFunctorRK4.h
+-
+spirit/BikeSimFunctorRK4.h
 -
 spirit/CarODE.h
 -
@@ -1289,15 +1303,15 @@ string
 /home/boston/Documents/spirit_dep/spirit/examples/rk4_3D_car/main.cpp
 iostream
 -
-spirit/Gui/spOpenSceneGraphGui.h
--
-spirit/Objects/spBox.h
+chrono
 -
 eigen3/Eigen/Eigen
 -
 spirit/spirit.h
 -
 spirit/BikeParameters.h
+-
+math.h
 -
 
 /usr/include/IL/../EGL/egl.h

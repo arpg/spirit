@@ -6,6 +6,18 @@
 
 #IncludeRegexTransform: 
 
+../include/spirit/BikeODE.h
+eigen3/Eigen/Eigen
+-
+
+../include/spirit/BikeSimFunctorRK4.h
+spirit/Types/spTypes.h
+-
+spirit/BikeODE.h
+-
+spirit/RK4.h
+-
+
 ../include/spirit/Calibration/CalibCarSimFunctor.h
 iostream
 -
@@ -448,6 +460,8 @@ iomanip
 spirit/CarSimFunctor.h
 -
 spirit/CarSimFunctorRK4.h
+-
+spirit/BikeSimFunctorRK4.h
 -
 spirit/CarODE.h
 -

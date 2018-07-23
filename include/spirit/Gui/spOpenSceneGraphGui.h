@@ -19,6 +19,7 @@
 #include <osgGA/GUIEventHandler>
 
 
+
 //// this class is the interface between OpenSceneGraph and spGui
 class spOpenSceneGraphGui : public spCommonGUI
 {

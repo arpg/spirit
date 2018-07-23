@@ -3,7 +3,7 @@
 spBike::spBike(const spVehicleConstructionInfo& vehicle_info, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world):spVehicle(vehicle_info,dynamics_world) {
   // check if object has been initialized with four wheels
   if(vehicle_info.wheels_anchor.size() != 2) {
-    SPERROREXIT("AWSDCar should have two wheels.");
+    SPERROREXIT("Bike should have two wheels.");
   }
   // Initialize vehicle with some parameters
 
@@ -21,7 +21,7 @@ void spBike::SetFrontSteeringAngle(double angle) {
   GetWheel(0)->SetSteeringServoTargetAngle(angle);
 }
 
-void spBike::SetRearSteeringAngle(double angle) {
+void spBike::SetRearSteeringAngle(void) {
   GetWheel(1)->SetSteeringServoTargetAngle(0);
 }
 

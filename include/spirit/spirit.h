@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <spirit/CarSimFunctor.h>
 #include <spirit/CarSimFunctorRK4.h>
+#include <spirit/BikeSimFunctorRK4.h>
 #include <spirit/CarODE.h>
 #include <spirit/Planners/spTrajectory.h>
 #include <spirit/Planners/VehicleCeresCostFunc.h>
