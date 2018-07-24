@@ -253,7 +253,7 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
           }
           case spObjectType::WAYPOINT:
           {
-            std::cout<<"WAYPOINT currently no update functionality."<<std::endl;
+            //std::cout<<"WAYPOINT currently no update functionality."<<std::endl;
             break;
           }
           case spObjectType::BOX:

@@ -20,11 +20,17 @@ int main(int argc, char** argv){
     BikeParams params;
     spObjectHandle car_handle = objs.CreateVehicle(params.bike_param);
 
+    // waypoint
+    spPose pt = spPose::Identity();
+    pt.translate(spTranslation(1,1,0));
+    spObjectHandle pt_handle = objs.CreateWaypoint(pt, spColor(1,1,0));
+
     // set gui and add objects
     Gui gui;
     gui.Create(spGuiType::GUI_OSG);
     gui.AddObject(objs.GetObject(box_handle));
     gui.AddObject(objs.GetObject(car_handle));
+    //gui.AddObject(objs.GetObject(pt_handle));
     spBike& bike = ((spBike&)objs.GetObject(car_handle));
 
     spState state;
