@@ -1,6 +1,6 @@
 #include <spirit/Objects/spMesh.h>
 
-spMesh::spMesh() {
+spMesh::spMesh(const osg::ref_ptr<osg::Node> meshnode) {
   mass_ = 0;
   color_ = spColor(1,1,1);
   pose_ = spPose::Identity();
@@ -8,6 +8,12 @@ spMesh::spMesh() {
   obj_guichanged_ = false;
   modifiable_gui_ = false;
   object_type_ = spObjectType::BOX;
+
+  // for OSG
+  if(!meshnode){ SPERROREXIT("No mesh loaded");}
+  mesh_ = meshnode;
+  mesh_->accept(nodeinfo_);
+  //std::cout<<nodeinfo_.vertices->size()<<std::endl;
 }
 
 spMesh::~spMesh() {}
@@ -43,3 +49,47 @@ const spColor& spMesh::GetColor() {
 bool spMesh::IsDynamic() {
   return false;
 }
+
+const osg::ref_ptr<osg::Node> spMesh::GetMesh(){
+  return mesh_;
+}
+
+Eigen::MatrixXd spMesh::GetVertices(){
+  Eigen::MatrixXd vertexdata(nodeinfo_.vertices->size(), 3);
+  for(unsigned int ii = 0; ii < nodeinfo_.vertices->size(); ii++){
+     vertexdata(ii,0) = (*nodeinfo_.vertices)[ii][0];
+     vertexdata(ii,1) = (*nodeinfo_.vertices)[ii][1];
+     vertexdata(ii,2) = (*nodeinfo_.vertices)[ii][2];
+    }
+   return vertexdata;
+}
+
+Eigen::MatrixXd spMesh::GetNormals(){
+  Eigen::MatrixXd normaldata(nodeinfo_.normals->size(), 3);
+  for(unsigned int ii = 0; ii < nodeinfo_.normals->size(); ii++){
+     normaldata(ii,0) = (*nodeinfo_.normals)[ii][0];
+     normaldata(ii,1) = (*nodeinfo_.normals)[ii][1];
+     normaldata(ii,2) = (*nodeinfo_.normals)[ii][2];
+    }
+  return normaldata;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

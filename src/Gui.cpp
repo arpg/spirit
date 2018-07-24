@@ -72,6 +72,11 @@ void Gui::AddObject(spCommonObject &obj) {
       gui_->AddLineStrip((spLineStrip&) obj);
       break;
     }
+    case spObjectType::MESH:
+    {
+      gui_->AddMesh((spMesh&) obj);
+      break;
+    }
     default:
     {
       std::cerr << "Unknown spirit object type." << std::endl;

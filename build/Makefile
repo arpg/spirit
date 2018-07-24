@@ -124,162 +124,6 @@ spirit/fast:
 .PHONY : spirit/fast
 
 #=============================================================================
-# Target rules for targets named car_robot
-
-# Build rule for target.
-car_robot: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 car_robot
-.PHONY : car_robot
-
-# fast build rule for target.
-car_robot/fast:
-	$(MAKE) -f examples/car_robot/CMakeFiles/car_robot.dir/build.make examples/car_robot/CMakeFiles/car_robot.dir/build
-.PHONY : car_robot/fast
-
-#=============================================================================
-# Target rules for targets named CarCalib
-
-# Build rule for target.
-CarCalib: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 CarCalib
-.PHONY : CarCalib
-
-# fast build rule for target.
-CarCalib/fast:
-	$(MAKE) -f examples/CarCalib/CMakeFiles/CarCalib.dir/build.make examples/CarCalib/CMakeFiles/CarCalib.dir/build
-.PHONY : CarCalib/fast
-
-#=============================================================================
-# Target rules for targets named mpc_car
-
-# Build rule for target.
-mpc_car: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 mpc_car
-.PHONY : mpc_car
-
-# fast build rule for target.
-mpc_car/fast:
-	$(MAKE) -f examples/mpc_car/CMakeFiles/mpc_car.dir/build.make examples/mpc_car/CMakeFiles/mpc_car.dir/build
-.PHONY : mpc_car/fast
-
-#=============================================================================
-# Target rules for targets named sim_car
-
-# Build rule for target.
-sim_car: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 sim_car
-.PHONY : sim_car
-
-# fast build rule for target.
-sim_car/fast:
-	$(MAKE) -f examples/sim_car/CMakeFiles/sim_car.dir/build.make examples/sim_car/CMakeFiles/sim_car.dir/build
-.PHONY : sim_car/fast
-
-#=============================================================================
-# Target rules for targets named shooting
-
-# Build rule for target.
-shooting: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 shooting
-.PHONY : shooting
-
-# fast build rule for target.
-shooting/fast:
-	$(MAKE) -f examples/shooting/CMakeFiles/shooting.dir/build.make examples/shooting/CMakeFiles/shooting.dir/build
-.PHONY : shooting/fast
-
-#=============================================================================
-# Target rules for targets named bvp_example
-
-# Build rule for target.
-bvp_example: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 bvp_example
-.PHONY : bvp_example
-
-# fast build rule for target.
-bvp_example/fast:
-	$(MAKE) -f examples/bvp_example/CMakeFiles/bvp_example.dir/build.make examples/bvp_example/CMakeFiles/bvp_example.dir/build
-.PHONY : bvp_example/fast
-
-#=============================================================================
-# Target rules for targets named gamepad_drive
-
-# Build rule for target.
-gamepad_drive: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 gamepad_drive
-.PHONY : gamepad_drive
-
-# fast build rule for target.
-gamepad_drive/fast:
-	$(MAKE) -f examples/gamepad_drive/CMakeFiles/gamepad_drive.dir/build.make examples/gamepad_drive/CMakeFiles/gamepad_drive.dir/build
-.PHONY : gamepad_drive/fast
-
-#=============================================================================
-# Target rules for targets named rk4
-
-# Build rule for target.
-rk4: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 rk4
-.PHONY : rk4
-
-# fast build rule for target.
-rk4/fast:
-	$(MAKE) -f examples/rk4/CMakeFiles/rk4.dir/build.make examples/rk4/CMakeFiles/rk4.dir/build
-.PHONY : rk4/fast
-
-#=============================================================================
-# Target rules for targets named rk4_car
-
-# Build rule for target.
-rk4_car: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 rk4_car
-.PHONY : rk4_car
-
-# fast build rule for target.
-rk4_car/fast:
-	$(MAKE) -f examples/rk4_car/CMakeFiles/rk4_car.dir/build.make examples/rk4_car/CMakeFiles/rk4_car.dir/build
-.PHONY : rk4_car/fast
-
-#=============================================================================
-# Target rules for targets named ode_car_mpc
-
-# Build rule for target.
-ode_car_mpc: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ode_car_mpc
-.PHONY : ode_car_mpc
-
-# fast build rule for target.
-ode_car_mpc/fast:
-	$(MAKE) -f examples/ode_car_mpc/CMakeFiles/ode_car_mpc.dir/build.make examples/ode_car_mpc/CMakeFiles/ode_car_mpc.dir/build
-.PHONY : ode_car_mpc/fast
-
-#=============================================================================
-# Target rules for targets named rk4_spirit_car
-
-# Build rule for target.
-rk4_spirit_car: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 rk4_spirit_car
-.PHONY : rk4_spirit_car
-
-# fast build rule for target.
-rk4_spirit_car/fast:
-	$(MAKE) -f examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/build.make examples/rk4_spirit_car/CMakeFiles/rk4_spirit_car.dir/build
-.PHONY : rk4_spirit_car/fast
-
-#=============================================================================
-# Target rules for targets named cost_surf
-
-# Build rule for target.
-cost_surf: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 cost_surf
-.PHONY : cost_surf
-
-# fast build rule for target.
-cost_surf/fast:
-	$(MAKE) -f examples/cost_surf/CMakeFiles/cost_surf.dir/build.make examples/cost_surf/CMakeFiles/cost_surf.dir/build
-.PHONY : cost_surf/fast
-
-#=============================================================================
 # Target rules for targets named rk4_3D_car
 
 # Build rule for target.
@@ -534,6 +378,33 @@ src/spGeneralTools.s: src/spGeneralTools.cpp.s
 src/spGeneralTools.cpp.s:
 	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/src/spGeneralTools.cpp.s
 .PHONY : src/spGeneralTools.cpp.s
+
+src/spInfoVisitor.o: src/spInfoVisitor.cpp.o
+
+.PHONY : src/spInfoVisitor.o
+
+# target to build an object file
+src/spInfoVisitor.cpp.o:
+	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/src/spInfoVisitor.cpp.o
+.PHONY : src/spInfoVisitor.cpp.o
+
+src/spInfoVisitor.i: src/spInfoVisitor.cpp.i
+
+.PHONY : src/spInfoVisitor.i
+
+# target to preprocess a source file
+src/spInfoVisitor.cpp.i:
+	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/src/spInfoVisitor.cpp.i
+.PHONY : src/spInfoVisitor.cpp.i
+
+src/spInfoVisitor.s: src/spInfoVisitor.cpp.s
+
+.PHONY : src/spInfoVisitor.s
+
+# target to generate assembly for a file
+src/spInfoVisitor.cpp.s:
+	$(MAKE) -f CMakeFiles/spirit.dir/build.make CMakeFiles/spirit.dir/src/spInfoVisitor.cpp.s
+.PHONY : src/spInfoVisitor.cpp.s
 
 src/spLineStrip.o: src/spLineStrip.cpp.o
 
@@ -895,18 +766,6 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... spirit"
-	@echo "... car_robot"
-	@echo "... CarCalib"
-	@echo "... mpc_car"
-	@echo "... sim_car"
-	@echo "... shooting"
-	@echo "... bvp_example"
-	@echo "... gamepad_drive"
-	@echo "... rk4"
-	@echo "... rk4_car"
-	@echo "... ode_car_mpc"
-	@echo "... rk4_spirit_car"
-	@echo "... cost_surf"
 	@echo "... rk4_3D_car"
 	@echo "... src/Gui.o"
 	@echo "... src/Gui.i"
@@ -935,6 +794,9 @@ help:
 	@echo "... src/spGeneralTools.o"
 	@echo "... src/spGeneralTools.i"
 	@echo "... src/spGeneralTools.s"
+	@echo "... src/spInfoVisitor.o"
+	@echo "... src/spInfoVisitor.i"
+	@echo "... src/spInfoVisitor.s"
 	@echo "... src/spLineStrip.o"
 	@echo "... src/spLineStrip.i"
 	@echo "... src/spLineStrip.s"

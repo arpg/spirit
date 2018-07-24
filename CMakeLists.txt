@@ -85,6 +85,7 @@ set( HDRS
 	include/spirit/Objects/spBike.h
 	include/spirit/Objects/spWheel.h
 	include/spirit/Objects/spWaypoint.h
+	include/spirit/Objects/spInfoVisitor.h
 	include/spirit/Types/spTypes.h
 	include/spirit/Objects/spLineStrip.h
 	include/spirit/CarSimFunctor.h
@@ -131,6 +132,7 @@ set( SRCS
 	src/spAWSDCar.cpp
 	src/spBike.cpp
 	src/spWheel.cpp
+	src/spInfoVisitor.cpp
 	src/spLineStrip.cpp
 	src/spPID.cpp
 	src/spTrajectory.cpp

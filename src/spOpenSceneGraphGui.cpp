@@ -12,7 +12,6 @@ spOpenSceneGraphGui::~spOpenSceneGraphGui()
 void spOpenSceneGraphGui::InitGui()
 {
     //viewer_.getCamera()->setViewMatrixAsLookAt( osg::Vec3(0.0f,-100.0f,0.0f), osg::Vec3(), osg::Z_AXIS );
-    //viewer_.setSceneData(root_.get());
     viewer_.setUpViewInWindow(20,20, 650, 650);
     viewer_.setCameraManipulator(new osgGA::TrackballManipulator());
     viewer_.realize();
@@ -199,6 +198,15 @@ void spOpenSceneGraphGui::AddLineStrip(spLineStrip& linestrip)
 
 }
 
+void spOpenSceneGraphGui::AddMesh(spMesh& mesh){
+    /*
+    OSGobj* meshptr = new OSGobj;
+    meshptr->name_ = "mesh";
+    osgobj_.push_back(meshptr);
+    mesh.SetGuiIndex(osgobj_.size()-1); */
+    root_->addChild(mesh.GetMesh());
+}
+
 void spOpenSceneGraphGui::UpdateBoxGuiObject(spBox& spobj)
 {
    int gui_index = spobj.GetGuiIndex();
@@ -262,7 +270,6 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
             //SPERROREXIT("BOX object not in use.");
             break;
           }
-          //case spObjectType::VEHICLE_AWSD:
           case spObjectType::VEHICLE_BIKE:
           {
             UpdateVehicleGuiObject((spVehicle&)spobj.GetObject(ii));
@@ -272,6 +279,11 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
           case spObjectType::LINESTRIP:
           {
             std::cout<<"LINESTRIP currently no update functionality."<<std::endl;
+            break;
+          }
+          case spObjectType::MESH:
+          {
+            std::cout<<"MESH currently no update functionality."<<std::endl;
             break;
           }
           default:

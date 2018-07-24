@@ -116,6 +116,12 @@ spObjectHandle Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_i
   return (--objects_.end());
 }
 
+spObjectHandle Objects::CreateMesh(const osg::ref_ptr<osg::Node>& meshnode) {
+  std::shared_ptr<spMesh> a_mesh = std::make_shared<spMesh>(meshnode);
+  objects_.push_back(a_mesh);
+  return (--objects_.end());
+}
+
 spObjectHandle Objects::CreateLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, const spColor& color) {
   std::shared_ptr<spLineStrip> a_curve = std::make_shared<spLineStrip>(pose,linestrip_pts,color);
   objects_.push_back(a_curve);

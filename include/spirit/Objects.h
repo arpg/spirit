@@ -8,6 +8,9 @@
 #include <spirit/Objects/spBike.h>
 #include <spirit/Objects/spWaypoint.h>
 #include <spirit/Objects/spLineStrip.h>
+#include <spirit/Objects/spMesh.h>
+#include <osg/Node>
+#include <osg/ref_ptr>
 
 
 typedef std::list<std::shared_ptr<spCommonObject>>::iterator spObjectHandle;
@@ -30,6 +33,7 @@ public:
   spObjectHandle CreateVehicle(const spVehicleConstructionInfo& vehicle_info);
   spObjectHandle CreateLineStrip(const spPose& pose, const spPoints3d& linestrip_pts, const spColor& color);
   spObjectHandle CreateLineStrip(const spPose& pose, const spCurve& curve, int num_pts, const spColor& color);
+  spObjectHandle CreateMesh(const osg::ref_ptr<osg::Node>& meshnode);
   void StepPhySimulation(double step_time);
   void RemoveObj(spObjectHandle& obj_handle);
   int GetNumOfObjects();
@@ -38,7 +42,7 @@ public:
   spObjectHandle GetListEnd();
 
 private:
-  spPose& btTransform2spPose(const btTransform& tr, double btworld_scale_inv);
+  spPose& Transform2spPose(const btTransform& tr, double btworld_scale_inv);
   btTransform& spPose2btTransform(const spPose& pose, double btworld_scale);
   btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
   std::list<std::shared_ptr<spCommonObject>> objects_;

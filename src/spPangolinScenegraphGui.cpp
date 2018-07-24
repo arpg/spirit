@@ -199,6 +199,9 @@ void spPangolinScenegraphGui::AddLineStrip(spLineStrip& linestrip) {
   glscenegraph_.AddChild(globjects_[globjects_.size()-1]);
 }
 
+void spPangolinScenegraphGui::AddMesh(spMesh& mesh){
+   SPERROREXIT("Mesh features not availible");
+}
 
 void spPangolinScenegraphGui::UpdateBoxGuiObject(spBox& spobj) {
   int gui_index = spobj.GetGuiIndex();

@@ -11,7 +11,9 @@ CMakeFiles/spirit.dir/src/Gui.cpp.o
  ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spLineStrip.h
+ ../include/spirit/Objects/spMesh.h
  ../include/spirit/Objects/spVehicle.h
  ../include/spirit/Objects/spWaypoint.h
  ../include/spirit/Objects/spWheel.h
@@ -829,7 +831,9 @@ CMakeFiles/spirit.dir/src/Objects.cpp.o
  ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spLineStrip.h
+ ../include/spirit/Objects/spMesh.h
  ../include/spirit/Objects/spVehicle.h
  ../include/spirit/Objects/spWaypoint.h
  ../include/spirit/Objects/spWheel.h
@@ -897,6 +901,15 @@ CMakeFiles/spirit.dir/src/Objects.cpp.o
  /usr/include/IL/../GLES2/gl2ext.h
  /usr/include/IL/../GLES2/gl2platform.h
  /usr/include/IL/../KHR/khrplatform.h
+ /usr/include/IL/../OpenThreads/Atomic
+ /usr/include/IL/../OpenThreads/Barrier
+ /usr/include/IL/../OpenThreads/Block
+ /usr/include/IL/../OpenThreads/Condition
+ /usr/include/IL/../OpenThreads/Config
+ /usr/include/IL/../OpenThreads/Exports
+ /usr/include/IL/../OpenThreads/Mutex
+ /usr/include/IL/../OpenThreads/ScopedLock
+ /usr/include/IL/../OpenThreads/Thread
  /usr/include/IL/../X11/X.h
  /usr/include/IL/../X11/Xfuncproto.h
  /usr/include/IL/../X11/Xlib.h
@@ -1365,6 +1378,105 @@ CMakeFiles/spirit.dir/src/Objects.cpp.o
  /usr/local/include/bullet/LinearMath/btVector3.h
  /usr/local/include/bullet/btBulletCollisionCommon.h
  /usr/local/include/bullet/btBulletDynamicsCommon.h
+ /usr/local/include/osg/Array
+ /usr/local/include/osg/AttributeDispatchers
+ /usr/local/include/osg/BoundingBox
+ /usr/local/include/osg/BoundingSphere
+ /usr/local/include/osg/BufferObject
+ /usr/local/include/osg/Callback
+ /usr/local/include/osg/Camera
+ /usr/local/include/osg/ClearNode
+ /usr/local/include/osg/ColorMask
+ /usr/local/include/osg/Config
+ /usr/local/include/osg/CopyOp
+ /usr/local/include/osg/CullSettings
+ /usr/local/include/osg/DisplaySettings
+ /usr/local/include/osg/Drawable
+ /usr/local/include/osg/Export
+ /usr/local/include/osg/FrameStamp
+ /usr/local/include/osg/GL
+ /usr/local/include/osg/GLDefines
+ /usr/local/include/osg/GLExtensions
+ /usr/local/include/osg/GLObjects
+ /usr/local/include/osg/Geode
+ /usr/local/include/osg/Geometry
+ /usr/local/include/osg/GraphicsContext
+ /usr/local/include/osg/GraphicsCostEstimator
+ /usr/local/include/osg/GraphicsThread
+ /usr/local/include/osg/Group
+ /usr/local/include/osg/Image
+ /usr/local/include/osg/Light
+ /usr/local/include/osg/Math
+ /usr/local/include/osg/Matrix
+ /usr/local/include/osg/MatrixTemplate
+ /usr/local/include/osg/Matrixd
+ /usr/local/include/osg/Matrixf
+ /usr/local/include/osg/MixinVector
+ /usr/local/include/osg/Node
+ /usr/local/include/osg/NodeVisitor
+ /usr/local/include/osg/Notify
+ /usr/local/include/osg/Object
+ /usr/local/include/osg/Observer
+ /usr/local/include/osg/OperationThread
+ /usr/local/include/osg/Plane
+ /usr/local/include/osg/Polytope
+ /usr/local/include/osg/PrimitiveSet
+ /usr/local/include/osg/Program
+ /usr/local/include/osg/Quat
+ /usr/local/include/osg/Referenced
+ /usr/local/include/osg/RenderInfo
+ /usr/local/include/osg/Shader
+ /usr/local/include/osg/ShaderComposer
+ /usr/local/include/osg/Shape
+ /usr/local/include/osg/State
+ /usr/local/include/osg/StateAttribute
+ /usr/local/include/osg/StateSet
+ /usr/local/include/osg/Stats
+ /usr/local/include/osg/Texture
+ /usr/local/include/osg/TextureAttribute
+ /usr/local/include/osg/Timer
+ /usr/local/include/osg/Transform
+ /usr/local/include/osg/Types
+ /usr/local/include/osg/Uniform
+ /usr/local/include/osg/UniformBase
+ /usr/local/include/osg/UserDataContainer
+ /usr/local/include/osg/ValueMap
+ /usr/local/include/osg/ValueObject
+ /usr/local/include/osg/ValueStack
+ /usr/local/include/osg/Vec2
+ /usr/local/include/osg/Vec2b
+ /usr/local/include/osg/Vec2d
+ /usr/local/include/osg/Vec2f
+ /usr/local/include/osg/Vec2i
+ /usr/local/include/osg/Vec2s
+ /usr/local/include/osg/Vec2ub
+ /usr/local/include/osg/Vec2ui
+ /usr/local/include/osg/Vec2us
+ /usr/local/include/osg/Vec3
+ /usr/local/include/osg/Vec3b
+ /usr/local/include/osg/Vec3d
+ /usr/local/include/osg/Vec3f
+ /usr/local/include/osg/Vec3i
+ /usr/local/include/osg/Vec3s
+ /usr/local/include/osg/Vec3ub
+ /usr/local/include/osg/Vec3ui
+ /usr/local/include/osg/Vec3us
+ /usr/local/include/osg/Vec4
+ /usr/local/include/osg/Vec4b
+ /usr/local/include/osg/Vec4d
+ /usr/local/include/osg/Vec4f
+ /usr/local/include/osg/Vec4i
+ /usr/local/include/osg/Vec4s
+ /usr/local/include/osg/Vec4ub
+ /usr/local/include/osg/Vec4ui
+ /usr/local/include/osg/Vec4us
+ /usr/local/include/osg/VertexArrayState
+ /usr/local/include/osg/View
+ /usr/local/include/osg/Viewport
+ /usr/local/include/osg/buffered_value
+ /usr/local/include/osg/fast_back_stack
+ /usr/local/include/osg/observer_ptr
+ /usr/local/include/osg/ref_ptr
 CMakeFiles/spirit.dir/src/RK4.cpp.o
  ../include/spirit/RK4.h
  /home/boston/Documents/spirit_dep/spirit/src/RK4.cpp
@@ -3293,7 +3405,9 @@ CMakeFiles/spirit.dir/src/spCirclePlanner.cpp.o
  ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spLineStrip.h
+ ../include/spirit/Objects/spMesh.h
  ../include/spirit/Objects/spVehicle.h
  ../include/spirit/Objects/spWaypoint.h
  ../include/spirit/Objects/spWheel.h
@@ -5113,6 +5227,158 @@ CMakeFiles/spirit.dir/src/spGeneralTools.cpp.o
  /usr/include/x86_64-linux-gnu/sys/sysmacros.h
  /usr/include/x86_64-linux-gnu/sys/ttydefaults.h
  /usr/include/x86_64-linux-gnu/sys/types.h
+CMakeFiles/spirit.dir/src/spInfoVisitor.cpp.o
+ ../include/spirit/Objects/spInfoVisitor.h
+ /home/boston/Documents/spirit_dep/spirit/src/spInfoVisitor.cpp
+ /usr/include/IL/../GL/gl.h
+ /usr/include/IL/../GL/gl_mangle.h
+ /usr/include/IL/../GL/glext.h
+ /usr/include/IL/../OpenThreads/Atomic
+ /usr/include/IL/../OpenThreads/Barrier
+ /usr/include/IL/../OpenThreads/Block
+ /usr/include/IL/../OpenThreads/Condition
+ /usr/include/IL/../OpenThreads/Config
+ /usr/include/IL/../OpenThreads/Exports
+ /usr/include/IL/../OpenThreads/Mutex
+ /usr/include/IL/../OpenThreads/ScopedLock
+ /usr/include/IL/../OpenThreads/Thread
+ /usr/include/IL/../alloca.h
+ /usr/include/IL/../endian.h
+ /usr/include/IL/../features.h
+ /usr/include/IL/../inttypes.h
+ /usr/include/IL/../stdc-predef.h
+ /usr/include/IL/../stdint.h
+ /usr/include/IL/../stdlib.h
+ /usr/include/IL/../string.h
+ /usr/include/IL/../time.h
+ /usr/include/IL/../xlocale.h
+ /usr/include/x86_64-linux-gnu/bits/byteswap-16.h
+ /usr/include/x86_64-linux-gnu/bits/byteswap.h
+ /usr/include/x86_64-linux-gnu/bits/endian.h
+ /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h
+ /usr/include/x86_64-linux-gnu/bits/select.h
+ /usr/include/x86_64-linux-gnu/bits/select2.h
+ /usr/include/x86_64-linux-gnu/bits/sigset.h
+ /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h
+ /usr/include/x86_64-linux-gnu/bits/stdlib-float.h
+ /usr/include/x86_64-linux-gnu/bits/stdlib-ldbl.h
+ /usr/include/x86_64-linux-gnu/bits/stdlib.h
+ /usr/include/x86_64-linux-gnu/bits/string.h
+ /usr/include/x86_64-linux-gnu/bits/string2.h
+ /usr/include/x86_64-linux-gnu/bits/string3.h
+ /usr/include/x86_64-linux-gnu/bits/time.h
+ /usr/include/x86_64-linux-gnu/bits/timex.h
+ /usr/include/x86_64-linux-gnu/bits/types.h
+ /usr/include/x86_64-linux-gnu/bits/typesizes.h
+ /usr/include/x86_64-linux-gnu/bits/waitflags.h
+ /usr/include/x86_64-linux-gnu/bits/waitstatus.h
+ /usr/include/x86_64-linux-gnu/bits/wchar.h
+ /usr/include/x86_64-linux-gnu/bits/wordsize.h
+ /usr/include/x86_64-linux-gnu/gnu/stubs-64.h
+ /usr/include/x86_64-linux-gnu/gnu/stubs.h
+ /usr/include/x86_64-linux-gnu/sys/cdefs.h
+ /usr/include/x86_64-linux-gnu/sys/select.h
+ /usr/include/x86_64-linux-gnu/sys/sysmacros.h
+ /usr/include/x86_64-linux-gnu/sys/types.h
+ /usr/local/include/osg/Array
+ /usr/local/include/osg/AttributeDispatchers
+ /usr/local/include/osg/BoundingBox
+ /usr/local/include/osg/BoundingSphere
+ /usr/local/include/osg/BufferObject
+ /usr/local/include/osg/Callback
+ /usr/local/include/osg/Camera
+ /usr/local/include/osg/ClearNode
+ /usr/local/include/osg/ColorMask
+ /usr/local/include/osg/Config
+ /usr/local/include/osg/CopyOp
+ /usr/local/include/osg/CullSettings
+ /usr/local/include/osg/DisplaySettings
+ /usr/local/include/osg/Drawable
+ /usr/local/include/osg/Export
+ /usr/local/include/osg/FrameStamp
+ /usr/local/include/osg/GL
+ /usr/local/include/osg/GLDefines
+ /usr/local/include/osg/GLExtensions
+ /usr/local/include/osg/GLObjects
+ /usr/local/include/osg/Geode
+ /usr/local/include/osg/Geometry
+ /usr/local/include/osg/GraphicsContext
+ /usr/local/include/osg/GraphicsCostEstimator
+ /usr/local/include/osg/GraphicsThread
+ /usr/local/include/osg/Group
+ /usr/local/include/osg/Image
+ /usr/local/include/osg/Light
+ /usr/local/include/osg/Math
+ /usr/local/include/osg/Matrix
+ /usr/local/include/osg/MatrixTemplate
+ /usr/local/include/osg/Matrixd
+ /usr/local/include/osg/Matrixf
+ /usr/local/include/osg/MixinVector
+ /usr/local/include/osg/Node
+ /usr/local/include/osg/NodeVisitor
+ /usr/local/include/osg/Notify
+ /usr/local/include/osg/Object
+ /usr/local/include/osg/Observer
+ /usr/local/include/osg/OperationThread
+ /usr/local/include/osg/Plane
+ /usr/local/include/osg/Polytope
+ /usr/local/include/osg/PrimitiveSet
+ /usr/local/include/osg/Program
+ /usr/local/include/osg/Quat
+ /usr/local/include/osg/Referenced
+ /usr/local/include/osg/RenderInfo
+ /usr/local/include/osg/Shader
+ /usr/local/include/osg/ShaderComposer
+ /usr/local/include/osg/Shape
+ /usr/local/include/osg/State
+ /usr/local/include/osg/StateAttribute
+ /usr/local/include/osg/StateSet
+ /usr/local/include/osg/Stats
+ /usr/local/include/osg/Texture
+ /usr/local/include/osg/TextureAttribute
+ /usr/local/include/osg/Timer
+ /usr/local/include/osg/Transform
+ /usr/local/include/osg/Types
+ /usr/local/include/osg/Uniform
+ /usr/local/include/osg/UniformBase
+ /usr/local/include/osg/UserDataContainer
+ /usr/local/include/osg/ValueMap
+ /usr/local/include/osg/ValueObject
+ /usr/local/include/osg/ValueStack
+ /usr/local/include/osg/Vec2
+ /usr/local/include/osg/Vec2b
+ /usr/local/include/osg/Vec2d
+ /usr/local/include/osg/Vec2f
+ /usr/local/include/osg/Vec2i
+ /usr/local/include/osg/Vec2s
+ /usr/local/include/osg/Vec2ub
+ /usr/local/include/osg/Vec2ui
+ /usr/local/include/osg/Vec2us
+ /usr/local/include/osg/Vec3
+ /usr/local/include/osg/Vec3b
+ /usr/local/include/osg/Vec3d
+ /usr/local/include/osg/Vec3f
+ /usr/local/include/osg/Vec3i
+ /usr/local/include/osg/Vec3s
+ /usr/local/include/osg/Vec3ub
+ /usr/local/include/osg/Vec3ui
+ /usr/local/include/osg/Vec3us
+ /usr/local/include/osg/Vec4
+ /usr/local/include/osg/Vec4b
+ /usr/local/include/osg/Vec4d
+ /usr/local/include/osg/Vec4f
+ /usr/local/include/osg/Vec4i
+ /usr/local/include/osg/Vec4s
+ /usr/local/include/osg/Vec4ub
+ /usr/local/include/osg/Vec4ui
+ /usr/local/include/osg/Vec4us
+ /usr/local/include/osg/VertexArrayState
+ /usr/local/include/osg/View
+ /usr/local/include/osg/Viewport
+ /usr/local/include/osg/buffered_value
+ /usr/local/include/osg/fast_back_stack
+ /usr/local/include/osg/observer_ptr
+ /usr/local/include/osg/ref_ptr
 CMakeFiles/spirit.dir/src/spLineStrip.cpp.o
  ../include/spirit/Objects/spCommonObject.h
  ../include/spirit/Objects/spLineStrip.h
@@ -5659,7 +5925,9 @@ CMakeFiles/spirit.dir/src/spLocalPlanner.cpp.o
  ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spLineStrip.h
+ ../include/spirit/Objects/spMesh.h
  ../include/spirit/Objects/spVehicle.h
  ../include/spirit/Objects/spWaypoint.h
  ../include/spirit/Objects/spWheel.h
@@ -6538,7 +6806,9 @@ CMakeFiles/spirit.dir/src/spMPC.cpp.o
  ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spLineStrip.h
+ ../include/spirit/Objects/spMesh.h
  ../include/spirit/Objects/spVehicle.h
  ../include/spirit/Objects/spWaypoint.h
  ../include/spirit/Objects/spWheel.h
@@ -7400,6 +7670,7 @@ CMakeFiles/spirit.dir/src/spMPC.cpp.o
  /usr/local/include/osgViewer/ViewerEventHandlers
 CMakeFiles/spirit.dir/src/spMesh.cpp.o
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spMesh.h
  ../include/spirit/Types/spTypes.h
  ../include/spirit/spGeneralTools.h
@@ -7465,6 +7736,15 @@ CMakeFiles/spirit.dir/src/spMesh.cpp.o
  /usr/include/IL/../GLES2/gl2ext.h
  /usr/include/IL/../GLES2/gl2platform.h
  /usr/include/IL/../KHR/khrplatform.h
+ /usr/include/IL/../OpenThreads/Atomic
+ /usr/include/IL/../OpenThreads/Barrier
+ /usr/include/IL/../OpenThreads/Block
+ /usr/include/IL/../OpenThreads/Condition
+ /usr/include/IL/../OpenThreads/Config
+ /usr/include/IL/../OpenThreads/Exports
+ /usr/include/IL/../OpenThreads/Mutex
+ /usr/include/IL/../OpenThreads/ScopedLock
+ /usr/include/IL/../OpenThreads/Thread
  /usr/include/IL/../X11/X.h
  /usr/include/IL/../X11/Xfuncproto.h
  /usr/include/IL/../X11/Xlib.h
@@ -7933,6 +8213,105 @@ CMakeFiles/spirit.dir/src/spMesh.cpp.o
  /usr/local/include/bullet/LinearMath/btVector3.h
  /usr/local/include/bullet/btBulletCollisionCommon.h
  /usr/local/include/bullet/btBulletDynamicsCommon.h
+ /usr/local/include/osg/Array
+ /usr/local/include/osg/AttributeDispatchers
+ /usr/local/include/osg/BoundingBox
+ /usr/local/include/osg/BoundingSphere
+ /usr/local/include/osg/BufferObject
+ /usr/local/include/osg/Callback
+ /usr/local/include/osg/Camera
+ /usr/local/include/osg/ClearNode
+ /usr/local/include/osg/ColorMask
+ /usr/local/include/osg/Config
+ /usr/local/include/osg/CopyOp
+ /usr/local/include/osg/CullSettings
+ /usr/local/include/osg/DisplaySettings
+ /usr/local/include/osg/Drawable
+ /usr/local/include/osg/Export
+ /usr/local/include/osg/FrameStamp
+ /usr/local/include/osg/GL
+ /usr/local/include/osg/GLDefines
+ /usr/local/include/osg/GLExtensions
+ /usr/local/include/osg/GLObjects
+ /usr/local/include/osg/Geode
+ /usr/local/include/osg/Geometry
+ /usr/local/include/osg/GraphicsContext
+ /usr/local/include/osg/GraphicsCostEstimator
+ /usr/local/include/osg/GraphicsThread
+ /usr/local/include/osg/Group
+ /usr/local/include/osg/Image
+ /usr/local/include/osg/Light
+ /usr/local/include/osg/Math
+ /usr/local/include/osg/Matrix
+ /usr/local/include/osg/MatrixTemplate
+ /usr/local/include/osg/Matrixd
+ /usr/local/include/osg/Matrixf
+ /usr/local/include/osg/MixinVector
+ /usr/local/include/osg/Node
+ /usr/local/include/osg/NodeVisitor
+ /usr/local/include/osg/Notify
+ /usr/local/include/osg/Object
+ /usr/local/include/osg/Observer
+ /usr/local/include/osg/OperationThread
+ /usr/local/include/osg/Plane
+ /usr/local/include/osg/Polytope
+ /usr/local/include/osg/PrimitiveSet
+ /usr/local/include/osg/Program
+ /usr/local/include/osg/Quat
+ /usr/local/include/osg/Referenced
+ /usr/local/include/osg/RenderInfo
+ /usr/local/include/osg/Shader
+ /usr/local/include/osg/ShaderComposer
+ /usr/local/include/osg/Shape
+ /usr/local/include/osg/State
+ /usr/local/include/osg/StateAttribute
+ /usr/local/include/osg/StateSet
+ /usr/local/include/osg/Stats
+ /usr/local/include/osg/Texture
+ /usr/local/include/osg/TextureAttribute
+ /usr/local/include/osg/Timer
+ /usr/local/include/osg/Transform
+ /usr/local/include/osg/Types
+ /usr/local/include/osg/Uniform
+ /usr/local/include/osg/UniformBase
+ /usr/local/include/osg/UserDataContainer
+ /usr/local/include/osg/ValueMap
+ /usr/local/include/osg/ValueObject
+ /usr/local/include/osg/ValueStack
+ /usr/local/include/osg/Vec2
+ /usr/local/include/osg/Vec2b
+ /usr/local/include/osg/Vec2d
+ /usr/local/include/osg/Vec2f
+ /usr/local/include/osg/Vec2i
+ /usr/local/include/osg/Vec2s
+ /usr/local/include/osg/Vec2ub
+ /usr/local/include/osg/Vec2ui
+ /usr/local/include/osg/Vec2us
+ /usr/local/include/osg/Vec3
+ /usr/local/include/osg/Vec3b
+ /usr/local/include/osg/Vec3d
+ /usr/local/include/osg/Vec3f
+ /usr/local/include/osg/Vec3i
+ /usr/local/include/osg/Vec3s
+ /usr/local/include/osg/Vec3ub
+ /usr/local/include/osg/Vec3ui
+ /usr/local/include/osg/Vec3us
+ /usr/local/include/osg/Vec4
+ /usr/local/include/osg/Vec4b
+ /usr/local/include/osg/Vec4d
+ /usr/local/include/osg/Vec4f
+ /usr/local/include/osg/Vec4i
+ /usr/local/include/osg/Vec4s
+ /usr/local/include/osg/Vec4ub
+ /usr/local/include/osg/Vec4ui
+ /usr/local/include/osg/Vec4us
+ /usr/local/include/osg/VertexArrayState
+ /usr/local/include/osg/View
+ /usr/local/include/osg/Viewport
+ /usr/local/include/osg/buffered_value
+ /usr/local/include/osg/fast_back_stack
+ /usr/local/include/osg/observer_ptr
+ /usr/local/include/osg/ref_ptr
 CMakeFiles/spirit.dir/src/spOpenSceneGraphGui.cpp.o
  ../include/spirit/Gui/spCommonGui.h
  ../include/spirit/Gui/spOpenSceneGraphGui.h
@@ -7941,7 +8320,9 @@ CMakeFiles/spirit.dir/src/spOpenSceneGraphGui.cpp.o
  ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spLineStrip.h
+ ../include/spirit/Objects/spMesh.h
  ../include/spirit/Objects/spVehicle.h
  ../include/spirit/Objects/spWaypoint.h
  ../include/spirit/Objects/spWheel.h
@@ -9208,7 +9589,9 @@ CMakeFiles/spirit.dir/src/spPangolinScenegraphGui.cpp.o
  ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spLineStrip.h
+ ../include/spirit/Objects/spMesh.h
  ../include/spirit/Objects/spVehicle.h
  ../include/spirit/Objects/spWaypoint.h
  ../include/spirit/Objects/spWheel.h
@@ -9315,6 +9698,15 @@ CMakeFiles/spirit.dir/src/spPangolinScenegraphGui.cpp.o
  /usr/include/IL/../GLES2/gl2ext.h
  /usr/include/IL/../GLES2/gl2platform.h
  /usr/include/IL/../KHR/khrplatform.h
+ /usr/include/IL/../OpenThreads/Atomic
+ /usr/include/IL/../OpenThreads/Barrier
+ /usr/include/IL/../OpenThreads/Block
+ /usr/include/IL/../OpenThreads/Condition
+ /usr/include/IL/../OpenThreads/Config
+ /usr/include/IL/../OpenThreads/Exports
+ /usr/include/IL/../OpenThreads/Mutex
+ /usr/include/IL/../OpenThreads/ScopedLock
+ /usr/include/IL/../OpenThreads/Thread
  /usr/include/IL/../X11/X.h
  /usr/include/IL/../X11/Xfuncproto.h
  /usr/include/IL/../X11/Xlib.h
@@ -9832,6 +10224,105 @@ CMakeFiles/spirit.dir/src/spPangolinScenegraphGui.cpp.o
  /usr/local/include/bullet/LinearMath/btVector3.h
  /usr/local/include/bullet/btBulletCollisionCommon.h
  /usr/local/include/bullet/btBulletDynamicsCommon.h
+ /usr/local/include/osg/Array
+ /usr/local/include/osg/AttributeDispatchers
+ /usr/local/include/osg/BoundingBox
+ /usr/local/include/osg/BoundingSphere
+ /usr/local/include/osg/BufferObject
+ /usr/local/include/osg/Callback
+ /usr/local/include/osg/Camera
+ /usr/local/include/osg/ClearNode
+ /usr/local/include/osg/ColorMask
+ /usr/local/include/osg/Config
+ /usr/local/include/osg/CopyOp
+ /usr/local/include/osg/CullSettings
+ /usr/local/include/osg/DisplaySettings
+ /usr/local/include/osg/Drawable
+ /usr/local/include/osg/Export
+ /usr/local/include/osg/FrameStamp
+ /usr/local/include/osg/GL
+ /usr/local/include/osg/GLDefines
+ /usr/local/include/osg/GLExtensions
+ /usr/local/include/osg/GLObjects
+ /usr/local/include/osg/Geode
+ /usr/local/include/osg/Geometry
+ /usr/local/include/osg/GraphicsContext
+ /usr/local/include/osg/GraphicsCostEstimator
+ /usr/local/include/osg/GraphicsThread
+ /usr/local/include/osg/Group
+ /usr/local/include/osg/Image
+ /usr/local/include/osg/Light
+ /usr/local/include/osg/Math
+ /usr/local/include/osg/Matrix
+ /usr/local/include/osg/MatrixTemplate
+ /usr/local/include/osg/Matrixd
+ /usr/local/include/osg/Matrixf
+ /usr/local/include/osg/MixinVector
+ /usr/local/include/osg/Node
+ /usr/local/include/osg/NodeVisitor
+ /usr/local/include/osg/Notify
+ /usr/local/include/osg/Object
+ /usr/local/include/osg/Observer
+ /usr/local/include/osg/OperationThread
+ /usr/local/include/osg/Plane
+ /usr/local/include/osg/Polytope
+ /usr/local/include/osg/PrimitiveSet
+ /usr/local/include/osg/Program
+ /usr/local/include/osg/Quat
+ /usr/local/include/osg/Referenced
+ /usr/local/include/osg/RenderInfo
+ /usr/local/include/osg/Shader
+ /usr/local/include/osg/ShaderComposer
+ /usr/local/include/osg/Shape
+ /usr/local/include/osg/State
+ /usr/local/include/osg/StateAttribute
+ /usr/local/include/osg/StateSet
+ /usr/local/include/osg/Stats
+ /usr/local/include/osg/Texture
+ /usr/local/include/osg/TextureAttribute
+ /usr/local/include/osg/Timer
+ /usr/local/include/osg/Transform
+ /usr/local/include/osg/Types
+ /usr/local/include/osg/Uniform
+ /usr/local/include/osg/UniformBase
+ /usr/local/include/osg/UserDataContainer
+ /usr/local/include/osg/ValueMap
+ /usr/local/include/osg/ValueObject
+ /usr/local/include/osg/ValueStack
+ /usr/local/include/osg/Vec2
+ /usr/local/include/osg/Vec2b
+ /usr/local/include/osg/Vec2d
+ /usr/local/include/osg/Vec2f
+ /usr/local/include/osg/Vec2i
+ /usr/local/include/osg/Vec2s
+ /usr/local/include/osg/Vec2ub
+ /usr/local/include/osg/Vec2ui
+ /usr/local/include/osg/Vec2us
+ /usr/local/include/osg/Vec3
+ /usr/local/include/osg/Vec3b
+ /usr/local/include/osg/Vec3d
+ /usr/local/include/osg/Vec3f
+ /usr/local/include/osg/Vec3i
+ /usr/local/include/osg/Vec3s
+ /usr/local/include/osg/Vec3ub
+ /usr/local/include/osg/Vec3ui
+ /usr/local/include/osg/Vec3us
+ /usr/local/include/osg/Vec4
+ /usr/local/include/osg/Vec4b
+ /usr/local/include/osg/Vec4d
+ /usr/local/include/osg/Vec4f
+ /usr/local/include/osg/Vec4i
+ /usr/local/include/osg/Vec4s
+ /usr/local/include/osg/Vec4ub
+ /usr/local/include/osg/Vec4ui
+ /usr/local/include/osg/Vec4us
+ /usr/local/include/osg/VertexArrayState
+ /usr/local/include/osg/View
+ /usr/local/include/osg/Viewport
+ /usr/local/include/osg/buffered_value
+ /usr/local/include/osg/fast_back_stack
+ /usr/local/include/osg/observer_ptr
+ /usr/local/include/osg/ref_ptr
 CMakeFiles/spirit.dir/src/spSettings.cpp.o
  ../include/spirit/Types/spTypes.h
  ../include/spirit/spGeneralTools.h
@@ -10376,7 +10867,9 @@ CMakeFiles/spirit.dir/src/spTrajectory.cpp.o
  ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spLineStrip.h
+ ../include/spirit/Objects/spMesh.h
  ../include/spirit/Objects/spVehicle.h
  ../include/spirit/Objects/spWaypoint.h
  ../include/spirit/Objects/spWheel.h
@@ -12822,7 +13315,9 @@ CMakeFiles/spirit.dir/src/spirit.cpp.o
  ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spLineStrip.h
+ ../include/spirit/Objects/spMesh.h
  ../include/spirit/Objects/spVehicle.h
  ../include/spirit/Objects/spWaypoint.h
  ../include/spirit/Objects/spWheel.h
@@ -12943,6 +13438,7 @@ CMakeFiles/spirit.dir/src/spirit.cpp.o
  /usr/include/IL/../OpenThreads/Config
  /usr/include/IL/../OpenThreads/Exports
  /usr/include/IL/../OpenThreads/Mutex
+ /usr/include/IL/../OpenThreads/ReentrantMutex
  /usr/include/IL/../OpenThreads/ScopedLock
  /usr/include/IL/../OpenThreads/Thread
  /usr/include/IL/../X11/X.h
@@ -13531,6 +14027,7 @@ CMakeFiles/spirit.dir/src/spirit.cpp.o
  /usr/local/include/osg/CullingSet
  /usr/local/include/osg/DisplaySettings
  /usr/local/include/osg/Drawable
+ /usr/local/include/osg/Endian
  /usr/local/include/osg/Export
  /usr/local/include/osg/FrameBufferObject
  /usr/local/include/osg/FrameStamp
@@ -13545,6 +14042,7 @@ CMakeFiles/spirit.dir/src/spirit.cpp.o
  /usr/local/include/osg/GraphicsThread
  /usr/local/include/osg/Group
  /usr/local/include/osg/Image
+ /usr/local/include/osg/KdTree
  /usr/local/include/osg/LOD
  /usr/local/include/osg/Light
  /usr/local/include/osg/LightSource
@@ -13623,6 +14121,7 @@ CMakeFiles/spirit.dir/src/spirit.cpp.o
  /usr/local/include/osg/Vec4ub
  /usr/local/include/osg/Vec4ui
  /usr/local/include/osg/Vec4us
+ /usr/local/include/osg/Version
  /usr/local/include/osg/VertexArrayState
  /usr/local/include/osg/View
  /usr/local/include/osg/Viewport
@@ -13632,15 +14131,28 @@ CMakeFiles/spirit.dir/src/spirit.cpp.o
  /usr/local/include/osg/ref_ptr
  /usr/local/include/osgDB/AuthenticationMap
  /usr/local/include/osgDB/Callbacks
+ /usr/local/include/osgDB/DataTypes
  /usr/local/include/osgDB/DatabasePager
  /usr/local/include/osgDB/DatabaseRevisions
+ /usr/local/include/osgDB/DotOsgWrapper
+ /usr/local/include/osgDB/DynamicLibrary
  /usr/local/include/osgDB/Export
  /usr/local/include/osgDB/FileCache
  /usr/local/include/osgDB/ImagePager
+ /usr/local/include/osgDB/ImageProcessor
+ /usr/local/include/osgDB/Input
+ /usr/local/include/osgDB/InputStream
  /usr/local/include/osgDB/ObjectCache
+ /usr/local/include/osgDB/ObjectWrapper
  /usr/local/include/osgDB/Options
+ /usr/local/include/osgDB/Output
+ /usr/local/include/osgDB/OutputStream
+ /usr/local/include/osgDB/ReadFile
  /usr/local/include/osgDB/ReaderWriter
+ /usr/local/include/osgDB/Registry
+ /usr/local/include/osgDB/Serializer
  /usr/local/include/osgDB/SharedStateManager
+ /usr/local/include/osgDB/StreamOperator
  /usr/local/include/osgDB/fstream
  /usr/local/include/osgGA/AnimationPathManipulator
  /usr/local/include/osgGA/CameraManipulator

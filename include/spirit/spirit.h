@@ -22,6 +22,7 @@
 #include <spirit/Planners/spCirclePlanner.h>
 #include <fstream>
 #include <spirit/RK4.h>
+#include <osgDB/ReadFile>
 
 
 class spirit {

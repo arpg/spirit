@@ -29,7 +29,9 @@ examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/main.cpp.o
  ../include/spirit/Objects/spBike.h
  ../include/spirit/Objects/spBox.h
  ../include/spirit/Objects/spCommonObject.h
+ ../include/spirit/Objects/spInfoVisitor.h
  ../include/spirit/Objects/spLineStrip.h
+ ../include/spirit/Objects/spMesh.h
  ../include/spirit/Objects/spVehicle.h
  ../include/spirit/Objects/spWaypoint.h
  ../include/spirit/Objects/spWheel.h
@@ -551,6 +553,7 @@ examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/main.cpp.o
  /usr/local/include/OpenThreads/Config
  /usr/local/include/OpenThreads/Exports
  /usr/local/include/OpenThreads/Mutex
+ /usr/local/include/OpenThreads/ReentrantMutex
  /usr/local/include/OpenThreads/ScopedLock
  /usr/local/include/OpenThreads/Thread
  /usr/local/include/assimp/./Compiler/poppack1.h
@@ -746,6 +749,7 @@ examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/main.cpp.o
  /usr/local/include/osg/CullingSet
  /usr/local/include/osg/DisplaySettings
  /usr/local/include/osg/Drawable
+ /usr/local/include/osg/Endian
  /usr/local/include/osg/Export
  /usr/local/include/osg/FrameBufferObject
  /usr/local/include/osg/FrameStamp
@@ -760,6 +764,7 @@ examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/main.cpp.o
  /usr/local/include/osg/GraphicsThread
  /usr/local/include/osg/Group
  /usr/local/include/osg/Image
+ /usr/local/include/osg/KdTree
  /usr/local/include/osg/LOD
  /usr/local/include/osg/Light
  /usr/local/include/osg/LightSource
@@ -838,6 +843,7 @@ examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/main.cpp.o
  /usr/local/include/osg/Vec4ub
  /usr/local/include/osg/Vec4ui
  /usr/local/include/osg/Vec4us
+ /usr/local/include/osg/Version
  /usr/local/include/osg/VertexArrayState
  /usr/local/include/osg/View
  /usr/local/include/osg/Viewport
@@ -847,15 +853,28 @@ examples/rk4_3D_car/CMakeFiles/rk4_3D_car.dir/main.cpp.o
  /usr/local/include/osg/ref_ptr
  /usr/local/include/osgDB/AuthenticationMap
  /usr/local/include/osgDB/Callbacks
+ /usr/local/include/osgDB/DataTypes
  /usr/local/include/osgDB/DatabasePager
  /usr/local/include/osgDB/DatabaseRevisions
+ /usr/local/include/osgDB/DotOsgWrapper
+ /usr/local/include/osgDB/DynamicLibrary
  /usr/local/include/osgDB/Export
  /usr/local/include/osgDB/FileCache
  /usr/local/include/osgDB/ImagePager
+ /usr/local/include/osgDB/ImageProcessor
+ /usr/local/include/osgDB/Input
+ /usr/local/include/osgDB/InputStream
  /usr/local/include/osgDB/ObjectCache
+ /usr/local/include/osgDB/ObjectWrapper
  /usr/local/include/osgDB/Options
+ /usr/local/include/osgDB/Output
+ /usr/local/include/osgDB/OutputStream
+ /usr/local/include/osgDB/ReadFile
  /usr/local/include/osgDB/ReaderWriter
+ /usr/local/include/osgDB/Registry
+ /usr/local/include/osgDB/Serializer
  /usr/local/include/osgDB/SharedStateManager
+ /usr/local/include/osgDB/StreamOperator
  /usr/local/include/osgDB/fstream
  /usr/local/include/osgGA/AnimationPathManipulator
  /usr/local/include/osgGA/CameraManipulator

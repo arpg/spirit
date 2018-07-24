@@ -497,7 +497,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=15
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -564,16 +564,10 @@ FIND_PACKAGE_MESSAGE_DETAILS_osgGA:INTERNAL=[/usr/local/lib/libosgGA.so][/usr/lo
 FIND_PACKAGE_MESSAGE_DETAILS_osgUtil:INTERNAL=[/usr/local/lib/libosgUtil.so][/usr/local/include][v()]
 //Details about finding osgViewer
 FIND_PACKAGE_MESSAGE_DETAILS_osgViewer:INTERNAL=[/usr/local/lib/libosgViewer.so][/usr/local/include][v()]
-//ADVANCED property for variable: HAL_INCLUDE_DIRS
-HAL_INCLUDE_DIRS-ADVANCED:INTERNAL=1
 //HAL include directories
 HAL_INCLUDE_DIRS:INTERNAL=/usr/include/eigen3;/home/boston/Documents/spirit_dep/Sophus/include;/home/boston/Documents/spirit_dep/Sophus/build/include;/usr/include;/home/boston/Documents/spirit_dep/HAL;/home/boston/Documents/spirit_dep/HAL/build
-//ADVANCED property for variable: HAL_LIBRARIES
-HAL_LIBRARIES-ADVANCED:INTERNAL=1
 //HAL libraries
 HAL_LIBRARIES:INTERNAL=/usr/lib/x86_64-linux-gnu/libtinyxml2.so;/usr/lib/x86_64-linux-gnu/libdc1394.so;/usr/lib/x86_64-linux-gnu/libraw1394.so;/usr/lib/x86_64-linux-gnu/libopencv_core.so.2.4.9;/usr/lib/x86_64-linux-gnu/libopencv_imgproc.so.2.4.9;/usr/lib/x86_64-linux-gnu/libopencv_highgui.so.2.4.9;/usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread;/usr/lib/x86_64-linux-gnu/libglog.so;/home/boston/Documents/spirit_dep/HAL/build/HAL/libhal.a
-//ADVANCED property for variable: HAL_LIBRARY_DIRS
-HAL_LIBRARY_DIRS-ADVANCED:INTERNAL=1
 //HAL library directories
 HAL_LIBRARY_DIRS:INTERNAL=
 //ADVANCED property for variable: OpenMP_CXX_FLAGS

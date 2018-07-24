@@ -2,12 +2,11 @@
 #define SP_MESH_H__
 
 #include <spirit/Objects/spCommonObject.h>
+#include <spirit/Objects/spInfoVisitor.h>
 
-/// spMesh to be implemented later, for now we are gonna make a flat surface as
-/// a ground for spirit
 class spMesh : public spCommonObject {
  public:
-  spMesh();
+  spMesh(const osg::ref_ptr<osg::Node> meshnode);
   ~spMesh();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
@@ -19,11 +18,17 @@ class spMesh : public spCommonObject {
   void SetDimensions(const spMeshSize& dims);
   spMeshSize GetDimensions();
 
+  const osg::ref_ptr<osg::Node> GetMesh();
+  Eigen::MatrixXd GetVertices();
+  Eigen::MatrixXd GetNormals();
+
  private:
   spMeshSize dims_;
   spPose pose_;
   spColor color_;
   double mass_;
+  osg::ref_ptr<osg::Node> mesh_;
+  spInfoVisitor nodeinfo_;
 };
 
 #endif  //  SP_MESH_H__

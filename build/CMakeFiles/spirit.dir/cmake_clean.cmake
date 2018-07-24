@@ -15,6 +15,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/spirit.dir/src/spAWSDCar.cpp.o"
   "CMakeFiles/spirit.dir/src/spBike.cpp.o"
   "CMakeFiles/spirit.dir/src/spWheel.cpp.o"
+  "CMakeFiles/spirit.dir/src/spInfoVisitor.cpp.o"
   "CMakeFiles/spirit.dir/src/spLineStrip.cpp.o"
   "CMakeFiles/spirit.dir/src/spPID.cpp.o"
   "CMakeFiles/spirit.dir/src/spTrajectory.cpp.o"

@@ -23,6 +23,7 @@ class spPangolinScenegraphGui : public spCommonGUI {
   void AddWaypoint(spWaypoint& waypoint);
   void AddVehicle(spVehicle& vehicle);
   void AddLineStrip(spLineStrip& linestrip);
+  void AddMesh(spMesh& mesh);
   void UpdateGuiObjectsFromSpirit(Objects &spobj);
   void UpdateSpiritObjectsFromGui(Objects& spobjects);
   void RemoveVehicle(spVehicle& vehicle);

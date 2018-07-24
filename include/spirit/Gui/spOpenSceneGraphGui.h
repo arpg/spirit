@@ -21,8 +21,7 @@
 
 
 //// this class is the interface between OpenSceneGraph and spGui
-class spOpenSceneGraphGui : public spCommonGUI
-{
+class spOpenSceneGraphGui : public spCommonGUI {
     public:
         spOpenSceneGraphGui();
         ~spOpenSceneGraphGui();
@@ -35,6 +34,7 @@ class spOpenSceneGraphGui : public spCommonGUI
         void AddWaypoint(spWaypoint& waypoint);
         void AddVehicle(spVehicle& vehicle);
         void AddLineStrip(spLineStrip& linestrip);
+        void AddMesh(spMesh& mesh);
         void UpdateGuiObjectsFromSpirit(Objects &spobj);
         void UpdateSpiritObjectsFromGui(Objects& spobjects);
         void RemoveVehicle(spVehicle& vehicle);
