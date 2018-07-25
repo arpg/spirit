@@ -43,6 +43,7 @@ void Gui::CheckKeyboardAction() {
 //}
 
 void Gui::AddObject(spCommonObject &obj) {
+   // std::cout<<obj.GetObjecType()<<std::endl;
   if(!gui_) {
     SPERROREXIT("gui_ object has not been created yet.");
   }
@@ -74,6 +75,7 @@ void Gui::AddObject(spCommonObject &obj) {
     }
     case spObjectType::MESH:
     {
+      std::cout<<"before add mesh"<<std::endl;
       gui_->AddMesh((spMesh&) obj);
       break;
     }

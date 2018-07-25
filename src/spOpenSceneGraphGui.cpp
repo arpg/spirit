@@ -54,9 +54,6 @@ void spOpenSceneGraphGui::AddBox(spBox& box)
     osgobj_.push_back(boxobj);
     box.SetGuiIndex(osgobj_.size()-1);
     root_->addChild(boxobj->transform_.get());
-
-    // NOT ideal to have this here but oh well for now
-    //viewer_.setSceneData(root_.get());
 }
 
 void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
@@ -156,7 +153,6 @@ void spOpenSceneGraphGui::AddVehicle(spVehicle& vehicle)
     bikeparts->rotz_ = osg::Matrix::rotate(vehicle.GetPose().rotation().eulerAngles(0,1,2)[2], osg::Vec3(0.0, 0.0, 1.0));
 
     Eigen::Vector3d framedim = vehicle.GetChassisSize();
-    //std::cout<<vehicle.GetPose().rotation().eulerAngles(0,1,2)[0]<<std::endl;
     bikeparts->shape_->setShape(new osg::Box(osg::Vec3(0.0f, 0.0f, 0.0f), framedim[0], framedim[1], framedim[2]));
     bikeparts->shape_->setColor(osg::Vec4(0.0f, 0.0f, 1.0f, 1.0f));
     bikeparts->geoshape_->addDrawable(bikeparts->shape_.get());
@@ -187,11 +183,8 @@ void spOpenSceneGraphGui::AddVehicle(spVehicle& vehicle)
         vehicle.GetWheel(ii)->SetGuiIndex(osgobj_.size()-1);
         root_->addChild(bikeparts->transform_.get());
     }
-
-
-    // NOT ideal to have this here but oh well for now
-    //viewer_.setSceneData(root_.get());
 }
+
 void spOpenSceneGraphGui::AddLineStrip(spLineStrip& linestrip)
 {
     std::cout<<"AddLineStrip(spLineStrip& linestrip) currently has no functionality"<<std::endl;
@@ -203,8 +196,11 @@ void spOpenSceneGraphGui::AddMesh(spMesh& mesh){
     OSGobj* meshptr = new OSGobj;
     meshptr->name_ = "mesh";
     osgobj_.push_back(meshptr);
-    mesh.SetGuiIndex(osgobj_.size()-1); */
-    root_->addChild(mesh.GetMesh());
+    mesh.SetGuiIndex(osgobj_.size()-1);
+    //root_->addChild(mesh.GetMesh().get()); */
+    //std::cout<<mesh.GetVertices().rows()<<std::endl;
+    std::cout<<"added mesh"<<std::endl;
+
 }
 
 void spOpenSceneGraphGui::UpdateBoxGuiObject(spBox& spobj)

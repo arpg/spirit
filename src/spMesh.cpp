@@ -1,19 +1,20 @@
 #include <spirit/Objects/spMesh.h>
 
-spMesh::spMesh(const osg::ref_ptr<osg::Node> meshnode) {
+spMesh::spMesh(const osg::ref_ptr<osg::Node>& meshnode) {
   mass_ = 0;
   color_ = spColor(1,1,1);
   pose_ = spPose::Identity();
   index_gui_ = -1;
   obj_guichanged_ = false;
   modifiable_gui_ = false;
-  object_type_ = spObjectType::BOX;
+  object_type_ = spObjectType::MESH;
 
   // for OSG
-  if(!meshnode){ SPERROREXIT("No mesh loaded");}
-  mesh_ = meshnode;
-  mesh_->accept(nodeinfo_);
-  //std::cout<<nodeinfo_.vertices->size()<<std::endl;
+  //mesh_ = meshnode;
+  meshnode->accept(nodeinfo_);
+  Eigen::MatrixXd vertexdata_(nodeinfo_.vertices->size(), 3);
+  Eigen::MatrixXd normaldata_(nodeinfo_.normals->size(), 3);
+  std::cout<<nodeinfo_.vertices->size()<<std::endl;
 }
 
 spMesh::~spMesh() {}
@@ -50,28 +51,26 @@ bool spMesh::IsDynamic() {
   return false;
 }
 
-const osg::ref_ptr<osg::Node> spMesh::GetMesh(){
+osg::ref_ptr<osg::Node> spMesh::GetMesh(){
   return mesh_;
 }
 
 Eigen::MatrixXd spMesh::GetVertices(){
-  Eigen::MatrixXd vertexdata(nodeinfo_.vertices->size(), 3);
   for(unsigned int ii = 0; ii < nodeinfo_.vertices->size(); ii++){
-     vertexdata(ii,0) = (*nodeinfo_.vertices)[ii][0];
-     vertexdata(ii,1) = (*nodeinfo_.vertices)[ii][1];
-     vertexdata(ii,2) = (*nodeinfo_.vertices)[ii][2];
+     vertexdata_(ii,0) = (*nodeinfo_.vertices)[ii][0];
+     vertexdata_(ii,1) = (*nodeinfo_.vertices)[ii][1];
+     vertexdata_(ii,2) = (*nodeinfo_.vertices)[ii][2];
     }
-   return vertexdata;
+   return vertexdata_;
 }
 
 Eigen::MatrixXd spMesh::GetNormals(){
-  Eigen::MatrixXd normaldata(nodeinfo_.normals->size(), 3);
   for(unsigned int ii = 0; ii < nodeinfo_.normals->size(); ii++){
-     normaldata(ii,0) = (*nodeinfo_.normals)[ii][0];
-     normaldata(ii,1) = (*nodeinfo_.normals)[ii][1];
-     normaldata(ii,2) = (*nodeinfo_.normals)[ii][2];
+     normaldata_(ii,0) = (*nodeinfo_.normals)[ii][0];
+     normaldata_(ii,1) = (*nodeinfo_.normals)[ii][1];
+     normaldata_(ii,2) = (*nodeinfo_.normals)[ii][2];
     }
-  return normaldata;
+  return normaldata_;
 }
 
 

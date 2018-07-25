@@ -26,7 +26,7 @@ int main(int argc, char** argv){
     // set gui and add objects
     Gui gui;
     gui.Create(spGuiType::GUI_OSG);
-    gui.AddObject(objs.GetObject(box_handle));
+    //gui.AddObject(objs.GetObject(box_handle));
     gui.AddObject(objs.GetObject(car_handle));
     gui.AddObject(objs.GetObject(mesh_handle));
     spBike& bike = ((spBike&)objs.GetObject(car_handle));
@@ -38,7 +38,6 @@ int main(int argc, char** argv){
     state.pose.rotate(rot1);
 
     bike.SetState(state);
-
     std::shared_ptr<spState> state_ptr = std::make_shared<spState>(state);
 
     spCtrlPts2ord_2dof inputcmd_curve;
@@ -48,19 +47,16 @@ int main(int argc, char** argv){
 
     //bike.SetFrontSteeringAngle(0);
 
-
     while(!gui.ShouldQuit())
     {
-        BikeSimFunctorRK4 mysim(params.bike_param,state);
-        //for(int ii=0;ii<1000;ii++){
-          mysim(0,1,0.1,inputcmd_curve,0,0,nullptr,state_ptr);
-          bike.SetState(mysim.GetState());
-          gui.Iterate(objs);
+        //BikeSimFunctorRK4 mysim(params.bike_param,state);
+        //mysim(0,1,0.1,inputcmd_curve,0,0,nullptr,state_ptr);
+        //bike.SetState(mysim.GetState());
+        gui.Iterate(objs);
 
-          std::this_thread::sleep_for(std::chrono::milliseconds(100));
-          double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
-          //std::cout << "yaw: " << yaw << std::endl;
-        //}
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        //double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
+
     }
     return 0;
 }
