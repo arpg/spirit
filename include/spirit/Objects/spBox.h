@@ -23,9 +23,10 @@ class spBox : public spCommonObject {
 
  private:
   spColor color_;
-  // pose_ shouldn't be used directly, call GetPose() if position of object is required
-  spPose pose_;
   std::shared_ptr<btCollisionShape> shape_;
+  spBoxSize size_;
+  double friction_;
+  double rolling_friction_;
 };
 
 #endif  //  SP_BOX_H__

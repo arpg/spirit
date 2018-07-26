@@ -10,7 +10,7 @@ Objects::Objects(const spPhyEngineType phy_type){
       this->InitBulletEmptyDynamicsWorld();
       break;
     default:
-       std::cout<<"Bullet Engine Not Created"<<std::endl;
+       std::cout<<"Bullet Engine Not Used"<<std::endl;
   }
 }
 

@@ -24,7 +24,6 @@ class spWaypoint : public spCommonObject {
   double linvelnorm_;
   spLinVel linveldir_;
   spRotVel rotvel_;
-  spPose pose_;
   spColor color_;
 };
 

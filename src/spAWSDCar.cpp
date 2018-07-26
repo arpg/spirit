@@ -5,13 +5,15 @@ spAWSDCar::spAWSDCar(const spVehicleConstructionInfo& vehicle_info, std::shared_
   if(vehicle_info.wheels_anchor.size() != 4) {
     SPERROREXIT("AWSDCar should have four wheels.");
   }
-  // Initialize vehicle with some parameters
-  for(int ii=0;ii<4;ii++)
-  {
-    GetWheel(ii)->EnableSteeringServo(true);
-    GetWheel(ii)->SetSteeringServoTargetAngle(0);
-    GetWheel(ii)->EnableDriveMotor(true);
-    GetWheel(ii)->SetDriveMotorTargetVelocity(0);
+  if(dynamics_world){
+    // Initialize vehicle with some parameters
+    for(int ii=0;ii<4;ii++)
+    {
+        GetWheel(ii)->EnableSteeringServo(true);
+        GetWheel(ii)->SetSteeringServoTargetAngle(0);
+        GetWheel(ii)->EnableDriveMotor(true);
+        GetWheel(ii)->SetDriveMotorTargetVelocity(0);
+    }
   }
 }
 

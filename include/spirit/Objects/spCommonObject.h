@@ -37,6 +37,8 @@ class spCommonObject {
   spObjectType object_type_;
   bool modifiable_gui_;
   double mass_;
+  spPose pose_;
+  bool phy_engine_;
   std::shared_ptr<btRigidBody> rigid_body_;
 //  btAlignedObjectArray<btCollisionShape*>*	collisionShapes_;
   void CreateRigidBody(double mass, const btTransform& tr, std::shared_ptr<btCollisionShape> shape);

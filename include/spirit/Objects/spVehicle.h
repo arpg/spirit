@@ -42,7 +42,6 @@ class spVehicle : public spCommonObject {
   spRotVel ch_rotvel_;
   spLinVel ch_linvel_;
   spBoxSize chassis_size_;
-  spPose pose_;
   spState state_;
   void SetWheelOrigin(int index, const spPose& pose);
   void SetWheelAnchor(int index, const spTranslation& tr);

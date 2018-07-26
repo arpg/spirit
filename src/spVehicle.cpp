@@ -3,29 +3,43 @@
 spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info, std::shared_ptr<btDiscreteDynamicsWorld> dynamics_world) {
   mass_ = vehicle_info.chassis_mass;
   chassis_size_ = vehicle_info.chassis_size;
-  // Create a bullet compound shape
-//  chassis_compound = new btCompoundShape();
-  chassis_compound_ = std::make_shared<btCompoundShape>();
-  // add chassis as a box to compound shape
-//  btCollisionShape* chassis_shape = new btBoxShape(btVector3(vehicle_info.chassis_size[0]/2.0,vehicle_info.chassis_size[1]/2.0,vehicle_info.chassis_size[2]/2.0)*WSCALE);
-  chassis_shape_ = std::make_shared<btBoxShape>(btVector3(vehicle_info.chassis_size[0]/2.0,vehicle_info.chassis_size[1]/2.0,vehicle_info.chassis_size[2]/2.0)*WSCALE);
-  // this transform is to put the cog in the right spot
+  object_type_ = vehicle_info.vehicle_type;
+  index_gui_ = -1;
+  obj_guichanged_ = false;
+  modifiable_gui_ = false;
+  obj_clamptosurface_ = false;
+
   cog_local_ = spPose::Identity();
   cog_local_.translation() = vehicle_info.cog;
-  btTransform tr;
-  spPose2btTransform(cog_local_.inverse(),tr);
-  chassis_compound_->addChildShape(tr,chassis_shape_.get());
-  // create a rigidbody from compound shape and add it to world
-  CreateRigidBody(vehicle_info.chassis_mass,cog_local_,chassis_compound_);
-  rigid_body_->setFriction(vehicle_info.chassis_friction);
-  int chassis_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
-  dynamics_world->addRigidBody(rigid_body_.get(),BulletCollissionType::COL_CHASSIS,chassis_collides_with_);
-  // set body velocities to zero
-  rigid_body_->setLinearVelocity(btVector3(0,0,0));
-  rigid_body_->setAngularVelocity(btVector3(0,0,0));
-  // set damping to zero since we are moving in air
-  rigid_body_->setDamping(0,0);
-  rigid_body_->setActivationState(DISABLE_DEACTIVATION);
+
+  if(dynamics_world){
+    phy_engine_ = true;
+    // Create a bullet compound shape
+    //  chassis_compound = new btCompoundShape();
+    chassis_compound_ = std::make_shared<btCompoundShape>();
+    // add chassis as a box to compound shape
+    //  btCollisionShape* chassis_shape = new btBoxShape(btVector3(vehicle_info.chassis_size[0]/2.0,vehicle_info.chassis_size[1]/2.0,vehicle_info.chassis_size[2]/2.0)*WSCALE);
+    chassis_shape_ = std::make_shared<btBoxShape>(btVector3(vehicle_info.chassis_size[0]/2.0,vehicle_info.chassis_size[1]/2.0,vehicle_info.chassis_size[2]/2.0)*WSCALE);
+    // this transform is to put the cog in the right spot
+    btTransform tr;
+    spPose2btTransform(cog_local_.inverse(),tr);
+    chassis_compound_->addChildShape(tr,chassis_shape_.get());
+    // create a rigidbody from compound shape and add it to world
+    CreateRigidBody(vehicle_info.chassis_mass,cog_local_,chassis_compound_);
+    rigid_body_->setFriction(vehicle_info.chassis_friction);
+    int chassis_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH;
+    dynamics_world->addRigidBody(rigid_body_.get(),BulletCollissionType::COL_CHASSIS,chassis_collides_with_);
+    // set body velocities to zero
+    rigid_body_->setLinearVelocity(btVector3(0,0,0));
+    rigid_body_->setAngularVelocity(btVector3(0,0,0));
+    // set damping to zero since we are moving in air
+    rigid_body_->setDamping(0,0);
+    rigid_body_->setActivationState(DISABLE_DEACTIVATION);
+    }
+  else{
+    phy_engine_ = false;
+  }
+
   // create and add wheels
   for(int ii=0; ii<vehicle_info.wheels_anchor.size(); ii++) {
     wheel_.push_back(std::make_shared<spWheel>(vehicle_info,ii,rigid_body_,dynamics_world));
@@ -34,12 +48,7 @@ spVehicle::spVehicle(const spVehicleConstructionInfo& vehicle_info, std::shared_
   SetPose(vehicle_info.pose);
   MoveWheelsToAnchors(vehicle_info.pose);
   SetColor(vehicle_info.color);
-  chassis_size_ = vehicle_info.chassis_size;
-  object_type_ = vehicle_info.vehicle_type;
-  index_gui_ = -1;
-  obj_guichanged_ = false;
-  modifiable_gui_ = false;
-  obj_clamptosurface_ = false;
+
 }
 
 spVehicle::~spVehicle() {
@@ -48,13 +57,17 @@ spVehicle::~spVehicle() {
 }
 
 void spVehicle::SetPose(const spPose& pose) {
-  btTransform tr;
-  spPose2btTransform(pose*GetLocalCOG(),tr);
-  rigid_body_->setWorldTransform(tr);
-//  statevec_.head(3) = pose.translation();
-//  spRotation quat(pose.rotation());
-//  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
-
+  if(phy_engine_){
+    btTransform tr;
+    spPose2btTransform(pose*GetLocalCOG(),tr);
+    rigid_body_->setWorldTransform(tr);
+    //  statevec_.head(3) = pose.translation();
+    //  spRotation quat(pose.rotation());
+    //  statevec_.segment(3,4) << quat.w(),quat.x(),quat.y(),quat.z();
+  }
+  else{
+    pose_ = pose;
+  }
   MoveWheelsToAnchors(pose);
 //  rigid_body_->clearForces();
 //  GetWheel(0)->GetRigidbody()->clearForces();
@@ -80,7 +93,9 @@ void spVehicle::MoveWheelsToAnchors(const spPose& chasis_pose) {
 }
 
 const spPose& spVehicle::GetPose() {
-  btTransform2spPose(rigid_body_->getWorldTransform(),pose_);
+  if(phy_engine_){
+    btTransform2spPose(rigid_body_->getWorldTransform(),pose_);
+  }
   pose_ = pose_*GetLocalCOG().inverse();
   return pose_;
 }
@@ -104,10 +119,12 @@ double spVehicle::GetChassisMass() {
 }
 
 void spVehicle::SetChassisMass(double mass) {
-  btVector3 localInertia(0,0,0);
-  // bullet calculates inertia tensor for a cuboid shape (it only has diagonal values).
-  chassis_compound_->calculateLocalInertia(mass,localInertia);
-  rigid_body_->setMassProps(mass,localInertia);
+  if(phy_engine_){
+    btVector3 localInertia(0,0,0);
+    // bullet calculates inertia tensor for a cuboid shape (it only has diagonal values).
+    chassis_compound_->calculateLocalInertia(mass,localInertia);
+    rigid_body_->setMassProps(mass,localInertia);
+  }
   mass_ = mass;
 }
 
@@ -127,25 +144,38 @@ int spVehicle::GetNumberOfWheels()
 
 std::shared_ptr<spWheel> spVehicle::GetWheel(int index)
 {
-
   return wheel_[index];
 }
 
 void spVehicle::SetChassisLinearVelocity(const spLinVel& linear_vel) {
-  rigid_body_->setLinearVelocity(btVector3(linear_vel[0],linear_vel[1],linear_vel[2])*WSCALE);
+  if(phy_engine_){
+    rigid_body_->setLinearVelocity(btVector3(linear_vel[0],linear_vel[1],linear_vel[2])*WSCALE);
+  }
+  else{
+    ch_linvel_ = linear_vel;
+  }
 }
 
 const spLinVel& spVehicle::GetChassisLinearVelocity() {
-  ch_linvel_ = spLinVel(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2])*WSCALE_INV;
+  if(phy_engine_){
+    ch_linvel_ = spLinVel(rigid_body_->getLinearVelocity()[0],rigid_body_->getLinearVelocity()[1],rigid_body_->getLinearVelocity()[2])*WSCALE_INV;
+  }
   return ch_linvel_;
 }
 
 void spVehicle::SetChassisAngularVelocity(const spRotVel& angular_vel) {
-  rigid_body_->setAngularVelocity(btVector3(angular_vel[0],angular_vel[1],angular_vel[2]));
+  if(phy_engine_){
+    rigid_body_->setAngularVelocity(btVector3(angular_vel[0],angular_vel[1],angular_vel[2]));
+  }
+  else{
+    ch_rotvel_ = angular_vel;
+  }
 }
 
 const spRotVel& spVehicle::GetChassisAngularVelocity() {
-  ch_rotvel_ = spRotVel(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
+  if(phy_engine_){
+    ch_rotvel_ = spRotVel(rigid_body_->getAngularVelocity()[0],rigid_body_->getAngularVelocity()[1],rigid_body_->getAngularVelocity()[2]);
+  }
   return ch_rotvel_;
 }
 
@@ -154,17 +184,29 @@ const spState& spVehicle::GetState() {
   // bullet uses Euler XYZ(yaw,pitch,roll) convention for rotations
 //  btTransform2spPose(rigid_body_->getWorldTransform(),state_.pose);
 //  state_.pose = state_.pose*GetLocalCOG().inverse();
-  state_.pose = GetPose();
-  state_.linvel = GetChassisLinearVelocity();
-  state_.rotvel = GetChassisAngularVelocity();
-  state_.front_steering = 0.5*(GetWheel(0)->GetSteeringServoCurrentAngle()+GetWheel(3)->GetSteeringServoCurrentAngle());
-  for(int ii=0; ii<GetNumberOfWheels(); ii++) {
-    state_.substate_vec[ii]->pose = GetWheel(ii)->GetPose();
-    state_.substate_vec[ii]->linvel = GetWheel(ii)->GetLinVel();
-    state_.substate_vec[ii]->rotvel = GetWheel(ii)->GetRotVel();
-    state_.wheel_speeds[ii] = GetWheel(ii)->GetWheelSpeed();
+  if(phy_engine_){
+    state_.pose = GetPose();
+    state_.linvel = GetChassisLinearVelocity();
+    state_.rotvel = GetChassisAngularVelocity();
+    state_.front_steering = 0.5*(GetWheel(0)->GetSteeringServoCurrentAngle()+GetWheel(3)->GetSteeringServoCurrentAngle());
+    for(int ii=0; ii<GetNumberOfWheels(); ii++) {
+       state_.substate_vec[ii]->pose = GetWheel(ii)->GetPose();
+       state_.substate_vec[ii]->linvel = GetWheel(ii)->GetLinVel();
+       state_.substate_vec[ii]->rotvel = GetWheel(ii)->GetRotVel();
+       state_.wheel_speeds[ii] = GetWheel(ii)->GetWheelSpeed();
+    }
   }
+  else{
+      state_.pose = GetPose();
+      state_.linvel = GetChassisLinearVelocity();
+      state_.rotvel = GetChassisAngularVelocity();
+      //state_.front_steering =
+      //rear_steering =
+      for(int ii=0; ii<GetNumberOfWheels(); ii++) {
+          //state_.wheel_speeds[ii] = GetWheel(ii)->GetWheelSpeed();
+      }
 
+    }
   return state_;
 }
 

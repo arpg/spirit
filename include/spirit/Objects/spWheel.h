@@ -44,7 +44,6 @@ private:
   const int steering_servo_axis = 5;
   spColor color_;
   // Use GetPose() whenever pose of object is required
-  spPose pose_;
   spLinVel linvel_;
   spRotVel rotvel_;
   std::shared_ptr<btHinge2Constraint> hinge_;
