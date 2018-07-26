@@ -1,14 +1,17 @@
 #include <spirit/Objects.h>
 
-Objects::Objects(){
+
+Objects::Objects(const spPhyEngineType phy_type){
   world_params_.worldMax.setValue(1000*WSCALE,1000*WSCALE,1000*WSCALE);
   world_params_.worldMin.setValue(-1000*WSCALE,-1000*WSCALE,-1000*WSCALE);
   world_params_.solver = spPhysolver::SEQUENTIAL_IMPULSE;
-  this->InitEmptyDynamicsWorld();
-}
-
-Objects::Objects(const Objects& obj) {
-  SPERROREXIT("Objects cpyConstructor shouldn't be called");
+  switch(phy_type){
+    case(spPhyEngineType::PHY_BULLET ):
+      this->InitBulletEmptyDynamicsWorld();
+      break;
+    default:
+       std::cout<<"Bullet Engine Not Created"<<std::endl;
+  }
 }
 
 Objects::~Objects(){
@@ -39,7 +42,7 @@ Objects::~Objects(){
   collisionConfiguration_.reset();
 }
 
-void Objects::InitEmptyDynamicsWorld() {
+void Objects::InitBulletEmptyDynamicsWorld() {
 
   collisionConfiguration_ = std::make_shared<btDefaultCollisionConfiguration>();
   dispatcher_ = std::make_shared<btCollisionDispatcher>(collisionConfiguration_.get());

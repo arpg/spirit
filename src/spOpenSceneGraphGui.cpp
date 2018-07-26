@@ -192,15 +192,11 @@ void spOpenSceneGraphGui::AddLineStrip(spLineStrip& linestrip)
 }
 
 void spOpenSceneGraphGui::AddMesh(spMesh& mesh){
-    /*
     OSGobj* meshptr = new OSGobj;
     meshptr->name_ = "mesh";
     osgobj_.push_back(meshptr);
     mesh.SetGuiIndex(osgobj_.size()-1);
-    //root_->addChild(mesh.GetMesh().get()); */
-    //std::cout<<mesh.GetVertices().rows()<<std::endl;
-    std::cout<<"added mesh"<<std::endl;
-
+    root_->addChild(mesh.GetMesh().get());
 }
 
 void spOpenSceneGraphGui::UpdateBoxGuiObject(spBox& spobj)
@@ -279,7 +275,7 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
           }
           case spObjectType::MESH:
           {
-            std::cout<<"MESH currently no update functionality."<<std::endl;
+            //std::cout<<"MESH currently no update functionality."<<std::endl;
             break;
           }
           default:

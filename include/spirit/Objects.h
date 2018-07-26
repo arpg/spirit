@@ -25,8 +25,7 @@ class Objects {
 
 
 public:
-  Objects();
-  Objects(const Objects& obj);
+  Objects(const spPhyEngineType phy_type);
   ~Objects();
   spObjectHandle CreateBox(const spPose& pose, const spBoxSize& size, double mass,const spColor& color);
   spObjectHandle CreateWaypoint(const spPose& pose, const spColor& color);
@@ -46,7 +45,7 @@ private:
   btTransform& spPose2btTransform(const spPose& pose, double btworld_scale);
   btRigidBody* CreateRigidBody(double mass, const btTransform& tr, btCollisionShape* shape);
   std::list<std::shared_ptr<spCommonObject>> objects_;
-  void InitEmptyDynamicsWorld();
+  void InitBulletEmptyDynamicsWorld();
   BulletWorldParams world_params_;
   std::shared_ptr<btDefaultCollisionConfiguration> collisionConfiguration_;
   std::shared_ptr<btCollisionDispatcher>	dispatcher_;

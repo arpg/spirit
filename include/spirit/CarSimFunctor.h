@@ -15,7 +15,7 @@ class CarSimFunctor {
         initial_state_(initial_state),
         gui_(gui),
         thread_(nullptr) /*, objects_(objects)*/ {
-    objects_ = std::make_shared<Objects>();
+    objects_ = std::make_shared<Objects>(spPhyEngineType::PHY_BULLET);
     spPose gnd_pose_ = spPose::Identity();
     gnd_pose_.translate(spTranslation(0, 0, -0.5));
     gnd_handle_ = objects_->CreateBox(gnd_pose_, spBoxSize(20, 20, 1), 0,

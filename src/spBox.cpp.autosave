@@ -7,6 +7,9 @@ spBox::spBox(const spPose& pose, const spBoxSize& size, double mass, const spCol
   modifiable_gui_ = false;
   obj_clamptosurface_ = false;
   object_type_ = spObjectType::BOX;
+  obj_guichanged_ = true;
+  SetDimensions(size);
+  SetMass(mass);
 
   if(dynamics_world) {
     shape_ = std::make_shared<btBoxShape>(btVector3(1.0,1.0,1.0));
@@ -16,12 +19,13 @@ spBox::spBox(const spPose& pose, const spBoxSize& size, double mass, const spCol
     int box_collides_with_ = BulletCollissionType::COL_BOX | BulletCollissionType::COL_MESH | BulletCollissionType::COL_CHASSIS | BulletCollissionType::COL_WHEEL;
     dynamics_world->addRigidBody(rigid_body_.get(),BulletCollissionType::COL_BOX,box_collides_with_);
     rigid_body_->setActivationState(DISABLE_DEACTIVATION);
-    obj_guichanged_ = true;
-    SetDimensions(size);
-    SetMass(mass);
     rigid_body_->setGravity(dynamics_world->getGravity());
     rigid_body_->setFriction(0);
     rigid_body_->setRollingFriction(0);
+  }
+  else {
+
+      
   }
 }
 

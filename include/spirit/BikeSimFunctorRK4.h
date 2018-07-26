@@ -51,7 +51,7 @@ class BikeSimFunctorRK4 {
     init[0] = initial_state_.pose.translation()[0];
     init[1] = initial_state_.pose.translation()[1];
     init[2] = initial_state_.pose.rotation().eulerAngles(0,1,2)[2]; // yaw
-    init[3] = 2;
+    init[3] = 1; // init velocity
 
 
     spCurve control_curve(2, 2);
@@ -79,7 +79,11 @@ class BikeSimFunctorRK4 {
       Eigen::AngleAxisd rot1(init[2],Eigen::Vector3d::UnitZ());
       state.pose.rotate(rot1);
       state.front_steering = u[0];
-      //std::cout<<"The speed: "<<state.linvel<<std::endl;
+      state.linvel = spLinVel(0,0,0);
+      state.linvel[0] = init[0];
+      state.linvel[1] = init[1];
+      state.linvel[2] = 0;
+
 
       if (traj_states != nullptr) {
         traj_states->push_back(std::make_shared<spState>(state));

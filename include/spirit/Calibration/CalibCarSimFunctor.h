@@ -13,7 +13,7 @@ class CalibCarSimFunctor {
     : gui_(gui) {
 
     thread_ = nullptr;
-    objects_ = std::make_shared<Objects>();
+    objects_ = std::make_shared<Objects>(spPhyEngineType::PHY_BULLET);
     // perturb parameters
     Eigen::VectorXd param_vec(vehicle_params->GetParameterVector());
     param_vec[perturbation_index] += epsilon;

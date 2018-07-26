@@ -30,40 +30,17 @@ public:
   spirit(const spSettings& user_settings);
   ~spirit();
   bool ShouldRun();
-  void IterateWorld();
   void CheckKeyboardAction();
   void ScenarioWorldBoxFall();
-  void DummyTests();
-  void SenarioCostSurf();
-  void ScenarioPIDController();
-  void CalcLocalPlannerJacobian();
-  void SenarioCeresTest();
-  void SenarioTrajectoryTest();
-  void SenarioStateInitialization();
-  void SenarioControllerTest();
-  void multithreadtest();
-  void zibil();
-  void SenarioCalibrationTest();
-  void NonlinControl();
-  void ScenarioSteadyStateCircle();
-  Objects objects_;
+  std::shared_ptr<Objects> objects_;
   Gui gui_;
   spVehicleConstructionInfo car_param;
 
 private:
-  void InitCarPool(int num_cars);
-  std::vector<Objects> pool_objects_vec_;
-  std::vector<std::thread> pool_threads_vec_;
   spSettings user_settings_;
   spObjectHandle obj_gnd_index;
   spObjectHandle obj_box_index;
-  spObjectHandle obj_car_index;
-  spObjectHandle obj_cars_index[9];
-  spObjectHandle obj_waypoints_index[9];
-  spObjectHandle obj_waypoint_index0;
-  spObjectHandle obj_waypoint_index1;
-  spObjectHandle obj_waypoint_index2;
-  spObjectHandle obj_linestrip_index;
+
 };
 
 #endif  //SPIRIT_H__

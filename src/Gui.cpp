@@ -75,7 +75,6 @@ void Gui::AddObject(spCommonObject &obj) {
     }
     case spObjectType::MESH:
     {
-      std::cout<<"before add mesh"<<std::endl;
       gui_->AddMesh((spMesh&) obj);
       break;
     }

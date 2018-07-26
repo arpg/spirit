@@ -10,11 +10,10 @@ spMesh::spMesh(const osg::ref_ptr<osg::Node>& meshnode) {
   object_type_ = spObjectType::MESH;
 
   // for OSG
-  //mesh_ = meshnode;
+  mesh_ = meshnode;
   meshnode->accept(nodeinfo_);
   Eigen::MatrixXd vertexdata_(nodeinfo_.vertices->size(), 3);
   Eigen::MatrixXd normaldata_(nodeinfo_.normals->size(), 3);
-  std::cout<<nodeinfo_.vertices->size()<<std::endl;
 }
 
 spMesh::~spMesh() {}

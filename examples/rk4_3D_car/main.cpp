@@ -12,7 +12,8 @@ int main(int argc, char** argv){
     spPose gnd = spPose::Identity();
     gnd.translate(spTranslation(0,0,-0.525));
 
-    Objects objs;
+    // NEED TO CHANGE OBJECTS BULLET CAN BE SET TO NONE
+    Objects objs(spPhyEngineType::PHY_BULLET);
     spObjectHandle box_handle = objs.CreateBox(gnd, spBoxSize(10,10,1), 0, spColor(1,1,1));
 
     // create bike
@@ -49,13 +50,16 @@ int main(int argc, char** argv){
 
     while(!gui.ShouldQuit())
     {
-        //BikeSimFunctorRK4 mysim(params.bike_param,state);
-        //mysim(0,1,0.1,inputcmd_curve,0,0,nullptr,state_ptr);
-        //bike.SetState(mysim.GetState());
+        BikeSimFunctorRK4 mysim(params.bike_param,state);
+        mysim(0,1,0.1,inputcmd_curve,0,0,nullptr,state_ptr);
+        bike.SetState(mysim.GetState());
         gui.Iterate(objs);
 
-        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        //double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
+        double lin_vel = std::sqrt(std::pow(mysim.GetState().linvel[0],2) + std::pow(mysim.GetState().linvel[1],2) + std::pow(mysim.GetState().linvel[2],2));
+        std::cout<<"Yaw: "<<yaw<<" linear vel: "<<lin_vel<<std::endl;
+
 
     }
     return 0;
