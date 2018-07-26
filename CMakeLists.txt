@@ -57,7 +57,6 @@ set( HDRS
 	include/spirit/spirit.h
 	include/spirit/Gui/spCommonGui.h
 	include/spirit/Gui/spPangolinScenegraphGui.h
-        include/spirit/Gui/spopenscenegraphgui.h
 	include/spirit/Objects.h
 	include/spirit/Gui.h
 	include/spirit/spGeneralTools.h
@@ -101,7 +100,6 @@ set( SRCS
 	src/Gui.cpp
 	src/spLocalPlanner.cpp
 	src/spPangolinScenegraphGui.cpp
-        src/spopenscenegraphgui.cpp
 	src/spGeneralTools.cpp
 	src/spSettings.cpp
 	src/spBox.cpp
