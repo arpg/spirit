@@ -68,21 +68,20 @@ void optitrack_pose_handler(hal::PoseMsg& PoseData) {
 
   // write to file
   filemutex_.lock();
-  logfile_ << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << "," << "," << "," << "," << "," << "," << "," << ","
+  logfile_ << 2 << "," << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << ","
            << optistate_.pose.translation()[0] << ","
            << optistate_.pose.translation()[1] << ","
            << curr_yaw << ","
            << optistate_.linvel[0] << ","
            << optistate_.linvel[1] << ","
-           << optistate_.rotvel[2] << ","
-           << "\n";
+           << optistate_.rotvel[2] << "\n";
   logfile_.flush();
   filemutex_.unlock();
 }
 
 void GamepadCallback(hal::GamepadMsg& _msg) {
   commandMSG.set_steering_angle(-_msg.axes().data(0));
-  commandMSG.set_throttle_percent(_msg.axes().data(4)*40);
+  commandMSG.set_throttle_percent(_msg.axes().data(3)*40);
 }
 
 void CarSensorCallback(hal::CarStateMsg msg) {
@@ -91,17 +90,16 @@ void CarSensorCallback(hal::CarStateMsg msg) {
               << msg.wheel_speed_fr() << ", "
               << msg.wheel_speed_rl() << ", "
               << msg.wheel_speed_rr() << ", "
-              << msg.steer_angle() << ", "
+              << msg.steer_angle()
               << std::endl;
 
     filemutex_.lock();
-    logfile_ << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << ","
+    logfile_ << 1 << "," << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << ","
              << msg.wheel_speed_fl() << ","
              << msg.wheel_speed_fr() << ","
              << msg.wheel_speed_rl() << ","
              << msg.wheel_speed_rr() << ","
-             << msg.steer_angle() << ","
-             << "\n";
+             << msg.steer_angle() << "\n";
     logfile_.flush();
     filemutex_.unlock();
 }
@@ -126,8 +124,7 @@ int main(int argc, char** argv) {
 //    ninja_car.UpdateCarCommand(commandMSG);
 
     filemutex_.lock();
-    logfile_ << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << "," << "," << "," << "," << ","  << ","
-             << commandMSG.steering_angle() << "," << commandMSG.throttle_percent() << "\n";
+    logfile_ << 0 << "," << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << "," <<commandMSG.steering_angle() << "," << commandMSG.throttle_percent() << "\n";
     logfile_.flush();
     filemutex_.unlock();
 
