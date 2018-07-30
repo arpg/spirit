@@ -104,18 +104,18 @@ int main(int argc, char** argv) {
   double simulation_length = 0.6;
 
   spworld.car_param.pose.translate(spTranslation(1.5,0,0));
-  spObjectHandle car_handle = spworld.objects_.CreateVehicle(spworld.car_param);
-  spworld.gui_.AddObject(spworld.objects_.GetObject(car_handle));
-  spAWSDCar& estimation_car = (spAWSDCar&) spworld.objects_.GetObject(car_handle);
+  spObjectHandle car_handle = spworld.objects_->CreateVehicle(spworld.car_param);
+  spworld.gui_.AddObject(spworld.objects_->GetObject(car_handle));
+  spAWSDCar& estimation_car = (spAWSDCar&) spworld.objects_->GetObject(car_handle);
 
   // create a flat ground
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
-  spObjectHandle gnd_handle = spworld.objects_.CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
-  spworld.gui_.AddObject(spworld.objects_.GetObject(gnd_handle));
+  spObjectHandle gnd_handle = spworld.objects_->CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
+  spworld.gui_.AddObject(spworld.objects_->GetObject(gnd_handle));
 
   // set friction coefficent of ground
-  ((spBox&)spworld.objects_.GetObject(gnd_handle)).SetFriction(1);
+  ((spBox&)spworld.objects_->GetObject(gnd_handle)).SetFriction(1);
 
   /////////////////////////////////
 

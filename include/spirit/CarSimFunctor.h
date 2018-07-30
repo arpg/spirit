@@ -113,7 +113,7 @@ class CarSimFunctor {
 //      car.SetEngineTorque(sample_control[1]*0.00001);
       objects_->StepPhySimulation(step_size);
       if ((gui_ != nullptr)) {
-        gui_->Iterate(*objects_);
+        gui_->Iterate(objects_);
         spGeneralTools::Delay_ms(1000 * step_size);
       }
       if (traj_states != nullptr) {

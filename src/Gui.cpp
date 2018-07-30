@@ -120,7 +120,7 @@ void Gui::RemoveObject(spCommonObject &obj) {
   }
 }
 
-void Gui::Iterate(Objects& spobjects) {
+void Gui::Iterate(std::shared_ptr<Objects> &spobjects) {
   gui_->UpdateGuiObjectsFromSpirit(spobjects);
   gui_->Refresh();
   gui_->UpdateSpiritObjectsFromGui(spobjects);

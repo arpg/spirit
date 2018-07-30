@@ -1,6 +1,7 @@
 #include <spirit/Planners/spTrajectory.h>
 
-spTrajectory::spTrajectory(Gui& gui, Objects& objects) : gui_(gui), objects_(objects) {
+spTrajectory::spTrajectory(Gui& gui, std::shared_ptr<Objects> &objects) : gui_(gui), objects_(objects) {
+  objects_ = std::make_shared<Objects>(spPhyEngineType::PHY_NONE);
   is_loop_ = false;
 }
 
@@ -8,10 +9,10 @@ spTrajectory::~spTrajectory(){
 }
 
 spObjectHandle spTrajectory::AddWaypoint(const spPose& pose, double velocity/*, bool en_default_3ord3dof_traj*/) {
-  spObjectHandle waypoint_handle = objects_.CreateWaypoint(pose,spColor(1, 1, 0));
-  ((spWaypoint&)objects_.GetObject(waypoint_handle)).SetLinearVelocityNorm(velocity);
-  gui_.AddObject(objects_.GetObject(waypoint_handle));
-  waypoint_vec_.push_back(&(spWaypoint&)objects_.GetObject(waypoint_handle));
+  spObjectHandle waypoint_handle = objects_->CreateWaypoint(pose,spColor(1, 1, 0));
+  ((spWaypoint&)objects_->GetObject(waypoint_handle)).SetLinearVelocityNorm(velocity);
+  gui_.AddObject(objects_->GetObject(waypoint_handle));
+  waypoint_vec_.push_back(&(spWaypoint&)objects_->GetObject(waypoint_handle));
 //  std::shared_ptr<spCurve> new_curve = std::make_shared<spCurve>(3,3);
 //  spCtrlPts3ord_3dof pts;
 //  has_def_traj_vec_.push_back(en_default_3ord3dof_traj);
@@ -22,8 +23,8 @@ spObjectHandle spTrajectory::AddWaypoint(const spPose& pose, double velocity/*, 
 ////    new_curve->SetHermiteControlPoints(pts);
 //  spObjectHandle linestrip_handle = objects_.CreateLineStrip(spPose::Identity(),*new_curve,10,spColor(0.4, 0, 0));
   spPoints3d points;
-  spObjectHandle linestrip_handle = objects_.CreateLineStrip(spPose::Identity(),points,spColor(0.4, 0, 0));
-  gui_.AddObject(objects_.GetObject(linestrip_handle));
+  spObjectHandle linestrip_handle = objects_->CreateLineStrip(spPose::Identity(),points,spColor(0.4, 0, 0));
+  gui_.AddObject(objects_->GetObject(linestrip_handle));
   linestrip_handle_vec_.push_back(linestrip_handle);
 ////  trajectorystrip_vec_.push_back(&(spLineStrip&)objects_.GetObject(linestrip_handle));
 //  curve_vec_.push_back(new_curve);
@@ -51,22 +52,22 @@ void spTrajectory::PlaybackTrajectoryOnGUI(const spVehicleConstructionInfo& vehi
     SPERROR("Trajectory not planned yet!");
     return;
   }
-  spObjectHandle car_handle = objects_.CreateVehicle(vehicle_params);
-  gui_.AddObject(objects_.GetObject(car_handle));
+  spObjectHandle car_handle = objects_->CreateVehicle(vehicle_params);
+  gui_.AddObject(objects_->GetObject(car_handle));
   spStateSeries& stateseries = *(stateseries_vec_[waypoint_index]);
   int num_steps = stateseries.size();
   if(max_num_steps != -1) {
     num_steps = max_num_steps;
   }
   for (int ii = 0; ii < num_steps-1; ++ii) {
-    ((spAWSDCar&)objects_.GetObject(car_handle)).SetState(*stateseries[ii]);
+    ((spAWSDCar&)objects_->GetObject(car_handle)).SetState(*stateseries[ii]);
     for(int jj=0; jj<(int)(10.0/playback_ratio);jj++) {
       gui_.Iterate(objects_);
       spGeneralTools::Delay_ms(7);
     }
   }
-  gui_.RemoveObject(objects_.GetObject(car_handle));
-  objects_.RemoveObj(car_handle);
+  gui_.RemoveObject(objects_->GetObject(car_handle));
+  objects_->RemoveObj(car_handle);
 }
 
 //void spTrajectory::SetTrajectoryPoints(int waypoint_index, const spPoints3d& traj_pts) {
@@ -81,7 +82,7 @@ void spTrajectory::SetTrajectoryStateSeries(int waypoint_index, std::shared_ptr<
   for(int ii=0; ii<state_series->size(); ii++) {
     points.push_back((*state_series)[ii]->pose.translation());
   }
-  ((spLineStrip&)objects_.GetObject(linestrip_handle_vec_[waypoint_index])).SetLineStripPoints(points);
+  ((spLineStrip&)objects_->GetObject(linestrip_handle_vec_[waypoint_index])).SetLineStripPoints(points);
 }
 
 std::shared_ptr<spStateSeries> spTrajectory::GetTrajectoryStateSeries(int waypoint_index) const {

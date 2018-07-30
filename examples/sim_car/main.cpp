@@ -33,18 +33,18 @@ int main(int argc, char** argv) {
   spirit spworld(settings_obj);
 
   // create a car with default values at car_param object
-  spObjectHandle car_handle = spworld.objects_.CreateVehicle(spworld.car_param);
-  spworld.gui_.AddObject(spworld.objects_.GetObject(car_handle));
-  spAWSDCar& car = (spAWSDCar&) spworld.objects_.GetObject(car_handle);
+  spObjectHandle car_handle = spworld.objects_->CreateVehicle(spworld.car_param);
+  spworld.gui_.AddObject(spworld.objects_->GetObject(car_handle));
+  spAWSDCar& car = (spAWSDCar&) spworld.objects_->GetObject(car_handle);
 
   // create a flat ground with a box object
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
-  spObjectHandle gnd_handle = spworld.objects_.CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
-  spworld.gui_.AddObject(spworld.objects_.GetObject(gnd_handle));
+  spObjectHandle gnd_handle = spworld.objects_->CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
+  spworld.gui_.AddObject(spworld.objects_->GetObject(gnd_handle));
 
   // set friction coefficent of ground
-  ((spBox&)spworld.objects_.GetObject(gnd_handle)).SetFriction(1);
+  ((spBox&)spworld.objects_->GetObject(gnd_handle)).SetFriction(1);
 
 
   while(1) {
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
     std::cout << "yaw -> " << std::atan2(rotmat(1,0),rotmat(0,0)) << std::endl;
 
     // step physics simulation for 0.01 seconds
-    spworld.objects_.StepPhySimulation(0.01);
+    spworld.objects_->StepPhySimulation(0.01);
 
     // iterate gui to update object status
     spworld.gui_.Iterate(spworld.objects_);

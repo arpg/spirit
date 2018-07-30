@@ -18,15 +18,15 @@ int main(int argc, char** argv) {
   // create a flat ground with a box object
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
-  spObjectHandle gnd_handle = spworld.objects_.CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
-  spworld.gui_.AddObject(spworld.objects_.GetObject(gnd_handle));
+  spObjectHandle gnd_handle = spworld.objects_->CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
+  spworld.gui_.AddObject(spworld.objects_->GetObject(gnd_handle));
 
   // set friction coefficent of ground
-  ((spBox&)spworld.objects_.GetObject(gnd_handle)).SetFriction(1);
+  ((spBox&)spworld.objects_->GetObject(gnd_handle)).SetFriction(1);
 
 
 
-  spTrajectory traj(spworld.gui_,spworld.objects_);
+  spTrajectory traj(spworld.gui_, spworld.objects_);
 
 
   spPose pose0(spPose::Identity());

@@ -32,6 +32,7 @@ public:
   bool ShouldRun();
   void CheckKeyboardAction();
   void ScenarioWorldBoxFall();
+  void IterateWorld();
   std::shared_ptr<Objects> objects_;
   Gui gui_;
   spVehicleConstructionInfo car_param;

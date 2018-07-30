@@ -12,7 +12,7 @@
 
 class spTrajectory {
 public:
-  spTrajectory(Gui& gui, Objects& objects);
+  spTrajectory(Gui& gui, std::shared_ptr<Objects> &objects);
   ~spTrajectory();
 
   spObjectHandle AddWaypoint(const spPose& pose, double velocity=1/*, bool en_default_3ord3dof_traj=false*/);
@@ -31,7 +31,7 @@ public:
 
 private:
   Gui&  gui_;
-  Objects& objects_;
+  std::shared_ptr<Objects> objects_;
   bool is_loop_;
   spCtrlPts3ord_3dof ctrl_pts_;
   std::vector<spObjectHandle> linestrip_handle_vec_;

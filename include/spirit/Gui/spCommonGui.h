@@ -17,8 +17,8 @@ class spCommonGUI {
   virtual void AddVehicle(spVehicle& vehicle) = 0;
   virtual void AddLineStrip(spLineStrip& curve) = 0;
   virtual void AddMesh(spMesh& mesh) = 0;
-  virtual void UpdateGuiObjectsFromSpirit(Objects& spobjects) = 0;
-  virtual void UpdateSpiritObjectsFromGui(Objects& spobjects) = 0;
+  virtual void UpdateGuiObjectsFromSpirit(std::shared_ptr<Objects> &spobjects) = 0;
+  virtual void UpdateSpiritObjectsFromGui(std::shared_ptr<Objects> &spobjects) = 0;
   virtual void RemoveVehicle(spVehicle& vehicle) = 0;
 
 };

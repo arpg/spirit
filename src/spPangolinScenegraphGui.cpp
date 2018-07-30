@@ -259,13 +259,13 @@ void spPangolinScenegraphGui::UpdateLineStripGuiObject(spLineStrip& spobj) {
   gllinestrip->SetPointsFromTrajectory(points);
 }
 
-void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
+void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(std::shared_ptr<Objects> &spobj) {
   // go through all spirit objects
-  for(spObjectHandle ii=spobj.GetListBegin(); ii!=spobj.GetListEnd(); ++ii) {
+  for(spObjectHandle ii=spobj->GetListBegin(); ii!=spobj->GetListEnd(); ++ii) {
     //only update objects which had gui property changes
-    if(spobj.GetObject(ii).HasChangedGui() && (spobj.GetObject(ii).GetGuiIndex()!=-1)) {
+    if(spobj->GetObject(ii).HasChangedGui() && (spobj->GetObject(ii).GetGuiIndex()!=-1)) {
       // update the gui object
-      switch (spobj.GetObject(ii).GetObjecType()) {
+      switch (spobj->GetObject(ii).GetObjecType()) {
         case spObjectType::WHEEL:
         {
           SPERROREXIT("WHEEL object should not be created by itself.");
@@ -273,22 +273,22 @@ void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
         }
         case spObjectType::WAYPOINT:
         {
-          UpdateWaypointGuiObject((spWaypoint&)spobj.GetObject(ii));
+          UpdateWaypointGuiObject((spWaypoint&)spobj->GetObject(ii));
           break;
         }
         case spObjectType::BOX:
         {
-          UpdateBoxGuiObject((spBox&)spobj.GetObject(ii));
+          UpdateBoxGuiObject((spBox&)spobj->GetObject(ii));
           break;
         }
         case spObjectType::VEHICLE_AWSD:
         {
-          UpdateVehicleGuiObject((spVehicle&)spobj.GetObject(ii));
+          UpdateVehicleGuiObject((spVehicle&)spobj->GetObject(ii));
           break;
         }
         case spObjectType::LINESTRIP:
         {
-          UpdateLineStripGuiObject((spLineStrip&)spobj.GetObject(ii));
+          UpdateLineStripGuiObject((spLineStrip&)spobj->GetObject(ii));
           break;
         }
         default:
@@ -300,11 +300,11 @@ void spPangolinScenegraphGui::UpdateGuiObjectsFromSpirit(Objects& spobj) {
   }
 }
 
-void spPangolinScenegraphGui::UpdateSpiritObjectsFromGui(Objects& spobjects) {
-  for(spObjectHandle ii=spobjects.GetListBegin(); ii!=spobjects.GetListEnd(); ++ii) {
+void spPangolinScenegraphGui::UpdateSpiritObjectsFromGui(std::shared_ptr<Objects> &spobjects) {
+  for(spObjectHandle ii=spobjects->GetListBegin(); ii!=spobjects->GetListEnd(); ++ii) {
     //only update objects which are dynamic
-    if(spobjects.GetObject(ii).IsGuiModifiable()) {
-      switch (spobjects.GetObject(ii).GetObjecType()) {
+    if(spobjects->GetObject(ii).IsGuiModifiable()) {
+      switch (spobjects->GetObject(ii).GetObjecType()) {
         case spObjectType::BOX:
         {
           break;
@@ -319,7 +319,7 @@ void spPangolinScenegraphGui::UpdateSpiritObjectsFromGui(Objects& spobjects) {
         }
         case spObjectType::WAYPOINT:
         {
-          spWaypoint& spwaypoint = (spWaypoint&) spobjects.GetObject(ii);
+          spWaypoint& spwaypoint = (spWaypoint&) spobjects->GetObject(ii);
           SceneGraph::GLWayPoint* glwaypoint = (SceneGraph::GLWayPoint*) globjects_[spwaypoint.GetGuiIndex()];
           spwaypoint.SetPose(spPose(glwaypoint->GetPose4x4_po()));
           spwaypoint.SetLinearVelocityNorm(glwaypoint->GetVelocity());

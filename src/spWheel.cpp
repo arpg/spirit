@@ -71,7 +71,12 @@ spWheel::~spWheel()
 }
 
 void spWheel::SetFriction(double friction) {
-  rigid_body_->setFriction(friction);
+    if(phy_engine_){
+      rigid_body_->setFriction(friction);
+    }
+    else{
+      friction_ = friction;
+    }
 }
 
 void spWheel::SetPose(const spPose& pose)
@@ -117,49 +122,88 @@ double spWheel::GetWidth()
 
 void spWheel::SetSteeringServoLowerLimit(double limit)
 {
-  hinge_->setAngularLowerLimit(btVector3(1,0,limit));
+  if(phy_engine_){
+    hinge_->setAngularLowerLimit(btVector3(1,0,limit));
+  }
+  else{
+    steering_lower_limit_ = limit;
+  }
 }
 
 void spWheel::SetSteeringServoUpperLimit(double limit)
 {
-  hinge_->setAngularUpperLimit(btVector3(-1,0,limit));
-
+  if(phy_engine_){
+    hinge_->setAngularUpperLimit(btVector3(-1,0,limit));
+  }
+  else{
+    steering_upper_limit_ = limit;
+  }
 }
 
 void spWheel::SetSteeringServoMaxVelocity(double velocity)
 {
-  hinge_->setTargetVelocity(steering_servo_axis,velocity);
-
+  if(phy_engine_){
+    hinge_->setTargetVelocity(steering_servo_axis,velocity);
+  }
+  else{
+    steering_max_velocity_ = velocity;
+  }
 }
 
 void spWheel::SetSteeringServoTorque(double torque)
 {
 //  steering_servo_torque_ = torque;
-  hinge_->setMaxMotorForce(steering_servo_axis,torque*WSCALE*WSCALE);
+  if(phy_engine_){
+    hinge_->setMaxMotorForce(steering_servo_axis,torque*WSCALE*WSCALE);
+  }
+  else{
+    steering_torque_ = torque;
+  }
 }
 
 void spWheel::EnableDriveMotor(bool status)
 {
 //  has_drive_motor_ = status;
-  hinge_->enableMotor(drive_motor_axis,status);
+  if(phy_engine_){
+    hinge_->enableMotor(drive_motor_axis,status);
+  }
+  else{
+    drive_motor_ = status;
+  }
+
 }
 
 void spWheel::EnableSteeringServo(bool status)
 {
 //  has_steering_servo_ = status;
-  hinge_->enableMotor(steering_servo_axis,status);
-  hinge_->setServo(steering_servo_axis,status);
+  if(phy_engine_){
+    hinge_->enableMotor(steering_servo_axis,status);
+    hinge_->setServo(steering_servo_axis,status);
+  }
+  else{
+    steering_servo_ = status;
+  }
 }
 
 void spWheel::SetDriveMotorTargetVelocity(double velocity)
 {
 //  drive_motor_target_velocity_ = velocity;
-  hinge_->setTargetVelocity(drive_motor_axis,velocity);
+  if(phy_engine_){
+    hinge_->setTargetVelocity(drive_motor_axis,velocity);
+  }
+  else{
+    drive_motor_target_velocity_ = velocity;
+  }
 }
 
 void spWheel::SetDriveMotorTorque(double torque)
 {
-  hinge_->setMaxMotorForce(drive_motor_axis,torque*WSCALE*WSCALE);
+  if(phy_engine_){
+    hinge_->setMaxMotorForce(drive_motor_axis,torque*WSCALE*WSCALE);
+  }
+  else{
+    drive_motor_torque_ = torque;
+  }
 }
 
 const spTranslation& spWheel::GetChassisAnchor()
@@ -169,37 +213,58 @@ const spTranslation& spWheel::GetChassisAnchor()
 
 double spWheel::GetSteeringServoCurrentAngle()
 {
-//  return steering_servo_angle_;
-  return hinge_->getAngle1();
+  if(phy_engine_){
+    return hinge_->getAngle1();
+  }
+  else{
+    SPERROR("Can only return servo angle when using bullet");
+    return 0;
+  }
 }
 
 void spWheel::SetSteeringServoTargetAngle(double angle)
 {
-//  steering_servo_target_angle_ = angle;
-  btVector3 limit;
-  hinge_->getAngularUpperLimit(limit);
-  if(angle>limit[2]) {
-    angle = limit[2];
+  if(phy_engine_){
+      btVector3 limit;
+      hinge_->getAngularUpperLimit(limit);
+      if(angle>limit[2]) {
+        angle = limit[2];
+      }
+      hinge_->getAngularLowerLimit(limit);
+      if(angle<limit[2]) {
+        angle = limit[2];
+      }
+      hinge_->setServoTarget(steering_servo_axis,angle);
   }
-  hinge_->getAngularLowerLimit(limit);
-  if(angle<limit[2]) {
-    angle = limit[2];
+  else{
+      steering_servo_target_angle_ = angle;
   }
-  hinge_->setServoTarget(steering_servo_axis,angle);
-}
-
-double spWheel::GetWheelSpeed() {
-  btQuaternion rot_inv(rigid_body_->getWorldTransform().getRotation().inverse());
-  return -(rigid_body_->getAngularVelocity().rotate(rot_inv.getAxis(),rot_inv.getAngle()))[0];
 }
 
 void spWheel::SetWheelSpeed(double rps) {
-  btQuaternion global_rotation_inv(rigid_body_->getWorldTransform().getRotation().inverse());
-  btVector3 global_vel(rigid_body_->getAngularVelocity());
-  btVector3 local_vel(global_vel.rotate(global_rotation_inv.getAxis(),global_rotation_inv.getAngle()));
-  local_vel[0] = -rps;
-  btQuaternion global_rotation(rigid_body_->getWorldTransform().getRotation());
-  rigid_body_->setAngularVelocity(local_vel.rotate(global_rotation.getAxis(),global_rotation.getAngle()));
+
+
+  if(phy_engine_){
+      btQuaternion global_rotation_inv(rigid_body_->getWorldTransform().getRotation().inverse());
+      btVector3 global_vel(rigid_body_->getAngularVelocity());
+      btVector3 local_vel(global_vel.rotate(global_rotation_inv.getAxis(),global_rotation_inv.getAngle()));
+      local_vel[0] = -rps;
+      btQuaternion global_rotation(rigid_body_->getWorldTransform().getRotation());
+      rigid_body_->setAngularVelocity(local_vel.rotate(global_rotation.getAxis(),global_rotation.getAngle()));
+  }
+  else{
+    wheel_speed_ = rps;
+  }
+}
+
+double spWheel::GetWheelSpeed() {
+  if(phy_engine_){
+      btQuaternion rot_inv(rigid_body_->getWorldTransform().getRotation().inverse());
+      return -(rigid_body_->getAngularVelocity().rotate(rot_inv.getAxis(),rot_inv.getAngle()))[0];
+  }
+  else{
+    return wheel_speed_;
+  }
 }
 
 const spRotVel& spWheel::GetRotVel(){
@@ -235,13 +300,25 @@ void spWheel::SetAngularVel(const spRotVel& vel) {
 }
 
 void spWheel::InitializeSteeringServoAngle(double angle){
-  double curr_angle = GetSteeringServoCurrentAngle();
-  Eigen::AngleAxisd rot(curr_angle-angle,Eigen::Vector3d::UnitZ());
-  spPose ps(GetPose());
-  ps.rotate(rot);
-  SetPose(ps);
-  SetSteeringServoTargetAngle(angle);
+    if(phy_engine_){
+        double curr_angle = GetSteeringServoCurrentAngle();
+        Eigen::AngleAxisd rot(curr_angle-angle,Eigen::Vector3d::UnitZ());
+        spPose ps(GetPose());
+        ps.rotate(rot);
+        SetPose(ps);
+        SetSteeringServoTargetAngle(angle);
+    }
+    else{
+        Eigen::AngleAxisd rot(angle,Eigen::Vector3d::UnitZ());
+        spPose ps(GetPose());
+        ps.rotate(rot);
+        SetPose(ps);
+        SetSteeringServoTargetAngle(angle);
+    }
 }
+
+
+
 
 //double spWheel::GetSuspensionLength(){
 ////  hinge_->calculateTransforms();

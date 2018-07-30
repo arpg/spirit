@@ -2,11 +2,12 @@
 
 
 Objects::Objects(const spPhyEngineType phy_type){
-  world_params_.worldMax.setValue(1000*WSCALE,1000*WSCALE,1000*WSCALE);
-  world_params_.worldMin.setValue(-1000*WSCALE,-1000*WSCALE,-1000*WSCALE);
-  world_params_.solver = spPhysolver::SEQUENTIAL_IMPULSE;
+  btengine_ = phy_type;
   switch(phy_type){
     case(spPhyEngineType::PHY_BULLET ):
+      world_params_.worldMax.setValue(1000*WSCALE,1000*WSCALE,1000*WSCALE);
+      world_params_.worldMin.setValue(-1000*WSCALE,-1000*WSCALE,-1000*WSCALE);
+      world_params_.solver = spPhysolver::SEQUENTIAL_IMPULSE;
       this->InitBulletEmptyDynamicsWorld();
       break;
     default:
@@ -23,23 +24,25 @@ Objects::~Objects(){
 //  for (spObjectHandle ii=objects_.begin();ii!=objects_.end();++ii) {
 //    RemoveObj(--ii);
 //  }
-  dynamics_world_->clearForces();
-  dynamics_world_.reset();
-  switch(world_params_.solver) {
+  if( btengine_ == spPhyEngineType::PHY_BULLET ) {
+    dynamics_world_->clearForces();
+    dynamics_world_.reset();
+    switch(world_params_.solver) {
     case spPhysolver::MLCP_DANTZIG:
-      solver_dantzig_.reset();
-      break;
+       solver_dantzig_.reset();
+       break;
     case spPhysolver::MLCP_PROJECTEDGAUSSSEIDEL:
-      solver_gseidel_.reset();
-      break;
+       solver_gseidel_.reset();
+       break;
     case spPhysolver::SEQUENTIAL_IMPULSE:
-      // do nothing
-      break;
+       // do nothing
+       break;
+    }
+    solver_.reset();
+    broadphase_.reset();
+    dispatcher_.reset();
+    collisionConfiguration_.reset();
   }
-  solver_.reset();
-  broadphase_.reset();
-  dispatcher_.reset();
-  collisionConfiguration_.reset();
 }
 
 void Objects::InitBulletEmptyDynamicsWorld() {
@@ -138,30 +141,41 @@ spObjectHandle Objects::CreateLineStrip(const spPose& pose, const spCurve& curve
 
 void Objects::RemoveObj(spObjectHandle& obj_handle) {
   if(obj_handle != NULL_HANDLE) {
-    if(GetObject(obj_handle).GetObjecType() == spObjectType::VEHICLE_AWSD) {
-      spAWSDCar& car = (spAWSDCar&) GetObject(obj_handle);
-      for(int ii=car.GetNumberOfWheels()-1; ii>=0; ii--) {
-        dynamics_world_->removeRigidBody(car.GetWheel(ii)->GetRigidbody().get());
-        dynamics_world_->removeConstraint(car.GetWheel(ii)->GetRigidbody().get()->getConstraintRef(0));
-      }
-      dynamics_world_->removeRigidBody(car.GetRigidbody().get());
-      dynamics_world_->clearForces();
-    } else if(GetObject(obj_handle).GetObjecType() == spObjectType::BOX) {
-      spBox& box = (spBox&) GetObject(obj_handle);
-      dynamics_world_->removeRigidBody(box.GetRigidbody().get());
-      dynamics_world_->clearForces();
-    } else {
-      if(GetObject(obj_handle).GetObjecType() == spObjectType::WHEEL)
-        SPERROR("obj is wheel");
-      if(GetObject(obj_handle).GetObjecType() == spObjectType::WAYPOINT)
-        SPERROR("obj is waypoint");
-      if(GetObject(obj_handle).GetObjecType() == spObjectType::LINESTRIP)
-        SPERROR("obj is linestrip");
-      SPERROREXIT("Removing other objects not implemented.");
+    if(btengine_ == spPhyEngineType::PHY_BULLET) {
+        if(GetObject(obj_handle).GetObjecType() == spObjectType::VEHICLE_AWSD) {
+          spAWSDCar& car = (spAWSDCar&) GetObject(obj_handle);
+          for(int ii=car.GetNumberOfWheels()-1; ii>=0; ii--) {
+            dynamics_world_->removeRigidBody(car.GetWheel(ii)->GetRigidbody().get());
+            dynamics_world_->removeConstraint(car.GetWheel(ii)->GetRigidbody().get()->getConstraintRef(0));
+          }
+          dynamics_world_->removeRigidBody(car.GetRigidbody().get());
+          dynamics_world_->clearForces();
+        } else if(GetObject(obj_handle).GetObjecType() == spObjectType::VEHICLE_BIKE){
+          spBike& car = (spBike&) GetObject(obj_handle);
+          for(int ii=car.GetNumberOfWheels()-1; ii>=0; ii--) {
+            dynamics_world_->removeRigidBody(car.GetWheel(ii)->GetRigidbody().get());
+            dynamics_world_->removeConstraint(car.GetWheel(ii)->GetRigidbody().get()->getConstraintRef(0));
+          }
+          dynamics_world_->removeRigidBody(car.GetRigidbody().get());
+          dynamics_world_->clearForces();
+        } else if(GetObject(obj_handle).GetObjecType() == spObjectType::BOX) {
+          spBox& box = (spBox&) GetObject(obj_handle);
+          dynamics_world_->removeRigidBody(box.GetRigidbody().get());
+          dynamics_world_->clearForces();
+        } else {
+          if(GetObject(obj_handle).GetObjecType() == spObjectType::WHEEL)
+            SPERROR("obj is wheel");
+          if(GetObject(obj_handle).GetObjecType() == spObjectType::WAYPOINT)
+            SPERROR("obj is waypoint");
+          if(GetObject(obj_handle).GetObjecType() == spObjectType::LINESTRIP)
+            SPERROR("obj is linestrip");
+          SPERROREXIT("Removing other objects not implemented.");
+         }
     }
     objects_.erase(obj_handle);
     obj_handle = NULL_HANDLE;
-  } else {
+  }
+  else {
     SPERROREXIT("Requested Handle is NULL.");
   }
 }
@@ -191,13 +205,15 @@ void Objects::StepPhySimulation(double step_time) {
   // simulation_step/penetration -> http://www.bulletphysics.org/Bullet/phpBB3/viewtopic.php?p=&f=&t=367
   // http://bulletphysics.org/mediawiki-1.5.8/index.php/Stepping_the_World
   // choose the number of iterations for the constraint solver in the range 4 to 10.
-  const btScalar fixed_time_step = 0.001;
-  if (step_time < fixed_time_step) {
-    SPERROREXIT("step_time should be greater than fixed_time_step in Line:");
+  if(btengine_ == spPhyEngineType::PHY_BULLET){
+    const btScalar fixed_time_step = 0.001;
+    if (step_time < fixed_time_step) {
+      SPERROREXIT("step_time should be greater than fixed_time_step in Line:");
+    }
+    // this is to guarantee that all steps are simulation steps rather than interpolation
+    // timeStep < maxSubSteps * fixedTimeStep
+    int max_sub_steps = (step_time/fixed_time_step)+1;
+    dynamics_world_->stepSimulation(step_time,max_sub_steps,fixed_time_step);
   }
-  // this is to guarantee that all steps are simulation steps rather than interpolation
-  // timeStep < maxSubSteps * fixedTimeStep
-  int max_sub_steps = (step_time/fixed_time_step)+1;
-  dynamics_world_->stepSimulation(step_time,max_sub_steps,fixed_time_step);
 }
 

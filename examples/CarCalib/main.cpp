@@ -133,22 +133,22 @@ int main(int argc, char** argv) {
   std::shared_ptr<spVehicleConstructionInfo> car_params = std::make_shared<MyVehicleConstInfo>();
 
 #ifdef SIM_CALIB
-  spObjectHandle car_handle = spworld.objects_.CreateVehicle(*car_params);
+  spObjectHandle car_handle = spworld.objects_->CreateVehicle(*car_params);
 
-  spworld.gui_.AddObject(spworld.objects_.GetObject(car_handle));
-  spAWSDCar& car = (spAWSDCar&) spworld.objects_.GetObject(car_handle);
+  spworld.gui_.AddObject(spworld.objects_->GetObject(car_handle));
+  spAWSDCar& car = (spAWSDCar&) spworld.objects_->GetObject(car_handle);
   //second car
-  spObjectHandle car2_handle = spworld.objects_.CreateVehicle(spworld.car_param);
-  spworld.gui_.AddObject(spworld.objects_.GetObject(car2_handle));
-  spAWSDCar& car2 = (spAWSDCar&) spworld.objects_.GetObject(car2_handle);
+  spObjectHandle car2_handle = spworld.objects_->CreateVehicle(spworld.car_param);
+  spworld.gui_.AddObject(spworld.objects_->GetObject(car2_handle));
+  spAWSDCar& car2 = (spAWSDCar&) spworld.objects_->GetObject(car2_handle);
   // create a flat ground
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
-  spObjectHandle gnd_handle = spworld.objects_.CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
-  spworld.gui_.AddObject(spworld.objects_.GetObject(gnd_handle));
+  spObjectHandle gnd_handle = spworld.objects_->CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
+  spworld.gui_.AddObject(spworld.objects_->GetObject(gnd_handle));
   // set ground friction
-  ((spBox&)spworld.objects_.GetObject(gnd_handle)).SetFriction(1);
-  ((spBox&)spworld.objects_.GetObject(gnd_handle)).SetRollingFriction(0.1);
+  ((spBox&)spworld.objects_->GetObject(gnd_handle)).SetFriction(1);
+  ((spBox&)spworld.objects_->GetObject(gnd_handle)).SetRollingFriction(0.1);
 
 #endif
 
@@ -267,7 +267,7 @@ bool flag0 = true;
     //car.SetEngineMaxVel(current_state.current_controls.second);
     // step forward the simulated car
     spTimestamp t0 = spGeneralTools::Tick();
-    spworld.objects_.StepPhySimulation(0.1);
+    spworld.objects_->StepPhySimulation(0.1);
     double tt = spGeneralTools::Tock_ms(t0);
 
     spGeneralTools::Delay_ms(100-tt);

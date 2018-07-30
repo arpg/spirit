@@ -10,14 +10,14 @@ int main(int argc, char** argv) {
   settings_obj.SetPhysicsEngineType(spPhyEngineType::PHY_BULLET);
   spirit spworld(settings_obj);
 
-  spObjectHandle car_handle = spworld.objects_.CreateVehicle(spworld.car_param);
-  spworld.gui_.AddObject(spworld.objects_.GetObject(car_handle));
-  spAWSDCar& car = (spAWSDCar&) spworld.objects_.GetObject(car_handle);
+  spObjectHandle car_handle = spworld.objects_->CreateVehicle(spworld.car_param);
+  spworld.gui_.AddObject(spworld.objects_->GetObject(car_handle));
+  spAWSDCar& car = (spAWSDCar&) spworld.objects_->GetObject(car_handle);
   // create a flat ground
   spPose gnd_pose_ = spPose::Identity();
   gnd_pose_.translate(spTranslation(0,0,-0.5));
-  spObjectHandle gnd_handle = spworld.objects_.CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
-  spworld.gui_.AddObject(spworld.objects_.GetObject(gnd_handle));
+  spObjectHandle gnd_handle = spworld.objects_->CreateBox(gnd_pose_,spBoxSize(50,50,1),0,spColor(0,1,0));
+  spworld.gui_.AddObject(spworld.objects_->GetObject(gnd_handle));
 
   spState state;
   state.pose = spPose::Identity();

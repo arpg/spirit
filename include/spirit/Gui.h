@@ -15,7 +15,7 @@ public:
   void Refresh();
   void CheckKeyboardAction();
   void AddObject(spCommonObject& obj);
-  void Iterate(Objects& spobjects);
+  void Iterate(std::shared_ptr<Objects> &spobjects);
   void RemoveObject(spCommonObject &obj);
 private:
   std::shared_ptr<spCommonGUI> gui_;

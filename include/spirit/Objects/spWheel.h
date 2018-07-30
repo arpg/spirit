@@ -48,6 +48,18 @@ private:
   spRotVel rotvel_;
   std::shared_ptr<btHinge2Constraint> hinge_;
   std::shared_ptr<btCollisionShape> wheel_shape_;
+  double friction_;
+  double steering_lower_limit_;
+  double steering_upper_limit_;
+  double steering_max_velocity_;
+  double steering_torque_;
+  double steering_servo_target_angle_;
+  double drive_motor_target_velocity_;
+  double drive_motor_torque_;
+  double wheel_speed_;
+  bool drive_motor_;
+  bool steering_servo_;
+
 };
 
 #endif  //  SP_WHEEL_H__

@@ -238,14 +238,14 @@ void spOpenSceneGraphGui::UpdateVehicleGuiObject(spVehicle& vehicle)
    }
 }
 
-void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
+void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(std::shared_ptr<Objects> &spobj)
 {
     // go through all spirit objects
-    for(spObjectHandle ii=spobj.GetListBegin(); ii!=spobj.GetListEnd(); ++ii) {
+    for(spObjectHandle ii=spobj->GetListBegin(); ii!=spobj->GetListEnd(); ++ii) {
       //only update objects which had gui property changes
-      if(spobj.GetObject(ii).HasChangedGui() && (spobj.GetObject(ii).GetGuiIndex()!=-1)) {
+      if(spobj->GetObject(ii).HasChangedGui() && (spobj->GetObject(ii).GetGuiIndex()!=-1)) {
         // update the gui object
-        switch (spobj.GetObject(ii).GetObjecType()) {
+        switch (spobj->GetObject(ii).GetObjecType()) {
           case spObjectType::WHEEL:
           {
             SPERROREXIT("WHEEL object should not be created by itself.");
@@ -258,13 +258,13 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
           }
           case spObjectType::BOX:
           {
-            UpdateBoxGuiObject((spBox&)spobj.GetObject(ii));
+            UpdateBoxGuiObject((spBox&)spobj->GetObject(ii));
             //SPERROREXIT("BOX object not in use.");
             break;
           }
           case spObjectType::VEHICLE_BIKE:
           {
-            UpdateVehicleGuiObject((spVehicle&)spobj.GetObject(ii));
+            UpdateVehicleGuiObject((spVehicle&)spobj->GetObject(ii));
             //SPERROREXIT("VEHICLE_AWSD not is use.");
             break;
             }
@@ -288,7 +288,7 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(Objects &spobj)
 }
 
 
-void spOpenSceneGraphGui::UpdateSpiritObjectsFromGui(Objects& spobjects)
+void spOpenSceneGraphGui::UpdateSpiritObjectsFromGui(std::shared_ptr<Objects> &spobjects)
 {
     //std::cout<<"UpdateSpiritObjectsFromGui(Objects& spobjects) currently has no functionality"<<std::endl;
 

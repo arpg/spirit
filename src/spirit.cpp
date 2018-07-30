@@ -50,6 +50,10 @@ bool spirit::ShouldRun() {
 
 void spirit::CheckKeyboardAction() { gui_.CheckKeyboardAction(); }
 
+void spirit::IterateWorld(){
+    gui_.Iterate(objects_);
+}
+
 void spirit::ScenarioWorldBoxFall() {
 
   spPose pose(spPose::Identity());

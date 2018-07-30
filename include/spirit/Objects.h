@@ -56,6 +56,7 @@ private:
   std::shared_ptr<btSolveProjectedGaussSeidel> solver_gseidel_;
   // when ever we remove a object we are gonna point its handle to NULL_HANDLE
   const spObjectHandle NULL_HANDLE;
+  spPhyEngineType btengine_;
 //  btAlignedObjectArray<btCollisionShape*>	collisionShapes_;
 };
 

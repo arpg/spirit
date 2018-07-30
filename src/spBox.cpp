@@ -40,7 +40,7 @@ void spBox::SetFriction(double fric_coeff) {
     rigid_body_->setFriction(fric_coeff);
   }
   else{
-     friction_ = fric_coeff;
+    friction_ = fric_coeff;
   }
 }
 

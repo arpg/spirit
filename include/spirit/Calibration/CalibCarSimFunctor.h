@@ -76,7 +76,7 @@ class CalibCarSimFunctor {
       double travel_time_ms = 100;
       objects_->StepPhySimulation(travel_time_ms*0.001);
       if ((gui_ != nullptr)) {
-        gui_->Iterate(*objects_);
+        gui_->Iterate(objects_);
 //        spGeneralTools::Delay_ms(travel_time_ms);
       }
       if(traj_states!= nullptr) {

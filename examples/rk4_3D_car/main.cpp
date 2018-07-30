@@ -15,25 +15,25 @@ int main(int argc, char** argv){
     gnd.rotate(rot);
 
     // NEED TO CHANGE OBJECTS BULLET CAN BE SET TO NONE
-    Objects objs(spPhyEngineType::PHY_NONE);
-    //Objects objs(spPhyEngineType::PHY_BULLET);
-    spObjectHandle box_handle = objs.CreateBox(gnd, spBoxSize(10,10,1), 0, spColor(1,1,1));
+    std::shared_ptr<Objects> objs = std::make_shared<Objects>(spPhyEngineType::PHY_NONE);
+    //std::shared_ptr<Objects> objs = std::make_shared<Objects>(spPhyEngineType::PHY_BULLET);
+    spObjectHandle box_handle = objs->CreateBox(gnd, spBoxSize(10,10,1), 0, spColor(1,1,1));
 
     // create bike
     BikeParams params;
-    spObjectHandle bike_handle = objs.CreateVehicle(params.bike_param);
+    spObjectHandle bike_handle = objs->CreateVehicle(params.bike_param);
 
     // mesh
     osg::ref_ptr<osg::Node> meshnode = osgDB::readNodeFile( "lab_v2.ply" );
-    spObjectHandle mesh_handle = objs.CreateMesh(meshnode);
+    spObjectHandle mesh_handle = objs->CreateMesh(meshnode);
 
     // set gui and add objects
     Gui gui;
     gui.Create(spGuiType::GUI_OSG);
-    gui.AddObject(objs.GetObject(box_handle));
-    gui.AddObject(objs.GetObject(bike_handle));
-    gui.AddObject(objs.GetObject(mesh_handle));
-    spBike& bike = ((spBike&)objs.GetObject(bike_handle));
+    gui.AddObject(objs->GetObject(box_handle));
+    gui.AddObject(objs->GetObject(bike_handle));
+    gui.AddObject(objs->GetObject(mesh_handle));
+    spBike& bike = ((spBike&)objs->GetObject(bike_handle));
 
 
     spState state;
@@ -62,7 +62,7 @@ int main(int argc, char** argv){
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
         double lin_vel = std::sqrt(std::pow(mysim.GetState().linvel[0],2) + std::pow(mysim.GetState().linvel[1],2) + std::pow(mysim.GetState().linvel[2],2));
-        std::cout<<"Yaw: "<<yaw<<" linear vel: "<<lin_vel<<std::endl;
+        std::cout<<"Yaw: "<<yaw<<" linear velocity: "<<lin_vel<<std::endl;
 
     }
     return 0;

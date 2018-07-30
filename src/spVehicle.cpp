@@ -200,12 +200,11 @@ const spState& spVehicle::GetState() {
       state_.pose = GetPose();
       state_.linvel = GetChassisLinearVelocity();
       state_.rotvel = GetChassisAngularVelocity();
-      //state_.front_steering =
-      //rear_steering =
-      for(int ii=0; ii<GetNumberOfWheels(); ii++) {
+      state_.front_steering = 0.5*(GetWheel(0)->GetPose().rotation().eulerAngles(0,1,2)[2]+GetWheel(3)->GetPose().rotation().eulerAngles(0,1,2)[2]);
+      state_.rear_steering = 0.5*(GetWheel(1)->GetPose().rotation().eulerAngles(0,1,2)[2]+GetWheel(2)->GetPose().rotation().eulerAngles(0,1,2)[2]);
+      //for(int ii=0; ii<GetNumberOfWheels(); ii++) {
           //state_.wheel_speeds[ii] = GetWheel(ii)->GetWheelSpeed();
-      }
-
+      //}
     }
   return state_;
 }

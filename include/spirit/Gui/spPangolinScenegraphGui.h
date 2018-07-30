@@ -24,8 +24,8 @@ class spPangolinScenegraphGui : public spCommonGUI {
   void AddVehicle(spVehicle& vehicle);
   void AddLineStrip(spLineStrip& linestrip);
   void AddMesh(spMesh& mesh);
-  void UpdateGuiObjectsFromSpirit(Objects &spobj);
-  void UpdateSpiritObjectsFromGui(Objects& spobjects);
+  void UpdateGuiObjectsFromSpirit(std::shared_ptr<Objects> &spobj);
+  void UpdateSpiritObjectsFromGui(std::shared_ptr<Objects> &spobjects);
   void RemoveVehicle(spVehicle& vehicle);
 
 
