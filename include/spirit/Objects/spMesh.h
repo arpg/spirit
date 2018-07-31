@@ -2,7 +2,7 @@
 #define SP_MESH_H__
 
 #include <spirit/Objects/spCommonObject.h>
-#include <spirit/Objects/spInfoVisitor.h>
+#include <spirit/spMeshVisitor.h>
 
 class spMesh : public spCommonObject {
  public:
@@ -27,7 +27,7 @@ class spMesh : public spCommonObject {
   spPose pose_;
   spColor color_;
   double mass_;
-  spInfoVisitor nodeinfo_;
+  spMeshVisitor nodeinfo_;
   osg::ref_ptr<osg::Node> mesh_;
   Eigen::MatrixXd vertexdata_;
   Eigen::MatrixXd normaldata_;

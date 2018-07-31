@@ -73,6 +73,7 @@ set( HDRS
 	include/spirit/Gui/spPangolinScenegraphGui.h
 	include/spirit/Gui/spOpenSceneGraphGui.h
 	include/spirit/Objects.h
+	include/spirit/spCommonFunctor.h
 	include/spirit/Gui.h
 	include/spirit/spGeneralTools.h
 	include/spirit/spSettings.h
@@ -85,7 +86,7 @@ set( HDRS
 	include/spirit/Objects/spBike.h
 	include/spirit/Objects/spWheel.h
 	include/spirit/Objects/spWaypoint.h
-	include/spirit/Objects/spInfoVisitor.h
+	include/spirit/spMeshVisitor.h
 	include/spirit/Types/spTypes.h
 	include/spirit/Objects/spLineStrip.h
 	include/spirit/CarSimFunctor.h
@@ -132,7 +133,7 @@ set( SRCS
 	src/spAWSDCar.cpp
 	src/spBike.cpp
 	src/spWheel.cpp
-	src/spInfoVisitor.cpp
+	src/spMeshVisitor.cpp
 	src/spLineStrip.cpp
 	src/spPID.cpp
 	src/spTrajectory.cpp
