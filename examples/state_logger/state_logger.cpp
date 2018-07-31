@@ -51,9 +51,9 @@ void optitrack_pose_handler(hal::PoseMsg& PoseData) {
     Eigen::AngleAxisd prev_rot(optistate_.prev_pose.rotation());
     double yaw_diff = curr_yaw-prev_rot.angle()*prev_rot.axis()[2];
     if(yaw_diff>SP_PI){
-      yaw_diff = 2*SP_PI-yaw_diff;
+      yaw_diff = -2*SP_PI+yaw_diff;
     } else if(yaw_diff<-SP_PI){
-      yaw_diff = -2*SP_PI-yaw_diff;
+      yaw_diff = 2*SP_PI+yaw_diff;
     }
     optistate_.rotvel[2] = inv_time_dif*yaw_diff;
   } else {
@@ -81,24 +81,28 @@ void optitrack_pose_handler(hal::PoseMsg& PoseData) {
 
 void GamepadCallback(hal::GamepadMsg& _msg) {
   commandMSG.set_steering_angle(-_msg.axes().data(0));
-  commandMSG.set_throttle_percent(_msg.axes().data(3)*40);
+  commandMSG.set_throttle_percent(_msg.axes().data(4)*40);
 }
 
 void CarSensorCallback(hal::CarStateMsg msg) {
-    std::cout << " car state -> "
-              << msg.wheel_speed_fl() << ", "
-              << msg.wheel_speed_fr() << ", "
-              << msg.wheel_speed_rl() << ", "
-              << msg.wheel_speed_rr() << ", "
-              << msg.steer_angle()
-              << std::endl;
+//    std::cout << " car state -> "
+//              << msg.wheel_speed_fl() << ", "
+//              << msg.wheel_speed_fr() << ", "
+//              << msg.wheel_speed_rl() << ", "
+//              << msg.wheel_speed_rr() << ", "
+//              << msg.steer_angle()
+//              << std::endl;
+
+    if(std::abs(msg.wheel_speed_fl())>100){
+        std::cout << " enc ->  " << msg.wheel_speed_fl() << std::endl;
+    }
 
     filemutex_.lock();
     logfile_ << 1 << "," << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << ","
              << msg.wheel_speed_fl() << ","
              << msg.wheel_speed_fr() << ","
-             << msg.wheel_speed_rl() << ","
-             << msg.wheel_speed_rr() << ","
+             << -msg.wheel_speed_rl() << ","
+             << -msg.wheel_speed_rr() << ","
              << msg.steer_angle() << "\n";
     logfile_.flush();
     filemutex_.unlock();
@@ -111,20 +115,21 @@ int main(int argc, char** argv) {
   gamepad.RegisterGamepadDataCallback(&GamepadCallback);
 
   // Connect to NinjaV3Car
-//  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
-//  ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
+  hal::Car ninja_car("ninja_v3:[baud=115200,dev=/dev/ttyUSB0]//");
+  ninja_car.RegisterCarStateDataCallback(&CarSensorCallback);
 
   // Connect to Optitrack system
-  hal::Posys optitrack("vicon://tracker:[dummy]");
+  hal::Posys optitrack("vicon://tracker:ninja");
   optitrack.RegisterPosysDataCallback(&optitrack_pose_handler);
 
   logfile_.open("log.csv");
 
   while(1){
-//    ninja_car.UpdateCarCommand(commandMSG);
+    ninja_car.UpdateCarCommand(commandMSG);
 
     filemutex_.lock();
-    logfile_ << 0 << "," << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << "," <<commandMSG.steering_angle() << "," << commandMSG.throttle_percent() << "\n";
+//    std::cout << commandMSG.steering_double inv_time_dif = angle() << "," << commandMSG.throttle_percent()/40.0 << std::endl;
+    logfile_ << 0 << "," << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << "," << -commandMSG.steering_angle() << "," << -commandMSG.throttle_percent()/40.0 << "\n";
     logfile_.flush();
     filemutex_.unlock();
 
