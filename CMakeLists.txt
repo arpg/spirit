@@ -73,7 +73,7 @@ set( HDRS
 	include/spirit/Gui/spPangolinScenegraphGui.h
 	include/spirit/Gui/spOpenSceneGraphGui.h
 	include/spirit/Objects.h
-	include/spirit/spCommonFunctor.h
+	include/spirit/spSimCommonFunctor.h
 	include/spirit/Gui.h
 	include/spirit/spGeneralTools.h
 	include/spirit/spSettings.h

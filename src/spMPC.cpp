@@ -204,7 +204,8 @@ void spMPC::MinimizeMPCError(const Maneuver& maneuver, const spState& current_st
 //  }
   // put more weight on trajecotry point errors rather than residula weights
   traj_point_weight = 1*traj_point_weight;
-  ceres::CostFunction* cost_function = new MPCManRegCostFunc(car_params_,current_state,maneuver,horizon_,residual_weight,traj_point_weight);
+  ceres::CostFunction* cost_function = new MPCManRegCostFunc<CarSimFunctorRK4>(car_params_,current_state,maneuver,horizon_,residual_weight,traj_point_weight);
+  //ceres::CostFunction* cost_function = new MPCManRegCostFunc<BikeSimFunctorRK4>(car_params_,current_state,maneuver,horizon_,residual_weight,traj_point_weight);
   Eigen::VectorXd min_limits(6);
   Eigen::VectorXd max_limits(6);
   for(int ii=0; ii<6; ii+=2) {

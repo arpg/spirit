@@ -3,8 +3,9 @@
 #include <spirit/Types/spTypes.h>
 #include <spirit/BikeODE.h>
 #include <spirit/RK4.h>
+#include <spirit/spSimCommonFunctor.h>
 
-class BikeSimFunctorRK4 {
+class BikeSimFunctorRK4 : public spSimCommonFunctor {
  public:
   BikeSimFunctorRK4(
       const spVehicleConstructionInfo& info, const spState& initial_state)
@@ -82,7 +83,7 @@ class BikeSimFunctorRK4 {
       state.linvel = spLinVel(0,0,0);
       state.linvel[0] = init[0];
       state.linvel[1] = init[1];
-      state.linvel[2] = 0;
+
 
 
       if (traj_states != nullptr) {

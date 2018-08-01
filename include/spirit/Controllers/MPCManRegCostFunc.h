@@ -8,10 +8,13 @@
 #include <ceres/ceres.h>
 #include <ceres/problem.h>
 #include <spirit/CarSimFunctorRK4.h>
+#include <spirit/BikeSimFunctorRK4.h>
 #include <spirit/Controllers/CircleMan.h>
+#include <spirit/spSimCommonFunctor.h>
 #include <thread>
 #include <iomanip>
 
+template<class simfunctor>
 class MPCManRegCostFunc : public ceres::DynamicCostFunction {
  public:
   MPCManRegCostFunc(const spVehicleConstructionInfo& info,
@@ -54,9 +57,9 @@ class MPCManRegCostFunc : public ceres::DynamicCostFunction {
 //      std::cout << "parameters are \n" << cntrl_vars << std::endl;
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> jac(jacobians[0],num_residual_blocks_*12,6);
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*12,1);
-      std::vector<std::shared_ptr<CarSimFunctorRK4>> sims;
+      std::vector<std::shared_ptr<simfunctor>> sims;
       for (int ii = 0; ii < parameter_block_sizes()[0] + 1; ii++) {
-        sims.push_back(std::make_shared<CarSimFunctorRK4>(vehicle_info_,current_state_));
+        sims.push_back(std::make_shared<simfunctor>(vehicle_info_,current_state_));
       }
 //      for (int ii = 0; ii < sims.size() ; ii++) {
 //        sims[ii]->SetState(current_state_);
@@ -115,7 +118,7 @@ class MPCManRegCostFunc : public ceres::DynamicCostFunction {
 //      std::cout << "res called " << std::endl;
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*12,1);
       std::shared_ptr<spStateSeries> curr_states = std::make_shared<spStateSeries>();
-      CarSimFunctorRK4 sims(vehicle_info_,current_state_);
+      simfunctor sims(vehicle_info_,current_state_);
       sims(0, (int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, 0, -1, curr_states);
       // Calculate residual
       for(int jj = 0; jj<num_residual_blocks_; jj++) {

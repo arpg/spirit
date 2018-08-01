@@ -3,8 +3,9 @@
 #include <spirit/Types/spTypes.h>
 #include <spirit/CarODE.h>
 #include <spirit/RK4.h>
+#include <spirit/spSimCommonFunctor.h>
 
-class CarSimFunctorRK4 {
+class CarSimFunctorRK4 : public spSimCommonFunctor {
  public:
   CarSimFunctorRK4(
       const spVehicleConstructionInfo& info, const spState& initial_state)
