@@ -9,6 +9,7 @@
 #include <spirit/Objects/spWaypoint.h>
 #include <spirit/Objects/spLineStrip.h>
 #include <spirit/Objects/spMesh.h>
+#include <spirit/RK4.h>
 #include <osg/Node>
 #include <osg/ref_ptr>
 

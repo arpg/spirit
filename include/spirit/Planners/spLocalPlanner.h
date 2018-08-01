@@ -6,6 +6,7 @@
 #include <spirit/Planners/VehicleCeresCostFunc.h>
 #include <spirit/ParamLimitLossFunc.h>
 
+
 class spLocalPlanner {
  public:
   spLocalPlanner(const spVehicleConstructionInfo& vehicle_info, bool overwrite_endstate=false, Gui* gui = nullptr);

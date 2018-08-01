@@ -84,8 +84,6 @@ class BikeSimFunctorRK4 : public spSimCommonFunctor {
       state.linvel[0] = init[0];
       state.linvel[1] = init[1];
 
-
-
       if (traj_states != nullptr) {
         traj_states->push_back(std::make_shared<spState>(state));
       }

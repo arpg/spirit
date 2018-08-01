@@ -3,6 +3,7 @@
 
 #include <spirit/Gui.h>
 #include <spirit/Controllers/spPID.h>
+#include <spirit/Controllers/spMPC.h>
 #include <spirit/spSettings.h>
 #include <spirit/Types/spTypes.h>
 #include <spirit/Objects.h>

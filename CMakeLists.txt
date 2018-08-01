@@ -137,7 +137,6 @@ set( SRCS
 	src/spLineStrip.cpp
 	src/spPID.cpp
 	src/spTrajectory.cpp
-	src/spMPC.cpp
 	src/spCirclePlanner.cpp
 	src/RK4.cpp
 	)

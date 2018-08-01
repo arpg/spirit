@@ -215,5 +215,11 @@ void Objects::StepPhySimulation(double step_time) {
     int max_sub_steps = (step_time/fixed_time_step)+1;
     dynamics_world_->stepSimulation(step_time,max_sub_steps,fixed_time_step);
   }
+
 }
+
+
+
+
+
 

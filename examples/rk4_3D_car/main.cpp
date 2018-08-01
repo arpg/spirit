@@ -21,8 +21,8 @@ int main(int argc, char** argv){
     spObjectHandle bike_handle = objs->CreateVehicle(params.bike_param);
 
     // mesh
-    osg::ref_ptr<osg::Node> meshnode = osgDB::readNodeFile( "lab_v2.ply" );
-    spObjectHandle mesh_handle = objs->CreateMesh(meshnode);
+    //osg::ref_ptr<osg::Node> meshnode = osgDB::readNodeFile( "lab_v2.ply" );
+    //spObjectHandle mesh_handle = objs->CreateMesh(meshnode);
 
     // set gui and add objects
     Gui gui;
@@ -42,11 +42,51 @@ int main(int argc, char** argv){
     //bike.SetState(state);
     //std::shared_ptr<spState> state_ptr = std::make_shared<spState>(state);
 
+    /*
+    // BVP
+    spTrajectory traj(gui, objs);
+
+    spPose pose0(spPose::Identity());
+    pose0.translate(spTranslation(0,0,0));
+    Eigen::AngleAxisd rot0(0,Eigen::Vector3d::UnitZ());
+    pose0.rotate(rot0);
+    traj.AddWaypoint(pose0,4);
+
+    spPose pose1(spPose::Identity());
+    pose1.translate(spTranslation(1,1,0));
+    double angle = SP_PI/10;
+    Eigen::AngleAxisd rot1(angle,Eigen::Vector3d::UnitZ());
+    pose1.rotate(rot1);
+    traj.AddWaypoint(pose1,4);
+
+    traj.IsLoop(false);
+
+    spLocalPlanner localplanner(params.bike_param, false, &gui);
+    gui.Iterate(objs);
+
+    spCurve controls_curve(2,2);
+
+    traj.SetTravelDuration(0,1);
+    localplanner.SolveInitialPlan(traj,0);
+    double final_cost = localplanner.SolveLocalPlan(traj,0);
+    std::cout << "final cost: " << final_cost << std::endl;
+
+    controls_curve.SetBezierControlPoints(traj.GetControls(0));
+    std::cout << "bezier control points:\n"<<controls_curve.GetBezierControlPoints() << std::endl;
+
+    while(1) {
+      gui.Iterate(objs);
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    */
+
+
+    // /*
     // MPC controller
     float horizon = 10;
-    double radius = 1;
+    double radius = 1;  // radius of circle
     double vel = 2;
-    spMPC mpc(params.bike_param,horizon);
+    spMPC<CarSimFunctorRK4> mpc(params.bike_param,horizon);
 
     spCtrlPts2ord_2dof inputcmd_curve;
     inputcmd_curve.col(0) = Eigen::Vector2d(0,0);
@@ -71,7 +111,7 @@ int main(int argc, char** argv){
       std::cout << "done " << std::endl;
         gui.Iterate(objs);
       }
-    }
+    } // */
 
 
     /*
@@ -89,7 +129,6 @@ int main(int argc, char** argv){
         std::cout<<"Yaw: "<<yaw<<" linear velocity: "<<lin_vel<<std::endl;
 
     } // */
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     return 0;
 }
 

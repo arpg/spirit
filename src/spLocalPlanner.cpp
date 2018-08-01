@@ -98,6 +98,7 @@ double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simu
 double spLocalPlanner::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simulation_duration, const spState& current_state, const spWaypoint& end_waypoint, std::shared_ptr<spStateSeries> traj_states) {
   double final_cost = SolveLocalPlan(controls,simulation_duration,current_state,end_waypoint);
   // TODO: we should be able to get traj_states from solution of last optimization step but for now we resimulate.
+  //CarSimFunctor sim(vehicle_parameters,current_state,gui_);
   CarSimFunctor sim(vehicle_parameters,current_state,gui_);
 //  CarSimFunctor sim(vehicle_parameters,current_state,nullptr);
   sim(0,(int)(simulation_duration/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,controls,0,-1,traj_states);

@@ -10,6 +10,7 @@
 #include <spirit/CarSimFunctor.h>
 #include <iomanip>
 
+
 class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
  public:
   VehicleCeresCostFunc(const spVehicleConstructionInfo& info,
