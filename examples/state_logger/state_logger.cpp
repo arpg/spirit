@@ -55,8 +55,27 @@ void optitrack_pose_handler(hal::PoseMsg& PoseData) {
     } else if(yaw_diff<-SP_PI){
       yaw_diff = 2*SP_PI+yaw_diff;
     }
-    optistate_.rotvel[2] = inv_time_dif*yaw_diff;
-  } else {
+    //optistate_.rotvel[2] = inv_time_dif*yaw_diff;
+    double yaw_rate = inv_time_dif*yaw_diff;
+
+    // filter yaw rate with averaging filter
+    const unsigned int buf_size = 10;
+    static double buf[buf_size];
+    static unsigned int last_index_ptr = 0;
+
+    buf[last_index_ptr] = yaw_rate;
+    if(last_index_ptr==buf_size-1){
+        last_index_ptr = 0;
+    } else {
+        last_index_ptr++;
+    }
+    double sum = 0;
+    for(int ii=0; ii<buf_size; ii++){
+        sum += buf[ii];
+    }
+    optistate_.rotvel[2] = sum/buf_size;
+
+    } else {
     optistate_.linvel = spLinVel(0,0,0);
     optistate_.rotvel = spRotVel(0,0,0);
   }
@@ -93,16 +112,49 @@ void CarSensorCallback(hal::CarStateMsg msg) {
 //              << msg.steer_angle()
 //              << std::endl;
 
-    if(std::abs(msg.wheel_speed_fl())>100){
-        std::cout << " enc ->  " << msg.wheel_speed_fl() << std::endl;
+    // filter noisy data - I get sometimes very large or very small numbers which could be due to error in the ECU firmware.
+    if((std::abs(msg.wheel_speed_fl())>300)||(std::abs(msg.wheel_speed_fr())>300)||(std::abs(msg.wheel_speed_rl())>300)||(std::abs(msg.wheel_speed_rr())>300)){
+        return;
     }
+
+    // filter all data with running average
+    const unsigned int buf_size = 10;
+    static double buf0[buf_size];
+    static double buf1[buf_size];
+    static double buf2[buf_size];
+    static double buf3[buf_size];
+    static unsigned int last_index_ptr = 0;
+
+    buf0[last_index_ptr] = msg.wheel_speed_fl();
+    buf1[last_index_ptr] = msg.wheel_speed_fr();
+    buf2[last_index_ptr] = msg.wheel_speed_rl();
+    buf3[last_index_ptr] = msg.wheel_speed_rr();
+    if(last_index_ptr==buf_size-1){
+        last_index_ptr = 0;
+    } else {
+        last_index_ptr++;
+    }
+    double sum0 = 0;
+    double sum1 = 0;
+    double sum2 = 0;
+    double sum3 = 0;
+    for(int ii=0; ii<buf_size; ii++){
+        sum0 += buf0[ii];
+        sum1 += buf1[ii];
+        sum2 += buf2[ii];
+        sum3 += buf3[ii];
+    }
+    double ws0 = sum0/buf_size;
+    double ws1 = sum1/buf_size;
+    double ws2 = sum2/buf_size;
+    double ws3 = sum3/buf_size;
 
     filemutex_.lock();
     logfile_ << 1 << "," << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << ","
-             << msg.wheel_speed_fl() << ","
-             << msg.wheel_speed_fr() << ","
-             << -msg.wheel_speed_rl() << ","
-             << -msg.wheel_speed_rr() << ","
+             << ws0 << ","
+             << ws1 << ","
+             << -ws2 << ","
+             << -ws3 << ","
              << msg.steer_angle() << "\n";
     logfile_.flush();
     filemutex_.unlock();
@@ -128,7 +180,6 @@ int main(int argc, char** argv) {
     ninja_car.UpdateCarCommand(commandMSG);
 
     filemutex_.lock();
-//    std::cout << commandMSG.steering_double inv_time_dif = angle() << "," << commandMSG.throttle_percent()/40.0 << std::endl;
     logfile_ << 0 << "," << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << "," << -commandMSG.steering_angle() << "," << -commandMSG.throttle_percent()/40.0 << "\n";
     logfile_.flush();
     filemutex_.unlock();
