@@ -4,14 +4,17 @@
 Objects::Objects(const spPhyEngineType phy_type){
   btengine_ = phy_type;
   switch(phy_type){
-    case(spPhyEngineType::PHY_BULLET ):
+    case(spPhyEngineType::PHY_BULLET):
       world_params_.worldMax.setValue(1000*WSCALE,1000*WSCALE,1000*WSCALE);
       world_params_.worldMin.setValue(-1000*WSCALE,-1000*WSCALE,-1000*WSCALE);
       world_params_.solver = spPhysolver::SEQUENTIAL_IMPULSE;
       this->InitBulletEmptyDynamicsWorld();
       break;
+    case(spPhyEngineType::PHY_NONE):
+      std::cout<<"No physics engine used"<<std::endl;
+      break;
     default:
-       std::cout<<"Bullet Engine Not Used"<<std::endl;
+       SPERROREXIT("Not a valid physics engine type");
   }
 }
 

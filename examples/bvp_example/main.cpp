@@ -36,15 +36,15 @@ int main(int argc, char** argv) {
   traj.AddWaypoint(pose0,4);
 
   spPose pose1(spPose::Identity());
-  pose1.translate(spTranslation(0.5,2,0.06));
+  pose1.translate(spTranslation(1,0,0.06));
   double angle = SP_PI/10;
   Eigen::AngleAxisd rot1(angle,Eigen::Vector3d::UnitZ());
   pose1.rotate(rot1);
   traj.AddWaypoint(pose1,4);
 
-  traj.IsLoop(false);
+  traj.IsLoop(true);
 
-  spLocalPlanner localplanner(spworld.car_param,false,&spworld.gui_);
+  spLocalPlanner<CarSimFunctor> localplanner(spworld.car_param,false,&spworld.gui_);
 
   spworld.gui_.Iterate(spworld.objects_);
 
@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 //  cntrl_cmd.col(2) = Eigen::Vector2d(0,50);
 //  controls_curve.SetBezierControlPoints(cntrl_cmd);
 
-  traj.SetTravelDuration(0,1);
+  traj.SetTravelDuration(0,3);
   localplanner.SolveInitialPlan(traj,0);
   double final_cost = localplanner.SolveLocalPlan(traj,0);
 //  double sim_duration = 1;

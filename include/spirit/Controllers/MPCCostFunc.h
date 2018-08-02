@@ -10,6 +10,7 @@
 #include <spirit/CarSimFunctor.h>
 #include <thread>
 #include <iomanip>
+template<typename simfunctor>
 class MPCCostFunc : public ceres::DynamicCostFunction {
  public:
   MPCCostFunc(const spVehicleConstructionInfo& info,
@@ -51,9 +52,9 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
 //      std::cout << "parameters are \n" << cntrl_vars << std::endl;
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>> jac(jacobians[0],num_residual_blocks_*12,6);
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*12,1);
-      std::vector<std::shared_ptr<CarSimFunctor>> sims;
+      std::vector<std::shared_ptr<simfunctor>> sims;
       for (int ii = 0; ii < parameter_block_sizes()[0] + 1; ii++) {
-        sims.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
+        sims.push_back(std::make_shared<simfunctor>(vehicle_info_,current_state_));
       }
 //      for (int ii = 0; ii < sims.size() ; ii++) {
 //        sims[ii]->SetState(current_state_);
@@ -61,7 +62,7 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
 #ifdef SOLVER_USE_CENTRAL_DIFF
       std::vector<std::shared_ptr<CarSimFunctor>> sims_neg;
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
-        sims_neg.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
+        sims_neg.push_back(std::make_shared<simfunctor>(vehicle_info_,current_state_));
       }
 #endif
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
@@ -75,7 +76,7 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
           sims[ii]->WaitForThreadJoin();
       }
 #if 0
-      std::shared_ptr<CarSimFunctor> sim = std::make_shared<CarSimFunctor>(vehicle_info_,current_state_);
+      std::shared_ptr<CarSimFunctor> sim = std::make_shared<simfunctor>(vehicle_info_,current_state_);
       std::vector<std::shared_ptr<std::thread>> thp;
       thp.push_back(std::make_shared<std::thread>(std::ref(*sims[0].get()),0,(int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, FINITE_DIFF_EPSILON, 0));
       if(thp[0]->joinable()) {
@@ -148,7 +149,7 @@ class MPCCostFunc : public ceres::DynamicCostFunction {
 //      std::cout << "res called " << std::endl;
       Eigen::Map<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>> res(residuals,num_residual_blocks_*12,1);
       std::shared_ptr<spStateSeries> curr_states = std::make_shared<spStateSeries>();
-      CarSimFunctor sims(vehicle_info_,current_state_);
+      simfunctor sims(vehicle_info_,current_state_);
       sims(0, (int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, 0, -1, curr_states);
       // Calculate residual
       for(int jj = 0; jj<num_residual_blocks_; jj++) {

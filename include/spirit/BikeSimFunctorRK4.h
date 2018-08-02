@@ -49,10 +49,16 @@ class BikeSimFunctorRK4 : public spSimCommonFunctor {
       initial_state_ = *init_state;
     }
 
+    double phi = initial_state_.pose.rotation().eulerAngles(0,1,2)[2];
+
+    initial_state_.linvel[0] = 0;
+    initial_state_.linvel[1] = 0;
+    initial_state_.linvel[2] = 0;
+
     init[0] = initial_state_.pose.translation()[0];
     init[1] = initial_state_.pose.translation()[1];
-    init[2] = initial_state_.pose.rotation().eulerAngles(0,1,2)[2]; // yaw
-    init[3] = 1; // init velocity
+    init[2] = phi; // yaw
+    init[3] = initial_state_.linvel.norm(); // init velocity
 
 
     spCurve control_curve(2, 2);
@@ -81,8 +87,10 @@ class BikeSimFunctorRK4 : public spSimCommonFunctor {
       state.pose.rotate(rot1);
       state.front_steering = u[0];
       state.linvel = spLinVel(0,0,0);
-      state.linvel[0] = init[0];
-      state.linvel[1] = init[1];
+      //state.rotvel = spRotVel(0,0,0);
+      //state.rotvel[2] = 1;
+      state.linvel[0] = init[3]*std::cos(init[2]);
+      state.linvel[1] = init[3]*std::sin(init[2]);
 
       if (traj_states != nullptr) {
         traj_states->push_back(std::make_shared<spState>(state));

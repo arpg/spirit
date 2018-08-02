@@ -1,4 +1,4 @@
-#ifndef SPMPC_H__
+﻿#ifndef SPMPC_H__
 #define SPMPC_H__
 #include <spirit/Types/spTypes.h>
 #include <spirit/spGeneralTools.h>
@@ -131,7 +131,7 @@ void spMPC<simfunctor>::MinimizeMPCError(const spStateSeries& ref_states,const s
 //  traj_point_weight[1] = 0.8;
   // put more weight on trajecotry point errors rather than residula weights
   traj_point_weight = 10*traj_point_weight;
-  ceres::CostFunction* cost_function = new MPCCostFunc(car_params_,current_state,ref_states,residual_weight,traj_point_weight);
+  ceres::CostFunction* cost_function = new MPCCostFunc<simfunctor>(car_params_,current_state,ref_states,residual_weight,traj_point_weight);
   Eigen::VectorXd min_limits(6);
   Eigen::VectorXd max_limits(6);
   for(int ii=0; ii<6; ii+=2) {
@@ -239,7 +239,6 @@ void spMPC<simfunctor>::MinimizeMPCError(const Maneuver& maneuver, const spState
   // put more weight on trajecotry point errors rather than residula weights
   traj_point_weight = 1*traj_point_weight;
   ceres::CostFunction* cost_function = new MPCManRegCostFunc<simfunctor>(car_params_,current_state,maneuver,horizon_,residual_weight,traj_point_weight);
-  //ceres::CostFunction* cost_function = new MPCManRegCostFunc<BikeSimFunctorRK4>(car_params_,current_state,maneuver,horizon_,residual_weight,traj_point_weight);
   Eigen::VectorXd min_limits(6);
   Eigen::VectorXd max_limits(6);
   for(int ii=0; ii<6; ii+=2) {

@@ -36,15 +36,16 @@ int main(int argc, char** argv){
     spState state;
     state.pose = spPose::Identity();
     state.pose.translate(spTranslation(0,0,0));
-    Eigen::AngleAxisd rot1(0,Eigen::Vector3d::UnitZ());
-    state.pose.rotate(rot1);
+    //Eigen::AngleAxisd rot1(0,Eigen::Vector3d::UnitZ());
+    //state.pose.rotate(rot1);
 
-    //bike.SetState(state);
-    //std::shared_ptr<spState> state_ptr = std::make_shared<spState>(state);
+    bike.SetState(state);
+    std::shared_ptr<spState> state_ptr = std::make_shared<spState>(state);
 
-    /*
+    // /*
     // BVP
     spTrajectory traj(gui, objs);
+
 
     spPose pose0(spPose::Identity());
     pose0.translate(spTranslation(0,0,0));
@@ -59,7 +60,8 @@ int main(int argc, char** argv){
     pose1.rotate(rot1);
     traj.AddWaypoint(pose1,4);
 
-    traj.IsLoop(false);
+    /*
+    traj.IsLoop(true);
 
     spLocalPlanner localplanner(params.bike_param, false, &gui);
     gui.Iterate(objs);
@@ -78,15 +80,15 @@ int main(int argc, char** argv){
       gui.Iterate(objs);
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-    */
+    //  */
 
 
-    // /*
+     /*
     // MPC controller
-    float horizon = 10;
+    float horizon = 5;
     double radius = 1;  // radius of circle
-    double vel = 2;
-    spMPC<CarSimFunctorRK4> mpc(params.bike_param,horizon);
+    double vel = 1;
+    spMPC<BikeSimFunctorRK4> mpc(params.bike_param,horizon);
 
     spCtrlPts2ord_2dof inputcmd_curve;
     inputcmd_curve.col(0) = Eigen::Vector2d(0,0);
@@ -99,13 +101,14 @@ int main(int argc, char** argv){
       std::cout << "controls -> \n" << inputcmd_curve << std::endl;
 
       std::shared_ptr<spStateSeries> series = std::make_shared<spStateSeries>();
-      mysim(0,(int)(horizon/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,inputcmd_curve,0,-1,series,std::make_shared<spState>(state));
+      mysim(0,(int)(horizon/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,inputcmd_curve,0,-1,series,state_ptr);
       while(1){
       for(int ii=0; ii<(int)(horizon/DISCRETIZATION_STEP_SIZE); ii++){
         spState state(*((*series)[ii]));
         bike.SetState(state);
         gui.Iterate(objs);
-        std::cout << "speed -> " << state.linvel.norm() << std::endl;
+        double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
+        std::cout<<"Yaw ->"<<yaw<<" "<<"speed -> " << state.linvel.norm() << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
       }
       std::cout << "done " << std::endl;

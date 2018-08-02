@@ -119,7 +119,6 @@ set( HDRS
 set( SRCS
 	src/spirit.cpp
 	src/Gui.cpp
-	src/spLocalPlanner.cpp
 	src/spPangolinScenegraphGui.cpp
 	src/spOpenSceneGraphGui.cpp
 	src/spGeneralTools.cpp

@@ -14,7 +14,7 @@
 #include <thread>
 #include <iomanip>
 
-template<class simfunctor>
+template<typename simfunctor>
 class MPCManRegCostFunc : public ceres::DynamicCostFunction {
  public:
   MPCManRegCostFunc(const spVehicleConstructionInfo& info,
@@ -65,9 +65,9 @@ class MPCManRegCostFunc : public ceres::DynamicCostFunction {
 //        sims[ii]->SetState(current_state_);
 //      }
 #ifdef SOLVER_USE_CENTRAL_DIFF
-      std::vector<std::shared_ptr<CarSimFunctorRK4>> sims_neg;
+      std::vector<std::shared_ptr<simfunctor>> sims_neg;
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
-        sims_neg.push_back(std::make_shared<CarSimFunctorRK4>(vehicle_info_,current_state_));
+        sims_neg.push_back(std::make_shared<simfunctor>(vehicle_info_,current_state_));
       }
 #endif
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
