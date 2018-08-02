@@ -8,9 +8,11 @@
 #include <ceres/ceres.h>
 #include <ceres/problem.h>
 #include <spirit/CarSimFunctor.h>
+#include <spirit/CarSimFunctorRK4.h>
+#include <spirit/BikeSimFunctorRK4.h>
 #include <iomanip>
 
-
+template<typename simfunctor>
 class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
  public:
   VehicleCeresCostFunc(const spVehicleConstructionInfo& info,
@@ -40,15 +42,15 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
       Eigen::Map<Eigen::Matrix<double, 13, 7, Eigen::RowMajor>> jac(jacobians[0]);
       Eigen::Map<Eigen::Matrix<double,13,1>> res(residuals);
       //      std::cout << "doing residual and jac" << std::endl;
-      std::vector<std::shared_ptr<CarSimFunctor>> sims;
+      std::vector<std::shared_ptr<simfunctor>> sims;
       for (int ii = 0; ii < parameter_block_sizes()[0] + 1; ii++) {
-        sims.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
+        sims.push_back(std::make_shared<simfunctor>(vehicle_info_,current_state_));
       }
 #if 0
 #ifdef SOLVER_USE_CENTRAL_DIFF
       std::vector<std::shared_ptr<CarSimFunctor>> sims_neg;
       for (int ii = 0; ii < parameter_block_sizes()[0]; ii++) {
-        sims_neg.push_back(std::make_shared<CarSimFunctor>(vehicle_info_,current_state_));
+        sims_neg.push_back(std::make_shared<simfunctor>(vehicle_info_,current_state_));
       }
 #endif
       ctpl::thread_pool pool(1);
@@ -120,7 +122,7 @@ class VehicleCeresCostFunc : public ceres::SizedCostFunction<13,7> {
 //      std::cout << "res   -> " << res.transpose() << std::endl;
     } else if (residuals != NULL) {
       Eigen::Map<Eigen::Matrix<double,13,1>> res(residuals);
-      CarSimFunctor sims(vehicle_info_,current_state_);
+      simfunctor sims(vehicle_info_,current_state_);
       sims(0, (int)(simulation_length/DISCRETIZATION_STEP_SIZE), DISCRETIZATION_STEP_SIZE, cntrl_vars, 0, -1);
 
       res << (target_state_ - sims.GetState()).vector(),simulation_length;

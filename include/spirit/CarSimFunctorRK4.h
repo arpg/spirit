@@ -4,11 +4,12 @@
 #include <spirit/CarODE.h>
 #include <spirit/RK4.h>
 #include <spirit/spSimCommonFunctor.h>
+#include <spirit/Gui.h>
 
 class CarSimFunctorRK4 : public spSimCommonFunctor {
  public:
   CarSimFunctorRK4(
-      const spVehicleConstructionInfo& info, const spState& initial_state)
+      const spVehicleConstructionInfo& info, const spState& initial_state, Gui* gui_ = nullptr)
       : initial_state_(initial_state),
         thread_(nullptr) {
   }

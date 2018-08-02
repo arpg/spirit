@@ -54,16 +54,15 @@ int main(int argc, char** argv){
     traj.AddWaypoint(pose0,4);
 
     spPose pose1(spPose::Identity());
-    pose1.translate(spTranslation(1,1,0));
+    pose1.translate(spTranslation(3,3,0));
     double angle = SP_PI/10;
     Eigen::AngleAxisd rot1(angle,Eigen::Vector3d::UnitZ());
     pose1.rotate(rot1);
     traj.AddWaypoint(pose1,4);
 
-    /*
     traj.IsLoop(true);
 
-    spLocalPlanner localplanner(params.bike_param, false, &gui);
+    spLocalPlanner<CarSimFunctorRK4> localplanner(params.bike_param, false, &gui);
     gui.Iterate(objs);
 
     spCurve controls_curve(2,2);
@@ -75,7 +74,7 @@ int main(int argc, char** argv){
 
     controls_curve.SetBezierControlPoints(traj.GetControls(0));
     std::cout << "bezier control points:\n"<<controls_curve.GetBezierControlPoints() << std::endl;
-
+    /*
     while(1) {
       gui.Iterate(objs);
       std::this_thread::sleep_for(std::chrono::milliseconds(10));

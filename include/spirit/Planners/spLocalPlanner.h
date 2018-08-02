@@ -54,7 +54,7 @@ double spLocalPlanner<simfunctor>::SolveLocalPlan(spCtrlPts2ord_2dof& controls, 
   goal_state.linvel = spLinVel(end_waypoint.GetLinearVelocityInWorld());
   Eigen::VectorXd residual_weight(13);
 //  residual_weight << 10, 10, 10, 0.1, 0.1, 0.1, 0.09, 0.09, 0.09, 0.1, 0.1, 0.1,0.1;
-  ceres::CostFunction* cost_function = new VehicleCeresCostFunc(vehicle_parameters,current_state,goal_state,weight_vec_);
+  ceres::CostFunction* cost_function = new VehicleCeresCostFunc<simfunctor>(vehicle_parameters,current_state,goal_state,weight_vec_);
   Eigen::VectorXd min_limits(7);
   Eigen::VectorXd max_limits(7);
   // set steering limits
@@ -132,7 +132,7 @@ double spLocalPlanner<simfunctor>::SolveLocalPlan(spCtrlPts2ord_2dof& controls, 
   double final_cost = SolveLocalPlan(controls,simulation_duration,current_state,end_waypoint);
   // TODO: we should be able to get traj_states from solution of last optimization step but for now we resimulate.
   //CarSimFunctor sim(vehicle_parameters,current_state,gui_);
-  CarSimFunctor sim(vehicle_parameters,current_state,gui_);
+  simfunctor sim(vehicle_parameters,current_state,gui_);
 //  CarSimFunctor sim(vehicle_parameters,current_state,nullptr);
   sim(0,(int)(simulation_duration/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,controls,0,-1,traj_states);
   return final_cost;
@@ -217,7 +217,7 @@ void spLocalPlanner<simfunctor>::SolveInitialPlan(spTrajectory& trajectory, int 
 //      state.InsertSubstate();
 //      state.substate_vec[ii]->linvel = state.linvel;
 //    }
-  CarSimFunctor sim(vehicle_parameters,state,gui_);
+  simfunctor sim(vehicle_parameters,state,gui_);
   std::shared_ptr<spStateSeries> state_series = std::make_shared<spStateSeries>();
   double travel_duration = trajectory.GetTravelDuration(way_index);
   sim(0,(int)(travel_duration/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,trajectory.GetControls(way_index),0,-1,state_series);
