@@ -20,6 +20,8 @@ class spWaypoint : public spCommonObject {
   void SetRotVel(const spRotVel& rotvel);
   const spRotVel& GetRotVel();
 
+  const spLinVel GetLinearVelocityDirection();
+
  private:
   double linvelnorm_;
   spLinVel linveldir_;

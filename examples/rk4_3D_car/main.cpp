@@ -14,7 +14,7 @@ int main(int argc, char** argv){
 
     std::shared_ptr<Objects> objs = std::make_shared<Objects>(spPhyEngineType::PHY_NONE);
     //std::shared_ptr<Objects> objs = std::make_shared<Objects>(spPhyEngineType::PHY_BULLET);
-    spObjectHandle box_handle = objs->CreateBox(gnd, spBoxSize(25,25,1), 0, spColor(1,1,1));
+    spObjectHandle box_handle = objs->CreateBox(gnd, spBoxSize(20,20,1), 0, spColor(1,1,1));
 
     // create bike
     BikeParams params;
@@ -28,7 +28,7 @@ int main(int argc, char** argv){
     Gui gui;
     gui.Create(spGuiType::GUI_OSG);
     gui.AddObject(objs->GetObject(box_handle));
-    //gui.AddObject(objs->GetObject(bike_handle));
+    gui.AddObject(objs->GetObject(bike_handle));
     //gui.AddObject(objs->GetObject(mesh_handle));
     spBike& bike = ((spBike&)objs->GetObject(bike_handle));
 
@@ -81,24 +81,21 @@ int main(int argc, char** argv){
     pose0.translate(spTranslation(0,0,0.06));
     Eigen::AngleAxisd rot0(0,Eigen::Vector3d::UnitZ());
     pose0.rotate(rot0);
-    traj.AddWaypoint(pose0,1);
+    traj.AddWaypoint(pose0,2,spLinVel(1,0,0));
 
     spPose pose1(spPose::Identity());
-    pose1.translate(spTranslation(2,2,0.06));
+    pose1.translate(spTranslation(3,4,0.06));
     double angle = SP_PI/2;
-    Eigen::AngleAxisd rot1(0,Eigen::Vector3d::UnitZ());
+    Eigen::AngleAxisd rot1(angle,Eigen::Vector3d::UnitZ());
     pose1.rotate(rot1);
-    traj.AddWaypoint(pose1,1);
-
-    traj.GetWaypoint(0).SetLinearVelocityDirection(spLinVel(1,0,0));
-    traj.GetWaypoint(1).SetLinearVelocityDirection(spLinVel(1,0,0));
+    traj.AddWaypoint(pose1,1,spLinVel(1,0,0));
 
     traj.IsLoop(false);
 
     // Solve local plan
     spLocalPlanner<BikeSimFunctorRK4> localplanner(params.bike_param, true, &gui);
     spBVPWeightVec weight_vec;
-    // x,y,z,roll,pitch,yaw,xdot,ydot,zdot,r_d, p_d,y_d,time
+    // x,y,z,roll,pitch,yaw,xdot,ydot,zdot,roll_dot,pitch_dot,yaw_dot,time
     weight_vec << 100, 100, 0, 0, 0, 10, 0.009, 0.009, 0.009, 0.01, 0.01, 0.01, 0.1;
     localplanner.SetCostWeight(weight_vec);
 
@@ -119,11 +116,11 @@ int main(int argc, char** argv){
     while(!gui.ShouldQuit()){
         spTimestamp t0 = spGeneralTools::Tick();
 
-        //mysim(0,1,0.1,traj.GetControls(0),0,-1,0,state_ptr);
+        mysim(0,1,0.1,traj.GetControls(0),0,-1,0,state_ptr);
         bike.SetState(mysim.GetState());
         gui.Iterate(objs);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(10));
         //double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
         //double lin_vel = mysim.GetState().linvel.norm();
         //std::cout<<"Yaw: "<<yaw<<" linear velocity: "<<lin_vel<<std::endl;

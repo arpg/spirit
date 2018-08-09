@@ -43,7 +43,7 @@ class spOpenSceneGraphGui : public spCommonGUI {
     private:
         //static void KeyActionMethodSample();
         void UpdateBoxGuiObject(spBox& spobj);
-        //void UpdateWaypointGuiObject(spWaypoint& spobj);
+        void UpdateWaypointGuiObject(spWaypoint& spobj);
         void UpdateVehicleGuiObject(spVehicle& spobj);
         void UpdateLineStripGuiObject(spLineStrip& spobj);
 

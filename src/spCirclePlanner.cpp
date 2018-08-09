@@ -24,6 +24,6 @@ void spCirclePlanner::SolveInitialPlan(spTrajectory& trajectory) {
     Eigen::AngleAxisd rot(thetha+0.4, Eigen::Vector3d::UnitZ());
     pose.rotate(rot);
 
-    trajectory.AddWaypoint(pose,ss_linvel_);
+    trajectory.AddWaypoint(pose,ss_linvel_,spLinVel(0,1,0));
   }
 }

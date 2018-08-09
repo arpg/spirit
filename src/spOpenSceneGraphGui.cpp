@@ -77,7 +77,7 @@ void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
     root_->addChild(waypts->transform_.get());
 
     osg::ref_ptr<osg::LineWidth> linewidth = new osg::LineWidth();
-    linewidth->setWidth(2.0f);
+    linewidth->setWidth(3.0f);
 
     // normal vectors
     double vecdist = 0.3;
@@ -103,7 +103,7 @@ void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
     root_->addChild(xline.get());
 
     osg::Vec3 yf(waypoint.GetPose().translation()[0] + vecdist*std::sin(waypoint.GetPose().rotation().eulerAngles(0,1,2)[2]),
-                waypoint.GetPose().translation()[1] + vecdist*std::cos(waypoint.GetPose().rotation().eulerAngles(0,1,2)[2]),
+                waypoint.GetPose().translation()[1] + vecdist*std::cos(SP_PI-waypoint.GetPose().rotation().eulerAngles(0,1,2)[2]),
                 waypoint.GetPose().translation()[2] + vecdist*std::sin(waypoint.GetPose().rotation().eulerAngles(0,1,2)[0]));
     osg::ref_ptr<osg::Vec3Array> ypts = new osg::Vec3Array;
     ypts->push_back( start );
@@ -139,7 +139,14 @@ void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
     root_->addChild(zline.get());
 
     // velocity vector
-    osg::Vec3 vel(waypoint.GetLinearVelocityInWorld()[0], waypoint.GetLinearVelocityInWorld()[1], waypoint.GetLinearVelocityInWorld()[2]);
+    /*
+    std::cout<<"start: "<<start[0]<<" "<<start[1]<<" "<<start[2]<<std::endl;
+    spLinVel lv;
+    lv = waypoint.GetLinearVelocityInWorld();
+    std::cout<<"lin vel: "<<lv[0]<<" "<<lv[1]<<" "<<lv[2]<<std::endl;
+    */
+
+    osg::Vec3 vel(start[0] + waypoint.GetLinearVelocityInWorld()[0], start[1] + waypoint.GetLinearVelocityInWorld()[1], start[2] + waypoint.GetLinearVelocityInWorld()[2]);
     osg::ref_ptr<osg::Vec3Array> vpts = new osg::Vec3Array;
     vpts->push_back( start );
     vpts->push_back( vel );
@@ -155,6 +162,12 @@ void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
     vline->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
     root_->addChild(vline.get());
 
+    /*
+    std::cout<<"vel mag: "<<waypoint.GetLinearVelocityNorm()<<std::endl;
+    spLinVel lv;
+    lv = waypoint.GetLinearVelocityDirection();
+    std::cout<<"lin vel dir: "<<lv[0]<<" "<<lv[1]<<" "<<lv[2]<<std::endl;
+    */
 }
 void spOpenSceneGraphGui::AddVehicle(spVehicle& vehicle)
 {
@@ -304,6 +317,43 @@ void spOpenSceneGraphGui::UpdateLineStripGuiObject(spLineStrip& spobj){
 
 }
 
+void spOpenSceneGraphGui::UpdateWaypointGuiObject(spWaypoint& spobj){
+   /*
+   int gui_index = spobj.GetGuiIndex();
+   if((!(spobj.GetGuiIndex() < osgobj_.size())) || (osgobj_[gui_index]->name_.compare("waypoint"))){
+     SPERROREXIT("gui object doesn't match spobject.");
+   }
+
+   spLinVel lv;
+   lv = spobj.GetLinearVelocityDirection();
+   std::cout<<"lin vel dir update: "<<lv[0]<<" "<<lv[1]<<" "<<lv[2]<<std::endl;
+
+   osg::Vec3 start(spobj.GetPose().translation()[0], spobj.GetPose().translation()[1], spobj.GetPose().translation()[2]);
+   osg::ref_ptr<osg::LineWidth> linewidth = new osg::LineWidth();
+   linewidth->setWidth(2.0f);
+   // velocity vector
+   osg::Vec3 vel(spobj.GetLinearVelocityInWorld()[0], spobj.GetLinearVelocityInWorld()[1], spobj.GetLinearVelocityInWorld()[2]);
+   osg::ref_ptr<osg::Vec3Array> vpts = new osg::Vec3Array;
+   vpts->push_back( start );
+   vpts->push_back( vel );
+   osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
+   normals->push_back( osg::Vec3(0.0f,-1.0f, 0.0f) );
+   osg::ref_ptr<osg::Vec4Array> velcolor = new osg::Vec4Array;
+   velcolor->push_back(osg::Vec4(1.0,1.0,1.0,1.0));
+   osg::ref_ptr<osg::Geometry> vline = new osg::Geometry;
+   vline->setVertexArray(vpts.get());
+   vline->setNormalArray(normals.get());
+   vline->setNormalBinding(osg::Geometry::BIND_OVERALL);
+   vline->setColorArray(velcolor.get());
+   vline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+   vline->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,2));
+   vline->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
+   root_->addChild(vline.get());
+   //*/
+
+
+}
+
 void spOpenSceneGraphGui::UpdateBoxGuiObject(spBox& spobj)
 {
    int gui_index = spobj.GetGuiIndex();
@@ -358,6 +408,7 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(std::shared_ptr<Objects> &s
           }
           case spObjectType::WAYPOINT:
           {
+            //UpdateWaypointGuiObject((spWaypoint&)spobj->GetObject(ii));
             //std::cout<<"WAYPOINT currently no update functionality."<<std::endl;
             break;
           }

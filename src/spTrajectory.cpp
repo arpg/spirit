@@ -8,9 +8,10 @@ spTrajectory::spTrajectory(Gui& gui, std::shared_ptr<Objects> &objects) : gui_(g
 spTrajectory::~spTrajectory(){
 }
 
-spObjectHandle spTrajectory::AddWaypoint(const spPose& pose, double velocity/*, bool en_default_3ord3dof_traj*/) {
+spObjectHandle spTrajectory::AddWaypoint(const spPose& pose, double velocity, const spLinVel& linvel) {
   spObjectHandle waypoint_handle = objects_->CreateWaypoint(pose,spColor(1, 1, 0));
   ((spWaypoint&)objects_->GetObject(waypoint_handle)).SetLinearVelocityNorm(velocity);
+  ((spWaypoint&)objects_->GetObject(waypoint_handle)).SetLinearVelocityDirection(linvel);
   gui_.AddObject(objects_->GetObject(waypoint_handle));
   waypoint_vec_.push_back(&(spWaypoint&)objects_->GetObject(waypoint_handle));
 //  std::shared_ptr<spCurve> new_curve = std::make_shared<spCurve>(3,3);
@@ -86,9 +87,9 @@ void spTrajectory::SetTrajectoryStateSeries(int waypoint_index, std::shared_ptr<
     double z = (*state_series)[ii]->pose.translation()[2];
     std::cout<<"waypoint: "<<waypoint_index<<" "<<"x: "<<x<<" "<<"y: "<<y<<" "<<"z: "<<z<<std::endl;
   }
-  ((spLineStrip&)objects_->GetObject(linestrip_handle_vec_[waypoint_index])).SetLineStripPoints(points);
-  //spObjectHandle linestrip_handle = objects_->CreateLineStrip(spPose::Identity(),points,spColor(0.4, 0, 0));
-  //gui_.AddObject(objects_->GetObject(linestrip_handle));
+  //((spLineStrip&)objects_->GetObject(linestrip_handle_vec_[waypoint_index])).SetLineStripPoints(points);
+  spObjectHandle linestrip_handle = objects_->CreateLineStrip(spPose::Identity(),points,spColor(0.4, 0, 0));
+  gui_.AddObject(objects_->GetObject(linestrip_handle));
 }
 
 std::shared_ptr<spStateSeries> spTrajectory::GetTrajectoryStateSeries(int waypoint_index) const {

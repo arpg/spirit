@@ -31,6 +31,10 @@ void spWaypoint::SetLinearVelocityDirection(const spLinVel& linvel_dir) {
   linveldir_.normalize();
 }
 
+const spLinVel spWaypoint::GetLinearVelocityDirection(){
+    return linveldir_;
+}
+
 void spWaypoint::SetLinearVelocityNorm(double velocity) {
   linvelnorm_ = velocity;
   obj_guichanged_ = true;
