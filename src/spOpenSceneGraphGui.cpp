@@ -76,10 +76,15 @@ void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
     waypoint.SetGuiIndex(osgobj_.size()-1);
     root_->addChild(waypts->transform_.get());
 
+    osg::ref_ptr<osg::LineWidth> linewidth = new osg::LineWidth();
+    linewidth->setWidth(2.0f);
+
     // normal vectors
-    double vecdist = 0.25;
+    double vecdist = 0.3;
     osg::Vec3 start(waypoint.GetPose().translation()[0], waypoint.GetPose().translation()[1], waypoint.GetPose().translation()[2]);
-    osg::Vec3 xf(waypoint.GetPose().translation()[0] + vecdist, waypoint.GetPose().translation()[1], waypoint.GetPose().translation()[2]);
+    osg::Vec3 xf(waypoint.GetPose().translation()[0] + vecdist*std::cos(waypoint.GetPose().rotation().eulerAngles(0,1,2)[2]),
+                waypoint.GetPose().translation()[1] + vecdist*std::sin(waypoint.GetPose().rotation().eulerAngles(0,1,2)[2]),
+                waypoint.GetPose().translation()[2] + vecdist*std::sin(waypoint.GetPose().rotation().eulerAngles(0,1,2)[0]));
     osg::ref_ptr<osg::Vec3Array> xpts = new osg::Vec3Array;
     xpts->push_back( start );
     xpts->push_back( xf );
@@ -94,9 +99,12 @@ void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
     xline->setColorArray(xcolor.get());
     xline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
     xline->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,2));
+    xline->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
     root_->addChild(xline.get());
 
-    osg::Vec3 yf(waypoint.GetPose().translation()[0], waypoint.GetPose().translation()[1] + vecdist, waypoint.GetPose().translation()[2]);
+    osg::Vec3 yf(waypoint.GetPose().translation()[0] + vecdist*std::sin(waypoint.GetPose().rotation().eulerAngles(0,1,2)[2]),
+                waypoint.GetPose().translation()[1] + vecdist*std::cos(waypoint.GetPose().rotation().eulerAngles(0,1,2)[2]),
+                waypoint.GetPose().translation()[2] + vecdist*std::sin(waypoint.GetPose().rotation().eulerAngles(0,1,2)[0]));
     osg::ref_ptr<osg::Vec3Array> ypts = new osg::Vec3Array;
     ypts->push_back( start );
     ypts->push_back( yf );
@@ -109,9 +117,12 @@ void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
     yline->setColorArray(ycolor.get());
     yline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
     yline->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,2));
+    yline->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
     root_->addChild(yline.get());
 
-    osg::Vec3 zf(waypoint.GetPose().translation()[0], waypoint.GetPose().translation()[1], waypoint.GetPose().translation()[2] + vecdist);
+    osg::Vec3 zf(waypoint.GetPose().translation()[0] + vecdist*std::sin(waypoint.GetPose().rotation().eulerAngles(0,1,2)[0]),
+                waypoint.GetPose().translation()[1] + vecdist*std::sin(waypoint.GetPose().rotation().eulerAngles(0,1,2)[1]),
+                waypoint.GetPose().translation()[2] + vecdist*std::cos(waypoint.GetPose().rotation().eulerAngles(0,1,2)[0]));
     osg::ref_ptr<osg::Vec3Array> zpts = new osg::Vec3Array;
     zpts->push_back( start );
     zpts->push_back( zf );
@@ -124,6 +135,7 @@ void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
     zline->setColorArray(zcolor.get());
     zline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
     zline->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,2));
+    zline->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
     root_->addChild(zline.get());
 
     // velocity vector
@@ -140,6 +152,7 @@ void spOpenSceneGraphGui::AddWaypoint(spWaypoint& waypoint)
     vline->setColorArray(velcolor.get());
     vline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
     vline->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0,2));
+    vline->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
     root_->addChild(vline.get());
 
 }
@@ -187,7 +200,39 @@ void spOpenSceneGraphGui::AddVehicle(spVehicle& vehicle)
 
 void spOpenSceneGraphGui::AddLineStrip(spLineStrip& linestrip)
 {
-    std::cout<<"AddLineStrip(spLineStrip& linestrip) currently has no functionality"<<std::endl;
+    OSGobj* lstrp = new OSGobj;
+    lstrp->name_ = "linestrip";
+
+    curr_lstrp_size_ = linestrip.GetLineStripPoints().size();
+    std::cout<<"Init points: "<<linestrip.GetLineStripPoints().size()<<std::endl;
+
+    for(unsigned int ii=0; ii<linestrip.GetLineStripPoints().size();ii++){
+        lstrp->pts_->push_back(osg::Vec3(linestrip.GetLineStripPoints()[ii][0], linestrip.GetLineStripPoints()[ii][1], linestrip.GetLineStripPoints()[ii][2]));
+        pt_num_ = ii+1;
+    }
+
+    osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
+    normals->push_back( osg::Vec3(0.0f,-1.0f, 0.0f) );
+
+    osg::ref_ptr<osg::LineWidth> linewidth = new osg::LineWidth();
+    linewidth->setWidth(5.0f);
+    lstrp->geoshape_->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
+
+    lstrp->color_->push_back(osg::Vec4(linestrip.GetColor()[0],linestrip.GetColor()[1],linestrip.GetColor()[2],1.0));
+    lstrp->geom_->setVertexArray(lstrp->pts_.get());
+    lstrp->geom_->setNormalArray(normals.get());
+    lstrp->geom_->setNormalBinding(osg::Geometry::BIND_OVERALL);
+    lstrp->geom_->setColorArray(lstrp->color_.get());
+    lstrp->geom_->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+    if(linestrip.GetLineStripPoints().size() >= 1){
+        lstrp->geom_->setVertexArray(lstrp->pts_.get());
+        //lstrp->geom_->addPrimitiveSet(new osg::DrawArrays(GL_LINE_STRIP,0,linestrip.GetLineStripPoints().size()));
+        lstrp->geom_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,linestrip.GetLineStripPoints().size()));
+    }
+    lstrp->geoshape_->addDrawable(lstrp->geom_.get());
+    osgobj_.push_back(lstrp);
+    linestrip.SetGuiIndex(osgobj_.size()-1);
+    root_->addChild(lstrp->geoshape_.get());
 
 }
 
@@ -197,6 +242,66 @@ void spOpenSceneGraphGui::AddMesh(spMesh& mesh){
     osgobj_.push_back(meshptr);
     mesh.SetGuiIndex(osgobj_.size()-1);
     root_->addChild(mesh.GetMesh().get());
+}
+
+void spOpenSceneGraphGui::UpdateLineStripGuiObject(spLineStrip& spobj){
+    // NEEDS TO BE FIXED!
+    // should not have to keep creating line strip nodes
+    int gui_index = spobj.GetGuiIndex();
+    if((!(spobj.GetGuiIndex() < osgobj_.size())) || (osgobj_[gui_index]->name_.compare("linestrip"))){
+      SPERROREXIT("gui object doesn't match spobject.");
+     }
+    std::cout<<"Update: "<<spobj.GetLineStripPoints().size()<<std::endl;
+    osg::ref_ptr<osg::Vec3Array> pts = new osg::Vec3Array;
+    for(unsigned int ii=0; ii<spobj.GetLineStripPoints().size(); ii++){
+        pts->push_back(osg::Vec3(spobj.GetLineStripPoints()[ii][0], spobj.GetLineStripPoints()[ii][1], spobj.GetLineStripPoints()[ii][2]));
+    }
+    osg::ref_ptr<osg::LineWidth> linewidth = new osg::LineWidth();
+    linewidth->setWidth(5.0f);
+
+    osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
+    normals->push_back( osg::Vec3(0.0f,-1.0f, 0.0f) );
+    osg::ref_ptr<osg::Vec4Array> xcolor = new osg::Vec4Array;
+    xcolor->push_back(osg::Vec4(spobj.GetColor()[0],spobj.GetColor()[1],spobj.GetColor()[2],1.0));
+    osg::ref_ptr<osg::Geometry> xline = new osg::Geometry;
+    xline->setVertexArray(pts.get());
+    xline->setNormalArray(normals.get());
+    xline->setNormalBinding(osg::Geometry::BIND_OVERALL);
+    xline->setColorArray(xcolor.get());
+    xline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+    if(spobj.GetLineStripPoints().size() >= 1){
+        xline->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,spobj.GetLineStripPoints().size()));
+    }
+    xline->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
+    root_->addChild(xline.get());
+
+
+    /*
+    int gui_index = spobj.GetGuiIndex();
+    if((!(spobj.GetGuiIndex() < osgobj_.size())) || (osgobj_[gui_index]->name_.compare("linestrip"))){
+      SPERROREXIT("gui object doesn't match spobject.");
+     }
+
+    if(curr_lstrp_size_ != spobj.GetLineStripPoints().size() ){
+        curr_lstrp_size_ = spobj.GetLineStripPoints().size();
+        std::cout<<"Update: "<<spobj.GetLineStripPoints().size()<<std::endl;
+
+        for(unsigned int ii=pt_num_; ii<spobj.GetLineStripPoints().size(); ii++){
+            osgobj_[gui_index]->pts_->push_back(osg::Vec3(spobj.GetLineStripPoints()[ii][0], spobj.GetLineStripPoints()[ii][1], spobj.GetLineStripPoints()[ii][2]));
+        }
+
+
+        int primnum = osgobj_[gui_index]->geom_->getNumPrimitiveSets();
+        if(primnum > 0) { osgobj_[gui_index]->geom_->removePrimitiveSet(0,1); }
+
+        if(spobj.GetLineStripPoints().size() >= 1){
+            osgobj_[gui_index]->geom_->setVertexArray(osgobj_[gui_index]->pts_.get());
+            osgobj_[gui_index]->geom_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,spobj.GetLineStripPoints().size()));
+            //osgobj_[gui_index]->geom_->addPrimitiveSet(new osg::DrawArrays(GL_LINE_STRIP ,0,spobj.GetLineStripPoints().size()));
+            }
+        } // */
+
+
 }
 
 void spOpenSceneGraphGui::UpdateBoxGuiObject(spBox& spobj)
@@ -259,18 +364,16 @@ void spOpenSceneGraphGui::UpdateGuiObjectsFromSpirit(std::shared_ptr<Objects> &s
           case spObjectType::BOX:
           {
             UpdateBoxGuiObject((spBox&)spobj->GetObject(ii));
-            //SPERROREXIT("BOX object not in use.");
             break;
           }
           case spObjectType::VEHICLE_BIKE:
           {
             UpdateVehicleGuiObject((spVehicle&)spobj->GetObject(ii));
-            //SPERROREXIT("VEHICLE_AWSD not is use.");
             break;
             }
           case spObjectType::LINESTRIP:
           {
-            std::cout<<"LINESTRIP currently no update functionality."<<std::endl;
+            UpdateLineStripGuiObject((spLineStrip&)spobj->GetObject(ii));
             break;
           }
           case spObjectType::MESH:

@@ -83,6 +83,7 @@ typedef Eigen::Vector3d spPoint3d;
 typedef Eigen::VectorXd spPointXd;
 typedef Eigen::Array<double,6,1> spVelocity;
 typedef std::vector<spPoint3d,Eigen::aligned_allocator<spPoint3d>> spPoints3d;
+typedef std::vector<std::vector<spPoint3d,Eigen::aligned_allocator<spPoint3d>>> spMegaPtVec;
 typedef std::vector<spPointXd,Eigen::aligned_allocator<spPointXd>> spPointsXd;
 typedef Eigen::Matrix3d spInertiaTensor;
 typedef Eigen::Vector3d spCubeInertiaTensor;

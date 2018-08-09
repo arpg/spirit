@@ -130,7 +130,7 @@ double spLocalPlanner<simfunctor>::SolveLocalPlan(spCtrlPts2ord_2dof& controls, 
 template<typename simfunctor>
 double spLocalPlanner<simfunctor>::SolveLocalPlan(spCtrlPts2ord_2dof& controls, double& simulation_duration, const spState& current_state, const spWaypoint& end_waypoint, std::shared_ptr<spStateSeries> traj_states) {
   double final_cost = SolveLocalPlan(controls,simulation_duration,current_state,end_waypoint);
-  // TODO: we should be able to get traj_states from solution of last optimization step but for now we resimulate.
+  // TODO: we should be able to get traj_states from solution of last optimization step but for nstate_seriesow we resimulate.
   //CarSimFunctor sim(vehicle_parameters,current_state,gui_);
   simfunctor sim(vehicle_parameters,current_state,gui_);
 //  CarSimFunctor sim(vehicle_parameters,current_state,nullptr);

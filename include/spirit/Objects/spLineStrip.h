@@ -18,7 +18,7 @@ class spLineStrip : public spCommonObject {
 
   void SetLineStripPoints(const spPoints3d& pts);
   void SetLineStripPointsFromCurve(const spCurve& curve, int num_pts);
-  const spPoints3d& GetLineStripPoints();
+  spPoints3d& GetLineStripPoints();
 
  private:
   spColor color_;

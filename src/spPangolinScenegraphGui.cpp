@@ -248,10 +248,10 @@ void spPangolinScenegraphGui::UpdateVehicleGuiObject(spVehicle& vehicle) {
 }
 
 void spPangolinScenegraphGui::UpdateLineStripGuiObject(spLineStrip& spobj) {
-  int gui_index = spobj.GetGuiIndex();
-  if(!(spobj.GetGuiIndex()<globjects_.size()) || (globjects_[gui_index]->ObjectName().compare("linestrip"))){
-    SPERROREXIT("gui object doesn't match spobject.");
-  }
+    int gui_index = spobj.GetGuiIndex();
+    if(!(spobj.GetGuiIndex()<globjects_.size()) || (globjects_[gui_index]->ObjectName().compare("linestrip"))){
+      SPERROREXIT("gui object doesn't match spobject.");
+    }
   SceneGraph::GLLineStrip* gllinestrip = (SceneGraph::GLLineStrip*) globjects_[gui_index];
   gllinestrip->SetPose(spobj.GetPose().matrix());
   gllinestrip->SetColor(spobj.GetColor()[0],spobj.GetColor()[1],spobj.GetColor()[2],1);

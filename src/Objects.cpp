@@ -107,7 +107,7 @@ spObjectHandle Objects::CreateVehicle(const spVehicleConstructionInfo& vehicle_i
   switch (vehicle_info.vehicle_type) {
     case spObjectType::VEHICLE_AWSD:
     {
-      btAlignedObjectArray<btCollisionShape*>	collisionShapes_;
+      btAlignedObjectArray<btCollisionShape*> collisionShapes_;
       std::shared_ptr<spAWSDCar> a_vehicle = std::make_shared<spAWSDCar>(vehicle_info,dynamics_world_);
       objects_.push_back(a_vehicle);
       break;

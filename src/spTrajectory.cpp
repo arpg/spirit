@@ -81,8 +81,14 @@ void spTrajectory::SetTrajectoryStateSeries(int waypoint_index, std::shared_ptr<
   spPoints3d points;
   for(int ii=0; ii<state_series->size(); ii++) {
     points.push_back((*state_series)[ii]->pose.translation());
+    double x = (*state_series)[ii]->pose.translation()[0];
+    double y = (*state_series)[ii]->pose.translation()[1];
+    double z = (*state_series)[ii]->pose.translation()[2];
+    std::cout<<"waypoint: "<<waypoint_index<<" "<<"x: "<<x<<" "<<"y: "<<y<<" "<<"z: "<<z<<std::endl;
   }
   ((spLineStrip&)objects_->GetObject(linestrip_handle_vec_[waypoint_index])).SetLineStripPoints(points);
+  //spObjectHandle linestrip_handle = objects_->CreateLineStrip(spPose::Identity(),points,spColor(0.4, 0, 0));
+  //gui_.AddObject(objects_->GetObject(linestrip_handle));
 }
 
 std::shared_ptr<spStateSeries> spTrajectory::GetTrajectoryStateSeries(int waypoint_index) const {

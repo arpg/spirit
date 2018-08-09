@@ -52,6 +52,6 @@ void spLineStrip::SetLineStripPoints(const spPoints3d& pts/*in their local coord
   obj_guichanged_ = true;
 }
 
-const spPoints3d& spLineStrip::GetLineStripPoints() {
+spPoints3d &spLineStrip::GetLineStripPoints() {
   return *points_;
 }

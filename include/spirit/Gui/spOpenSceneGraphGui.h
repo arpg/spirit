@@ -17,6 +17,7 @@
 #include <osgGA/TrackballManipulator>
 #include <osgViewer/ViewerEventHandlers>
 #include <osgGA/GUIEventHandler>
+#include <osg/LineWidth>
 
 
 
@@ -44,7 +45,7 @@ class spOpenSceneGraphGui : public spCommonGUI {
         void UpdateBoxGuiObject(spBox& spobj);
         //void UpdateWaypointGuiObject(spWaypoint& spobj);
         void UpdateVehicleGuiObject(spVehicle& spobj);
-        //void UpdateLineStripGuiObject(spLineStrip& spobj);
+        void UpdateLineStripGuiObject(spLineStrip& spobj);
 
 
         // variables relevent to OSG visualizer
@@ -55,6 +56,10 @@ class spOpenSceneGraphGui : public spCommonGUI {
         struct OSGobj
         {
             std::string name_;
+            osg::ref_ptr<osg::Vec3Array> pts_ = new osg::Vec3Array;
+            osg::ref_ptr<osg::Geometry> geom_ = new osg::Geometry;
+            osg::ref_ptr<osg::Vec4Array> color_ = new osg::Vec4Array;
+
             osg::ref_ptr<osg::MatrixTransform> transform_ = new osg::MatrixTransform;
             osg::Matrix translate_, rotx_, roty_, rotz_;
 
@@ -64,6 +69,9 @@ class spOpenSceneGraphGui : public spCommonGUI {
         };
 
         std::vector<OSGobj*> osgobj_;
+        int pt_num_;
+        int curr_lstrp_size_;
+
 };
 
 #endif // SPOPENSCENEGRAPHGUI_H
