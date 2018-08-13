@@ -32,7 +32,7 @@ int main(int argc, char** argv){
     //gui.AddObject(objs->GetObject(mesh_handle));
     spBike& bike = ((spBike&)objs->GetObject(bike_handle));
 
-   /*
+    /*
     spPoints3d p;
     spPoints3d p2;
     spObjectHandle linestrip_handle = objs->CreateLineStrip(spPose::Identity(),p,spColor(0, 1, 0));
@@ -40,8 +40,6 @@ int main(int argc, char** argv){
     gui.AddObject(objs->GetObject(linestrip_handle));
     gui.AddObject(objs->GetObject(linestrip_handle2));
 
-    //*/
-    /*
     double x=0;
     double y=0;
     double z=0,zp=0;
@@ -66,33 +64,66 @@ int main(int argc, char** argv){
 
     } //*/
 
-    //spState state;
-    //state.pose = spPose::Identity();
-    //state.pose.translate(spTranslation(0,0,0));
-    //bike.SetState(state);
-    //std::shared_ptr<spState> state_ptr = std::make_shared<spState>(state);
 
-    //  /*
+
+    // /*
     // BVP
     spTrajectory traj(gui, objs);
 
     // waypoints
+    /*
     spPose pose0(spPose::Identity());
-    pose0.translate(spTranslation(0,0,0.06));
+    pose0.translate(spTranslation(2,-3,0.06));
     Eigen::AngleAxisd rot0(0,Eigen::Vector3d::UnitZ());
     pose0.rotate(rot0);
-    traj.AddWaypoint(pose0,2,spLinVel(1,0,0));
+    traj.AddWaypoint(pose0,1,spLinVel(1,0,0));
 
     spPose pose1(spPose::Identity());
-    pose1.translate(spTranslation(3,4,0.06));
-    double angle = SP_PI/2;
+    pose1.translate(spTranslation(2,3,0));
+    double angle = SP_PI;
     Eigen::AngleAxisd rot1(angle,Eigen::Vector3d::UnitZ());
     pose1.rotate(rot1);
     traj.AddWaypoint(pose1,1,spLinVel(1,0,0));
 
-    traj.IsLoop(false);
+    spPose pose2(spPose::Identity());
+    pose2.translate(spTranslation(-2,2,0.06));
+    angle = -SP_PI/2;
+    Eigen::AngleAxisd rot2(angle,Eigen::Vector3d::UnitZ());
+    pose2.rotate(rot2);
+    traj.AddWaypoint(pose2,1,spLinVel(1,0,0));
+
+    spPose pose3(spPose::Identity());
+    pose3.translate(spTranslation(-2,-2,0.06));
+    angle = 0;
+    Eigen::AngleAxisd rot3(0,Eigen::Vector3d::UnitZ());
+    pose3.rotate(rot3);
+    traj.AddWaypoint(pose3,1,spLinVel(1,0,0));
+    */
+    double a = 1.5;
+    double b = 1.5;
+    int num_waypoints = 8;
+    for(int ii=0; ii<num_waypoints; ii++) {
+      // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
+      double theta = ii*(2*SP_PI)/num_waypoints;
+      double r = (a*b)/sqrt(b*b*pow(cos(theta),2)+a*a*pow(sin(theta),2));
+      double x = r*cos(theta);
+      double y = r*sin(theta);
+      // slope of the line is
+      double angle = atan2(-(x*b*b),(y*a*a));
+      spPose pose(spPose::Identity());
+      pose.translate(spTranslation(x,y,0.07));
+      Eigen::AngleAxisd rot(angle+SP_PI_HALF/*+0.6*/,Eigen::Vector3d::UnitZ());
+      pose.rotate(rot);
+      traj.AddWaypoint(pose,1,spLinVel(1,0,0));
+      spRotVel rotvel(0,0,2);
+      traj.GetWaypoint(ii).SetRotVel(rotvel);
+      traj.GetWaypoint(ii).SetLinearVelocityDirection(spLinVel(0,1,0));
+  }
+
+    traj.IsLoop(true);
 
     // Solve local plan
+    // set to true, each waypoint in connected to each other in order created
     spLocalPlanner<BikeSimFunctorRK4> localplanner(params.bike_param, true, &gui);
     spBVPWeightVec weight_vec;
     // x,y,z,roll,pitch,yaw,xdot,ydot,zdot,roll_dot,pitch_dot,yaw_dot,time
@@ -112,11 +143,13 @@ int main(int argc, char** argv){
     bike.SetState(state);
     std::shared_ptr<spState> state_ptr = std::make_shared<spState>(state);
 
+    // control signal from local planner
+    /*
     BikeSimFunctorRK4 mysim(params.bike_param,state);
     while(!gui.ShouldQuit()){
         spTimestamp t0 = spGeneralTools::Tick();
 
-        mysim(0,1,0.1,traj.GetControls(0),0,-1,0,state_ptr);
+        mysim(0,1,0.1,traj.GetControls(0),0,-1,0,state_ptr); // gets control signal between first two waypoints
         bike.SetState(mysim.GetState());
         gui.Iterate(objs);
 
@@ -125,43 +158,43 @@ int main(int argc, char** argv){
         //double lin_vel = mysim.GetState().linvel.norm();
         //std::cout<<"Yaw: "<<yaw<<" linear velocity: "<<lin_vel<<std::endl;
 
-        //double calc_time = spGeneralTools::Tock_ms(t0);
-        //std::cout << "Frequency " << (double)(1/(calc_time/1000)) << " Hz" << std::endl;
-
-
-
+        double calc_time = spGeneralTools::Tock_ms(t0);
+        std::cout << "Frequency " << (double)(1/(calc_time/1000)) << " Hz" << std::endl;
     } // */
 
-     /*
+    // /*
     // MPC reference tracking
-    float horizon = 5;
-    spMPC<BikeSimFunctorRK4> mpc(params.bike_param,horizon);
+    float horizon = 1;
+    spMPC<BikeSimFunctorRK4> mpc(params.bike_param, horizon);
 
     spCtrlPts2ord_2dof controls;
-    controls.col(0) = Eigen::Vector2d(0,10);
-    controls.col(1) = Eigen::Vector2d(0,10);
-    controls.col(2) = Eigen::Vector2d(0,10);
+    controls.col(0) = Eigen::Vector2d(0,0);
+    controls.col(1) = Eigen::Vector2d(0,0);
+    controls.col(2) = Eigen::Vector2d(0,0);
 
     BikeSimFunctorRK4 mysim(params.bike_param, state);
-
-
-    if(mpc.CalculateControls(traj, bike.GetState(), controls)){
-      std::cout << "controls -> \n" << controls << std::endl;
-
+    // /*
       while(!gui.ShouldQuit()){
-          std::shared_ptr<spStateSeries> series = std::make_shared<spStateSeries>();
-          mysim(0,(int)(horizon/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,controls,0,-1,series,state_ptr);
+          spTimestamp t0 = spGeneralTools::Tick();
+
+          mpc.CalculateControls(traj, state, controls);
+          std::cout << "controls -> \n" << controls << std::endl;
+
+          mysim(0,(int)(horizon/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,controls,0,-1,0,state_ptr);
           for(int ii=0; ii<(int)(horizon/DISCRETIZATION_STEP_SIZE); ii++){
-              spState tstate(*((*series)[ii]));
-              bike.SetState(tstate);
+              bike.SetState(mysim.GetState());
               gui.Iterate(objs);
 
-              double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
-              std::cout<<"Yaw ->"<<yaw<<" "<<"speed -> " << tstate.linvel.norm() << std::endl;
-              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+              //double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
+              //double lin_vel = mysim.GetState().linvel.norm();
+              //std::cout<<"Yaw: "<<yaw<<" linear velocity: "<<lin_vel<<std::endl;
+
+              double calc_time = spGeneralTools::Tock_ms(t0);
+              //std::cout << "Frequency " << (double)(1/(calc_time/1000)) << " Hz" << std::endl;
+
+              std::this_thread::sleep_for(std::chrono::milliseconds(10));
           }
-       } // */
-    //}
+       }
 
      // */
 
@@ -206,22 +239,6 @@ int main(int argc, char** argv){
       }
     } // */
 
-
-     /*
-    while(!gui.ShouldQuit())
-    {
-
-        BikeSimFunctorRK4 mysim(params.bike_param,state);
-        mysim(0,1,0.1,inputcmd_curve,0,0,nullptr,state_ptr);
-        bike.SetState(mysim.GetState());
-        gui.Iterate(objs);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        double yaw = mysim.GetState().pose.rotation().eulerAngles(0,1,2)[2];
-        double lin_vel = std::sqrt(std::pow(mysim.GetState().linvel[0],2) + std::pow(mysim.GetState().linvel[1],2) + std::pow(mysim.GetState().linvel[2],2));
-        std::cout<<"Yaw: "<<yaw<<" linear velocity: "<<lin_vel<<std::endl;
-
-    } // */
     return 0;
 }
 

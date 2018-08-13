@@ -216,9 +216,6 @@ void spOpenSceneGraphGui::AddLineStrip(spLineStrip& linestrip)
     OSGobj* lstrp = new OSGobj;
     lstrp->name_ = "linestrip";
 
-    curr_lstrp_size_ = linestrip.GetLineStripPoints().size();
-    std::cout<<"Init points: "<<linestrip.GetLineStripPoints().size()<<std::endl;
-
     for(unsigned int ii=0; ii<linestrip.GetLineStripPoints().size();ii++){
         lstrp->pts_->push_back(osg::Vec3(linestrip.GetLineStripPoints()[ii][0], linestrip.GetLineStripPoints()[ii][1], linestrip.GetLineStripPoints()[ii][2]));
         pt_num_ = ii+1;
@@ -258,63 +255,43 @@ void spOpenSceneGraphGui::AddMesh(spMesh& mesh){
 }
 
 void spOpenSceneGraphGui::UpdateLineStripGuiObject(spLineStrip& spobj){
-    // NEEDS TO BE FIXED!
-    // should not have to keep creating line strip nodes
     int gui_index = spobj.GetGuiIndex();
     if((!(spobj.GetGuiIndex() < osgobj_.size())) || (osgobj_[gui_index]->name_.compare("linestrip"))){
       SPERROREXIT("gui object doesn't match spobject.");
      }
-    std::cout<<"Update: "<<spobj.GetLineStripPoints().size()<<std::endl;
-    osg::ref_ptr<osg::Vec3Array> pts = new osg::Vec3Array;
-    for(unsigned int ii=0; ii<spobj.GetLineStripPoints().size(); ii++){
-        pts->push_back(osg::Vec3(spobj.GetLineStripPoints()[ii][0], spobj.GetLineStripPoints()[ii][1], spobj.GetLineStripPoints()[ii][2]));
+
+    root_->removeChild(osgobj_[gui_index]->geoshape_);
+
+    OSGobj* lstrp = new OSGobj;
+    lstrp->name_ = "linestrip";
+
+    for(unsigned int ii=0; ii<spobj.GetLineStripPoints().size();ii++){
+        lstrp->pts_->push_back(osg::Vec3(spobj.GetLineStripPoints()[ii][0], spobj.GetLineStripPoints()[ii][1], spobj.GetLineStripPoints()[ii][2]));
+        pt_num_ = ii+1;
     }
-    osg::ref_ptr<osg::LineWidth> linewidth = new osg::LineWidth();
-    linewidth->setWidth(5.0f);
 
     osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
     normals->push_back( osg::Vec3(0.0f,-1.0f, 0.0f) );
-    osg::ref_ptr<osg::Vec4Array> xcolor = new osg::Vec4Array;
-    xcolor->push_back(osg::Vec4(spobj.GetColor()[0],spobj.GetColor()[1],spobj.GetColor()[2],1.0));
-    osg::ref_ptr<osg::Geometry> xline = new osg::Geometry;
-    xline->setVertexArray(pts.get());
-    xline->setNormalArray(normals.get());
-    xline->setNormalBinding(osg::Geometry::BIND_OVERALL);
-    xline->setColorArray(xcolor.get());
-    xline->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+
+    osg::ref_ptr<osg::LineWidth> linewidth = new osg::LineWidth();
+    linewidth->setWidth(5.0f);
+    lstrp->geoshape_->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
+
+    lstrp->color_->push_back(osg::Vec4(spobj.GetColor()[0],spobj.GetColor()[1],spobj.GetColor()[2],1.0));
+    lstrp->geom_->setVertexArray(lstrp->pts_.get());
+    lstrp->geom_->setNormalArray(normals.get());
+    lstrp->geom_->setNormalBinding(osg::Geometry::BIND_OVERALL);
+    lstrp->geom_->setColorArray(lstrp->color_.get());
+    lstrp->geom_->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
     if(spobj.GetLineStripPoints().size() >= 1){
-        xline->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,spobj.GetLineStripPoints().size()));
+        lstrp->geom_->setVertexArray(lstrp->pts_.get());
+        //lstrp->geom_->addPrimitiveSet(new osg::DrawArrays(GL_LINE_STRIP,0,linestrip.GetLineStripPoints().size()));
+        lstrp->geom_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,spobj.GetLineStripPoints().size()));
     }
-    xline->getOrCreateStateSet()->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
-    root_->addChild(xline.get());
-
-
-    /*
-    int gui_index = spobj.GetGuiIndex();
-    if((!(spobj.GetGuiIndex() < osgobj_.size())) || (osgobj_[gui_index]->name_.compare("linestrip"))){
-      SPERROREXIT("gui object doesn't match spobject.");
-     }
-
-    if(curr_lstrp_size_ != spobj.GetLineStripPoints().size() ){
-        curr_lstrp_size_ = spobj.GetLineStripPoints().size();
-        std::cout<<"Update: "<<spobj.GetLineStripPoints().size()<<std::endl;
-
-        for(unsigned int ii=pt_num_; ii<spobj.GetLineStripPoints().size(); ii++){
-            osgobj_[gui_index]->pts_->push_back(osg::Vec3(spobj.GetLineStripPoints()[ii][0], spobj.GetLineStripPoints()[ii][1], spobj.GetLineStripPoints()[ii][2]));
-        }
-
-
-        int primnum = osgobj_[gui_index]->geom_->getNumPrimitiveSets();
-        if(primnum > 0) { osgobj_[gui_index]->geom_->removePrimitiveSet(0,1); }
-
-        if(spobj.GetLineStripPoints().size() >= 1){
-            osgobj_[gui_index]->geom_->setVertexArray(osgobj_[gui_index]->pts_.get());
-            osgobj_[gui_index]->geom_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,spobj.GetLineStripPoints().size()));
-            //osgobj_[gui_index]->geom_->addPrimitiveSet(new osg::DrawArrays(GL_LINE_STRIP ,0,spobj.GetLineStripPoints().size()));
-            }
-        } // */
-
-
+    lstrp->geoshape_->addDrawable(lstrp->geom_.get());
+    osgobj_.push_back(lstrp);
+    spobj.SetGuiIndex(osgobj_.size()-1);
+    root_->addChild(lstrp->geoshape_.get());
 }
 
 void spOpenSceneGraphGui::UpdateWaypointGuiObject(spWaypoint& spobj){

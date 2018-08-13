@@ -201,7 +201,7 @@ const spState& spVehicle::GetState() {
       state_.linvel = GetChassisLinearVelocity();
       state_.rotvel = GetChassisAngularVelocity();
       state_.front_steering = 0.5*(GetWheel(0)->GetPose().rotation().eulerAngles(0,1,2)[2]+GetWheel(3)->GetPose().rotation().eulerAngles(0,1,2)[2]);
-      state_.rear_steering = 0.5*(GetWheel(1)->GetPose().rotation().eulerAngles(0,1,2)[2]+GetWheel(2)->GetPose().rotation().eulerAngles(0,1,2)[2]);
+      //state_.rear_steering = 0.5*(GetWheel(1)->GetPose().rotation().eulerAngles(0,1,2)[2]+GetWheel(2)->GetPose().rotation().eulerAngles(0,1,2)[2]);
       //for(int ii=0; ii<GetNumberOfWheels(); ii++) {
           //state_.wheel_speeds[ii] = GetWheel(ii)->GetWheelSpeed();
       //}
@@ -211,7 +211,7 @@ const spState& spVehicle::GetState() {
 
 void spVehicle::SetState(const spState& state){
   if(state.substate_vec.size() != GetNumberOfWheels()) {
-//    SPERROR("state tree size mismatch.");
+    //SPERROR("state tree size mismatch.");
   }
   SetPose(state.pose);
   MoveWheelsToAnchors(state.pose);
@@ -221,7 +221,7 @@ void spVehicle::SetState(const spState& state){
   Eigen::AngleAxisd rot1(state.front_steering + state.pose.rotation().eulerAngles(0,1,2)[2], Eigen::Vector3d::UnitZ());
   p.rotate(rot1);
   GetWheel(1)->SetPose(p);
- // SetChassisLinearVelocity(state.linvel);
+  //SetChassisLinearVelocity(state.linvel);
   //SetChassisAngularVelocity(state.rotvel);
  // if(state.substate_vec.size()<GetNumberOfWheels()) {
     
