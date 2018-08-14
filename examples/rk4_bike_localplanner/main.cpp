@@ -5,8 +5,6 @@
 #include <spirit/BikeParameters.h>
 #include <math.h>
 
-
-
 int main(int argc, char** argv){
 
     // create ground

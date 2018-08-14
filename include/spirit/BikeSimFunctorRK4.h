@@ -75,7 +75,7 @@ class BikeSimFunctorRK4 : public spSimCommonFunctor {
 
 
     Eigen::VectorXd u(2);
-    for (int ii = 0; ii < num_sim_steps; ii++) {
+    for(int ii = 0; ii < num_sim_steps; ii++) {
       // control inputs
       control_curve.GetPoint(sample_control, ii / (double)num_sim_steps);
       u[0] = sample_control[0]; // steering
