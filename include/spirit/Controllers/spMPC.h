@@ -18,9 +18,9 @@ class spMPC {
   int CalculateControls(const spTrajectory& ref_traj, const spState& curr_state, spCtrlPts2ord_2dof& controls);
   int CircleManReg(const spState& curr_state, spCtrlPts2ord_2dof& controls, double radius, double tangent_vel);
   void SetHorizon(float horizon_duration);
+  void FindClosestTrajPoint(int& closest_waypoint_index, int& closest_subindex, const spTrajectory& ref_traj, const spState& curr_state);
 
  private:
-  void FindClosestTrajPoint(int& closest_waypoint_index, int& closest_subindex, const spTrajectory& ref_traj, const spState& curr_state);
   void MinimizeMPCError(const spStateSeries& ref_states,const spState& current_state, spCtrlPts2ord_2dof& controls);
   void MinimizeMPCError(const Maneuver& maneuver, const spState& current_state, spCtrlPts2ord_2dof& controls);
   int horizon_;
