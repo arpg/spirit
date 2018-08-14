@@ -99,8 +99,8 @@ int main(int argc, char** argv){
     pose3.rotate(rot3);
     traj.AddWaypoint(pose3,1,spLinVel(1,0,0));
     */
-    double a = 1.5;
-    double b = 1.5;
+    double a = 5;
+    double b = 5;
     int num_waypoints = 8;
     for(int ii=0; ii<num_waypoints; ii++) {
       // calculate ellipse radius from theta and then get x , y coordinates of ellipse from r and theta
@@ -114,7 +114,7 @@ int main(int argc, char** argv){
       pose.translate(spTranslation(x,y,0.07));
       Eigen::AngleAxisd rot(angle+SP_PI_HALF/*+0.6*/,Eigen::Vector3d::UnitZ());
       pose.rotate(rot);
-      traj.AddWaypoint(pose,1,spLinVel(1,0,0));
+      traj.AddWaypoint(pose,1,spLinVel(0,1,0));
       spRotVel rotvel(0,0,2);
       traj.GetWaypoint(ii).SetRotVel(rotvel);
       traj.GetWaypoint(ii).SetLinearVelocityDirection(spLinVel(0,1,0));
@@ -168,9 +168,9 @@ int main(int argc, char** argv){
     spMPC<BikeSimFunctorRK4> mpc(params.bike_param, horizon);
 
     spCtrlPts2ord_2dof controls;
-    controls.col(0) = Eigen::Vector2d(0,0);
-    controls.col(1) = Eigen::Vector2d(0,0);
-    controls.col(2) = Eigen::Vector2d(0,0);
+    controls.col(0) = Eigen::Vector2d(0,10);
+    controls.col(1) = Eigen::Vector2d(0,10);
+    controls.col(2) = Eigen::Vector2d(0,10);
 
     BikeSimFunctorRK4 mysim(params.bike_param, state);
     // /*
