@@ -92,6 +92,7 @@ set( HDRS
 	include/spirit/CarSimFunctor.h
 	include/spirit/CarSimFunctorRK4.h
 	include/spirit/BikeSimFunctorRK4.h
+	include/spirit/MeshBikeSimFunctorRK4.h
 	include/spirit/CarFunc.h
 	include/spirit/Controllers/spPID.h
 	include/spirit/Planners/spTrajectory.h

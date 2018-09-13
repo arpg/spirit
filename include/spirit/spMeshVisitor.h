@@ -4,6 +4,7 @@
 #include <osg/Geode>
 #include <osg/Geometry>
 #include <iostream>
+#include <eigen3/Eigen/Eigen>
 
 class spMeshVisitor : public osg::NodeVisitor
 {
@@ -18,8 +19,27 @@ public:
 
     virtual void apply( osg::Node& node );
     virtual void apply( osg::Geode& geode );
+
+    void GetMeshData();
+    Eigen::MatrixXd GetVertices();
+    Eigen::MatrixXd GetNormals();
+    Eigen::MatrixXd BoundingBoxVertex(Eigen::MatrixXd vertex, Eigen::VectorXd bounds);
+
+    struct meshstruct{
+        Eigen::MatrixXd *vtx_ptr;
+        Eigen::MatrixXd *nrml_ptr;
+
+        // bounded vertex and normal data
+        Eigen::MatrixXd *bvtx_ptr;
+        Eigen::MatrixXd *bnrml_ptr;
+
+    };
+    meshstruct mstruct;
+
 protected:
     unsigned int _level;
+
+
 };
 
 #endif // SP_MESHVISITOR_H

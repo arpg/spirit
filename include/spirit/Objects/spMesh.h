@@ -6,7 +6,7 @@
 
 class spMesh : public spCommonObject {
  public:
-  spMesh(const osg::ref_ptr<osg::Node>& meshnode);
+  spMesh(const osg::ref_ptr<osg::Node> &meshnode);
   ~spMesh();
   void SetPose(const spPose& pose);
   const spPose& GetPose();
@@ -19,8 +19,7 @@ class spMesh : public spCommonObject {
   spMeshSize GetDimensions();
 
   osg::ref_ptr<osg::Node> GetMesh();
-  Eigen::MatrixXd GetVertices();
-  Eigen::MatrixXd GetNormals();
+
 
   Eigen::VectorXd localSearch(Eigen::MatrixXd vertex, double x, double y, double z, double r);
   Eigen::VectorXd medianAngles(Eigen::MatrixXd normal, Eigen::VectorXd index);
@@ -33,10 +32,10 @@ class spMesh : public spCommonObject {
   spPose pose_;
   spColor color_;
   double mass_;
-  spMeshVisitor nodeinfo_;
   osg::ref_ptr<osg::Node> mesh_;
-  Eigen::MatrixXd vertexdata_;
-  Eigen::MatrixXd normaldata_;
+  //spMeshVisitor nodeinfo_;
+  //Eigen::MatrixXd vertexdata_;
+  //Eigen::MatrixXd normaldata_;
 };
 
 #endif  //  SP_MESH_H__
