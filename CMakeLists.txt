@@ -76,6 +76,7 @@ set( HDRS
 	include/spirit/spSimCommonFunctor.h
 	include/spirit/Gui.h
 	include/spirit/spGeneralTools.h
+	include/spirit/spMeshFunctions.h
 	include/spirit/spSettings.h
 	include/spirit/Objects/spBox.h
 	include/spirit/Objects/spCommonObject.h
@@ -125,6 +126,7 @@ set( SRCS
 	src/spGeneralTools.cpp
 	src/spSettings.cpp
 	src/spBox.cpp
+	src/spMeshFunctions.cpp
 	src/spWaypoint.cpp
 	src/spCommonObject.cpp
 	src/Objects.cpp

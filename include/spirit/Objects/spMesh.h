@@ -20,13 +20,6 @@ class spMesh : public spCommonObject {
 
   osg::ref_ptr<osg::Node> GetMesh();
 
-
-  Eigen::VectorXd localSearch(Eigen::MatrixXd vertex, double x, double y, double z, double r);
-  Eigen::VectorXd medianAngles(Eigen::MatrixXd normal, Eigen::VectorXd index);
-  double checkPitch(Eigen::VectorXd angles);
-  Eigen::VectorXd nearestVertex(Eigen::MatrixXd vertex, Eigen::VectorXd carPose);
-  Eigen::VectorXd checkPoint(Eigen::VectorXd v, Eigen::VectorXd carPose, double rw);
-
  private:
   spMeshSize dims_;
   spPose pose_;

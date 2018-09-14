@@ -31,18 +31,19 @@ int main(int argc, char** argv){
     Eigen::VectorXd b(5);
     b<< -4, 2, -4, 1, 1; //xmin, xmax, ymin, ymax, zlim
     mv.GetMeshData();
+    mv.BoundingBox(b);
 
     // set gui and add objects
     Gui gui;
     gui.Create(spGuiType::GUI_OSG);
-    gui.AddObject(objs->GetObject(box_handle));
+    //gui.AddObject(objs->GetObject(box_handle));
     gui.AddObject(objs->GetObject(bike_handle));
-    //gui.AddObject(objs->GetObject(mesh_handle));
+    gui.AddObject(objs->GetObject(mesh_handle));
     spBike& bike = ((spBike&)objs->GetObject(bike_handle));
 
     // set cars initial pose
     spState state;
-    Eigen::AngleAxisd rot(0,Eigen::Vector3d::UnitZ());
+    Eigen::AngleAxisd rot(SP_PI,Eigen::Vector3d::UnitZ());
     state.pose.rotate(rot);
     state.pose.translate(spTranslation(0,0,0));
     bike.SetState(state);
@@ -50,12 +51,13 @@ int main(int argc, char** argv){
 
     // /*
     spCtrlPts2ord_2dof inputcmd_curve;
-    inputcmd_curve.col(0) = Eigen::Vector2d(.3,1);
-    inputcmd_curve.col(1) = Eigen::Vector2d(.3,1);
-    inputcmd_curve.col(2) = Eigen::Vector2d(.3,1);
+    double sf = 0.05;
+    inputcmd_curve.col(0) = Eigen::Vector2d(sf,1);
+    inputcmd_curve.col(1) = Eigen::Vector2d(sf,1);
+    inputcmd_curve.col(2) = Eigen::Vector2d(sf,1);
 
     MeshBikeSimFunctorRK4 mysim(params.bike_param,state);
-    mysim.SetMeshData(mv.mstruct.vtx_ptr, mv.mstruct.nrml_ptr);
+    mysim.SetMeshData(mv.mstruct.bvtx_ptr, mv.mstruct.bnrml_ptr);
 
     while(!gui.ShouldQuit()){
         spTimestamp t0 = spGeneralTools::Tick();
@@ -71,7 +73,7 @@ int main(int argc, char** argv){
 
         double calc_time = spGeneralTools::Tock_ms(t0);
         //std::cout << "Frequency " << (double)(1/(calc_time/1000)) << " Hz" << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     } // */
 
 

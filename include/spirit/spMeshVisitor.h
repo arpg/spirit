@@ -23,7 +23,7 @@ public:
     void GetMeshData();
     Eigen::MatrixXd GetVertices();
     Eigen::MatrixXd GetNormals();
-    Eigen::MatrixXd BoundingBoxVertex(Eigen::MatrixXd vertex, Eigen::VectorXd bounds);
+    void BoundingBox(Eigen::VectorXd bounds);
 
     struct meshstruct{
         Eigen::MatrixXd *vtx_ptr;
