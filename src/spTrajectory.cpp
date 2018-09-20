@@ -24,7 +24,7 @@ spObjectHandle spTrajectory::AddWaypoint(const spPose& pose, double velocity, co
 ////    new_curve->SetHermiteControlPoints(pts);
 //  spObjectHandle linestrip_handle = objects_.CreateLineStrip(spPose::Identity(),*new_curve,10,spColor(0.4, 0, 0));
   spPoints3d points;
-  spObjectHandle linestrip_handle = objects_->CreateLineStrip(spPose::Identity(),points,spColor(0.4, 0, 0));
+  spObjectHandle linestrip_handle = objects_->CreateLineStrip(spPose::Identity(),points,spColor(1, .5, 0));
   gui_.AddObject(objects_->GetObject(linestrip_handle));
   linestrip_handle_vec_.push_back(linestrip_handle);
 ////  trajectorystrip_vec_.push_back(&(spLineStrip&)objects_.GetObject(linestrip_handle));

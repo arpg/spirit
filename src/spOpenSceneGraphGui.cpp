@@ -11,7 +11,7 @@ spOpenSceneGraphGui::~spOpenSceneGraphGui()
 
 void spOpenSceneGraphGui::InitGui()
 {
-    //viewer_.getCamera()->setViewMatrixAsLookAt( osg::Vec3(0.0f,-100.0f,0.0f), osg::Vec3(), osg::Z_AXIS );
+    viewer_.getCamera()->setViewMatrixAsLookAt( osg::Vec3(0.0f,-100.0f,0.0f), osg::Vec3(), osg::Z_AXIS );
     viewer_.setUpViewInWindow(20,20, 650, 650);
     viewer_.setCameraManipulator(new osgGA::TrackballManipulator());
     viewer_.realize();
@@ -249,6 +249,8 @@ void spOpenSceneGraphGui::AddLineStrip(spLineStrip& linestrip)
 void spOpenSceneGraphGui::AddMesh(spMesh& mesh){
     OSGobj* meshptr = new OSGobj;
     meshptr->name_ = "mesh";
+    meshptr->color_->push_back(osg::Vec4(1.0,1.0,1.0,1.0));
+    meshptr->geom_->setColorArray(meshptr->color_.get());
     osgobj_.push_back(meshptr);
     mesh.SetGuiIndex(osgobj_.size()-1);
     root_->addChild(mesh.GetMesh().get());
