@@ -43,7 +43,7 @@ class BikeSimFunctorRK4 : public spSimCommonFunctor {
                   int pert_index,
                   std::shared_ptr<spStateSeries> traj_states = nullptr,
                   std::shared_ptr<spState> init_state = nullptr ) {
-    Eigen::VectorXd init(4);
+    Eigen::VectorXd init(5);
     RK4 rk4solver(0.01);
     rk4solver.RegisterODE(&BikeODE);
     if(init_state != nullptr) {
@@ -58,8 +58,9 @@ class BikeSimFunctorRK4 : public spSimCommonFunctor {
 
     init[0] = initial_state_.pose.translation()[0];
     init[1] = initial_state_.pose.translation()[1];
-    init[2] = phi; // yaw
-    init[3] = initial_state_.linvel.norm(); // init velocity
+    init[2] = initial_state_.pose.translation()[2];
+    init[3] = phi; // yaw
+    init[4] = initial_state_.linvel.norm(); // init velocity
 
 
     spCurve control_curve(2, 2);
@@ -74,24 +75,25 @@ class BikeSimFunctorRK4 : public spSimCommonFunctor {
     }
 
 
-    Eigen::VectorXd u(2);
+    Eigen::VectorXd u(3);
     for(int ii = 0; ii < num_sim_steps; ii++) {
       // control inputs
       control_curve.GetPoint(sample_control, ii / (double)num_sim_steps);
       u[0] = sample_control[0]; // steering
       u[1] = sample_control[1]; // acceleration
+      u[2] = 0; // pitch is 0, driving on flat ground
       rk4solver.Solve(init,u,step_size);
       spState state;
       state.pose = spPose::Identity();
-      state.pose.translate(spTranslation(init[0],init[1],initial_state_.pose.translation()[2]));
-      Eigen::AngleAxisd rot1(init[2],Eigen::Vector3d::UnitZ());
+      state.pose.translate(spTranslation(init[0],init[1],init[2]));
+      Eigen::AngleAxisd rot1(init[3],Eigen::Vector3d::UnitZ());
       state.pose.rotate(rot1);
       state.front_steering = u[0];
       state.linvel = spLinVel(0,0,0);
       //state.rotvel = spRotVel(0,0,0);
       //state.rotvel[2] = 1;
-      state.linvel[0] = init[3]*std::cos(init[2]);
-      state.linvel[1] = init[3]*std::sin(init[2]);
+      state.linvel[0] = init[4]*std::cos(init[3]);
+      state.linvel[1] = init[4]*std::sin(init[3]);
 
       if (traj_states != nullptr) {
         traj_states->push_back(std::make_shared<spState>(state));

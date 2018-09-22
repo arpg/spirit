@@ -68,7 +68,7 @@ int main(int argc, char** argv){
     // is trajectory in a loop
     traj.IsLoop(true);
 
-     ///*
+     // /*
     // Solve local plan
     // set to true, each waypoint in connected to each other in order created
     spLocalPlanner<MeshBikeSimFunctorRK4> localplanner(params.bike_param, true, &gui);
@@ -95,14 +95,14 @@ int main(int argc, char** argv){
 
     // /*
     // MPC reference tracking
-    float horizon = 1;
+    float horizon = .1;
     spMPC<MeshBikeSimFunctorRK4> mpc(params.bike_param, horizon);
     MeshBikeSimFunctorRK4 mysim(params.bike_param,state);
     // */
 
     spCtrlPts2ord_2dof inputcmd_curve;
-    double sf = 0;
-    double a = .1;
+    double sf = .3;
+    double a = .2;
     inputcmd_curve.col(0) = Eigen::Vector2d(sf,a);
     inputcmd_curve.col(1) = Eigen::Vector2d(sf,a);
     inputcmd_curve.col(2) = Eigen::Vector2d(sf,a);
@@ -110,13 +110,13 @@ int main(int argc, char** argv){
     while(!gui.ShouldQuit()){
         spTimestamp t0 = spGeneralTools::Tick();
 
-         /*
+        /*
         mysim(0,1,0.1,inputcmd_curve,0,0,nullptr,state_ptr);
         bike.SetState(mysim.GetState());
         gui.Iterate(objs);
         // */
 
-         ///*
+        ///*
         mpc.CalculateControls(traj, state, inputcmd_curve);
         mysim(0,(int)(horizon/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,inputcmd_curve,0,-1,0,state_ptr);
         for(int ii=0; ii<(int)(horizon/DISCRETIZATION_STEP_SIZE); ii++){
