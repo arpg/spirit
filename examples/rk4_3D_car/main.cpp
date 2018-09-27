@@ -5,6 +5,8 @@
 #include <spirit/BikeParameters.h>
 #include <math.h>
 #include <spirit/spMeshFunctions.h>
+//gprof tool
+//openmp
 
 int main(int argc, char** argv){
 
@@ -68,7 +70,7 @@ int main(int argc, char** argv){
     // is trajectory in a loop
     traj.IsLoop(true);
 
-     // /*
+     /*
     // Solve local plan
     // set to true, each waypoint in connected to each other in order created
     spLocalPlanner<MeshBikeSimFunctorRK4> localplanner(params.bike_param, true, &gui);
@@ -78,9 +80,12 @@ int main(int argc, char** argv){
     localplanner.SetCostWeight(weight_vec);
 
     for(int ii=0; ii<traj.GetNumWaypoints(); ii++){
+        spTimestamp t0 = spGeneralTools::Tick();
         traj.SetTravelDuration(ii, 0.5); // 0.5 init cond
         localplanner.SolveInitialPlan(traj, ii); // seed init cond for path
         localplanner.SolveLocalPlan(traj); // solve path
+        std::cout << "Frequency " << (double)(1/(spGeneralTools::Tock_ms(t0)/1000)) << " Hz" << std::endl;
+
     } // */
 
     // set cars initial pose
@@ -101,8 +106,8 @@ int main(int argc, char** argv){
     // */
 
     spCtrlPts2ord_2dof inputcmd_curve;
-    double sf = .3;
-    double a = .2;
+    double sf = 0;
+    double a = 1;
     inputcmd_curve.col(0) = Eigen::Vector2d(sf,a);
     inputcmd_curve.col(1) = Eigen::Vector2d(sf,a);
     inputcmd_curve.col(2) = Eigen::Vector2d(sf,a);
@@ -110,13 +115,13 @@ int main(int argc, char** argv){
     while(!gui.ShouldQuit()){
         spTimestamp t0 = spGeneralTools::Tick();
 
-        /*
+        ///*
         mysim(0,1,0.1,inputcmd_curve,0,0,nullptr,state_ptr);
         bike.SetState(mysim.GetState());
         gui.Iterate(objs);
         // */
 
-        ///*
+        /*
         mpc.CalculateControls(traj, state, inputcmd_curve);
         mysim(0,(int)(horizon/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,inputcmd_curve,0,-1,0,state_ptr);
         for(int ii=0; ii<(int)(horizon/DISCRETIZATION_STEP_SIZE); ii++){
