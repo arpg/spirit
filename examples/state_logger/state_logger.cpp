@@ -12,7 +12,6 @@
 #include <fstream>
 #include <mutex>
 
-
 struct OptiState{
   spPose prev_pose;
   spPose pose;
@@ -178,7 +177,6 @@ int main(int argc, char** argv) {
 
   while(1){
     ninja_car.UpdateCarCommand(commandMSG);
-
     filemutex_.lock();
     logfile_ << 0 << "," << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << "," << -commandMSG.steering_angle() << "," << -commandMSG.throttle_percent()/40.0 << "\n";
     logfile_.flush();
