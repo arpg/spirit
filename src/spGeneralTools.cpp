@@ -28,6 +28,11 @@ double spGeneralTools::Tock_us(spTimestamp tick_time) {
   return std::chrono::duration_cast<std::chrono::microseconds>( tock_time - tick_time ).count();
 }
 
+double spGeneralTools::Tock_ns(spTimestamp tick_time) {
+  spTimestamp tock_time = std::chrono::high_resolution_clock::now();
+  return std::chrono::duration_cast<std::chrono::nanoseconds>( tock_time - tick_time ).count();
+}
+
 double spGeneralTools::TickTock_ms(spTimestamp tick_time,spTimestamp tock_time) {
   return std::chrono::duration_cast<std::chrono::milliseconds>( tock_time - tick_time ).count();
 }

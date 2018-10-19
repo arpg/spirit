@@ -55,7 +55,7 @@ void optitrack_pose_handler(hal::PoseMsg& PoseData) {
     } else if(yaw_diff<-SP_PI){
       yaw_diff = 2*SP_PI+yaw_diff;
     }
-    //optistate_.rotvel[2] = inv_time_dif*yaw_diff;
+    //optistate_.rotvel[2] = inlinv_time_dif*yaw_diff;
     double yaw_rate = inv_time_dif*yaw_diff;
 
     // filter yaw rate with averaging filter

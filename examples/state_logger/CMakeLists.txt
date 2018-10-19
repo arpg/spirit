@@ -20,7 +20,7 @@ target_link_libraries(state_logger
   dl
 )
 
-add_executable( calibrate_model calibrate_model.cpp)
+add_executable( calibrate_model calibrate_model.cpp AnalyticalCalibCostFunc.h LogParser.h)
 target_link_libraries(calibrate_model
   ${HAL_LIBRARIES}
   ${spirit_LIBRARIES}

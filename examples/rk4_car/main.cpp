@@ -6,8 +6,7 @@
 
 int main(int argc, char** argv) {
 
-  RK4 rk4solver(0.1);
-  rk4solver.RegisterODE(&CarODE);
+  RK4<CarODE> rk4solver(0.1);
 
   Eigen::VectorXd init(10);
   init[0] = 0.01;
@@ -30,7 +29,7 @@ int main(int argc, char** argv) {
 //return 0;
 
   spTimestamp t0 = spGeneralTools::Tick();
-  Eigen::ArrayXXd traj = rk4solver.Solve(init,u,100);
+  Eigen::MatrixXd traj = rk4solver.Solve(init,u,100);
   double calc_time = spGeneralTools::Tock_us(t0);
   std::cout << "traj cols " << traj.cols() << std::endl;
   std::cout << "traj rows " << traj.rows() << std::endl;

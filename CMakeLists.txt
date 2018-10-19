@@ -17,7 +17,7 @@ include(install_package)
 option( BUILD_SHARED_LIBS "Build shared libraries." ON )
 
 # Default flags.
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -O0")
 
 IF(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
@@ -85,6 +85,8 @@ set( HDRS
 	include/spirit/RK4.h
 	include/spirit/CarODE.h
 	include/spirit/LogBarrierLossFunc.h
+	include/spirit/ODEInterface.h
+	include/spirit/CalibDerCarODE.h
 	)
 
 set( SRCS
@@ -107,7 +109,7 @@ set( SRCS
 	src/spTrajectory.cpp
 	src/spMPC.cpp
 	src/spCirclePlanner.cpp
-	src/RK4.cpp
+	#src/RK4.cpp
 	)
 
 OPTION( EXPORT_spirit

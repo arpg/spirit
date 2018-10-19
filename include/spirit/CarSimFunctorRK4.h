@@ -42,8 +42,8 @@ class CarSimFunctorRK4 {
                   std::shared_ptr<spStateSeries> traj_states = nullptr,
                   std::shared_ptr<spState> init_state = nullptr ) {
     Eigen::VectorXd init(10);
-    RK4 rk4solver(0.01);
-    rk4solver.RegisterODE(&CarODE);
+    RK4<CarODE> rk4solver(0.01);
+//    rk4solver.RegisterODE(target_ode);
     if(init_state != nullptr) {
       initial_state_ = *init_state;
     }
