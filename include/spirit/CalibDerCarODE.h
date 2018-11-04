@@ -50,10 +50,10 @@ public:
     double w2_i = x_t[5];
     double w3_i = x_t[6];
     double chi_i = x_t[9];
-    double sigma_i = -u_t[0];//x_t[10];
+    double sigma_i = x_t[10];
 
     double Ix = pp_[0];
-    double Iy = pp_[1];
+    double Iy = pp_[0];
     double Iw = pp_[2];
     double It = pp_[3];
     double mu_n_p0 = pp_[4];

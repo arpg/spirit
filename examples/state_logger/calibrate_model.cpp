@@ -15,6 +15,7 @@ int main(){
   }
 
   log.ComputeStateInputVec();
+  log.ReplaceWithSimData();
 
 //  for(int ii=0; ii<log.state_input_vec_.size();ii++){
 //    if(log.state_input_vec_[ii].data_type==2){
@@ -111,35 +112,71 @@ int main(){
   Eigen::VectorXd max_limits(14);
   for(int ii=0; ii<14; ii++) {
     min_limits[ii] = 0;
-    max_limits[ii] = 1000;
+    max_limits[ii] = 100;
   }
-  ceres::CostFunction* loss_function = new LogBaarrierLossFunc<14>(min_limits,max_limits,1);
-
+//  ceres::CostFunction* loss_function = new LogBaarrierLossFunc<14>(min_limits,max_limits,0.1);
+  ceres::CostFunction* loss_function = new ParamLimitLossFunc<14>(min_limits,max_limits,1000);
   double parameters[num_params];
 
-  parameters[0] = 0.39;
-  parameters[1] = 0.39;
-  parameters[2] = 0.01;
-  parameters[3] = 1.16;
-  parameters[4] = 0.001;
-  parameters[5] = 0.049;
-  parameters[6] = 0.011;
-  parameters[7] = 0.0011;
-  parameters[8] = 0.0009;
-  parameters[9] = 0.0053;
-  parameters[10] = 0.011;
-  parameters[11] = 0.001;
-  parameters[12] = 0.001;
-  parameters[13] = 5;
+//  parameters[0] = 4.392;
+//  parameters[1] = 4.392;
+//  parameters[2] = 0.0636;
+//  parameters[3] = 12.69;
+//  parameters[4] = 14.83;
+//  parameters[5] = 84.16;
+//  parameters[6] = 1.024;
+//  parameters[7] = 1.1790;
+//  parameters[8] = 7.07;
+//  parameters[9] = 1.059;
+//  parameters[10] = 1.118;
+//  parameters[11] = 5.72;
+//  parameters[12] = 0.68;
+//  parameters[13] = 4.88;
 
-  problem.AddResidualBlock(calib_cost, NULL, parameters);
+  parameters[0] = 4.392;
+  parameters[1] = 4.392;
+  parameters[2] = 0.1636;
+  parameters[3] = 2.69;
+  parameters[4] = 4.83;
+  parameters[5] = 80.16;
+  parameters[6] = 1.024;
+  parameters[7] = 1.1790;
+  parameters[8] = 2.07;
+  parameters[9] = 1.059;
+  parameters[10] = 1.118;
+  parameters[11] = 5.72;
+  parameters[12] = 0.1;
+  parameters[13] = 1.88;
+
+  problem.AddResidualBlock(calib_cost,new ceres::TukeyLoss(100), parameters);
   problem.AddResidualBlock(loss_function,NULL,parameters);
 
   std::vector<int> fix_param_vec;
-//  fix_param_vec.push_back(0);
-//  fix_param_vec.push_back(1);
-//  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(14,fix_param_vec);
-//  problem.SetParameterization(parameters,subparam);
+  fix_param_vec.push_back(0);
+  fix_param_vec.push_back(1);
+//  fix_param_vec.push_back(2);
+//  fix_param_vec.push_back(3);
+//  fix_param_vec.push_back(4);
+//  fix_param_vec.push_back(5);
+//  fix_param_vec.push_back(6);
+//  fix_param_vec.push_back(7);
+//  fix_param_vec.push_back(8);
+//  fix_param_vec.push_back(9);
+//  fix_param_vec.push_back(10);
+//  fix_param_vec.push_back(11);
+//  fix_param_vec.push_back(12);
+//  fix_param_vec.push_back(13);
+  ceres::SubsetParameterization* subparam = new ceres::SubsetParameterization(14,fix_param_vec);
+  problem.SetParameterization(parameters,subparam);
+
+//  ceres::Problem::EvaluateOptions opt;
+//  double cost = 0;
+//  for (int ii = 0; ii < 100; ++ii) {
+//    parameters[12] = 0.1+1*ii/99.0;
+//    problem.Evaluate(opt,&cost,nullptr,nullptr,nullptr);
+//    std::cout << parameters[12] << ", " << cost << std::endl;
+//  }
+//SPERROREXIT("done");
 
   // Run the solver!
   ceres::Solver::Options options;
@@ -150,16 +187,16 @@ int main(){
 //  options.max_consecutive_nonmonotonic_steps = 10;
 //  options.max_num_consecutive_invalid_steps = 2;
 //  options.min_relative_decrease = 1e-3;
-  options.parameter_tolerance = 1e-6;
+//  options.parameter_tolerance = 1e-6;
 //  options.max_trust_region_radius = 0.1;
 //  options.function_tolerance = 1e-6;
 //  options.gradient_tolerance = 1e-4;
 //  options.use_nonmonotonic_steps = true;
   options.max_num_iterations = 1000;
   options.minimizer_progress_to_stdout = true;
-//  options.gradient_check_numeric_derivative_relative_step_size = 0.1;
-//  options.gradient_check_relative_precision = 1e-1;
-  options.check_gradients = false;
+  options.gradient_check_numeric_derivative_relative_step_size = 0.01;
+  options.gradient_check_relative_precision = 1e-3;
+//  options.check_gradients = true;
   ceres::Solver::Summary summary;
   ceres::Solve(options, &problem, &summary);
 

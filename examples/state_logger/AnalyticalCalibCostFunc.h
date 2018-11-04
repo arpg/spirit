@@ -11,7 +11,7 @@
 class AnalyticalCalibCostFunc : public ceres::DynamicCostFunction {
  public:
   AnalyticalCalibCostFunc(const LogParser& log, unsigned int num_params) : log_(log) {
-    SetNumResiduals(log.GetNumMeaseurements());
+    SetNumResiduals(log.GetNumMeaseurements()-5);
     AddParameterBlock(num_params);
     std::cout << "residual size is " << num_residuals() << std::endl;
   }
@@ -56,117 +56,104 @@ class AnalyticalCalibCostFunc : public ceres::DynamicCostFunction {
       double time_diff;
       int row_count = 0;
 
-      std::ofstream myfile;
-      myfile.open("path.csv",std::ofstream::trunc);
+//      std::ofstream myfile;
+//      myfile.open("path.csv",std::ofstream::trunc);
 
-//      std::ofstream myfile2;
-//      myfile2.open("path2.csv",std::ofstream::trunc);
-
-
-      for(unsigned long int ii=0; ii<log_.state_input_vec_.size()-1; ii++){
+      for(unsigned long int ii=1; ii<log_.state_input_vec_.size()-1; ii++){
         curr_u[0] = log_.state_input_vec_[ii].input[0];
         curr_u[1] = log_.state_input_vec_[ii].input[1];
         time_diff = log_.state_input_vec_[ii+1].timestamp - log_.state_input_vec_[ii].timestamp;
         rk4solver.SolveOnce(curr_state,curr_u,time_diff,iter_jac);
 
-        double linvel_x = std::cos(curr_state[9])*curr_state[0] - std::sin(curr_state[9])*curr_state[1];
-        double linvel_y = std::sin(curr_state[9])*curr_state[0] + std::cos(curr_state[9])*curr_state[1];
+//        double linvel_x = std::cos(curr_state[9])*curr_state[0] - std::sin(curr_state[9])*curr_state[1];
+//        double linvel_y = std::sin(curr_state[9])*curr_state[0] + std::cos(curr_state[9])*curr_state[1];
 
-        for(int ii=0; ii<11; ii++){
-          if(ii==0){
-            myfile << linvel_x << ",";
-          } else if(ii==1){
-            myfile << linvel_y << ",";
-          } else {
-            myfile << curr_state[ii] << ",";
-          }
-        }
-        myfile << "\n";
+//        for(int ii=0; ii<11; ii++){
+//          if(ii==0){
+//            myfile << linvel_x << ",";
+//          } else if(ii==1){
+//            myfile << linvel_y << ",";
+//          } else {
+//            myfile << curr_state[ii] << ",";
+//          }
+//        }
+//        myfile << "\n";
+
+        int ind = 0;
+        Eigen::VectorXd zer(14);
+        zer = Eigen::VectorXd::Zero(14);
 
         if(log_.state_input_vec_[ii+1].data_type == 1){
-
           jac.row(row_count) = iter_jac.row(3);
+//          zer[ind] = iter_jac.row(3)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[3] - log_.state_input_vec_[ii+1].state[0];
-          res[row_count] *= 0.1;
+//          res[row_count] *= 0.1;
           row_count++;
           jac.row(row_count) = iter_jac.row(4);
+//          zer[ind] = iter_jac.row(4)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[4] - log_.state_input_vec_[ii+1].state[1];
-          res[row_count] *= 0.1;
+//          res[row_count] *= 0.1;
           row_count++;
           jac.row(row_count) = iter_jac.row(5);
+//          zer[ind] = iter_jac.row(5)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[5] - log_.state_input_vec_[ii+1].state[2];
-          res[row_count] *= 0.1;
+//          res[row_count] *= 0.1;
           row_count++;
           jac.row(row_count) = iter_jac.row(6);
+//          zer[ind] = iter_jac.row(6)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[6] - log_.state_input_vec_[ii+1].state[3];
-          res[row_count] *= 0.1;
+//          res[row_count] *= 0.1;
           row_count++;
           jac.row(row_count) = iter_jac.row(10);
+//          zer[ind] = iter_jac.row(10)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[10] - log_.state_input_vec_[ii+1].state[4];
           row_count++;
-
-//          for(int jj=0; jj<11; jj++){
-//            if((jj<=6)&&(jj>=3)){
-//              myfile2 << log_.state_input_vec_[ii+1].state[jj-3] << ",";
-//            } else if (jj==10) {
-//              myfile2 << log_.state_input_vec_[ii+1].state[jj-6] << ",";
-//            } else {
-//              myfile2 << 0 << ",";
-//            }
-//          }
-//          myfile2 << "\n";
         }
 
         if(log_.state_input_vec_[ii+1].data_type == 2){
-//          Eigen::VectorXd zer(14);
-//          zer = Eigen::VectorXd::Zero(14);
-
           jac.row(row_count) = iter_jac.row(7);
+//          zer[ind] = iter_jac.row(7)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[7] - log_.state_input_vec_[ii+1].state[0];
-          res[row_count] *= 10;
+//          res[row_count] *= 10;
           row_count++;
           jac.row(row_count) = iter_jac.row(8);
+//          zer[ind] = iter_jac.row(8)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[8] - log_.state_input_vec_[ii+1].state[1];
-          res[row_count] *= 10;
+//          res[row_count] *= 10;
           row_count++;
           jac.row(row_count) = iter_jac.row(9);
+//          zer[ind] = iter_jac.row(9)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[9] - log_.state_input_vec_[ii+1].state[2];
-          res[row_count] *= 0.1;
+//          res[row_count] *= 0.1;
           row_count++;
 
           jac.row(row_count) = iter_jac.row(0);
+//          zer[ind] = iter_jac.row(0)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[0] - log_.state_input_vec_[ii+1].state[3];
           row_count++;
           jac.row(row_count) = iter_jac.row(1);
+//          zer[ind] = iter_jac.row(1)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[1] - log_.state_input_vec_[ii+1].state[4];
           row_count++;
           jac.row(row_count) = iter_jac.row(2);
+//          zer[ind] = iter_jac.row(2)[ind];
+//          jac.row(row_count) = zer;
           res[row_count] = curr_state[2] - log_.state_input_vec_[ii+1].state[5];
           row_count++;
-
-//          double chi = log_.state_input_vec_[ii+1].state[2];
-//          double linx = std::cos(chi)*log_.state_input_vec_[ii+1].state[3] - std::sin(chi)*log_.state_input_vec_[ii+1].state[4];
-//          double liny = std::sin(chi)*log_.state_input_vec_[ii+1].state[3] + std::cos(chi)*log_.state_input_vec_[ii+1].state[4];
-//          for(int jj=0; jj<11; jj++){
-//            if(jj==0){
-//              myfile2 << linx << ",";
-//            } else if(jj==1){
-//              myfile2 << liny << ",";
-//            } else if(jj==2){
-//                myfile2 << log_.state_input_vec_[ii+1].state[5] << ",";
-//            } else if ((jj>=7)&&(jj<=9)) {
-//              myfile2 << log_.state_input_vec_[ii+1].state[jj-7] << ",";
-//            } else {
-//              myfile2 << 0 << ",";
-//            }
-//          }
-//          myfile2 << "\n";
-
         }
       }
 
-      myfile.close();
-//      myfile2.close();
+//      myfile.close();
 
 //      std::cout << " jac is \n" << jac << std::endl;
 //      std::cout << "res is " << res << std::endl;
@@ -176,7 +163,6 @@ class AnalyticalCalibCostFunc : public ceres::DynamicCostFunction {
 
     } else if (residuals != NULL) {
       Eigen::Map<Eigen::VectorXd> res(residuals,num_residuals());
-      std::cout << "doing residuals" << std::endl;
       // create a RK4 solver object
       RK4<CalibDerODE> rk4solver(0.01);
 
@@ -209,7 +195,7 @@ class AnalyticalCalibCostFunc : public ceres::DynamicCostFunction {
       double time_diff;
       int row_count = 0;
 
-      for(unsigned long int ii=0; ii<log_.state_input_vec_.size()-1; ii++){
+      for(unsigned long int ii=1; ii<log_.state_input_vec_.size()-1; ii++){
         curr_u[0] = log_.state_input_vec_[ii].input[0];
         curr_u[1] = log_.state_input_vec_[ii].input[1];
         time_diff = log_.state_input_vec_[ii+1].timestamp - log_.state_input_vec_[ii].timestamp;
@@ -217,16 +203,16 @@ class AnalyticalCalibCostFunc : public ceres::DynamicCostFunction {
 
         if(log_.state_input_vec_[ii+1].data_type == 1){
           res[row_count] = curr_state[3] - log_.state_input_vec_[ii+1].state[0];
-          res[row_count] *= 0.1;
+//          res[row_count] *= 0.1;
           row_count++;
           res[row_count] = curr_state[4] - log_.state_input_vec_[ii+1].state[1];
-          res[row_count] *= 0.1;
+//          res[row_count] *= 0.1;
           row_count++;
           res[row_count] = curr_state[5] - log_.state_input_vec_[ii+1].state[2];
-          res[row_count] *= 0.1;
+//          res[row_count] *= 0.1;
           row_count++;
           res[row_count] = curr_state[6] - log_.state_input_vec_[ii+1].state[3];
-          res[row_count] *= 0.1;
+//          res[row_count] *= 0.1;
           row_count++;
           res[row_count] = curr_state[10] - log_.state_input_vec_[ii+1].state[4];
           row_count++;
@@ -234,13 +220,13 @@ class AnalyticalCalibCostFunc : public ceres::DynamicCostFunction {
 
         if(log_.state_input_vec_[ii+1].data_type == 2){
           res[row_count] = curr_state[7] - log_.state_input_vec_[ii+1].state[0];
-          res[row_count] *= 10;
+//          res[row_count] *= 10;
           row_count++;
           res[row_count] = curr_state[8] - log_.state_input_vec_[ii+1].state[1];
-          res[row_count] *= 10;
+//          res[row_count] *= 10;
           row_count++;
           res[row_count] = curr_state[9] - log_.state_input_vec_[ii+1].state[2];
-          res[row_count] *= 0.1;
+//          res[row_count] *= 0.1;
           row_count++;
 
           res[row_count] = curr_state[0] - log_.state_input_vec_[ii+1].state[3];

@@ -37,7 +37,7 @@ class ParamLimitLossFunc : public ceres::SizedCostFunction<tsize,tsize> {
         }
       }
       jac = jac_vec.asDiagonal();
-      std::cout << "jac vec " << jac_vec.transpose() << std::endl;
+//      std::cout << "jac vec " << jac_vec.transpose() << std::endl;
 
 
       // Residual Calculation

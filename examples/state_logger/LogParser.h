@@ -3,6 +3,9 @@
 
 #include <fstream>
 #include <string>
+//#include <Eigen/Eigen>
+#include <spirit/spirit.h>
+#include <spirit/CalibDerCarODE.h>
 
 
 struct LogSample{
@@ -66,6 +69,132 @@ public:
     } else if(state_input_vec_[0].data_type == 2){
       num_measurements_ -= 6;
     }
+  }
+
+  void ReplaceWithSimData(){
+    RK4<CalibDerODE> rk4solver(0.01);
+    Eigen::VectorXd params(14);
+    params[0] = 4.392;
+    params[1] = 4.392;
+    params[2] = 0.0636;
+    params[3] = 12.69;
+    params[4] = 14.83;
+    params[5] = 84.16;
+    params[6] = 1.024;
+    params[7] = 1.1790;
+    params[8] = 7.07;
+    params[9] = 1.059;
+    params[10] = 1.118;
+    params[11] = 5.72;
+    params[12] = 0.68;
+    params[13] = 4.88;
+    rk4solver.SetParameterVec(params);
+    Eigen::MatrixXd iter_jac(11,14);
+    Eigen::VectorXd curr_u(2);
+    Eigen::VectorXd curr_state(11);
+    curr_state = Eigen::VectorXd::Zero(11);
+    if(state_input_vec_[1].data_type == 1){
+      curr_state[3] = state_input_vec_[1].state[0];
+      curr_state[4] = state_input_vec_[1].state[1];
+      curr_state[5] = state_input_vec_[1].state[2];
+      curr_state[6] = state_input_vec_[1].state[3];
+      curr_state[10] = state_input_vec_[1].state[4];
+      std::cout << "got type 1"<< std::endl;
+    }
+    if(state_input_vec_[0].data_type == 2){
+      curr_state[7] = state_input_vec_[0].state[0];
+      curr_state[8] = state_input_vec_[0].state[1];
+      curr_state[9] = state_input_vec_[0].state[2];
+      curr_state[0] = state_input_vec_[0].state[3];
+      curr_state[1] = state_input_vec_[0].state[4];
+      curr_state[2] = state_input_vec_[0].state[5];
+      std::cout << "got type 2"<< std::endl;
+    }
+
+    if(curr_state[0] == 0){
+      curr_state[0] = 0.01;
+    }
+
+    double time_diff;
+
+    for(int ii=1; ii<state_input_vec_.size()-1; ii++){
+      curr_u[0] = state_input_vec_[ii].input[0];
+      curr_u[1] = state_input_vec_[ii].input[1];
+      time_diff = state_input_vec_[ii+1].timestamp - state_input_vec_[ii].timestamp;
+      rk4solver.SolveOnce(curr_state,curr_u,time_diff,iter_jac);
+
+      if(state_input_vec_[ii+1].data_type == 1){
+        state_input_vec_[ii+1].state[0] = curr_state[3];
+        state_input_vec_[ii+1].state[1] = curr_state[4];
+        state_input_vec_[ii+1].state[2] = curr_state[5];
+        state_input_vec_[ii+1].state[3] = curr_state[6];
+        state_input_vec_[ii+1].state[4] = curr_state[10];
+      }
+      if(state_input_vec_[ii+1].data_type == 2){
+        state_input_vec_[ii+1].state[0] = curr_state[7];
+        state_input_vec_[ii+1].state[1] = curr_state[8];
+        state_input_vec_[ii+1].state[2] = curr_state[9];
+        state_input_vec_[ii+1].state[3] = curr_state[0];
+        state_input_vec_[ii+1].state[4] = curr_state[1];
+        state_input_vec_[ii+1].state[5] = curr_state[2];
+      }
+    }
+
+    if(state_input_vec_[1].data_type == 1){
+      curr_state[3] = state_input_vec_[1].state[0];
+      curr_state[4] = state_input_vec_[1].state[1];
+      curr_state[5] = state_input_vec_[1].state[2];
+      curr_state[6] = state_input_vec_[1].state[3];
+      curr_state[10] = state_input_vec_[1].state[4];
+      std::cout << "got type 1"<< std::endl;
+    }
+    if(state_input_vec_[0].data_type == 2){
+      curr_state[7] = state_input_vec_[0].state[0];
+      curr_state[8] = state_input_vec_[0].state[1];
+      curr_state[9] = state_input_vec_[0].state[2];
+      curr_state[0] = state_input_vec_[0].state[3];
+      curr_state[1] = state_input_vec_[0].state[4];
+      curr_state[2] = state_input_vec_[0].state[5];
+      std::cout << "got type 2"<< std::endl;
+    }
+
+    if(curr_state[0] == 0){
+      curr_state[0] = 0.01;
+    }
+    for(int ii=1; ii<state_input_vec_.size()-1; ii++){
+      curr_u[0] = state_input_vec_[ii].input[0];
+      curr_u[1] = state_input_vec_[ii].input[1];
+      time_diff = state_input_vec_[ii+1].timestamp - state_input_vec_[ii].timestamp;
+      rk4solver.SolveOnce(curr_state,curr_u,time_diff,iter_jac);
+
+      if(state_input_vec_[ii+1].data_type == 1){
+        if((state_input_vec_[ii+1].state[0] == curr_state[3])&&
+        (state_input_vec_[ii+1].state[1] == curr_state[4])&&
+        (state_input_vec_[ii+1].state[2] == curr_state[5])&&
+        (state_input_vec_[ii+1].state[3] == curr_state[6])&&
+        (state_input_vec_[ii+1].state[4] == curr_state[10])){
+          //nothing
+        } else{
+          std::cout << "err" << (state_input_vec_[ii+1].state[0] - curr_state[3]) << std::endl;
+          SPERROREXIT("not matching 1");
+        }
+      }
+      if(state_input_vec_[ii+1].data_type == 2){
+        if((state_input_vec_[ii+1].state[0] == curr_state[7])&&
+        (state_input_vec_[ii+1].state[1] == curr_state[8])&&
+        (state_input_vec_[ii+1].state[2] == curr_state[9])&&
+        (state_input_vec_[ii+1].state[3] == curr_state[0])&&
+        (state_input_vec_[ii+1].state[4] == curr_state[1])&&
+        (state_input_vec_[ii+1].state[5] == curr_state[2])){
+          // nothing
+        } else {
+          SPERROREXIT("not matching 2");
+        }
+
+
+      }
+    }
+
   }
 
   bool ParseCsvLog(){
