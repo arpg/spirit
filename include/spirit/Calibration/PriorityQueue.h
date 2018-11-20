@@ -124,7 +124,6 @@ private:
     options.linear_solver_type = ceres::DENSE_QR;
     options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
     options.minimizer_progress_to_stdout = false;
-    options.num_linear_solver_threads = 1;
     ceres::Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
 //    std::cout << summary.FullReport() << std::endl;

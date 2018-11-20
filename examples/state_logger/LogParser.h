@@ -74,20 +74,37 @@ public:
   void ReplaceWithSimData(){
     RK4<CalibDerODE> rk4solver(0.01);
     Eigen::VectorXd params(14);
+//    params[0] = 4.392;
+//    params[1] = 4.392;
+//    params[2] = 0.0636;
+//    params[3] = 12.69;
+//    params[4] = 14.83;
+//    params[5] = 84.16;
+//    params[6] = 1.024;
+//    params[7] = 1.1790;
+//    params[8] = 7.07;
+//    params[9] = 1.059;
+//    params[10] = 1.118;
+//    params[11] = 5.72;
+//    params[12] = 0.68;
+//    params[13] = 4.88;
     params[0] = 4.392;
     params[1] = 4.392;
-    params[2] = 0.0636;
-    params[3] = 12.69;
-    params[4] = 14.83;
-    params[5] = 84.16;
-    params[6] = 1.024;
-    params[7] = 1.1790;
-    params[8] = 7.07;
-    params[9] = 1.059;
-    params[10] = 1.118;
-    params[11] = 5.72;
-    params[12] = 0.68;
-    params[13] = 4.88;
+    params[2] = 0.636;
+    params[3] = 1.01;
+
+    params[4] = 0.4;
+    params[5] = 0.0001;
+    params[6] = 0;
+    params[7] = 1;
+
+    params[8] = 0.0001;
+    params[9] = 0.0001;
+    params[10] = 0;
+    params[11] = 1;
+
+    params[12] = 0.01;
+    params[13] = 4.9;
     rk4solver.SetParameterVec(params);
     Eigen::MatrixXd iter_jac(11,14);
     Eigen::VectorXd curr_u(2);
