@@ -38,7 +38,7 @@ class AnalyticalCalibCostFunc : public ceres::DynamicCostFunction {
         curr_state[4] = log_.state_input_vec_[1].state[1];
         curr_state[5] = log_.state_input_vec_[1].state[2];
         curr_state[6] = log_.state_input_vec_[1].state[3];
-        curr_state[10] = -log_.state_input_vec_[1].state[4];
+        curr_state[10] = log_.state_input_vec_[1].state[4];
       }
       if(log_.state_input_vec_[0].data_type == 2){
         curr_state[7] = log_.state_input_vec_[0].state[0];

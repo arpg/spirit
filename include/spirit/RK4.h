@@ -121,7 +121,7 @@ private:
     target_ode_.Run(k4,x_t+int_step_*k3,u_t);
     x_t = x_t+(int_step_/6.0)*(k1+2*k2+2*k3+k4);
 
-    // Sina: this is a hack, move rotation angle wrap around to somewhere appropriate
+    // TODO: this is a hack, move rotation angle wrap around to somewhere appropriate
     double chi_mod = std::fmod(x_t[9]+SP_PI,2*SP_PI);
     if(chi_mod<0){
       chi_mod += 2*SP_PI;

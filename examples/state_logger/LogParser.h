@@ -252,7 +252,7 @@ public:
         sample.data[3] = vx;
         sample.data[4] = vy;
       }if(sample.data_type == 1){
-        sample.data[4] /= 1.91;
+        sample.data[4] /= -1.91;
       }
 
       logvec_.push_back(sample);
