@@ -5,14 +5,15 @@
 #include <spirit/BikeParameters.h>
 #include <math.h>
 #include <spirit/spMeshFunctions.h>
+#include <vector>
 //gprof tool
 //openmp
 
 int main(int argc, char** argv){
 
     // Testing threads
-    unsigned int n = std::thread::hardware_concurrency();
-    std::cout<<n<<" concurrent threads supported"<<std::endl;
+    //unsigned int n = std::thread::hardware_concurrency();
+    //std::cout<<n<<" concurrent threads supported"<<std::endl;
 
     // Testing OSG Gui
     // create ground
@@ -39,6 +40,7 @@ int main(int argc, char** argv){
     gui.AddObject(objs->GetObject(mesh_handle));
     spBike& bike = ((spBike&)objs->GetObject(bike_handle));
 
+// /*
     spTrajectory traj(gui, objs);
 
     // waypoints
@@ -49,12 +51,12 @@ int main(int argc, char** argv){
     traj.AddWaypoint(pose0,1,spLinVel(1,0,0));
 
     spPose pose1(spPose::Identity());
-    pose1.translate(spTranslation(-4,-1,0.5));
+    pose1.translate(spTranslation(-4.3,-1,1));
     Eigen::AngleAxisd rot1(SP_PI,Eigen::Vector3d::UnitZ());
     pose1.rotate(rot1);
     traj.AddWaypoint(pose1,1,spLinVel(1,0,0));
 
-    /*
+     /*
     spPose pose2(spPose::Identity());
     pose2.translate(spTranslation(0,0.5,0.06));
     Eigen::AngleAxisd rot2(0,Eigen::Vector3d::UnitZ());
@@ -65,12 +67,12 @@ int main(int argc, char** argv){
     pose3.translate(spTranslation(1,0,0.06));
     Eigen::AngleAxisd rot3(-SP_PI/2,Eigen::Vector3d::UnitZ());
     pose3.rotate(rot3);
-    traj.AddWaypoint(pose3,1,spLinVel(1,0,0)); */
+    traj.AddWaypoint(pose3,1,spLinVel(1,0,0));
+    */
 
     // is trajectory in a loop
     traj.IsLoop(true);
 
-     /*
     // Solve local plan
     // set to true, each waypoint in connected to each other in order created
     spLocalPlanner<MeshBikeSimFunctorRK4> localplanner(params.bike_param, true, &gui);
@@ -84,9 +86,10 @@ int main(int argc, char** argv){
         traj.SetTravelDuration(ii, 0.5); // 0.5 init cond
         localplanner.SolveInitialPlan(traj, ii); // seed init cond for path
         localplanner.SolveLocalPlan(traj); // solve path
-        std::cout << "Frequency " << (double)(1/(spGeneralTools::Tock_ms(t0)/1000)) << " Hz" << std::endl;
+        //std::cout << "Frequency " << (double)(1/(spGeneralTools::Tock_ms(t0)/1000)) << " Hz" << std::endl;
 
-    } // */
+    }
+// */
 
     // set cars initial pose
     spState state;
@@ -98,12 +101,11 @@ int main(int argc, char** argv){
     std::shared_ptr<spState> state_ptr = std::make_shared<spState>(state);
 
 
-    // /*
     // MPC reference tracking
-    float horizon = .1;
+    float horizon = .01;
     spMPC<MeshBikeSimFunctorRK4> mpc(params.bike_param, horizon);
     MeshBikeSimFunctorRK4 mysim(params.bike_param,state);
-    // */
+
 
     spCtrlPts2ord_2dof inputcmd_curve;
     double sf = 0;
@@ -115,13 +117,14 @@ int main(int argc, char** argv){
     while(!gui.ShouldQuit()){
         spTimestamp t0 = spGeneralTools::Tick();
 
-        ///*
+         /*
         mysim(0,1,0.1,inputcmd_curve,0,0,nullptr,state_ptr);
         bike.SetState(mysim.GetState());
         gui.Iterate(objs);
         // */
 
-        /*
+         // /*
+        std::cout<<"Sim starting"<<std::endl;
         mpc.CalculateControls(traj, state, inputcmd_curve);
         mysim(0,(int)(horizon/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,inputcmd_curve,0,-1,0,state_ptr);
         for(int ii=0; ii<(int)(horizon/DISCRETIZATION_STEP_SIZE); ii++){
@@ -140,10 +143,7 @@ int main(int argc, char** argv){
         double calc_time = spGeneralTools::Tock_ms(t0);
         //std::this_thread::sleep_for(std::chrono::milliseconds(10));
         std::cout << "Frequency " << (double)(1/(calc_time/1000)) << " Hz" << std::endl;
-
     }
-
-
     return 0;
 }
 
