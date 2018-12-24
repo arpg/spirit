@@ -40,7 +40,7 @@ int main(int argc, char** argv){
     gui.AddObject(objs->GetObject(mesh_handle));
     spBike& bike = ((spBike&)objs->GetObject(bike_handle));
 
-// /*
+ /*
     spTrajectory traj(gui, objs);
 
     // waypoints
@@ -56,7 +56,7 @@ int main(int argc, char** argv){
     pose1.rotate(rot1);
     traj.AddWaypoint(pose1,1,spLinVel(1,0,0));
 
-     /*
+
     spPose pose2(spPose::Identity());
     pose2.translate(spTranslation(0,0.5,0.06));
     Eigen::AngleAxisd rot2(0,Eigen::Vector3d::UnitZ());
@@ -68,7 +68,7 @@ int main(int argc, char** argv){
     Eigen::AngleAxisd rot3(-SP_PI/2,Eigen::Vector3d::UnitZ());
     pose3.rotate(rot3);
     traj.AddWaypoint(pose3,1,spLinVel(1,0,0));
-    */
+
 
     // is trajectory in a loop
     traj.IsLoop(true);
@@ -89,13 +89,13 @@ int main(int argc, char** argv){
         //std::cout << "Frequency " << (double)(1/(spGeneralTools::Tock_ms(t0)/1000)) << " Hz" << std::endl;
 
     }
-// */
+ */
 
     // set cars initial pose
     spState state;
-    state.pose = traj.GetWaypoint(0).GetPose();
-    //Eigen::AngleAxisd rot(SP_PI,Eigen::Vector3d::UnitZ());
-    //state.pose.rotate(rot);
+    //state.pose = traj.GetWaypoint(0).GetPose();
+    Eigen::AngleAxisd rot(SP_PI,Eigen::Vector3d::UnitZ());
+    state.pose.rotate(rot);
     state.pose.translate(spTranslation(0,0,0));
     bike.SetState(state);
     std::shared_ptr<spState> state_ptr = std::make_shared<spState>(state);
@@ -117,13 +117,13 @@ int main(int argc, char** argv){
     while(!gui.ShouldQuit()){
         spTimestamp t0 = spGeneralTools::Tick();
 
-         /*
+         ///*
         mysim(0,1,0.1,inputcmd_curve,0,0,nullptr,state_ptr);
         bike.SetState(mysim.GetState());
         gui.Iterate(objs);
         // */
 
-         // /*
+          /*
         std::cout<<"Sim starting"<<std::endl;
         mpc.CalculateControls(traj, state, inputcmd_curve);
         mysim(0,(int)(horizon/DISCRETIZATION_STEP_SIZE),DISCRETIZATION_STEP_SIZE,inputcmd_curve,0,-1,0,state_ptr);
