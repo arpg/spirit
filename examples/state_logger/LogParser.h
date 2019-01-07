@@ -73,39 +73,26 @@ public:
 
   void ReplaceWithSimData(){
     RK4<CalibDerODE> rk4solver(0.01);
-    Eigen::VectorXd params(14);
-//    params[0] = 4.392;
-//    params[1] = 4.392;
-//    params[2] = 0.0636;
-//    params[3] = 12.69;
-//    params[4] = 14.83;
-//    params[5] = 84.16;
-//    params[6] = 1.024;
-//    params[7] = 1.1790;
-//    params[8] = 7.07;
-//    params[9] = 1.059;
-//    params[10] = 1.118;
-//    params[11] = 5.72;
-//    params[12] = 0.68;
-//    params[13] = 4.88;
-    params[0] = 4.392;
-    params[1] = 4.392;
-    params[2] = 0.636;
-    params[3] = 1.01;
+    Eigen::VectorXd parameters(14);
 
-    params[4] = 0.4;
-    params[5] = 0.0001;
-    params[6] = 0;
-    params[7] = 1;
+    parameters[0] = 4.392;
+    parameters[1] = 4.392;
+    parameters[2] = 0.0636;
+    parameters[3] = 0.001;
 
-    params[8] = 0.0001;
-    params[9] = 0.0001;
-    params[10] = 0;
-    params[11] = 1;
+    parameters[4] = 0.4;
+    parameters[5] = 0;
+    parameters[6] = 1;
+    parameters[7] = 0;
 
-    params[12] = 0.01;
-    params[13] = 4.9;
-    rk4solver.SetParameterVec(params);
+    parameters[8] = 20;
+    parameters[9] = 0;
+    parameters[10] = 1;
+    parameters[11] = 0;
+
+    parameters[12] = 0.01;
+    parameters[13] = 0.04;
+    rk4solver.SetParameterVec(parameters);
     Eigen::MatrixXd iter_jac(11,14);
     Eigen::VectorXd curr_u(2);
     Eigen::VectorXd curr_state(11);
@@ -253,6 +240,23 @@ public:
         sample.data[4] = vy;
       }if(sample.data_type == 1){
         sample.data[4] /= -1.91;
+        // this is a hack for messed up wheel order when taking dataset from car
+//        double temp = sample.data[1];
+//        sample.data[1] = sample.data[2];
+//        sample.data[2] = sample.data[3];
+//        sample.data[3] = temp;
+
+//        double temp = sample.data[3];
+//        sample.data[3] = sample.data[2];
+//        sample.data[2] = sample.data[0];
+//        sample.data[0] = temp;
+
+        double temp = sample.data[0];
+        sample.data[0] = sample.data[1];
+        sample.data[1] = sample.data[3];
+        sample.data[2] = sample.data[2];
+        sample.data[3] = temp;
+
       }
 
       logvec_.push_back(sample);

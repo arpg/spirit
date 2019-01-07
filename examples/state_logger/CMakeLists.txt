@@ -35,3 +35,11 @@ target_link_libraries(calibrate_model
   ${CeresSolver_LIBRARIES}
   dl
 )
+
+add_executable( sample_traj sample_traj.cpp AnalyticalCalibCostFunc.h LogParser.h)
+target_link_libraries(sample_traj
+  ${HAL_LIBRARIES}
+  ${spirit_LIBRARIES}
+  ${CeresSolver_LIBRARIES}
+  dl
+)

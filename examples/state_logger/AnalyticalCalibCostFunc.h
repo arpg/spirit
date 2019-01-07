@@ -77,6 +77,7 @@ class AnalyticalCalibCostFunc : public ceres::DynamicCostFunction {
             myfile << curr_state[ii] << ",";
           }
         }
+        myfile << log_.state_input_vec_[ii+1].timestamp << ",";
         myfile << "\n";
 
         if(log_.state_input_vec_[ii+1].data_type == 1){

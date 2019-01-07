@@ -125,10 +125,16 @@ void CarSensorCallback(hal::CarStateMsg msg) {
     static double buf3[buf_size];
     static unsigned int last_index_ptr = 0;
 
+    // BUG: wheel order is messed up, change this later to following commented code as well as the hack on LogParser.h
+//    buf0[last_index_ptr] = msg.wheel_speed_fl();
+//    buf1[last_index_ptr] = msg.wheel_speed_fr();
+//    buf2[last_index_ptr] = msg.wheel_speed_rl();
+//    buf3[last_index_ptr] = msg.wheel_speed_rr();
     buf0[last_index_ptr] = msg.wheel_speed_fl();
-    buf1[last_index_ptr] = msg.wheel_speed_fr();
-    buf2[last_index_ptr] = msg.wheel_speed_rl();
-    buf3[last_index_ptr] = msg.wheel_speed_rr();
+    buf1[last_index_ptr] = msg.wheel_speed_rl();
+    buf2[last_index_ptr] = msg.wheel_speed_rr();
+    buf3[last_index_ptr] = msg.wheel_speed_fr();
+
     if(last_index_ptr==buf_size-1){
         last_index_ptr = 0;
     } else {
@@ -151,6 +157,7 @@ void CarSensorCallback(hal::CarStateMsg msg) {
 
     filemutex_.lock();
     logfile_ << 1 << "," << spGeneralTools::Tock_us(start_timestamp_)*1e-6 << ","
+    // BUG: wheel order is messed up, change this later to following commented code as well as the hack on LogParser.h
              << ws0 << ","
              << ws1 << ","
              << -ws2 << ","
